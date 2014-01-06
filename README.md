@@ -1,4 +1,4 @@
-csvw
+CSVW
 ====
 
 Deliverables of W3C’s [CSV on the Web Working Group](http://www.w3.org/2013/data/csvw). Please consult that page for further details on the goals and deliverables of the that group.
