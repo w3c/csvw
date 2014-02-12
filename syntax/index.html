@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width,initial-scale=1" name="viewport" />
+    <title>Syntax for Tabular Data on the Web</title>
+    <script class="remove" src="http://www.w3.org/Tools/respec/respec-w3c-common">
+		</script>
+    <script class="remove">
+var respecConfig = {
+    specStatus: "ED",
+    shortName: "tabular-syntax",
+    //publishDate:  "2012-12-12",
+    //previousPublishDate:  "",
+    edDraftURI: "http://w3c.github.io/csvw/syntax/",
+    // lcEnd: "3000-01-01",
+    // crEnd: "3000-01-01",
+    editors: [{
+            name: "Jeni Tennison",
+            company: "ODI",
+            companyURL: "http://www.theodi.org/"
+        }],
+    wg: "CSV on the Web",
+    wgURI: "https://www.w3.org/2013/csvw/wiki/Main_Page",
+    wgPublicList: "public-csv-wg",
+    wgPatentURI: "http://www.w3.org/2001/tag/disclosures",
+    otherLinks: [{
+            key: "Repository",
+            data: [{
+                    value: "We are on Github.",
+                    href: "https://github.com/w3c/csvw"
+                }, {
+                    value: "File a bug.",
+                    href: "https://github.com/w3c/csvw"
+                }, {
+                    value: "Commit history.",
+                    href: "https://github.com/w3c/csvw/commits/gh-pages"
+                }
+            ]
+        }
+    ],
+    inlineCSS: true,
+    noIDLIn: true,
+    noLegacyStyle: false
+    };
+    </script>
+    <link href="editorial.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <section id="abstract">
+      <p>
+        Tabular data is routinely transferred on the web as "CSV", but the definition of "CSV" in practice is very loose. This document outlines a basic data model or infoset for tabular data, and the recommended syntax for mapping into that data model.
+      </p>
+    </section>
+    <section id="sotd">
+      <p>
+        This is a draft document which may be merged into another document or eventually make its way into being a standalone Working Draft.
+      </p>
+    </section>
+    <section id="intro">
+      <h2>Introduction</h2>
+    	<p>
+        Tabular data is routinely transferred on the web as "CSV", but the definition of "CSV" in practice is very loose. Some people use the term to mean any delimited text file. Others stick more closely to the most standard definition of CSV that there is, [[!RFC4180]]. <a href="#standards" class="sectionRef"></a> describes the various ways in which CSV is defined.
+      </p>
+    </section>
+    <section id="model">
+      <h2>Tabular Data Model</h2>
+      <p>
+        Data is held in a <dfn>table</dfn>.
+      </p>
+      <p>
+        Each table has one or more <dfn title="column">columns</dfn>, each of which is named. For compatibility with SQL, each column must have a unique name. The names of columns are case sensitive.
+      </p>
+      <p class="issue">
+        Should the order of columns be significant?
+      </p>
+      <p class="issue">
+        In SQL, each column has a type. Should this be part of the generic tabular data model, and if so what types could each column have?
+      </p>
+      <p>
+        Each table has one or more <dfn title="row">rows</dfn>. Each row contains a <dfn>field</dfn> for each column in the table. Some of these fields may be <dfn title="null field">null fields</dfn>.
+      </p>
+      <p class="issue">
+        Should metadata be considered to be part of the core data model for tabular data, for our purposes, or should tabular data be kept very clean and any annotations be considered as being laid over the top of it? Should we have a separate data model for annotated tabular data?
+      </p>
+    </section>
+    <section id="syntax">
+      <h2>CSV+ Syntax</h2>
+      <p>
+        This section defines a standard, CSV-based, syntax for tabular data and how it maps into the tabular data model described in <a href="#model" class="sectionRef"></a>. Compliant applications that output this format must meet each of the constraints.
+      </p>
+      <div class="note">
+        <p>
+          This syntax is not compliant with <code>text/csv</code> as defined in [[!RFC4180]]: it permits characters other than ASCII, and it permits line endings other than <code>CRLF</code>. Supporting the full set of Unicode characters by using UTF-8 and supporting <code>LF</code> line endings are important characteristics for data formats that are used internationally and on non-Windows platforms. However, all files that adhere to [[!RFC4180]]'s definition of CSV are compliant CSV+ files.
+        </p>
+      </div>
+      <section id="encoding">
+        <h3>Encoding</h3>
+        <p>
+          CSV+ files MUST be encoded using UTF-8.
+        </p>
+        <p>
+          To fix up CSV files that use a different encoding, parsers SHOULD detect the encoding of the file through some other mechanism (eg interacting with a user or adopting a default encoding based on locale).
+        </p>
+      </section>
+      <section id="line-endings">
+        <h3>Line Endings</h3>
+        <p>
+          All occurrences of <code>CRLF</code> (<code>U+000D U+000A</code>) within a CSV+ MUST be normalised to <code>LF</code> (<code>U+000A</code>). This is significant within <a title="field">fields</a> that contain line endings.
+        </p>
+        <p>
+          To fix up CSV files that use other line endings, parsers SHOULD replace any <a href="http://en.wikipedia.org/wiki/Newline#Unicode">other line endings</a> used within the document with line feed (<code>U+000A</code>) characters.
+        </p>
+      </section>
+      <section id="lines">
+        <h3>Lines</h3>
+        <p>
+          Each line of a CSV+ file MUST contain the same number of comma-separated values.
+        </p>
+        <p>
+          Values that contain commas, line endings or double quotes MUST be escaped by having the entire value wrapped in double quotes. There MUST NOT be whitespace before or after the double quotes. Within these escaped fields, any double quotes MUST be escaped with two double quotes (<code>""</code>).
+        </p>
+        <p>
+          To fix up delimited files that do not use commas as separators, parsers SHOULD replace the delimiter used within the file with commas and escape any values that contain commas by wrapping in double quotes and escaping any enclosed double quotes by repeating them.
+        </p>
+        <p>
+          To fix up CSV files that have whitespace before or after an escaped value, parsers SHOULD ignore the whitespace.
+        </p>
+        <p>
+          To fix up CSV files in which different lines contain different numbers of values, additional empty values should be added to the end of lines such that they all contain the same number of values as the line with the most values.
+        </p>
+        <section id="headers">
+          <h4>Headers</h4>
+          <p>
+            The first line of a CSV+ file MUST contain a comma-separated list of names of <a title="column">columns</a>. This is known as the <dfn>header line</dfn> and forms the columns of the table. Column names MUST be unique and MUST NOT be blank.
+          </p>
+          <p class="issue">
+            Any constraints on contents of column names? For compatibility?
+          </p>
+          <p>
+            To fix up CSV files that do not have a header line, parsers SHOULD act as if there were a header line with the same number of fields as the first row in the CSV file, numbered sequentially starting at 0 (ie <code>0</code>, <code>1</code> etc).
+          </p>
+          <p class="note">
+            0-based here for better compatibility with fragment identifiers for CSV [[RFC7111]].
+          </p>
+          <p>
+            To fix up CSV files that contain duplicate column names, parsers SHOULD append sequential numbers to any occurrences of a given colum name after the first. For example, if the header row is
+          </p>
+          <pre class="example">
+  name,street,city,country,street,city,country
+          </pre>
+          <p>
+            then the parser should act as if this were
+          </p>
+          <pre class="example">
+  name,street,city,country,street1,city1,country1
+          </pre>
+          <p>
+            To fix up CSV files that have missing or blank columns, parsers SHOULD act as if the blank column name were instead the index of that column (starting from 1). For example, if the header row is
+          </p>
+          <pre class="example">
+  name,,street,city,country
+          </pre>
+          <p>
+            then the parser should act as if this were
+          </p>
+          <pre class="example">
+  name,2,street,city,country
+          </pre>
+        </section>
+      </section>
+
+    </section>
+    <section class="appendix" id="standards">
+      <h2>Existing Standards</h2>
+      <p>
+        This appendix outlines various ways in which CSV is defined.
+      </p>
+      <section id="rfc">
+        <h3>RFC 4180</h3>
+        <p>
+          [[!RFC4180]] defines CSV with the following ABNF grammar:
+        </p>
+        <pre>
+file = [header CRLF] record *(CRLF record) [CRLF]
+header = name *(COMMA name)
+record = field *(COMMA field)
+name = field
+field = (escaped / non-escaped)
+escaped = DQUOTE *(TEXTDATA / COMMA / CR / LF / 2DQUOTE) DQUOTE
+non-escaped = *TEXTDATA
+COMMA = %x2C
+CR = %x0D
+DQUOTE =  %x22
+LF = %x0A
+CRLF = CR LF
+TEXTDATA =  %x20-21 / %x23-2B / %x2D-7E
+        </pre>
+        <p>
+          Of particular note here are:
+        </p>
+        <ul>
+          <li>The production for <code>TEXTDATA</code> indicates that only non-control ASCII characters are permitted within a CSV file. This restriction is routinely ignored in practice, and is impractical on the international web.</li>
+          <li>Lines should be ended with <code>CRLF</code>. This makes it harder to produce CSV files on Unix-based systems where the usual line ending is <code>LF</code>.</li>
+          <li>The header line is optional; a <code>header</code> parameter on the media type indicates whether the header is present or not.</li>
+          <li>Fields may be escaped by wrapping them in double quotes; any double quotes within the field must be escaped with two double quotes (<code>""</code>).</li>
+        </ul>
+      </section>
+      <section id="excel">
+        <h3>Excel</h3>
+        <p>
+          Excel is a common tool for both creating and reading CSV documents, and therefore the CSV that it produces is a de facto standard.
+        </p>
+        <p class="note">
+          The following describes the behaviour of Microsoft Excel for Mac 2011 with an English locale. Further testing is needed to see the behaviour of Excel in other situations.
+        </p>
+        <section>
+          <h4>Saved CSV</h4>
+          <p>
+            Excel generates CSV files encoded using Windows-1252 with <code>LF</code> line endings. Characters that cannot be represented within Windows-1252 are replaced by underscores. Only those fields that need escaping (eg because they contain commas or double quotes) are escaped, and double quotes are escaped with two double quotes.
+          </p>
+          <p>
+            Dates and numbers are formatted as displayed, which means that formatting can lead to information being lost or becoming inconsistent.
+          </p>
+        </section>
+        <section>
+          <h4>Opened CSV</h4>
+          <p>
+            When opening CSV files, Excel interprets CSV files saved in UTF-8 as being encoded as Windows-1252 (whether or not a BOM is present). It correctly deals with double quoted fields, except that it converts line breaks within fields into spaces. It understands <code>CRLF</code> as a line break. It detects dates (formatted as <code>YYYY-MM-DD</code>) and formats them in the default date formatting for files.
+          </p>
+        </section>
+        <section>
+          <h4>Imported CSV</h4>
+          <p>
+            Excel provides more control when importing CSV files into Excel. However, it does not properly understand UTF-8 (with or without BOM). It does however properly understand UTF-16 and can read non-ASCII characters from a UTF-16-encoded file.
+          </p>
+          <p>
+            A particular quirk in the importing of CSV is that if a field contains a line break, the final double quote that escapes the field will be included within it.
+          </p>
+        </section>
+        <section>
+          <h4>Copied Tabular Data</h4>
+          <p>
+            When tabular data is copied from Excel, it is copied in a tab-delimited format, with <code>LF</code> line breaks.
+          </p>
+        </section>
+      </section>
+      <section id="google">
+        <h3>Google Spreadsheets</h3>
+        <section>
+          <h4>Downloading CSV</h4>
+          <p>
+            Downloaded CSV files are encoded in UTF-8, without a BOM, and with <code>LF</code> line endings. Dates and numbers are formatted as they appear within the spreadsheet.
+          </p>
+        </section>
+        <section>
+          <h4>Importing CSV</h4>
+          <p>
+            CSV files can be imported as UTF-8 (with or without BOM). <code>CRLF</code> line endings are correctly recognised. Dates are reformatted to the default date format on load.
+          </p>
+        </section>
+      </section>
+      <section id="">
+        <h3>CSV Files in the Simple Data Format</h3>
+        <p>
+          Ths <a href="http://dataprotocols.org/simple-data-format/#csv-files">Simple Data Format</a> places the following restrictions on CSV files:
+        </p>
+        <blockquote>
+          <p>As a starting point, CSV files included in a Simple Data Format package must conform to the RFC for CSV (4180 - Common Format and MIME Type for Comma-Separated Values (CSV) Files). In addition:</p>
+
+          <ul>
+            <li>File names MUST end with <code>.csv</code></li>
+            <li>Files MUST be encoded as UTF-8</li>
+            <li>
+              <p>Files MUST have a single header row. This row MUST be the first row in the
+          file.</p>
+
+              <ul>
+                <li>Terminology: each column in the CSV file is termed a <em>field</em> and
+          its <code>name</code> is the string in that column in the header row.</li>
+                <li>The <code>name</code> MUST be unique amongst fields and MUST contain at
+          least one character</li>
+                <li>There are no further restrictions on the form of the <code>name</code> but
+          it is RECOMMENDED that it contain only alphanumeric characters
+          together with “ .-_”</li>
+              </ul>
+            </li>
+            <li>Rows in the file MUST NOT contain more fields than are in the header row (though they may
+          contain less)</li>
+            <li>Each file MUST have an entry in the <code>resources</code> array in the <code>datapackage.json</code> file</li>
+            <li>The resource metadata MUST include a <code>schema</code> attribute whose value MUST conform to the JSON
+          Table Schema</li>
+            <li>All fields in the CSV files MUST be described in the <code>schema</code></li>
+          </ul>
+
+          <p>CSV files generated by different applications often vary in their syntax, e.g. use of quoting characters, delimiters, etc. To encourage conformance, CSV files in a Simple Data Format SHOULD</p>
+
+          <ul>
+            <li>Use “,” as field delimiters</li>
+            <li>Use “rn” or “n” as line terminators</li>
+          </ul>
+
+          <p>If a CSV file does not follow these rules then its specific CSV dialect MUST be documented. The resource 
+          hash for the resource in the <code>datapackage.json</code> descriptor MUST:</p>
+
+          <ul>
+            <li>Include a <code>dialect</code> key that conforms to that described in the <a href="/csv-dialect/">CSV Dialect Description Format</a></li>
+          </ul>
+
+          <p>Applications processing the CSV file SHOULD read use the <code>dialect</code> of the CSV file to guide parsing.</p>
+        </blockquote>
+      </section>
+      <div class="issue">
+        <p>
+          More details of behaviour of other tools should go here. This should include the most popular CSV parsing/generating libraries in common programming languages. Test files which include non-ASCII characters, double quotes and line breaks within fields are:
+        </p>
+        <ul>
+          <li><a href="test-utf8.csv">test-utf8.csv</a></li>
+          <li><a href="test-utf8-bom.csv">test-utf8-bom.csv</a></li>
+          <li><a href="test-utf16.csv">test-utf16.csv</a></li>
+          <li><a href="test-utf16-bom.csv">test-utf16-bom.csv</a></li>
+          <li><a href="test.xlsx">test.xslx</a></li>
+          <li><a href="test.xls">test.xsl</a></li>
+        </ul>
+      </div>
+    </section>
+  </body>
+</html>
+
