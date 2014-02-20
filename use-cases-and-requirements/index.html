@@ -106,59 +106,398 @@ var respecConfig = {
       <p> ... </p>
       <p> Example normative reference [[!RFC4180]]. </p>
       <p> Example informative reference [[HTML5]]. </p>
-      <pre class="example">
-        Example example (!); Inline processing MUST NOT happen inside examples so these are untouched.
-      </pre>
     </section>
     <section id="uc">
       <h2>Use Cases</h2>
-      <p> ... </p>
-      <div class="note">
-        <p> Example note. </p>
+      <section id="UC-SurfaceTemperatureDatabank">
+        <h2>Use Case #1 - Creation of consolidated global land surface temperature climate
+          databank</h2>
+        <p>
+          <span style="font-size: 10pt">(Contributed by Jeremy Tandy)</span>
+        </p>
+        <p> Climate change and global warming have become one of the most pressing environmental
+          concerns in society today. Crucial to predicting future change is an understanding of how
+          the world’s historical climate, with long duration instrumental records of climate being
+          central to that goal. Whilst there is an abundance of data recording the climate at
+          locations the world over, the scrutiny under which climate science is put means that much
+          of this data remains unused leading to a paucity of data in some regions with which to
+          verify our understanding of climate change.</p>
+
+        <p>The <a href="http://www.surfacetemperatures.org/home">International Surface Temperature
+            Initiative</a> seeks to create a consolidated global land surface temperatures databank
+          as an open and freely available resource to climate scientists.</p>
+
+        <p>To achieve this goal, climate datasets, known as “decks”, are gathered from participating
+          organisations and merged into a combined dataset using a scientifically peer reviewed <a
+            href="ftp://ftp.ncdc.noaa.gov/pub/data/globaldatabank/monthly/stage3/merging_methodology.pdf"
+            > method</a> which assesses the data records for inclusion against a variety of
+          criteria.</p>
+
+        <p>Given the need for openness and transparency in creating the databank, it is essential
+          that the provenance of the source data is clear. Original source data, particularly for
+          records captured prior to the mid-twentieth century, may be in hard-copy form. In order to
+          incorporate the widest possible scope of source data, the International Surface
+          Temperature Initiative is supported by <a
+            href="http://www.surfacetemperatures.org/databank/data-rescue-task-team">data rescue
+            activities</a> to digitise hard copy records.</p>
+
+        <p>The data is, where possible, published in the following four stages:</p>
         <ul>
-          <li>...</li>
+          <li>Stage 0: raw digital image of hard copy records or information as to hard copy
+            location</li>
+          <li>Stage 1: data in native format provided</li>
+          <li>Stage 2: data converted into a common format and with provenance and version control
+            information appended</li>
+          <li>Stage 3: merged collation of stage 2 data within a single consolidated dataset</li>
         </ul>
-      </div>
-      <p class="issue"> Example issue. </p>
-      <section id="uc1">
-        <h2>Detailed Use Case 1</h2>
-        <p> Use cases will follow a narrative and, where possible, include examples of real data
-          files. </p>
-        <p> Each use case will: </p>
+
+        <p>The Stage 1 data is typically provided in tabular form - the most common variant is
+          white-space delimited ASCII files. Each data deck comprises multiple files which are
+          packaged as a compressed tar ball (<code>.tar.gz</code>). Included within the compressed
+          tar ball package, and provided alongside, is a read-me file providing unstructured
+          supplementary information. Summary information is often embedded at the top of each
+          file.</p>
+
+        <p>For example, see the <a
+            href="ftp://ftp.ncdc.noaa.gov/pub/data/globaldatabank/monthly/stage1/uganda/uganda.monthly.stage1.20120301.tar.gz"
+            > Ugandan Stage 1 data deck</a> and associated <a
+            href="ftp://ftp.ncdc.noaa.gov/pub/data/globaldatabank/monthly/stage1/uganda/1-readme-uganda.txt"
+            > readme file</a>.</p>
+
+        <p>The Ugandan Stage 1 data deck appears to be comprised of two discrete datasets, each
+          partitioned into a sub-directory within the tar ball: <code>uganda-raw</code> and
+            <code>uganda-bestguess</code>. Each sub-directory includes a Microsoft Word document
+          providing supplementary information about the provenance of the dataset; of particular
+          note is that <code>uganda-raw</code> is collated from 9 source datasets whilst
+            <code>uganda-bestguess</code> provides what is considered by the data publisher to be
+          the best set of values with duplicate values discarded.</p>
+
+        <p>
+          <strong>Requires:</strong>
+          <a href="#R-AnnotationAndSupplementaryInfo">AnnotationAndSupplementaryInfo</a>
+        </p>
+
+        <p>Dataset <code>uganda-raw</code> is split into 96 discrete files, each providing maximum,
+          minimum or mean monthly air temperature for one of the 32 weather observation stations
+          (sites) included in the data set. Similarly, dataset <code>uganda-bestguess</code> is
+          partitioned into discrete files; this case just 3 files each of which provide maximum,
+          minimum or mean monthly air temperature data for all sites. The mapping from data file to
+          data sub-set is described in the Microsoft Word document.</p>
+
+        <p>
+          <strong>Requires:</strong>
+          <a href="#R-CsvAsSubsetOfLargerDataset">CsvAsSubsetOfLargerDataset</a>
+        </p>
+
+        <p>A snippet of the data indicating maximum monthly temperature for Entebbe, Uganda, from
+            <code>uganda-raw</code> is provided below. File = <a href="637050_ENTEBBE_tmx.txt"
+            >637050_ENTEBBE_tmx.txt</a></p>
+
+        <pre class="example">
+            637050  ENTEBBE
+            5
+            ENTEBBE BEA     0.05    32.45   3761F
+            ENTEBBE GHCNv3G 0.05    32.45   1155M
+            ENTEBBE ColArchive      0.05    32.45   1155M
+            ENTEBBE GSOD    0.05    32.45   1155M
+            ENTEBBE NCARds512       0.05    32.755  1155M
+            
+            Tmax
+            {snip}
+            1935.04	27.83	27.80	27.80	-999.00	-999.00
+            1935.12	25.72	25.70	25.70	-999.00	-999.00
+            1935.21	26.44	26.40	26.40	-999.00	-999.00
+            1935.29	25.72	25.70	25.70	-999.00	-999.00
+            1935.37	24.61	24.60	24.60	-999.00	-999.00
+            1935.46	24.33	24.30	24.30	-999.00	-999.00
+            1935.54	24.89	24.90	24.90	-999.00	-999.00
+            {snip}
+          </pre>
+
+        <p>The key characteristics are:</p>
         <ul>
-          <li>indicate the contributor.</li>
-          <li>(where necessary) reference a more detailed use case description - noting that this
-            document should contain sufficient information to be able to stand alone.</li>
-          <li>reference specific requirement(s); e.g. "Requires: <a>Requirement 1</a>" - these
-            references will be embedded in the narrative.</li>
+          <li>white space delimited; this is not strictly a CSV file</li>
+          <li>summary information pertinent to the “data rows” is included at the beginning of the
+            data file</li>
+          <li>row, column and cell value interpretation is informed by accompanying Microsoft Word
+            document; human intervention is required to unambiguously determine semantics, e.g. the
+            meaning of each column, the unit of measurement</li>
+          <li>the observed property is defined as “Tmax”; there is no reference to an authoritative
+            definition describing that property</li>
+          <li>there is no header line providing column names </li>
+          <li>the year and month (column 1) is expressed as a decimal value; e.g. 1901.04 –
+            equivalent to January, 1901</li>
+          <li>multiple temperature values (“replicates”) are provided for each row; one from each of
+            the sources defined in the header, e.g. <code>BEA</code> (British East Africa),
+              <code>GHCNv3G</code>, <code>ColArchive</code>, <code>GSOD</code> and
+              <code>NCARds512</code></li>
+          <li>the provenance of specific cell values cannot be asserted; for example, data values
+            for 1935 observed at Entebbe are digitised from <a
+              href="ftp://ftp.ncdc.noaa.gov/pub/data/globaldatabank/monthly/stage0/uganda/Uganda_1935-1938.pdf#page=3"
+              > digital images published in PDF</a></li>
         </ul>
+        <p>A snippet of the data indicating maximum monthly temperature for all stations in Uganda
+          from <code>uganda-bestguess</code> is provided below (truncated to 9 columns). File = <a
+            href="ug_tmx_jrc_bg_v1.0.txt">ug_tmx_jrc_bg_v1.0.txt</a></p>
+
+        <pre class="example">
+            ARUA	BOMBO	BUKALASA	BUTIABA	DWOLI	ENTEBBE AIR	FT PORTAL	GONDOKORO	[…]
+            {snip}
+            1935.04	-99.00	-99.00	-99.00	-99.00	-99.00	27.83	-99.00	-99.00	[…]
+            1935.12	-99.00	-99.00	-99.00	-99.00	-99.00	25.72	-99.00	-99.00	[…]
+            1935.21	-99.00	-99.00	-99.00	-99.00	-99.00	26.44	-99.00	-99.00	[…]
+            1935.29	-99.00	-99.00	-99.00	-99.00	-99.00	25.72	-99.00	-99.00	[…]
+            1935.37	-99.00	-99.00	-99.00	-99.00	-99.00	24.61	-99.00	-99.00	[…]
+            1935.46	-99.00	-99.00	-99.00	-99.00	-99.00	24.33	-99.00	-99.00	[…]
+            1935.54	-99.00	-99.00	-99.00	-99.00	-99.00	24.89	-99.00	-99.00	[…]
+            {snip}
+          </pre>
+
+        <p>Many of the characteristics concerning the “raw” file are exhibited here too.
+          Additionally, we see that:</p>
+        <ul>
+          <li>the delimiter is now tab (<code>U+0009</code>)</li>
+          <li>metadata is entirely missing from this file, requiring human intervention to combine
+            the filename token (<code>tmx</code>) with supplementary information in the accompanying
+            Microsoft Word document to determine the semantics</li>
+        </ul>
+        <p class="issue">do we support delimiters other than comma, missing (or non-unique) column
+          names etc. … or assume that some trivial pre-processor is required to fix up the text?</p>
+
+        <p>At present, the global surface temperature databank comprises 25 Stage 1 data decks for
+          monthly temperature observations. These are provided by numerous organisations in
+          heterogeneous forms. In order to merge these data decks into a single combined dataset,
+          each data deck has to be converted into a standard form. Columns consist of: <code>station
+            name</code>, <code>latitude</code>, <code>longitude</code>, <code>altitude</code>,
+            <code>date</code>, <code>maximum monthly temperature</code>, <code>minimum monthly
+            temperature</code>, <code>mean monthly temperature</code> plus additional provenance
+          information.</p>
+
+        <p>An example Stage 2 data file is given for Entebbe, Uganda, below. File = <a
+            href="uganda_000000000005_monthly_stage2">uganda_000000000005_monthly_stage2</a></p>
+
+        <pre class="example">
+            {snip}
+            ENTEBBE                            0.0500    32.4500  1146.35 193501XX  2783  1711  2247 301/109/101/104/999/999/999/000/000/000/102
+            ENTEBBE                            0.0500    32.4500  1146.35 193502XX  2572  1772  2172 301/109/101/104/999/999/999/000/000/000/102
+            ENTEBBE                            0.0500    32.4500  1146.35 193503XX  2644  1889  2267 301/109/101/104/999/999/999/000/000/000/102
+            ENTEBBE                            0.0500    32.4500  1146.35 193504XX  2572  1817  2194 301/109/101/104/999/999/999/000/000/000/102
+            ENTEBBE                            0.0500    32.4500  1146.35 193505XX  2461  1722  2092 301/109/101/104/999/999/999/000/000/000/102
+            ENTEBBE                            0.0500    32.4500  1146.35 193506XX  2433  1706  2069 301/109/101/104/999/999/999/000/000/000/102
+            ENTEBBE                            0.0500    32.4500  1146.35 193507XX  2489  1628  2058 301/109/101/104/999/999/999/000/000/000/102
+            {snip}
+          </pre>
+
+        <p>Because of the heterogeneity of the Stage 1 data decks, bespoke data processing programs
+          were required for each data deck consuming valuable effort and resource in simple data
+          pre-processing. If the semantics, structure and other supplementary metadata pertinent to
+          the Stage 1 data decks had been machine readable, then this data homogenisation stage
+          could have been avoided altogether. Data provenance is crucial to this initiative,
+          therefore it would be beneficial to be able to associate the supplementary metadata
+          without needing to edit the original data files.</p>
+
+        <p>
+          <strong>Requires:</strong>
+          <a href="#R-LinksToExternallyManagedDefinitions">LinksToExternallyManagedDefinitions</a>,
+            <a href="#R-SyntacticTypeDefinition">SyntacticTypeDefinition</a>, <a
+            href="#R-SemanticTypeDefinition">SemanticTypeDefinition</a>, <a
+            href="#R-MissingValueDefinition">MissingValueDefinition</a> and <a
+            href="#R-ZeroEditAdditionOfSupplementaryMetadata"
+            >ZeroEditAdditionOfSupplementaryMetadata</a>
+        </p>
+
+        <p>The data pre-processing tools created to parse each Stage 1 data deck into the standard
+          Stage 2 format and the merge process to create the consolidated Stage 3 data set were
+          written using the software most familiar to the participating scientists: <a
+            href="http://en.wikipedia.org/wiki/Fortran_95_language_features">Fortran 95</a>. The
+          merge software source code is available <a
+            href="ftp://ftp.ncdc.noaa.gov/pub/data/globaldatabank/monthly/stage3/recommended/code/recommended.code.v1.0.0-beta4.20130614.tar.gz"
+            >online</a>. It is worth noting that this sector of the scientific community commonly
+          uses <a href="http://www.exelisvis.com/ProductsServices/IDL.aspx">IDL</a> and is gradually
+          adopting <a href="http://www.python.org/">Python</a> as the default software language
+          choice. </p>
+
+        <p>The resulting merged dataset is published in several formats – including tabular text.
+          The <a
+            href="ftp://ftp.ncdc.noaa.gov/pub/data/globaldatabank/monthly/stage3/recommended/results/recommended-ghcn_format.monthly.stage3.v1.0.0-beta4.20130614.tar.gz"
+            > GHCN-format merged dataset</a> comprises of several files: merged data and withheld
+          data (e.g. those data that did not meet the merge criteria) each with an associated
+          “inventory” file.</p>
+
+        <p>A snippet of the inventory for merged data is provided below; each row describing one of
+          the 31,427 sites in the dataset. File = <a href="merged.monthly.stage3.v1.0.0-beta4.inv"
+            >merged.monthly.stage3.v1.0.0-beta4.inv</a></p>
+
+        <pre class="example">
+            {snip}
+            REC41011874   0.0500  32.4500 1155.0 ENTEBBE_AIRPO
+            {snip}
+          </pre>
+
+        <p>The columns are: <code>station identifier</code>, <code>latitude</code>,
+            <code>longitude</code>, <code>altitude (m)</code> and <code>station name</code>. The
+          data is fixed format rather than delimited.</p>
+
+        <p>Similarly, a snippet of the merged data itself is provided. Given that the original
+            <code>.dat</code> file is a largely unmanageable 422.6 MB in size, a subset is provided.
+          File = <a href="merged.monthly.stage3.v1.0.0-beta4.snip"
+            >merged.monthly.stage3.v1.0.0-beta4.snip</a></p>
+
+        <pre class="example">
+            {snip}
+            REC410118741935TAVG 2245    2170    2265    2195    2090    2070    2059    2080    2145    2190    2225    2165   
+            REC410118741935TMAX 2780    2570    2640    2570    2460    2430    2490    2520    2620    2630    2660    2590   
+            REC410118741935TMIN 1710    1770    1890    1820    1720    1710    1629    1640    1670    1750    1790    1740   
+            {snip}
+          </pre>
+
+        <p>The columns are: <code>station identifier</code>, <code>year</code>, <code>quantity
+            kind</code> and the quantity values for months January to December in that year. Again,
+          the data is fixed format rather than delimited.</p>
+
+        <p>Here we see the station identifier <code>REC41011874</code> being used as a foreign key
+          to refer to the observing station details; in this case Entebbe Airport. Once again, there
+          is no metadata provided within the file to describe how to interpret each of the data
+          values.</p>
+
+        <p>
+          <strong>Requires:</strong>
+          <a href="#R-ForeignKeyReferences">ForeignKeyReferences</a>
+        </p>
       </section>
-      <section id="uc2">
-        <h2>Detailed Use Case 2</h2>
-        <p> ... </p>
-      </section>
+
       <section id="other-uc">
         <h2>Other Use Cases</h2>
         <p> Don't know if we need this yet? </p>
       </section>
+
     </section>
     <section id="req">
       <h2>Requiremnents</h2>
       <section id="acc-req">
         <h2>Accepted Requirements</h2>
-        <section id="req1">
-          <h2>
-            <dfn>Requirement 1</dfn>
-          </h2>
-          <p> Each requirement will have: </p>
-          <ul>
-            <li>a unique identifier.</li>
-            <li>title.</li>
-            <li>brief description.</li>
-            <li>reference to supporting use case(s); e.g. "Motivation:".</li>
-            <li>reference corresponding issues (as issues arise).</li>
-          </ul>
-        </section>
+        <dl>
+          <dt id="R-AnnotationAndSupplementaryInfo">R-AnnotationAndSupplementaryInfo</dt>
+          <dd>
+            <em id="_R-AnnotationAndSupplementaryInfo">
+              <strong>Ability to add annotation and supplementary information to CSV file</strong>
+            </em>
+            <p>description to be added here</p>
+            <p>
+              <strong>Motivation:</strong>
+              <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>
+            </p>
+          </dd>
+          <dt id="R-CsvAsSubsetOfLargerDataset">R-CsvAsSubsetOfLargerDataset</dt>
+          <dd>
+            <em id="_R-CsvAsSubsetOfLargerDataset">
+              <strong>Ability to assert how a single CSV file is a facet or subset of a larger
+                dataset</strong>
+            </em>
+            <p>description to be added here</p>
+            <p>
+              <strong>Motivation:</strong>
+              <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>
+            </p>
+          </dd>
+          <dt id="R-LinksToExternallyManagedDefinitions">R-LinksToExternallyManagedDefinitions</dt>
+          <dd>
+            <em id="_R-LinksToExternallyManagedDefinitions">
+              <strong>Ability to provide (hyper)links to externally managed definitions from with a
+                CSV file</strong>
+            </em>
+            <p>description to be added here</p>
+            <p>
+              <strong>Motivation:</strong>
+              <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>
+            </p>
+          </dd>
+          <dt id="R-SyntacticTypeDefinition">R-SyntacticTypeDefinition</dt>
+          <dd>
+            <em id="_R-SyntacticTypeDefinition">
+              <strong>Ability to declare syntactic type for data values</strong>
+            </em>
+            <p>supporting automated recognition syntactic type e.g. date, number etc. ... further
+              description to be added</p>
+            <p>
+              <strong>Motivation:</strong>
+              <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>
+            </p>
+          </dd>
+          <dt id="R-SemanticTypeDefinition">R-SemanticTypeDefinition</dt>
+          <dd>
+            <em id="_R-SemanticTypeDefinition">
+              <strong>Ability to declare semantic type for data values</strong>
+            </em>
+            <p>supporting automated recognition of semantic type, typically expressed for each
+              column ... further description to be added</p>
+            <div class="note">
+              <p>To express semantics in a machine readable form, RDF seems the appropriate choice.
+                Furthermore, best practice indicates that one should adopt common and widely adopted
+                patterns (e.g. RDF vocabularies, OWL ontologies) when publishing data to enable a
+                wide audience to consume and understand the data. Existing (de facto) standard
+                patterns may add complexity when defining the semantics associated with a particular
+                row such that a single RDF predicate is insufficient. </p>
+              <p>For example, to express a quantity value using <a href="http://qudt.org/">QUDT</a>
+                we use an instance of <code>qudt:QuantityValue</code> to relate the numerical value
+                with the quantity kind (e.g. air temperature) and unit of measurement (e.g.
+                Celsius). Thus the semantics needed for a column containing temperature values might
+                be: <code>qudt:value/qudt:numericValue</code> – more akin to a <a
+                  href="http://marmotta.apache.org/ldpath/language.html">LDPath</a>.</p>
+              <p>Furthermore, use of OWL axioms when defining a sub-property of
+                  <code>qudt:value</code> would allow the quantity type and unit of measurement to
+                be inferred, with the column semantics then being specified as
+                  <code>ex:temperature_Cel/qudt:numericValue</code>.</p>
+            </div>
+            <p>
+              <strong>Motivation:</strong>
+              <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>
+            </p>
+          </dd>
+          <dt id="R-MissingValueDefinition">R-MissingValueDefinition</dt>
+          <dd>
+            <em id="_R-MissingValueDefinition">
+              <strong>Ability to declare a "missing value" token and, optionally, a reason for the
+                value to be missing</strong>
+            </em>
+            <p>Significant amounts of existing tabular text data include values such as
+                <code>-999</code>. Typically, these are outside the normal expected range of values
+              and are meant to infer that the value for that cell is missing. Automated parsing of
+              CSV files needs to recognise such missing value tokens and behave accordingly.
+              Furthermore, it is often useful for a data publisher to declare <em>why</em> a value
+              is missing; e.g. <code>withheld</code> or <code>aboveMeasurementRange</code></p>
+            <p>
+              <strong>Motivation:</strong>
+              <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>
+            </p>
+          </dd>
+          <dt id="R-ZeroEditAdditionOfSupplementaryMetadata"
+            >R-ZeroEditAdditionOfSupplementaryMetadata</dt>
+          <dd>
+            <em id="_R-ZeroEditAdditionOfSupplementaryMetadata">
+              <strong>Ability to add supplementary metadata to an existing CSV file without
+                requiring modification of that file</strong>
+            </em>
+            <p>description to be added here</p>
+            <p>
+              <strong>Motivation:</strong>
+              <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>
+            </p>
+          </dd>
+          <dt id="R-ForeignKeyReferences">R-ForeignKeyReferences</dt>
+          <dd>
+            <em id="_R-ForeignKeyReferences">
+              <strong>Ability to cross reference between CSV files</strong>
+            </em>
+            <p>To interpret data in a given row of a CSV file, need to be able to refer to
+              information provided in supplementary CSV files; e.g. using a foreign key type
+              reference. The cross-referenced CSV files may, or may not, be packaged together.</p>
+            <p>
+              <strong>Motivation:</strong>
+              <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>
+            </p>
+          </dd>
+        </dl>
       </section>
       <section id="can-req">
         <h2>Candidate Requirements</h2>
