@@ -106,10 +106,10 @@ var respecConfig = {
       <section id="line-endings">
         <h3>Line Endings</h3>
         <p>
-          All occurrences of <code>CRLF</code> (<code>U+000D U+000A</code>) within a CSV+ MUST be normalised to <code>LF</code> (<code>U+000A</code>). This is significant within <a title="field">fields</a> that contain line endings.
+          The ends of rows in a CSV+ file MUST be either <code>CRLF</code> (<code>U+000D U+000A</code>) or <code>LF</code> (<code>U+000A</code>). Line endings within escaped <a title="field">fields</a> are not normalised.
         </p>
         <p>
-          To fix up CSV files that use other line endings, parsers SHOULD replace any <a href="http://en.wikipedia.org/wiki/Newline#Unicode">other line endings</a> used within the document with line feed (<code>U+000A</code>) characters.
+          To fix up CSV files that use other line ending characters, parsers SHOULD replace any <a href="http://en.wikipedia.org/wiki/Newline#Unicode">other line endings</a> used at the end of rows (but not within fields) with line feed (<code>U+000A</code>) characters.
         </p>
       </section>
       <section id="lines">
@@ -138,10 +138,10 @@ var respecConfig = {
             Any constraints on contents of column names? For compatibility?
           </p>
           <p>
-            To fix up CSV files that do not have a header line, parsers SHOULD act as if there were a header line with the same number of fields as the first row in the CSV file, numbered sequentially starting at 0 (ie <code>0</code>, <code>1</code> etc).
+            To fix up CSV files that do not have a header line, parsers SHOULD act as if there were a header line with the same number of fields as the first row in the CSV file, numbered sequentially starting at 1 (ie <code>1</code>, <code>2</code> etc).
           </p>
           <p class="note">
-            0-based here for better compatibility with fragment identifiers for CSV [[RFC7111]].
+            1-based here for better compatibility with fragment identifiers for CSV [[RFC7111]].
           </p>
           <p>
             To fix up CSV files that contain duplicate column names, parsers SHOULD append sequential numbers to any occurrences of a given colum name after the first. For example, if the header row is
@@ -226,7 +226,7 @@ TEXTDATA =  %x20-21 / %x23-2B / %x2D-7E
         <section>
           <h4>Opened CSV</h4>
           <p>
-            When opening CSV files, Excel interprets CSV files saved in UTF-8 as being encoded as Windows-1252 (whether or not a BOM is present). It correctly deals with double quoted fields, except that it converts line breaks within fields into spaces. It understands <code>CRLF</code> as a line break. It detects dates (formatted as <code>YYYY-MM-DD</code>) and formats them in the default date formatting for files.
+            When opening CSV files, Excel interprets CSV files saved in UTF-8 as being encoded as Windows-1252 (whether or not a <a href="http://en.wikipedia.org/wiki/Byte_order_mark"><acronym title="Byte Order Mark">BOM</acronym></a> is present). It correctly deals with double quoted fields, except that it converts line breaks within fields into spaces. It understands <code>CRLF</code> as a line break. It detects dates (formatted as <code>YYYY-MM-DD</code>) and formats them in the default date formatting for files.
           </p>
         </section>
         <section>
@@ -250,7 +250,7 @@ TEXTDATA =  %x20-21 / %x23-2B / %x2D-7E
         <section>
           <h4>Downloading CSV</h4>
           <p>
-            Downloaded CSV files are encoded in UTF-8, without a BOM, and with <code>LF</code> line endings. Dates and numbers are formatted as they appear within the spreadsheet.
+            Downloaded CSV files are encoded in UTF-8, without a <a href="http://en.wikipedia.org/wiki/Byte_order_mark"><acronym title="Byte Order Mark">BOM</acronym></a>, and with <code>LF</code> line endings. Dates and numbers are formatted as they appear within the spreadsheet.
           </p>
         </section>
         <section>
