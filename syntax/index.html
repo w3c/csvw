@@ -66,28 +66,57 @@ var respecConfig = {
     <section id="model">
       <h2>Tabular Data Model</h2>
       <p>
-        Data is held in a <dfn>table</dfn>.
+        There are different levels of data models for tabular data:
       </p>
-      <p>
-        Each table has one or more <dfn title="column">columns</dfn>, each of which is named. For compatibility with SQL, each column must have a unique name. The names of columns are case sensitive.
-      </p>
-      <p class="issue">
-        Should the order of columns be significant?
-      </p>
-      <p class="issue">
-        In SQL, each column has a type. Should this be part of the generic tabular data model, and if so what types could each column have?
-      </p>
-      <p>
-        Each table has one or more <dfn title="row">rows</dfn>. Each row contains a <dfn>field</dfn> for each column in the table. Some of these fields may be <dfn title="null field">null fields</dfn>.
-      </p>
-      <p class="issue">
-        Should metadata be considered to be part of the core data model for tabular data, for our purposes, or should tabular data be kept very clean and any annotations be considered as being laid over the top of it? Should we have a separate data model for annotated tabular data?
-      </p>
+      <ul>
+        <li>The <a>core data model</a> described in <a href="#core-model" class="sectionRef"></a> defines the core model for a single table of basic data.</li>
+        <li>The <a>annotated data model</a> described in <a href="#annotated-model" class="sectionRef"></a> defines a model for tables that are annotated with metadata.</li>
+        <li>The <a>grouped data model</a> described in <a href="#grouped-model" class="sectionRef"></a> defines a model for tables that are related to each other in some way.</a>
+      </ul>
+      <section id="core-model">
+        <h3>Core Data Model</h3>
+        <p>
+          Data is held in a <dfn>table</dfn>.
+        </p>
+        <p>
+          Each table has one or more <dfn title="column">columns</dfn>, each of which is named. For compatibility with SQL, the names of the columns must be unique. The names of columns are case sensitive. The order of the columns is significant and must be preserved by applications.
+        </p>
+        <p>
+          Each table has one or more <dfn title="row">rows</dfn>. Each row contains a <dfn>field</dfn> for each column in the table. Some of these fields may be <dfn title="null field">null fields</dfn>.
+        </p>
+      </section>
+      <section id="annotated-model">
+        <h3>Annotated Data Model</h3>
+        <p>
+          An <dfn>annotated table</dfn> is a <a>table</a> that is annotated with additional metadata. The table has a number of <dfn title="property">properties</dfn> which provide additional information about the table as a whole. The <dfn title="value">values</dfn> of these properties may be lists, structured objects, or atomic values. Annotations on a table may include links to other tables (eg to indicate tables that include related information).
+        </p>
+        <p>
+          The <a title="column">columns</a> within an <a>annotated table</a> are all <dfn title="annotated column">annotated columns</dfn>. The annotations on a column provide information about how to interpret the <a title="field">fields</a> in the column, such as the expected type of values in that column or whether the column contains unique values.
+        </p>
+        <p>
+          The <a title="row">rows</a> within an <a>annotated table</a> are all <dfn title="annotated row">annotated rows</dfn>. The annotations on a row provide additional metadata about the information held in the row, such as the certainty or source of the information it contains.
+        </p>
+        <p>
+          The <a title="field">fields</a> within an <a>annotated row</a> are all <dfn title="annotated field">annotated fields</dfn>. The annotations on a field provide metadata about the value held in the field, particularly when this overrides the information provided for the <a>annotated column</a> and <a>annotated row</a> that the field falls within. Annotations on a field might be notes about the value or type annotations.
+        </p>
+        <p>
+          An <a>annotated table</a> may also contain a number of <dfn title="annotated region">annotated regions</dfn>. These are selected <a title="field">fields</a> within the table that have annotations associated with them. <a title="annotated column">Annotated columns</a> and <a title="annotated row">annotated rows</a> are special types of annotated regions where the region is the entirety of a single column or single row.
+        </p>
+      </section>
+      <section id="grouped-model">
+        <h3>Grouped Data Model</h3>
+        <p>
+          A <dfn>group of tables</dfn> comprises a set of <a title="table">tables</a> (which may be <a title="annotated table">annotated tables</a>) and a set of annotations (<a title="property">properties</a> and <a title="value">values</a>) that relate to the set.
+        </p>
+        <p class="note">
+          Tables can be loosely related to each other simply through annotations; not all tables that are related to each other need to grouped together. Groups of tables are useful because they can be annotated with metadata that applies to all the tables in the group.
+        </p>
+      </section>
     </section>
     <section id="syntax">
       <h2>CSV+ Syntax</h2>
       <p>
-        This section defines a standard, CSV-based, syntax for tabular data and how it maps into the tabular data model described in <a href="#model" class="sectionRef"></a>. Compliant applications that output this format must meet each of the constraints.
+        This section defines a standard, CSV-based, syntax for tabular data and how it maps into the core tabular data model described in <a href="#core-model" class="sectionRef"></a>. Compliant applications that output this format must meet each of the constraints.
       </p>
       <div class="note">
         <p>
