@@ -144,7 +144,8 @@ var respecConfig = {
 
         <p>
           <strong>Requires:</strong>
-          <a href="#R-PrimaryKey">PrimaryKey</a>
+          <a href="#R-PrimaryKey">PrimaryKey</a> and <a href="#R-ForeignKeyReferences"
+            >ForeignKeyReferences</a>
         </p>
 
         <p>Upon receipt by TNA, each of the Transcriptions of Records is validated against the (set
@@ -163,7 +164,7 @@ var respecConfig = {
 
         <p>
           <strong>Requires:</strong>
-          <a href="#R-ExternalDataDefinitionResource">ExternalDataDefinitionResource</a>, <a
+          <a href="#R-ExternalDataDefinitionResource">ExternalDataDefinitionResource</a> and <a
             href="#R-CsvValidation">CsvValidation</a>
         </p>
 
@@ -179,7 +180,7 @@ var respecConfig = {
         <p>
           <strong>Requires:</strong>
           <a href="#R-SyntacticTypeDefinition">SyntacticTypeDefinition</a>, <a
-            href="#R-SemanticTypeDefinition">SemanticTypeDefinition</a>, <a
+            href="#R-SemanticTypeDefinition">SemanticTypeDefinition</a> and <a
             href="#R-CsvToRdfTransformation">CsvToRdfTransformation</a>
         </p>
 
@@ -197,8 +198,119 @@ var respecConfig = {
         </div>
 
       </section>
+      <section id="UC-PublicationOfNationalStatistics">
+        <h2>Use Case #2 - Publication of National Statistics</h2>
+        <p>
+          <span style="font-size: 10pt">(Contributed by Jeni Tennison)</span>
+        </p>
+        <p>The <a href="http://www.ons.gov.uk/">Office for National Statistics</a> (ONS) is the UK’s
+          largest independent producer of official statistics and is the recognised national
+          statistical institute for the UK. It is responsible for collecting and publishing
+          statistics related to the economy, population and society at national, regional and local
+          levels.</p>
+        <p>Sets of statistics are typically grouped together into collections of tabular data for
+          publication. Example collections of statistics include:</p>
+        <ul>
+          <li>
+            <a
+              href="http://www.ons.gov.uk/ons/rel/ppi2/producer-prices-indices/december-2013/rft-mm22-producer-price-indices--reference-table--december-2013.xls"
+              >producer prices indices (Microsoft Excel Workbook)</a>
+          </li>
+          <li>
+            <a
+              href="http://www.ons.gov.uk/ons/rel/cpi/consumer-price-indices/december-2013/consumer-price-inflation-reference-tables.xls"
+              >consumer prices indices (Microsoft Excel Workbook)</a>
+          </li>
+          <li>
+            <a
+              href="http://www.ons.gov.uk/ons/rel/lms/labour-market-statistics/january-2014/table-a01.xls"
+              >labour market statistics (Microsoft Excel Workbook)</a>
+          </li>
+        </ul>
+        <p>In each of the examples above, multiple data tables are provided in a single Microsoft
+          Excel Workbook, one table per sheet. Each Workbook includes a manifest of the tables
+          included therein - provided as a table of contents. Furthermore, each Workbook also
+          provides metadata pertaining to the whole package. For example, the <a
+            href="http://www.ons.gov.uk/ons/rel/ppi2/producer-prices-indices/december-2013/rft-mm22-producer-price-indices--reference-table--december-2013.xls"
+            >producer prices indices</a> workbook includes a coversheet that specifies: </p>
+        <ul>
+          <li>title</li>
+          <li>applicability interval (e.g. "Data for December 2013")</li>
+          <li>editor and publication office</li>
+          <li>publication date, and</li>
+          <li>license</li>
+        </ul>
+        <p>Several tables may appear within a single sheet; for example, refer to <a
+            href="http://www.ons.gov.uk/ons/rel/lms/labour-market-statistics/january-2014/table-a01.xls"
+            >labour market statistics</a> sheet 18(1). Here we see statistics relating to headline
+          estimates, change on quarter and change on year. A closer inspection indicates that the
+          column layout is identical for each sub-table; only the meaning of the data values
+          changes.</p>
+        <p>
+          <strong>Requires:</strong>
+          <a href="#R-PackagingOfMultipleTables">PackagingOfMultipleTables</a>
+        </p>
+        <p>Correct interpretation of the statistics often requires additional qualification or
+          awareness of context. To achieve this ONS routinely include supplementary information and
+          annotation within their published statistics. These may be applied to:</p>
+        <ul>
+          <li>a package of tables; e.g. the entire Workbook</li>
+          <li>an individual sheet within the Workbook</li>
+          <li>a range of cells within a sheet</li>
+          <li>a row</li>
+          <li>a coloumn</li>
+          <li>an individual cell</li>
+        </ul>
+        <p>The layout of tabular data within each sheet is optimised for human consumption.
+          Presentation artifacts are typically intermingled with the data itself making it difficult
+          for data reusers to extract data from these tables for further processing. Presentation
+          artifacts, some of which are illustrated in figure <a
+            href="#fig-presentation-artifacts-in-statistics-worksheet"></a>, include:</p>
+        <ul>
+          <li>titles for tables and sub-tables</li>
+          <li>annotations</li>
+          <li>graphical logos and other formatting</li>
+          <li>column ordering - whereby proximity implies some implicit relationship</li>
+          <li>merged cells within column headers to indicate grouping</li>
+          <li>column headers spanning multiple rows</li>
+        </ul>
+        <figure>
+          <img src="a01jan2014_tcm77-347639_sheet-18(1).png" width="909" height="454" />
+          <figcaption>Presentation artifacts in statistics worksheet</figcaption>
+        </figure>
+        <p>
+          <strong>Requires:</strong>
+          <a href="#R-AnnotationAndSupplementaryInfo">AnnotationAndSupplementaryInfo</a>
+        </p>
+        <p>Furthermore, these statistical data sets make frequent use of predefined category codes
+          and geographic regions. At present there is no mechanism to associate the catagory codes,
+          provided as plain text, with their authoritative definitions.</p>
+        <p>
+          <strong>Requires:</strong>
+          <a href="#R-AssociationOfCodeValuesWithExternalDefinitions"
+            >AssociationOfCodeValuesWithExternalDefinitions</a>
+        </p>
+        <p>Finally, reuse of the statistical data is also inhibited by a lack of explicit definition
+          of the meaning of column headings.</p>
+        <p>
+          <strong>Requires:</strong>
+          <a href="#R-SemanticTypeDefinition">SemanticTypeDefinition</a>
+        </p>
+        <p>Statistical data is currently published in Microsoft Excel Workbook format in order
+          overcome limitations inherent in simple data formats such as CSV. However, it is also
+          important to remember that the data user community also have preferred tools for consuming
+          the statistical data. Spreadsheet applications such as Microsoft Excel, Numbers for Mac
+          and LibreOffice Calc are a mainstay of the ubiquitously deployed desktop productivity
+          software, enabling a large swath of users to work with data provided in Microsoft Excel
+          Workbook format. It is important that compatibility, at least at a basic level, is
+          maintained with the data analysis tools in common usage. </p>
+        <p>
+          <strong>Requires:</strong>
+          <a href="#R-ZeroEditCompatibility">ZeroEditCompatibility</a>
+        </p>
+      </section>
       <section id="UC-SurfaceTemperatureDatabank">
-        <h2>Use Case #2 - Creation of consolidated global land surface temperature climate
+        <h2>Use Case #3 - Creation of consolidated global land surface temperature climate
           databank</h2>
         <p>
           <span style="font-size: 10pt">(Contributed by Jeremy Tandy)</span>
@@ -497,6 +609,22 @@ var respecConfig = {
                 >DigitalPreservationOfGovernmentRecords</a>
             </p>
           </dd>
+          <dt id="R-ForeignKeyReferences">R-ForeignKeyReferences</dt>
+          <dd>
+            <em id="_R-ForeignKeyReferences">
+              <strong>Ability to cross reference between CSV files</strong>
+            </em>
+            <p>To interpret data in a given row of a CSV file, need to be able to refer to
+              information provided in supplementary CSV files or elsewhere within the same CSV file;
+              e.g. using a foreign key type reference. The cross-referenced CSV files may, or may
+              not, be packaged together.</p>
+            <p>
+              <strong>Motivation:</strong>
+              <a href="#UC-DigitalPreservationOfGovernmentRecords"
+                >DigitalPreservationOfGovernmentRecords</a>, <a
+                href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>
+            </p>
+          </dd>
           <dt id="R-ExternalDataDefinitionResource">R-ExternalDataDefinitionResource</dt>
           <dd>
             <em id="_R-ExternalDataDefinitionResource">
@@ -507,7 +635,7 @@ var respecConfig = {
               describe the structure and semantics of that file. This additional metadata is termed
               a <em>Data Definition Resource</em> (<dfn>DDR</dfn>). The <a>DDR</a> may be defined
               outside the scope of the CSV file with which it is associated; for example, if the
-              <a>DDR</a> is common to many CSV files or the <a>DDR</a> is used to drive CSV file
+                <a>DDR</a> is common to many CSV files or the <a>DDR</a> is used to drive CSV file
               validation. In such cases it must be possible to associate the <a>DDR</a> from the CSV
               file.</p>
             <p>
@@ -543,10 +671,10 @@ var respecConfig = {
               be determined to relate the entity described within a given row to the corresponding
               data values for that row. Where available, the type of a data value should be
               incorporated in the resulting RDF. Built-in types defined in [[RDF-CONCEPTS]] (e.g.
-              <code><a href="http://www.w3.org/2001/XMLSchema#dateTime">xsd:dateTime</a></code>,
-              <code><a href="http://www.w3.org/2001/XMLSchema#integer">xsd:integer</a></code>
+                  <code><a href="http://www.w3.org/2001/XMLSchema#dateTime">xsd:dateTime</a></code>,
+                  <code><a href="http://www.w3.org/2001/XMLSchema#integer">xsd:integer</a></code>
               etc.) and types defined in other RDF vocabularies / OWL ontologies (e.g. <code><a
-                href="http://www.opengis.net/ont/geosparql#wktLiteral">geo:wktLiteral</a></code>
+                  href="http://www.opengis.net/ont/geosparql#wktLiteral">geo:wktLiteral</a></code>
               from <a href="http://www.opengeospatial.org/standards/geosparql">GeoSPARQL</a>) shall
               be supported.</p>
             <p class="issue">Should we be referencing RDF 1.1?</p>
@@ -554,7 +682,7 @@ var respecConfig = {
               <strong>Dependency:</strong>
               <a href="#R-SemanticTypeDefinition">R-SemanticTypeDefinition</a>, <a
                 href="#R-SyntacticTypeDefinition">R-SyntacticTypeDefinition</a>, <a
-                  href="#R-PrimaryKey">R-PrimaryKey</a>
+                href="#R-PrimaryKey">R-PrimaryKey</a>
             </p>
             <p>
               <strong>Motivation:</strong>
@@ -562,15 +690,94 @@ var respecConfig = {
                 >DigitalPreservationOfGovernmentRecords</a>
             </p>
           </dd>
+
+          <dt id="R-PackagingOfMultipleTables">R-PackagingOfMultipleTables</dt>
+          <dd>
+            <em id="_R-PackagingOfMultipleTables">
+              <strong>Ability to group multiple data tables into a single package for
+                publication</strong>
+            </em>
+            <p>When publishing sets of related data tables, it shall be possible to group them
+              together into a single package for publication. The package may optionally include a
+              manifest of the tables contained therein and summary information pertinent to the
+              whole pacckage.</p>
+            <p>
+              <strong>Motivation:</strong>
+              <a href="#UC-PublicationOfNationalStatistics">PublicationOfNationalStatistics</a>
+            </p>
+          </dd>
           <dt id="R-AnnotationAndSupplementaryInfo">R-AnnotationAndSupplementaryInfo</dt>
           <dd>
             <em id="_R-AnnotationAndSupplementaryInfo">
               <strong>Ability to add annotation and supplementary information to CSV file</strong>
             </em>
-            <p>description to be added here</p>
+            <p>Annotations and supplementary information may be associated with:</p>
+            <ul>
+              <li>a package of tables; e.g. the entire Workbook</li>
+              <li>an individual sheet within the Workbook</li>
+              <li>a range of cells within a sheet</li>
+              <li>a row</li>
+              <li>a coloumn</li>
+              <li>an individual cell</li>
+            </ul>
+            <p>Annotations and supplementary information may be literal values or references to a
+              remote resource. The presence of annotations or supplementary information must not
+              adversely impact parsing of the tabular data (e.g. the annotations and supplementary
+              information must be logically separate).</p>
             <p>
               <strong>Motivation:</strong>
-              <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>
+              <a href="#UC-PublicationOfNationalStatistics">PublicationOfNationalStatistics</a>, <a
+                href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>
+            </p>
+          </dd>
+          <dt id="R-AssociationOfCodeValuesWithExternalDefinitions"
+            >R-AssociationOfCodeValuesWithExternalDefinitions</dt>
+          <dd>
+            <em id="_R-AssociationOfCodeValuesWithExternalDefinitions">
+              <strong>Ability to associate a code value with externally managed defintion</strong>
+            </em>
+            <p>CSV files make frequent use of code values when describing data. Examples include:
+              geographic regions, status codes and category codes. It is difficult to interpret the
+              tabular data with out an unambiguous definition of the code values used.</p>
+            <p>It must be possible to unambiguously associate the notation used within a CSV file
+              with the appropriate external definition.</p>
+            <div class="note">
+              <p>We cannot assume that the publisher of the CSV file will use a URI to reference the
+                code value; most likely they will use a local identifier that is unique within the
+                scope of a particular code list. For example, the Land Registry use the codes "A",
+                "C" and "D" to denote their transactions rather than a fully qualified URI reference
+                to the concept that these codes identify.</p>
+              <p>Thus the requirement here is two fold:</p>
+              <ul>
+                <li>to refer to the code list (aka thesaurus) wherein the code value is defined,
+                  and</li>
+                <li>to determine the relevant entity within the code list using the notation
+                  provided in the cell value.</li>
+              </ul>
+            </div>
+            <p>
+              <strong>Motivation:</strong>
+              <a href="#UC-PublicationOfNationalStatistics">PublicationOfNationalStatistics</a>, <a
+                href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>
+            </p>
+          </dd>
+          <dt id="R-ZeroEditCompatibility">R-ZeroEditCompatibility</dt>
+          <dd>
+            <em id="_R-ZeroEditCompatibility">
+              <strong>Compatibility of data analysis tools in common usage with CSV+</strong>
+            </em>
+            <p>CSV+ format should be compatible, at least at a basic level, with the data analysis
+              tools in common usage. At a minimum, existing tools should be able to interpret CSV+
+              as though it were CSV (as defined in [[RFC4180]]).</p>
+            <div class="issue">
+              <p>Whilst we have a list of CSV tools emerging on the <a
+                  href="https://www.w3.org/2013/csvw/wiki/Tools">wiki</a> we are yet to define the
+                list of tools with which we expect, or aspire, to retain compatibility with.</p>
+              <p>We also do not have an authoritative set of conformance tests yet.</p>
+            </div>
+            <p>
+              <strong>Motivation:</strong>
+              <a href="#UC-PublicationOfNationalStatistics">PublicationOfNationalStatistics</a>
             </p>
           </dd>
           <dt id="R-CsvAsSubsetOfLargerDataset">R-CsvAsSubsetOfLargerDataset</dt>
@@ -632,15 +839,16 @@ var respecConfig = {
                 be: <code>qudt:value/qudt:numericValue</code> – more akin to a <a
                   href="http://marmotta.apache.org/ldpath/language.html">LDPath</a>.</p>
               <p>Furthermore, use of OWL axioms when defining a sub-property of
-                <code>qudt:value</code> would allow the quantity type and unit of measurement to
+                  <code>qudt:value</code> would allow the quantity type and unit of measurement to
                 be inferred, with the column semantics then being specified as
-                <code>ex:temperature_Cel/qudt:numericValue</code>.</p>
+                  <code>ex:temperature_Cel/qudt:numericValue</code>.</p>
             </div>
             <p>
               <strong>Motivation:</strong>
-              <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>, <a
-                href="#UC-DigitalPreservationOfGovernmentRecords"
-                >DigitalPreservationOfGovernmentRecords</a>
+              <a href="#UC-DigitalPreservationOfGovernmentRecords"
+                >DigitalPreservationOfGovernmentRecords</a>, <a
+                href="#UC-PublicationOfNationalStatistics">PublicationOfNationalStatistics</a>,<a
+                href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>
             </p>
           </dd>
           <dt id="R-MissingValueDefinition">R-MissingValueDefinition</dt>
@@ -650,7 +858,7 @@ var respecConfig = {
                 value to be missing</strong>
             </em>
             <p>Significant amounts of existing tabular text data include values such as
-              <code>-999</code>. Typically, these are outside the normal expected range of values
+                <code>-999</code>. Typically, these are outside the normal expected range of values
               and are meant to infer that the value for that cell is missing. Automated parsing of
               CSV files needs to recognise such missing value tokens and behave accordingly.
               Furthermore, it is often useful for a data publisher to declare <em>why</em> a value
@@ -668,19 +876,6 @@ var respecConfig = {
                 requiring modification of that file</strong>
             </em>
             <p>description to be added here</p>
-            <p>
-              <strong>Motivation:</strong>
-              <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>
-            </p>
-          </dd>
-          <dt id="R-ForeignKeyReferences">R-ForeignKeyReferences</dt>
-          <dd>
-            <em id="_R-ForeignKeyReferences">
-              <strong>Ability to cross reference between CSV files</strong>
-            </em>
-            <p>To interpret data in a given row of a CSV file, need to be able to refer to
-              information provided in supplementary CSV files; e.g. using a foreign key type
-              reference. The cross-referenced CSV files may, or may not, be packaged together.</p>
             <p>
               <strong>Motivation:</strong>
               <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>
