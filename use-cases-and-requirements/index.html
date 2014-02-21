@@ -134,32 +134,67 @@ var respecConfig = {
           Records is CSV as the government departments providing the Records lack either the
           technology or resources to provide metadata in the XML and RDF formats preferred by the
           TNA.</p>
+        <p>A CSV-encoded Transcriptions of Records typically describes a set of Records, often
+          organised within a hierarchy. As a result, it is necessary to describe the
+          interrelationships between Records within a single CSV file.</p>
+        <p>Each row within a CSV file relates to a particular Record and is allocated a unique
+          identifier. This unique identifier behaves as a primary key for the Record within the
+          scope of the CSV file and is used when referencing that Record from within other Record
+          transcriptions.</p>
+
+        <p>
+          <strong>Requires:</strong>
+          <a href="#R-PrimaryKey">PrimaryKey</a>
+        </p>
+
         <p>Upon receipt by TNA, each of the Transcriptions of Records is validated against the (set
           of) centrally published data definition(s); it is essential that received CSV metadata
           comply with these specifications to ensure efficient and error free ingest into the
           Records Catalogue.</p>
+        <p>The validation applied is dependent the type of entity described in each row. Entity type
+          is specified in a specific column (e.g. <code>type</code>).</p>
         <p>The data definition file, or CSV Schema, used by the CSV Validation Tool effectively
           forms the basis of a formal contract between TNA and supplying organisations. For more
           information on the CSV Validation Tool and CSV Schema developed by TNA please refer to the
             <a href="https://github.com/digital-preservation/csv-validator#csv-validator">online
-            documentation</a></p>
+            documentation</a>. </p>
+        <p>The CSV Validation Tool is written in <a href="http://www.scala-lang.org/">Scala</a>
+          version 2.10.</p>
 
         <p>
           <strong>Requires:</strong>
-          <a href="#R-ExternalDataDefinitionResource">ExternalDataDefinitionResource</a>
+          <a href="#R-ExternalDataDefinitionResource">ExternalDataDefinitionResource</a>, <a
+            href="#R-CsvValidation">CsvValidation</a>
+        </p>
+
+        <p>Following validation, the CSV-encoded Transcriptions of Records are transformed into RDF
+          for insertion into the triple store that underpins the Records Catalogue. The CSV files do
+          not include all the information required to undertake the transformation, e.g. defining
+          which RDF properties are to be used when creating triples for the data value in each cell.
+          As a result, bespoke software has been created by TNA to supply the necessary additional
+          information during the CSV to RDF transformation process. The availability of generic
+          mechanisms to transform CSV to RDF would reduce the burden of effort within TNA when working
+          with CSV files.</p>
+
+        <p>
+          <strong>Requires:</strong>
+          <a href="#R-SyntacticTypeDefinition">SyntacticTypeDefinition</a>, <a
+            href="#R-SemanticTypeDefinition">SemanticTypeDefinition</a>, <a
+            href="#R-CsvToRdfTransformation">CsvToRdfTransformation</a>
         </p>
 
         <div class="issue">
-          <p>Reference to format definition for a transcription of records is missing.</p>
+          <p>Reference to Data Definition Resource (<a>DDR</a>) for a transcription of records is
+            required.</p>
           <p>Provide reference to TNA Records <a href="http://discovery.nationalarchives.gov.uk/"
               >discovery catalogue</a>.</p>
           <p>Use case also requires a real example to refer to; both the CSV metadata and a
-            reference into the catalogue.</p>
+            reference into the catalogue. Please can this show how the row type leads to different
+            validation being applied?</p>
+          <p>Resulting RDF transformed from the example CSV is required.</p>
+          <p>Please indicate what software language and/or tools/libraries are used to work with the
+            CSV data - both validation and <em>transformation</em>.</p>
         </div>
-        
-        <p class="note">This use case is work in progress - more to be added by jtandy</p>
-
-
 
       </section>
       <section id="UC-SurfaceTemperatureDatabank">
@@ -432,6 +467,32 @@ var respecConfig = {
       <section id="acc-req">
         <h2>Accepted Requirements</h2>
         <dl>
+          <dt id="R-PrimaryKey">R-PrimaryKey</dt>
+          <dd>
+            <em id="_R-PrimaryKey">
+              <strong>Ability to determine the primary key for entities described within a CSV
+                file</strong>
+            </em>
+            <p>Each row within a CSV file typically relates to a single entity. In many cases that
+              entity is the object of references from other entities described within the CSV file -
+              or perhaps even from entities described in other CSV files or data resources.</p>
+            <p>Typically within a CSV file, primary key identifiers are only unique within the scope
+              of the CSV file within which they are stated (e.g. a local identifier). In order for
+              the entity to be unambiguously identified, the local identifier needs to be converted
+              to a URI (as defined in [[!RFC3986]]).</p>
+            <ol>
+              <li>need to determine which cell provides the primary key in a given row.</li>
+              <li>where the primary key is defined as a local identfier, need to determine how to
+                convert the local identifier to a URI.</li>
+            </ol>
+            <p class="note">Assumption that a row within a CSV file describes a <em>single</em>
+              entity for which a primary key can be assigned.</p>
+            <p>
+              <strong>Motivation:</strong>
+              <a href="#UC-DigitalPreservationOfGovernmentRecords"
+                >DigitalPreservationOfGovernmentRecords</a>
+            </p>
+          </dd>
           <dt id="R-ExternalDataDefinitionResource">R-ExternalDataDefinitionResource</dt>
           <dd>
             <em id="_R-ExternalDataDefinitionResource">
@@ -440,11 +501,57 @@ var respecConfig = {
             </em>
             <p>To allow automated processing of a CSV file additional metadata is required to
               describe the structure and semantics of that file. This additional metadata is termed
-              a <em><dfn>Data Definition Resource</dfn></em> (DDR). The <a>DDR</a> may be defined
+              a <em>Data Definition Resource</em> (<dfn>DDR</dfn>). The <a>DDR</a> may be defined
               outside the scope of the CSV file with which it is associated; for example, if the
                 <a>DDR</a> is common to many CSV files or the <a>DDR</a> is used to drive CSV file
-              validation. In such cases it must be possible to associate the <a>DDR</a> from the
-              CSV file.</p>
+              validation. In such cases it must be possible to associate the <a>DDR</a> from the CSV
+              file.</p>
+            <p>
+              <strong>Motivation:</strong>
+              <a href="#UC-DigitalPreservationOfGovernmentRecords"
+                >DigitalPreservationOfGovernmentRecords</a>
+            </p>
+          </dd>
+          <dt id="R-CsvValidation">R-CsvValidation</dt>
+          <dd>
+            <em id="_R-CsvValidation">
+              <strong>Ability to validate a CSV for conformance with a specified <a>DDR</a></strong>
+            </em>
+            <p>The content of a CSV often needs to be validated for conformance against a
+              specification (e.g. a <a>DDR</a>). The validation applied may vary based on row-specific 
+              attributes such as the type of entity described in that row.</p>
+            <p class="issue">Is CSV validation in scope?</p>
+            <p>
+              <strong>Motivation:</strong>
+              <a href="#UC-DigitalPreservationOfGovernmentRecords"
+                >DigitalPreservationOfGovernmentRecords</a>
+            </p>
+          </dd>
+          <dt id="R-CsvToRdfTransformation">R-CsvToRdfTransformation</dt>
+          <dd>
+            <em id="_R-CsvToRdfTransformation">
+              <strong>Ability to automatically transform a CSV into RDF</strong>
+            </em>
+            <p>Standardised CSV to RDF transformation mechanisms mitigate the need for bespoke
+              transformation software to be developed by CSV data consumers, thus simplifying the
+              exploitation of CSV data. Identifiers used as primary and foreign keys within a CSV
+              file need to be converted to URIs. RDF properties (or <em>property paths</em>) need to
+              be determined to relate the entity described within a given row to the corresponding
+              data values for that row. Where available, the type of a data value should be
+              incorporated in the resulting RDF. Built-in types defined in [[RDF-CONCEPTS]] (e.g.
+                  <code><a href="http://www.w3.org/2001/XMLSchema#dateTime">xsd:dateTime</a></code>,
+                  <code><a href="http://www.w3.org/2001/XMLSchema#integer">xsd:integer</a></code>
+              etc.) and types defined in other RDF vocabularies / OWL ontologies (e.g. <code><a
+                  href="http://www.opengis.net/ont/geosparql#wktLiteral">geo:wktLiteral</a></code>
+              from <a href="http://www.opengeospatial.org/standards/geosparql">GeoSPARQL</a>) shall
+              be supported.</p>
+            <p class="issue">Should we be referencing RDF 1.1?</p>
+            <p>
+              <strong>Dependency:</strong>
+              <a href="#R-SemanticTypeDefinition">R-SemanticTypeDefinition</a>, <a
+                href="#R-SyntacticTypeDefinition">R-SyntacticTypeDefinition</a>, <a
+                href="#R-PrimaryKey">R-PrimaryKey</a>
+            </p>
             <p>
               <strong>Motivation:</strong>
               <a href="#UC-DigitalPreservationOfGovernmentRecords"
@@ -495,7 +602,9 @@ var respecConfig = {
               description to be added</p>
             <p>
               <strong>Motivation:</strong>
-              <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>
+              <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>, <a
+                href="#UC-DigitalPreservationOfGovernmentRecords"
+                >DigitalPreservationOfGovernmentRecords</a>
             </p>
           </dd>
           <dt id="R-SemanticTypeDefinition">R-SemanticTypeDefinition</dt>
@@ -525,7 +634,9 @@ var respecConfig = {
             </div>
             <p>
               <strong>Motivation:</strong>
-              <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>
+              <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>, <a
+                href="#UC-DigitalPreservationOfGovernmentRecords"
+                >DigitalPreservationOfGovernmentRecords</a>
             </p>
           </dd>
           <dt id="R-MissingValueDefinition">R-MissingValueDefinition</dt>
