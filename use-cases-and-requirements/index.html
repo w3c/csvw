@@ -19,7 +19,11 @@ var respecConfig = {
             name: "Jeremy Tandy",
             company: "Met Office",
             companyURL: "http://www.metoffice.gov.uk/"
-        }],
+        },{
+	  name: "Davide Ceolin",
+	  company: "VU University Amsterdam",
+	  companyURL: "http://www.vu.nl"
+	}],
     wg: "CSV on the Web",
     wgURI: "https://www.w3.org/2013/csvw/wiki/Main_Page",
     wgPublicList: "public-csv-wg",
@@ -615,6 +619,81 @@ var respecConfig = {
           merged dataset (Stage 3) outlined above.</p>
         
       </section>
+      <section id="UC-ReliabilityAnalysesOfPoliceOpenData">
+	<h2>Use Case #8 - Reliability Analyses of Police Open Data</h2>
+        <p>
+          <span style="font-size: 10pt">(Contributed by Davide Ceolin)</span>
+        </p>
+	<p>Several Web sources expose datasets about UK crime statistics.
+	These datasets vary in format (e.g. maps vs. CSV files), timeliness, aggregation level, etc.
+	Before being published on the Web, these data are processed to preserve the privacy of the people
+	involved, but again the processing policy varies from source to source.</p>
+	<p>Every month, the UK Police Home Office publishes (via data.police.uk) CSV files that report crime
+	counts, aggregated on geographical basis (per address or police neighbourhood) and on type basis.
+	Before publishing, data are smoothed, that is, grouped in predefined areas and assigned to the
+	mid point of each area. Each area has to contain a minimum number of physical addresses. The goal
+	of this procedure is to prevent the reconstruction of the identity of the people involved in the
+	crimes.</p>
+	<p>Over time, the policies adopted for preprocessing these data have changed, but data previously
+	published have not been recomputed. Therefore, datasets about different months present relevant
+	differences in terms of crime types reported and geographical aggregation (e.g. initially, each
+	geographical area for aggregation had to include at least 12 physical addresses. Later, this
+	limit was lowered to 8).</p>
+	<p>These policies introduce a controlled error in the data for privacy reasons, but these changes
+	in the policies imply the fact that different datasets adhere differently to the real data, i.e.
+	they present different reliability levels. Previous work [1] provided two procedures for measuring
+	and comparing the reliability of the datasets, but in order to automate and improve these procedures,
+	it is crucial to understand the meaning of the columns, the relationships between columns, and how the
+	data rows have been computed.</p>
+	<p>For instance, here is a snippet from a dataset about crime happened in Hampshire in April 2012:
+	<pre class="example">
+        Month	Force			Neighbourhood	Burglary	Robbery		Vehicle crime	Violent crime	Anti-social behaviour	Other crime
+{snip}
+2011-04	Hampshire Constabulary	2LE11		2		0		1		6		14			6
+2011-04	Hampshire Constabulary	2LE10		1		0		2		4		15			6
+2011-04	Hampshire Constabulary	2LE12		3		0		0		4		25			21
+{snip}
+	</pre>
+	and that dataset reports 248 entries, while in October 2012, the crime types we can see are increased to 11:
+	<pre class = "example">
+	  Month	Force			Neighbourhood Burglary	Robbery	Vehicle crime	Violent crime	ASB	CDA	Shoplifting	Other theft	Drugs	PDW	Other crime
+2012-10	Hampshire Constabulary	2LE11		1		0		1		2	8	0		0		1	1	0	1
+2012-10	Hampshire Constabulary	1SY01		9		1		12		8	87	17		12		14	13	7	4
+2012-10	Hampshire Constabulary	1SY02		11		0		11		20	144	39		2		12	9	8	5
+	</pre>
+	<ul>
+	  <li>ASB = Anti-social behaviour</li>
+	  <li>PDW = Public Disorder and Weapons</li>
+	  <li>CDA = Criminal damage and arson</li>
+	</ul>
+	This dataset reports 232 entries.</p>
+	
+	<p>In order to properly handle the columns,
+	it is crucial to understand the type of the data therein contained. Given the context, knowing
+	this information would reveal an important part of the column meaning (e.g. to identify dates).
+	</p>
+	<p>
+          <strong>Requires:</strong>
+          <a href="#R-SyntacticTypeDefinition">SyntacticTypeDefinition</a>
+        </p>
+	<p>
+	Also, it is important to understand the precise semantics of each column.
+	This is relevant for two reasons. First, to identify relations between columns (e.g. some crime types
+	are siblings, while other are less semantically related). Second, to identify semantic relations between
+	columns in heterogeneous datasets (e.g. a column in one dataset may correspond to the sum of two or more
+	columns in others).
+	</p>
+	<p>
+          <strong>Requires:</strong>
+          <a href="#R-SemanticTypeDefinition">SemanticTypeDefinition</a>
+        </p>
+	<p>Lastly, datasets with different row numbers are the result of different smoothing procedures. Therefore, it would
+	be important to trace and access their provenance, in order to facilitate their comparison.</p>
+	<p>
+          <strong>Requires:</strong>
+          <a href="#R-ProvenanceRecording">ProvenanceRecording</a>
+        </p>
+      </section>
 
       <section id="other-uc">
         <h2>Other Use Cases</h2>
@@ -887,6 +966,7 @@ var respecConfig = {
               <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>, <a
                 href="#UC-DigitalPreservationOfGovernmentRecords"
                 >DigitalPreservationOfGovernmentRecords</a>
+		, <a href="#UC-ReliabilityAnalysesOfPoliceOpenData">ReliabilityAnalysesOfPoliceOpenData</a>
             </p>
           </dd>
           <dt id="R-SemanticTypeDefinition">R-SemanticTypeDefinition</dt>
@@ -920,6 +1000,7 @@ var respecConfig = {
                 >DigitalPreservationOfGovernmentRecords</a>, <a
                 href="#UC-PublicationOfNationalStatistics">PublicationOfNationalStatistics</a>,<a
                 href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>
+		, <a href="#UC-ReliabilityAnalysesOfPoliceOpenData">ReliabilityAnalysesOfPoliceOpenData</a>
             </p>
           </dd>
           <dt id="R-MissingValueDefinition">R-MissingValueDefinition</dt>
@@ -950,6 +1031,18 @@ var respecConfig = {
             <p>
               <strong>Motivation:</strong>
               <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>
+            </p>
+          </dd>
+	  <dt id="R-ProvenanceRecording">R-ProvenanceRecording</dt>
+          <dd>
+            <em id="_R-ProvenanceRecording">
+              <strong>Ability to keep track of the provenance trace of a CSV file</strong>
+            </em>
+            <p>The ability to capture the provenance of a CSV file or of part of it is crucial to understand and properly manage the data therein contained.</p>
+	    <p class="issue">Should we distinguish between the provenance of part of the CSV file (e.g. of some cells) and the provenance of the file as a whole?</p>
+            <p>
+              <strong>Motivation:</strong>
+              <a href="#UC-ReliabilityAnalysesOfPoliceOpenData">ReliabilityAnalysesOfPoliceOpenData</a>
             </p>
           </dd>
         </dl>
