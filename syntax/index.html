@@ -49,7 +49,7 @@ var respecConfig = {
   <body>
     <section id="abstract">
       <p>
-        Tabular data is routinely transferred on the web as "CSV", but the definition of "CSV" in practice is very loose. This document outlines a basic data model or infoset for tabular data, and the recommended syntax for mapping into that data model.
+        Tabular data is routinely transferred on the web as "CSV", but the definition of "CSV" in practice is very loose. This document outlines a basic data model or infoset for tabular data, and a best practice syntax for mapping into that data model.
       </p>
     </section>
     <section id="sotd">
@@ -59,8 +59,11 @@ var respecConfig = {
     </section>
     <section id="intro">
       <h2>Introduction</h2>
+      <p>
+        <dfn title="tabular data">Tabular data</dfn> is data that is structured into rows, each of which contains information about some thing. Each row contains the same number of fields (although some of these fields may be empty), which provide values of properties of the thing described by the row. In tabular data, fields within the same column provide values for the same property of the thing described by the particular row. This is what differentiates tabular data from other line-oriented formats. 
+      </p>
     	<p>
-        Tabular data is routinely transferred on the web as "CSV", but the definition of "CSV" in practice is very loose. Some people use the term to mean any delimited text file. Others stick more closely to the most standard definition of CSV that there is, [[!RFC4180]]. <a href="#standards" class="sectionRef"></a> describes the various ways in which CSV is defined.
+        Tabular data is routinely transferred on the web in a textual format called "CSV", but the definition of "CSV" in practice is very loose. Some people use the term to mean any delimited text file. Others stick more closely to the most standard definition of CSV that there is, [[!RFC4180]]. <a href="#standards" class="sectionRef"></a> describes the various ways in which CSV is defined.
       </p>
     </section>
     <section id="model">
@@ -79,28 +82,52 @@ var respecConfig = {
           Data is held in a <dfn>table</dfn>.
         </p>
         <p>
-          Each table has one or more <dfn title="column">columns</dfn>, each of which is named. For compatibility with SQL, the names of the columns must be unique. The names of columns are case sensitive. The order of the columns is significant and must be preserved by applications.
+          Each table has one or more <dfn title="column">columns</dfn>. The order of the columns is significant and must be preserved by applications.
         </p>
         <p>
           Each table has one or more <dfn title="row">rows</dfn>. Each row contains a <dfn>field</dfn> for each column in the table. Some of these fields may be <dfn title="null field">null fields</dfn>.
+        </p>
+        <p class="issue">
+          Is the order of rows significant in a table?
         </p>
       </section>
       <section id="annotated-model">
         <h3>Annotated Data Model</h3>
         <p>
-          An <dfn>annotated table</dfn> is a <a>table</a> that is annotated with additional metadata. The table has a number of <dfn title="property">properties</dfn> which provide additional information about the table as a whole. The <dfn title="value">values</dfn> of these properties may be lists, structured objects, or atomic values. Annotations on a table may include links to other tables (eg to indicate tables that include related information).
+          An <dfn>annotated table</dfn> is a <a>table</a> that is annotated with additional metadata. The table has a number of <dfn title="property">properties</dfn> which provide additional information about the table as a whole. The <dfn title="value">values</dfn> of these properties may be lists, structured objects, or atomic values. Annotations on a table may include:
         </p>
+        <ul>
+          <li>titles or descriptions of the table</li>
+          <li>information about the source or provenance of the data in the table</li>
+          <li>links to other tables (eg to indicate tables that include related information)</li>
+        </ul>
         <p>
-          The <a title="column">columns</a> within an <a>annotated table</a> are all <dfn title="annotated column">annotated columns</dfn>. The annotations on a column provide information about how to interpret the <a title="field">fields</a> in the column, such as the expected type of values in that column or whether the column contains unique values.
+          The <a title="column">columns</a> within an <a>annotated table</a> are all <dfn title="annotated column">annotated columns</dfn>. The annotations on a column provide information about how to interpret the <a title="field">fields</a> in the column.
         </p>
+        <ul>
+          <li>a name or label for the column</li>
+          <li>the expected type of values in that column</li>
+          <li>an indication of whether the column contains unique values</li>
+        </ul>
         <p>
-          The <a title="row">rows</a> within an <a>annotated table</a> are all <dfn title="annotated row">annotated rows</dfn>. The annotations on a row provide additional metadata about the information held in the row, such as the certainty or source of the information it contains.
+          The <a title="row">rows</a> within an <a>annotated table</a> are all <dfn title="annotated row">annotated rows</dfn>. The annotations on a row provide additional metadata about the information held in the row, such as:
         </p>
+        <ul>
+          <li>the certainty of the information in that row</li>
+          <li>information about the source or provenance of the data in that row</li>
+        </ul>
         <p>
-          The <a title="field">fields</a> within an <a>annotated row</a> are all <dfn title="annotated field">annotated fields</dfn>. The annotations on a field provide metadata about the value held in the field, particularly when this overrides the information provided for the <a>annotated column</a> and <a>annotated row</a> that the field falls within. Annotations on a field might be notes about the value or type annotations.
+          The <a title="field">fields</a> within an <a>annotated row</a> are all <dfn title="annotated field">annotated fields</dfn>. The annotations on a field provide metadata about the value held in the field, particularly when this overrides the information provided for the <a>annotated column</a> and <a>annotated row</a> that the field falls within. Annotations on a field might be:
         </p>
+        <ul>
+          <li>notes to aid the interpretation of the value</li>
+          <li>type annotations for the value</li>
+        </ul>
         <p>
           An <a>annotated table</a> may also contain a number of <dfn title="annotated region">annotated regions</dfn>. Regions are themselves tabular structures comprised of selected <a title="row">rows</a> and <a title="column">columns</a> and the <a title="field">fields</a> within those rows for those columns. Annotated regions are regions that have annotations associated with them. <a title="annotated column">Annotated columns</a> and <a title="annotated row">annotated rows</a> are special types of annotated regions where the region is the entirety of a single column or single row.
+        </p>
+        <p class="issue">
+          Should we describe annotated regions? Are there any use cases which justify it?
         </p>
       </section>
       <section id="grouped-model">
@@ -116,30 +143,59 @@ var respecConfig = {
     <section id="syntax">
       <h2>CSV+ Syntax</h2>
       <p>
-        This section defines a standard, CSV-based, syntax for tabular data and how it maps into the core tabular data model described in <a href="#core-model" class="sectionRef"></a>. Compliant applications that output this format must meet each of the constraints.
+        There is no standard for CSV, and there are many variants of CSV used on the web today. This section defines a standard, CSV-based, syntax for tabular data and how it maps into the core tabular data model described in <a href="#core-model" class="sectionRef"></a>. Compliant applications that output this format must meet each of the constraints.
+      </p>
+      <p>
+        This section does not seek to describe how applications that <em>input</em> textual tabular data should interpret it, except that any data that is in the format defined here should be understood as defined here. There may be many other formats which an application might interpret into the tabular data model described here, including using different separators or fixed format tables, multiple tables within a single file, or ones that have metadata lines before a table header.
       </p>
       <div class="note">
         <p>
           This syntax is not compliant with <code>text/csv</code> as defined in [[!RFC4180]]: it permits characters other than ASCII, and it permits line endings other than <code>CRLF</code>. Supporting the full set of Unicode characters by using UTF-8 and supporting <code>LF</code> line endings are important characteristics for data formats that are used internationally and on non-Windows platforms. However, all files that adhere to [[!RFC4180]]'s definition of CSV are compliant CSV+ files.
         </p>
       </div>
+      <section id="content-type">
+        <h3>Content Type</h3>
+        <p>
+          The appropriate content type for a CSV+ file is <code>text/csv</code>. For example, when a CSV+ file is transmitted via HTTP, the HTTP response MUST include a <code>Content-Type</code> header with the value <code>text/csv</code>:
+        </p>
+        <pre>
+Content-Type: text/csv
+        </pre>
+        <p class="issue">
+          See below for issues relating to whether we should instead define a different content type.
+        </p>
+      </section>
       <section id="encoding">
         <h3>Encoding</h3>
         <p>
-          CSV+ files MUST be encoded using UTF-8.
+          CSV+ files SHOULD be encoded using UTF-8. If a CSV+ file is not encoded using UTF-8, the encoding MUST be specified through the <code>charset</code> parameter in the <code>Content-Type</code> header:
         </p>
-        <p>
-          To fix up CSV files that use a different encoding, parsers SHOULD detect the encoding of the file through some other mechanism (eg interacting with a user or adopting a default encoding based on locale).
-        </p>
+        <pre>
+Content-Type: text/csv;charset=ISO-8859-1
+        </pre>
+        <div class="issue">
+          <p>
+            RFC4180 defines the default charset as US-ASCII because that was (at the time RFC4180 was written) the default charset for all <code>text/*</code> media types. This has been superseded with RFC6657.
+            <a href="http://tools.ietf.org/html/rfc6657#section-3">Section 3 of RFC6657</a> states "new subtypes of the "text" media type SHOULD NOT define a default "charset" value.  If there is a strong reason to do so despite this advice, they SHOULD use the "UTF-8" [RFC3629] charset as the default."
+          </p>
+          <p>
+            Do we have a strong reason to specify a default charset? Should we be defining <code>application/csv</code> instead, to avoid doing unrecommended things with a <code>text/*</code> media type.
+          </p>
+        </div>
       </section>
       <section id="line-endings">
         <h3>Line Endings</h3>
         <p>
           The ends of rows in a CSV+ file MUST be either <code>CRLF</code> (<code>U+000D U+000A</code>) or <code>LF</code> (<code>U+000A</code>). Line endings within escaped <a title="field">fields</a> are not normalised.
         </p>
-        <p>
-          To fix up CSV files that use other line ending characters, parsers SHOULD replace any <a href="http://en.wikipedia.org/wiki/Newline#Unicode">other line endings</a> used at the end of rows (but not within fields) with line feed (<code>U+000A</code>) characters.
-        </p>
+        <div class="issue">
+          <p>
+            <a href="http://tools.ietf.org/html/rfc2046#section-4.1.1">Section 4.1.1 of RFC2046</a> specifies that "The canonical form of any MIME "text" subtype MUST always represent a line break as a CRLF sequence.  Similarly, any occurrence of CRLF in MIME "text" MUST represent a line break.  Use of CR and LF outside of line break sequences is also forbidden."
+          </p>
+          <p>
+            Should we be defining <code>application/csv</code> instead, to prevent having to adhere to this rule, or should we stick to the <code>CRLF</code> rule?
+          </p>
+        </div>
       </section>
       <section id="lines">
         <h3>Lines</h3>
@@ -149,52 +205,16 @@ var respecConfig = {
         <p>
           Values that contain commas, line endings or double quotes MUST be escaped by having the entire value wrapped in double quotes. There MUST NOT be whitespace before or after the double quotes. Within these escaped fields, any double quotes MUST be escaped with two double quotes (<code>""</code>).
         </p>
-        <p>
-          To fix up delimited files that do not use commas as separators, parsers SHOULD replace the delimiter used within the file with commas and escape any values that contain commas by wrapping in double quotes and escaping any enclosed double quotes by repeating them.
-        </p>
-        <p>
-          To fix up CSV files that have whitespace before or after an escaped value, parsers SHOULD ignore the whitespace.
-        </p>
-        <p>
-          To fix up CSV files in which different lines contain different numbers of values, additional empty values should be added to the end of lines such that they all contain the same number of values as the line with the most values.
-        </p>
         <section id="headers">
           <h4>Headers</h4>
           <p>
-            The first line of a CSV+ file MUST contain a comma-separated list of names of <a title="column">columns</a>. This is known as the <dfn>header line</dfn> and forms the columns of the table. Column names MUST be unique and MUST NOT be blank.
-          </p>
-          <p class="issue">
-            Any constraints on contents of column names? For compatibility?
+            The first line of a CSV+ file SHOULD contain a comma-separated list of names of <a title="column">columns</a>. This is known as the <dfn>header line</dfn> and provides names for the columns. There are no constraints on these names.
           </p>
           <p>
-            To fix up CSV files that do not have a header line, parsers SHOULD act as if there were a header line with the same number of fields as the first row in the CSV file, numbered sequentially starting at 1 (ie <code>1</code>, <code>2</code> etc).
+            If a CSV+ file does not include a header line, this MUST be specified using the <code>header</code> parameter of the media type:
           </p>
-          <p class="note">
-            1-based here for better compatibility with fragment identifiers for CSV [[RFC7111]].
-          </p>
-          <p>
-            To fix up CSV files that contain duplicate column names, parsers SHOULD append sequential numbers to any occurrences of a given colum name after the first. For example, if the header row is
-          </p>
-          <pre class="example">
-  name,street,city,country,street,city,country
-          </pre>
-          <p>
-            then the parser should act as if this were
-          </p>
-          <pre class="example">
-  name,street,city,country,street1,city1,country1
-          </pre>
-          <p>
-            To fix up CSV files that have missing or blank columns, parsers SHOULD act as if the blank column name were instead the index of that column (starting from 1). For example, if the header row is
-          </p>
-          <pre class="example">
-  name,,street,city,country
-          </pre>
-          <p>
-            then the parser should act as if this were
-          </p>
-          <pre class="example">
-  name,2,street,city,country
+          <pre>
+Content-Type: text/csv;header=absent
           </pre>
         </section>
       </section>
