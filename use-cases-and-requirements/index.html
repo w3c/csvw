@@ -720,11 +720,11 @@ var respecConfig = {
 	<p>
           <strong>Requires:</strong>
           <a href="#R-MultipleHeadingRows">MultipleHeadingRows</a>
-        </p>
+	</p>
 	<p>The first column contains a GenBank identifier for each gene, with the column name
 	"gene_name". It would be useful to be able to describe the type of data in this column, either using a URL prefix
 	("http://www.ncbi.nlm.nih.gov/nuccore/"), or a standard name ("genbank"), so that the parser can convert each cell to a URL
-	(e.g. <http://www.ncbi.nlm.nih.gov/nuccore/NM_008638>) to uniquely identify each gene.</p>
+	(e.g. "http://www.ncbi.nlm.nih.gov/nuccore/NM_008638") to uniquely identify each gene.</p>
 	<p>The second column contains the standard symbol for each gene, labelled as "symbol".
 	These appear to be HUGO gene nomenclature symbols, but as there's no mapping it's hard to be sure which namespace these symbols
 	are from.</p>
@@ -765,7 +765,7 @@ var respecConfig = {
 	4 hours).</p>
 	<p>
           <strong>Requires:</strong>
-          <a href="#R-ProvenanceExtraction">ProvenanceExtraction</a>
+          <a href="#R-AnnotationAndSupplementaryInfo">AnnotationAndSupplementaryInfo</a>
         </p>
 	<p>All the details of the experiment (which cells were used, how they were treated, when they were
 	measured) are described in the methods section of the article. To be able to compare data between multiple experiments, a parser
@@ -774,7 +774,109 @@ var respecConfig = {
           <strong>Requires:</strong>
           <a href="#R-ProvenanceRecording">ProvenanceRecording</a>
         </p>
+	</section>
+      <section id="UC-OpenSpendingData">
+        <h2>Use Case #14 - OpenSpending Data</h2>
+        <p>
+          <span style="font-size: 10pt">(Contributed by Stasinos Konstantopoulos)</span>
+        </p>
+		<p>The <a href="http://datahub.io/organization/openspending">OpenSpending</a> and the <a href="http://datahub.io/organization/budgit">Budgit</a> platforms
+		provide plenty of useful datasets providing figures of national budget and speding of several countries. A journalist willing to investigate
+		about public spending fallacies can use these data as a basis for his research, and possibly compare them against different sources.
+		Similarly, a politician that is interested in developing new policies for development can, for instance, combine these data with those from the
+		<a href="http://data.worldbank.org/">World Bank</a> to identify correlations and, possibly, dependencies to leverage.
+		</p>
+		<p>
+		Nevertheless, these uses of these datasets are possibly undermined by the following obstacles.
+		</p>
+		<ul>
+		  <li>There are whole collections of datasets where a single currency is implied for all amounts given. See, for example, how all
+		  <a href="http://datahub.io/dataset/si-budgets">Slovenian Budget Datasets</a> are implicitly give amounts in Euros. It would be
+		  interesting to be able to specify that
+		  in all currently listed datasets under that URL, as well as any added in the future, from 2007 onwards give amounts in EUR.</li>
+		  In order to be able to compare and combine these data with those provided by other sources like the
+		  <a href="http://data.worldbank.org/country/uganda">World Bank</a>,
+		  in an automatic manner, it would be necessary to explicit the currency of each column.
+		  <p>
+		    <strong>Requires:</strong>
+		    <a href="#R-UnitMeasureDefinition">UnitMeasureDefinition</a>
+		  </p>
+		  <li>Similar issues are also in the <a href="http://www.publishwhatyoufund.org/files/uganda_final.csv">Uganda Budget and Aid to Uganda, 2003-2007</a> file,
+		  where there are four columns related to the amount. Of these, "amount" (Ugandan Shillings implied)
+		  and "amount_dollars" (USD implied) are mandatory. The value of these columns is implicit, and moreover, as explained in the
+		  <a href="http://datahub.io/dataset/ugandabudget">complementary information</a>, the Ugandan Shillings amount is computed by converting
+		  the Dollars amount using a ratio determined on year basis (e.g. 2003/4: 1 USD = 1.847 UGX). Since this ratio varies on year basis,
+		  and still corresponds to an approximation of the yearly value of the exchange rate, in order to properly use these data, it would
+		  be preferrable to know how these were obtained, or where to find such information.
+		  </li>
+		  <p>
+		    <strong>Requires:</strong>
+		    <a href="#R-LinksToExternallyManagedDefinitions">LinksToExternallyManagedDefinitions</a>, 
+		    <a href="#R-ProvenanceRecording">ProvenanceRecording</a>
+		  </p>
+		  <li>
+		  Again in the <a href="http://www.publishwhatyoufund.org/files/uganda_final.csv">Uganda Budget and Aid to Uganda, 2003-2007</a> file, if a row represents a
+		  donation, then the values for the "amount_donor" (the amount in the donor's original currency) and "donorcurrency" (the donor's currency name) columns of
+		  that row are reported.
+		  Otherwise, the corresponding values are set to "0", to indicate that the row does not represent a donation and that the only relevant amounts for that row
+		  are reported in the "amount" and "amount_dollars" column. To make these files machine-understandable, it is necessary to make this coding explicit.</li>
+		  <p>
+		    <strong>Requires:</strong>
+		    <a href="#R-MissingValueDefinition">MissingValueDefinition</a>
+		  </p>
+		</ul>
+		<p class="note">The <a href="http://datahub.io/">datahub.io</a> platform that collects both OpenSpeding and Budgit data allows publishing data in Simple Data Format (SDF), RDF
+		and other formats providing explicit semantics. Nevertheless, the datasets mentioned above present either implicit semantics and/or additional metadata files provided only
+		as attachment.</p>
       </section>
+      <section id="UC-RepresentingEntitiesAndFactsExtractedFromText">
+	<h2>Use Case #20 - Representing Entitles and Facts Extracted From Text</h2>
+        <p>
+          <span style="font-size: 10pt">(Contributed by Tim Finin)</span>
+        </p>
+	<p>The US National Institute of Standards and Technology (NIST) has run various conferences on
+	extracting information from text centered around challenge problems. Participants submit the output
+	of their systems on an evaluation dataset to NIST for scoring, typically in the form of tab-separated format.
+	</p>
+
+	<p>The <a href="http://www.nist.gov/tac/2013/KBP/ColdStart/guidelines/KBP2013_ColdStartTaskDescription_1.1.pdf">2013 NIST Cold Start Knowledge Base Population Task</a>, for example, asks participants to extract
+	facts from text and to represent these as triples along with associated metadata that include provenance
+	and certainty values. A line in the submission format consists of a triple (subj pred obj) and, for some
+	predicates, provenance information. Provenance includes a document ID and, depending on the predicate, one
+	or three pairs of string offsets within the document. For predicates that are relations, an optional second
+	set of provenance values can be provided. Each line can also have a optional float as a final column to represent
+	a certainty measure.
+	</p>
+
+	<p>The following four lines show examples of possible triples of varying length. D00124 is the ID of a document
+	and the strings like 283-286 refer to strings in a document using the offsets of the first and last characters.
+	The final float on some lines is the optional certainty value.</p>
+	
+	<pre class="example">
+	  {snip}
+	  :e4 type         PER
+	  :e4 mention      "Bart"  D00124 283-286
+	  :e4 mention      "JoJo"  D00124 145-149 0.9
+	  :e4 per:siblings :e7     D00124 283-286 173-179 274-281
+	  :e4 per:age      "10"    D00124 180-181 173-179 182-191 0.9
+	  :e4 per:parent   :e9     D00124 180-181 381-380 399-406 D00101 220-225 230-233 201-210
+	  {snip}
+	</pre>
+	<p>The submission format does not require that each line have the same number of columns. The expected provenance
+	information for a triple depends on the predicate. For example, for type typically has no provenance, mention has
+	a document ID and offset pair and domain predicates like per:age have one or two provenance records each of which
+	has a document ID and three offset pairs.
+	</p>
+	<p>
+	  <strong>Requires:</strong>
+	  <a href="#R-AnnotationAndSupplementaryInfo">AnnotationAndSupplementaryInfo</a>,
+	  <a href="#R-MissingValueDefinition">MissingValueDefinition</a>,
+	  <a href="#R-SemanticTypeDefinition">SemanticTypeDefinition</a>,
+	  <a href="#R-SynctacticTypeDefinition">SyntacticTypeDefinition</a>
+	</p>
+
+
+      </section>  
       <section id="other-uc">
         <h2>Other Use Cases</h2>
         <p> Don't know if we need this yet? </p>
@@ -782,7 +884,7 @@ var respecConfig = {
 
     </section>
     <section id="req">
-      <h2>Requiremnents</h2>
+      <h2>Requirements</h2>
       <section id="acc-req">
         <h2>Accepted Requirements</h2>
         <p>...</p>
@@ -957,7 +1059,9 @@ var respecConfig = {
             <p>
               <strong>Motivation:</strong>
               <a href="#UC-PublicationOfNationalStatistics">PublicationOfNationalStatistics</a>, <a
-                href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>
+                href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>,
+		<a href="#UC-AnalyzingScientificSpreadsheets">AnalyzingScientificSpreadsheets</a>,
+		<a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>
             </p>
           </dd>
           <dt id="R-AssociationOfCodeValuesWithExternalDefinitions"
@@ -1031,7 +1135,7 @@ var respecConfig = {
             <p>description to be added here</p>
             <p>
               <strong>Motivation:</strong>
-              <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>
+              <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>, <a href="#UC-OpenSpendingData">OpenSpendingData</a>
             </p>
           </dd>
           <dt id="R-SyntacticTypeDefinition">R-SyntacticTypeDefinition</dt>
@@ -1047,7 +1151,8 @@ var respecConfig = {
                 href="#UC-DigitalPreservationOfGovernmentRecords"
                 >DigitalPreservationOfGovernmentRecords</a>
 		, <a href="#UC-ReliabilityAnalysesOfPoliceOpenData">ReliabilityAnalysesOfPoliceOpenData</a>
-		, <a href="#UC-AnalyzingScientificSpreadsheets">AnalyzingScientificSpreadsheets</a>
+		, <a href="#UC-AnalyzingScientificSpreadsheets">AnalyzingScientificSpreadsheets</a>,
+		<a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>
             </p>
           </dd>
           <dt id="R-SemanticTypeDefinition">R-SemanticTypeDefinition</dt>
@@ -1082,7 +1187,8 @@ var respecConfig = {
                 href="#UC-PublicationOfNationalStatistics">PublicationOfNationalStatistics</a>,<a
                 href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>,
 		<a href="#UC-ReliabilityAnalysesOfPoliceOpenData">ReliabilityAnalysesOfPoliceOpenData</a>,
-		<a href="#UC-AnalyzingScientificSpreadsheets">AnalyzingScientificSpreadsheets</a>
+		<a href="#UC-AnalyzingScientificSpreadsheets">AnalyzingScientificSpreadsheets</a>,
+		<a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>
             </p>
           </dd>
           <dt id="R-MissingValueDefinition">R-MissingValueDefinition</dt>
@@ -1099,7 +1205,9 @@ var respecConfig = {
               is missing; e.g. <code>withheld</code> or <code>aboveMeasurementRange</code></p>
             <p>
               <strong>Motivation:</strong>
-              <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>
+              <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>,
+	      <a href="#UC-OpenSpendingData">OpenSpendingData</a>,
+	      <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>
             </p>
           </dd>
           <dt id="R-ZeroEditAdditionOfSupplementaryMetadata"
@@ -1124,7 +1232,8 @@ var respecConfig = {
 	    <p class="issue">Should we distinguish between the provenance of part of the CSV file (e.g. of some cells) and the provenance of the file as a whole?</p>
             <p>
               <strong>Motivation:</strong>
-              <a href="#UC-ReliabilityAnalysesOfPoliceOpenData">ReliabilityAnalysesOfPoliceOpenData</a>, <a href="#UC-AnalyzingScientificSpreadsheets">AnalyzingScientificSpreadsheets</a>
+              <a href="#UC-ReliabilityAnalysesOfPoliceOpenData">ReliabilityAnalysesOfPoliceOpenData</a>, <a href="#UC-AnalyzingScientificSpreadsheets">AnalyzingScientificSpreadsheets</a>,
+	      <a href="#UC-OpenSpendingData">OpenSpendingData</a>
             </p>
           </dd>
 	  <dt id="R-MultipleHeadingRows">R-MultipleHeadingRows</dt>
@@ -1160,18 +1269,7 @@ var respecConfig = {
 	    <a href="#R-SemanticTypeDefinition">R-SemanticTypeDefinition</a>.</p>
             <p>
               <strong>Motivation:</strong>
-              <a href="#UC-AnalyzingScientificSpreadsheets">AnalyzingScientificSpreadsheets</a>
-            </p>
-          </dd>
-	  <dt id="R-ProvenanceExtraction">R-ProvenanceExtraction</dt>
-          <dd>
-            <em id="_R-ProvenanceExtraction">
-              <strong>Ability to extract provenance information implicitly provided in the CSV file (e.g. in column headers).</strong>
-            </em>
-	    <p>Column headers or cells could contain information about how the values have been computed. It would be useful to be able to interpret such information.</p>
-            <p>
-              <strong>Motivation:</strong>
-              <a href="#UC-AnalyzingScientificSpreadsheets">AnalyzingScientificSpreadsheets</a>
+              <a href="#UC-AnalyzingScientificSpreadsheets">AnalyzingScientificSpreadsheets</a>, <a href="#UC-OpenSpendingData">OpenSpendingData</a>
             </p>
           </dd>
         </dl>
