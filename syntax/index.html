@@ -74,7 +74,7 @@ var respecConfig = {
       <ul>
         <li>The <strong>core data model</strong> described in <a href="#core-model" class="sectionRef"></a> defines the core model for a single table of basic data.</li>
         <li>The <strong>annotated data model</strong> described in <a href="#annotated-model" class="sectionRef"></a> defines a model for tables that are annotated with metadata.</li>
-        <li>The <strong>grouped data model</strong> described in <a href="#grouped-model" class="sectionRef"></a> defines a model for tables that are related to each other in some way.</a>
+        <li>The <strong>grouped data model</strong> described in <a href="#grouped-model" class="sectionRef"></a> defines a model for tables that are related to each other in some way.</li>
       </ul>
       <section id="core-model">
         <h3>Core Data Model</h3>
@@ -148,7 +148,7 @@ var respecConfig = {
         There is no standard for CSV, and there are many variants of CSV used on the web today. This section defines a method for outputting tabular data adhering to the core tabular data model described in <a href="#core-model" class="sectionRef"></a> into a standard, CSV-based, syntax. Compliant applications that output this format must meet each of the constraints.
       </p>
       <p>
-        This section does not seek to describe how applications that <em>input</em> textual tabular data should interpret it, except that any data that is in the format defined here should be understood as defined here. There may be many other formats which an application might interpret into the tabular data model described here, including using different separators or fixed format tables, multiple tables within a single file, or ones that have metadata lines before a table header.
+        This section does not seek to describe how applications that <em>input</em> textual tabular data should interpret it, except that any data that is in the format defined here should be understood as defined here.
       </p>
       <div class="note">
         <p>
@@ -221,6 +221,85 @@ Content-Type: text/csv;header=absent
         </section>
       </section>
 
+    </section>
+    <section id="parsing">
+      <h2>Parsing Tabular Data</h2>
+      <p>
+        As described in <a href="#syntax" class="sectionRef"></a>, there may be many formats which an application might interpret into the tabular data model described in <a href="#model" class="sectionRef"></a>, including using different separators or fixed format tables, multiple tables within a single file, or ones that have metadata lines before a table header.
+      </p>
+      <p>
+        This section describes an algorithm for parsing formats other than the plain CSV+ format specified in <a href="#syntax" class="sectionRef"></a>. It is impossible to do this in a fully automated manner, so this algorithm depends on the following flags being set externally (eg through user input):
+      </p>
+      <dl>
+        <dt><dfn>encoding<dfn></dt>
+        <dd>The character encoding for the file, one of the encodings listed in [[!encoding]]. The default is <code>utf-8</code>.</dd>
+        <dt><dfn>row terminator</dfn></dt>
+        <dd>The character that is used at the end of a row. The default is <code>CRLF</code>.</dd>
+        <dt><dfn>enclosure character</dfn></dt>
+        <dd>The character that is used around escaped fields. The default is <code>"</code>.</dd>
+        <dt><dfn>escape character</dfn></dt>
+        <dd>The character that is used to escape the <a>enclosure character</a> within escaped fields. The default is <code>"</code>.</dd>
+        <dt><dfn>skip rows</dfn></dt>
+        <dd>The number of rows to skip at the beginning of the file, before a header row or tabular data. The default is <code>0</code>.</dd>
+        <dt><dfn>comment prefix</dfn></dt>
+        <dd>A character that, when it appears at the beginning of a skipped row, indicates a comment that should be associated as a comment annotation to the table. The default is <code>#</code>.</dd>
+        <dt><dfn>header row count</dfn></dt>
+        <dd>The number of header rows (following the skipped rows) in the file. The default is <code>1</code>.</dd>
+        <dt><dfn>delimiter<dfn></dt>
+        <dd>The separator between fields. The default is <code>,</code>.</dd>
+        <dt><dfn>skip columns</dfn></dt>
+        <dd>The number of columns to skip at the beginning of each row, before any header columns. The default is <code>0</code>.</dd>
+        <dt><dfn>header column count</dfn></dt>
+        <dd>The number of header columns (following the skipped columns) in each row. The default is <code>0</code>.</dd>
+        <dt><dfn>skip blank rows</dfn></dt>
+        <dd>Indicates whether to ignore wholly empty rows (ie rows in which all the fields are empty). The default is <code>false</code>.</dd>
+      </dl>
+      <div class="issue">
+        <p>
+          When parsing, should we:
+        </p>
+        <ul>
+          <li>always trim whitespace around fields?</li>
+          <li>always create empty fields for missing cells?</li>
+        </ul>
+      </div>
+      <p>
+        The algorithm for parsing a document containing tabular data is as follows:
+      </p>
+      <ol>
+        <li>Read the file using the specified <a>encoding</a>.</li>
+        <li>Find the rows. Each row ends with a <a>row terminator</a>, but values that are enclosed within the <a>enclosure character</a> may contain the <a>row terminator</a> without it indicating the end of the row. The <a>enclosure character</a> may be escaped using the <a>escape character</a> where it appears within fields.</li>
+        <li>Skip the number of rows indicated by the <a>skip rows</a> parameter.</li>
+        <li>Within the skipped rows, find rows that start with the <a>comment prefix</a>. These form comment annotations on the table.</li>
+        <li>Gather the number of header rows indicated by the <a>header row count</a> parameter; the remaining rows are data rows.</li>
+        <li>
+          <p>
+            Split the header and data rows into fields using the <a>delimiter</a>. Values that are enclosed within the <a>enclosure character</a> may contain the <a>delimiter</a>. The <a>enclosure character</a> may be escaped using the <a>escape character</a> where it appears within fields.
+          </p>
+          <p>
+            If <a>trim</a> is <code>true</code> or <code>start</code> then whitespace from the start of values that are not enclosed must be removed from the value. If <a>trim</a> is <code>true</code> or <code>end</code> then whitespace from the end of values that are not enclosed must be removed from the value.
+          </p>
+        </li>
+        <li>In each row, ignore the number of columns indicated by the <a>skip columns</a> parameter.</li>
+        <li>Gather the number of header columns indicated by the <a>header column count</a> parameter.</li>
+        <li>Each field within a header row that is not in a skipped or header column is a label annotation on that column.</li>
+        <li>Each field within a header column is an annotation on the row it appears in; if there is a header row then that provides the type of the annotation for the row, otherwise it is a label annotation.</li>
+        <li>If <a>skip blank rows</a> is <code>true</code> then ignore any rows in which all the field values are empty strings.</li>
+      </ol>
+      <!-- alternative, more procedural appraoch would be something like this:
+      <p>
+        To <dfn>read a row</dfn>:
+      </p>
+      <ol>
+        <li>set <var>fields</var> to an empty list</li>
+        <li>set <var>skipped rows</var> to <code>0</code></li>
+        <li>set <var>header rows</var> to an empty list</li>
+        <li><a>read a field</a> and add that value to the <var>fields</var> list</li>
+        <li>if the next character is whitespace, then if <a>trim</a> is <code>true</code> or <code>end</code> then ignore the next whitespace characters, otherwise raise an error.</li>
+        <li>otherwise, if the next character is the <a>delimiter</a> then go back to step 2.</li>
+        <li>otherwise, if the next character is the <a>row terminator</a> then return the list of <var>fields</var> as the content of the row.</li>
+      </ol>
+    -->
     </section>
     <section class="appendix" id="standards">
       <h2>Existing Standards</h2>
