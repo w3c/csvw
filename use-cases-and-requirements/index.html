@@ -755,6 +755,140 @@ Department for Business Innovation and Skills,Higher Education Funding Council f
           <a href="#R-CsvToRdfTransformation">CsvToRdfTransformation</a>
         </p>
       </section>
+      
+      <section id="UC-PublicationOfPropertyTransactionData">
+        <h2>Use Case #5 - Publication of property transaction data</h2>
+        <p>
+          <span style="font-size: 10pt">(Contributed by Andy Seaborne)</span>
+        </p>
+        <p>The <a href="http://www.landregistry.gov.uk/media/about-us">Land Registry</a> is the 
+          government department with responsibility to register the ownership of land and property
+          within England and Wales. Once land or property is entered to the Land Register
+          any ownership changes, mortgages or leases affecting that land or property are recorded.</p>
+        
+        <p>Their <a href="http://www.landregistry.gov.uk/market-trend-data/public-data/price-paid-data">
+          Price paid data</a>, dating from 1995 and consisting of more than 18.5 million records, 
+          tracks the residential property sales in England and Wales that are lodged for registration. 
+          This dataset is one of the most reliable sources of house price information in England and Wales.</p>
+        
+        <p>Residential property transaction details are extracted from a data warehouse system 
+          and collated into a tabular dataset for each month. 
+          The current monthly dataset is available online in both <code>.txt</code> and 
+          <code>.csv</code> formats. Snippets of data for January 2014 are provided below. White space
+          has been added for clarity.</p>
+        
+        <p><a href="http://publicdata.landregistry.gov.uk/market-trend-data/price-paid-data/b/pp-monthly-update.txt">
+          pp-monthly-update.txt</a></p>
+        <pre class="example">
+{C6428808-DC2A-4CE7-8576-0000303EF81B},137000,2013-12-13 00:00, "B67 5HE","T","N","F","130","",       "WIGORN ROAD",       "",   "SMETHWICK",            "SANDWELL",       "WEST MIDLANDS","A"
+{16748E59-A596-48A0-B034-00007533B0C1}, 99950,2014-01-03 00:00, "PE3 8QR","T","N","F", "11","",             "RISBY","BRETTON","PETERBOROUGH","CITY OF PETERBOROUGH","CITY OF PETERBOROUGH","A"
+{F10C5B50-92DD-4A69-B7F1-0000C3899733},355000,2013-12-19 00:00,"BH24 1SW","D","N","F", "55","","NORTH POULNER ROAD",       "",    "RINGWOOD",          "NEW FOREST",           "HAMPSHIRE","A"
+{snip}
+        </pre>
+        
+        <p><a href="http://publicdata.landregistry.gov.uk/market-trend-data/price-paid-data/b/pp-monthly-update-new-version.csv">
+          pp-monthly-update-new-version.csv</a></p>
+        <pre class="example">
+"{C6428808-DC2A-4CE7-8576-0000303EF81B}","137000","2013-12-13 00:00", "B67 5HE","T","N","F","130","",       "WIGORN ROAD",       "",   "SMETHWICK",            "SANDWELL",       "WEST MIDLANDS","A"
+"{16748E59-A596-48A0-B034-00007533B0C1}", "99950","2014-01-03 00:00", "PE3 8QR","T","N","F", "11","",             "RISBY","BRETTON","PETERBOROUGH","CITY OF PETERBOROUGH","CITY OF PETERBOROUGH","A"
+"{F10C5B50-92DD-4A69-B7F1-0000C3899733}","355000","2013-12-19 00:00","BH24 1SW","D","N","F", "55","","NORTH POULNER ROAD",       "",    "RINGWOOD",          "NEW FOREST",           "HAMPSHIRE","A"
+{snip}
+        </pre>
+        
+        <p>There seems to be little difference between the two formats with the exception that all 
+          fields within the <code>.csv</code> file are escaped with a pair of double quotes (<code>""</code>).</p>
+        
+        <p>The header row is absent. Information regarding the meaning of each column and the 
+          abbreviations used within the dataset are provided in a complementary 
+          <a href="http://www.landregistry.gov.uk/market-trend-data/public-data/price-paid-faq#m18">FAQ document</a>. 
+          The column headings are provided below along with some supplemental detail:</p>
+        
+        <ol>
+          <li><code>Transaction unique identifier</code></li>
+          <li><code>Price</code> - sale price stated on the Transfer deed</li>
+          <li><code>Date of Transfer</code> - date when the sale was completed, as stated on the Transfer deed</li>
+          <li><code>Postcode</code></li>
+          <li><code>Property Type</code> - <code>D</code> (detatched), <code>S</code> (semi-detatched), 
+            <code>T</code> (terraced), <code>F</code> (flats/maisonettes)</li>
+          <li><code>Old/New</code> - <code>Y</code> (newly built property) and 
+            <code>N</code> (established residential building)</li>
+          <li><code>Duration</code> - relates to tenure; <code>F</code> (freehold) and <code>L</code> (leasehold)</li>
+          <li><code>PAON</code> - Primary Addressable Object Name</li>
+          <li><code>SAON</code> - Secondary Addressable Object Name</li>
+          <li><code>Street</code></li>
+          <li><code>Locality</code></li>
+          <li><code>Town/City</code></li>
+          <li><code>Local Authority</code></li>
+          <li><code>County</code></li>
+          <li><code>Record status</code> - indicates status of the transaction; <code>A</code> 
+            (addition of a new transaction), <code>C</code> (correction of an existing transaction) 
+            and <code>D</code> (deleted transaction)</li>
+        </ol>
+        
+        <p>
+          <strong>Requires:</strong>
+          <a href="#R-AnnotationAndSupplementaryInfo">AnnotationAndSupplementaryInfo</a>
+        </p>
+        
+        <p>Each row, or record, within the tabular dataset describes a property transaction. The 
+          <code>Transaction unique identifier</code> column provides the primary key for each record.</p>
+        
+        <p>
+          <strong>Requires:</strong>
+          <a href="#R-PrimaryKey">PrimaryKey</a>
+        </p>
+        
+        <p>Each transaction record makes use of predefined category codes as outlined above; e.g. 
+          <code>Duration</code> may be <code>F</code> (freehold) or <code>L</code> (leasehold). Furthermore, 
+          geographic descriptors are commonly used. Whilst there is no attempt to 
+          link these descriptors to specific geographic identifiers, such a linkage is likely
+          to provide additional utility when aggregating transaction data by location or region for further
+          analysis. At present there is no standardised mechanism to associate the catagory codes,
+          provided as plain text, or geographic identifiers with their authoritative definitions.</p>
+        
+        <p>
+          <strong>Requires:</strong>
+          <a href="#R-AssociationOfCodeValuesWithExternalDefinitions">AssociationOfCodeValuesWithExternalDefinitions</a>
+        </p>
+        
+        <p>The collated monthly transaction dataset is used as the basis for updating the Land Registry's 
+          information systems; in this case the data is persisted as RDF triples within a triple store. 
+          A <a href="http://landregistry.data.gov.uk/landregistry/sparql/sparql.html">SPARQL end-point</a>
+          and accompanying <a href="http://landregistry.data.gov.uk/def/ppi">data definitions</a> are provided 
+          by the Land Registry allowing users to query the content of the triple store.</p>
+        
+        <p>In order to update the triple store, the monthly transaction dataset is converted into RDF. The 
+          value of the <code>Record status</code> field for a given row informs the update process: add, update or
+          delete. Bespoke software has been created by the Land Registry to transformation from CSV to RDF.
+          The transformation requires supplementary information not present in the CSV, such as the RDF 
+          properties for each column specified in the <a href="http://landregistry.data.gov.uk/def/ppi">
+          data definitions</a>. The need to create and maintain bespoke software incurs costs that may 
+          be avoided through use of a generic CSV-to-RDF transformation mechanism. </p>
+        
+        <p>
+          <strong>Requires:</strong>
+          <a href="#R-CsvToRdfTransformation">CsvToRdfTransformation</a>
+        </p>
+        
+        <p class="note">The monthly transaction dataset contains in the order of 100,000 records;
+          any transformation will need to scale accordingly.</p>
+        
+        <p>In parallel to providing access via the <a href="http://landregistry.data.gov.uk/landregistry/sparql/sparql.html">
+          SPARQL end-point</a>, the Land Registry also provides aggregated sets of transaction data. Data is
+          available as a single file containing all transactions since 1995, or partitioned by year.
+          Given that the complete dataset is approaching 3GB in size, the annual partitions provide a
+          far more manageable method to download the property transaction data. However, each annual 
+          partition is only a subset of the complete dataset. It is important to be able to both make
+          assertions about the complete dataset (e.g. publication date, license etc.) and to be 
+          able to understand how an annual partition relates to the complete dataset and other partitions.</p>
+        
+        <p>
+          <strong>Requires:</strong>
+          <a href="#R-CsvAsSubsetOfLargerDataset">CsvAsSubsetOfLargerDataset</a>
+        </p>
+        
+      </section>
+      
       <section id="UC-ReliabilityAnalysesOfPoliceOpenData">
 	<h2>Use Case #8 - Reliability Analyses of Police Open Data</h2>
         <p>
@@ -1094,7 +1228,8 @@ Department for Business Innovation and Skills,Higher Education Funding Council f
               <strong>Motivation:</strong>
               <a href="#UC-DigitalPreservationOfGovernmentRecords"
                 >DigitalPreservationOfGovernmentRecords</a>,
-              <a href="#UC-OrganogramData">OrganogramData</a>
+              <a href="#UC-OrganogramData">OrganogramData</a>, 
+              <a href="#UC-PublicationOfPropertyTransactionData">PublicationOfPropertyTransactionData</a>
             </p>
           </dd>
           <dt id="R-ForeignKeyReferences">R-ForeignKeyReferences</dt>
@@ -1197,9 +1332,9 @@ Department for Business Innovation and Skills,Higher Education Funding Council f
             </p>
             <p>
               <strong>Motivation:</strong>
-              <a href="#UC-DigitalPreservationOfGovernmentRecords"
-                >DigitalPreservationOfGovernmentRecords</a>,
-              <a href="#UC-OrganogramData">OrganogramData</a>
+              <a href="#UC-DigitalPreservationOfGovernmentRecords">DigitalPreservationOfGovernmentRecords</a>,
+              <a href="#UC-OrganogramData">OrganogramData</a>,
+              <a href="#UC-PublicationOfPropertyTransactionData">PublicationOfPropertyTransactionData</a>
             </p>
           </dd>
 
@@ -1250,13 +1385,14 @@ Department for Business Innovation and Skills,Higher Education Funding Council f
             
             <p>
               <strong>Motivation:</strong>
-              <a href="#UC-PublicationOfNationalStatistics">PublicationOfNationalStatistics</a>, <a
-                href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>,
-		<a href="#UC-AnalyzingScientificSpreadsheets">AnalyzingScientificSpreadsheets</a>,
-		<a href="#UC-ReliabilityAnalysesOfPoliceOpenData">ReliabilityAnalysesOfPoliceOpenData</a>,
-		<a href="#UC-OpenSpendingData">OpenSpendingData</a>,
-		<a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>,
-		<a href="#UC-IntelligentlyPreviewingCSVFiles">IntelligentlyPreviewingCSVFiles</a>	
+              <a href="#UC-PublicationOfNationalStatistics">PublicationOfNationalStatistics</a>, 
+              <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>,
+              <a href="#UC-PublicationOfPropertyTransactionData">PublicationOfPropertyTransactionData</a>,
+	          	<a href="#UC-AnalyzingScientificSpreadsheets">AnalyzingScientificSpreadsheets</a>,
+	          	<a href="#UC-ReliabilityAnalysesOfPoliceOpenData">ReliabilityAnalysesOfPoliceOpenData</a>,
+          		<a href="#UC-OpenSpendingData">OpenSpendingData</a>,
+	          	<a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>,
+	          	<a href="#UC-IntelligentlyPreviewingCSVFiles">IntelligentlyPreviewingCSVFiles</a>	
             </p>
           </dd>
           <dt id="R-AssociationOfCodeValuesWithExternalDefinitions"
@@ -1286,8 +1422,9 @@ Department for Business Innovation and Skills,Higher Education Funding Council f
             </div>
             <p>
               <strong>Motivation:</strong>
-              <a href="#UC-PublicationOfNationalStatistics">PublicationOfNationalStatistics</a>, <a
-                href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>
+              <a href="#UC-PublicationOfNationalStatistics">PublicationOfNationalStatistics</a>, 
+              <a href="#UC-PublicationOfPropertyTransactionData">PublicationOfPropertyTransactionData</a>,
+              <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>
             </p>
           </dd>
           <dt id="R-ZeroEditCompatibility">R-ZeroEditCompatibility</dt>
@@ -1318,7 +1455,8 @@ Department for Business Innovation and Skills,Higher Education Funding Council f
             <p>description to be added here</p>
             <p>
               <strong>Motivation:</strong>
-              <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>
+              <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>,
+              <a href="#UC-PublicationOfPropertyTransactionData">PublicationOfPropertyTransactionData</a>
             </p>
           </dd>
           <dt id="R-LinksToExternallyManagedDefinitions">R-LinksToExternallyManagedDefinitions</dt>
