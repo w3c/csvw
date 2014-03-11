@@ -971,9 +971,11 @@ Department for Business Innovation and Skills,Higher Education Funding Council f
         <p>
           <span style="font-size: 10pt">(Contributed by Alf Eaton, Davide Ceolin, Martine de Vos)</span>
         </p>
-	<p>A paper published in Nature Immunology in December 2012 compared changes in expression of a range of genes in
-	response to treatment with two different cytokines [1]. The results were published in the paper as graphic figures,
-	and the raw data was presented in the form of two supplementary spreadsheets, as Excel files [2].</p>
+	<p>A <a href="http://www.nature.com/ni/journal/v13/n12/full/ni.2449.html#supplementary-information">paper</a> published
+	in Nature Immunology in December 2012 compared changes in expression of a range of genes in
+	response to treatment with two different cytokines. The results were published in the paper as graphic figures,
+	and the raw data was presented in the form of <a href="http://www.nature.com/ni/journal/v13/n12/extref/ni.2449-S3.xls">
+	two supplementary spreadsheets, as Excel files</a>.</p>
 
 	<p>Having at disposal both the paper and the results, a scientist may wish to reproduce the experiment, check if the results
 	he obtains coincide with those published, and compare those results with others, provided by different studies about the same
@@ -981,21 +983,43 @@ Department for Business Innovation and Skills,Higher Education Funding Council f
 	</p>
 	<p>
 	Because of the size of the datasets and of the complexity of the computations, it could be necessary to perform such
-	analyses and comparisons by means of properly defined software. Such software would require as input the data contained in the
-	Excel file. However, it would be difficult to write a parser to extract the information, for the following reasons.
+	analyses and comparisons by means of properly defined software, typically by means of an R, Python or Matlab script.
+	Such software would require as input the data contained in the
+	Excel file. However, it would be difficult to write a parser to extract the information, for the reasons described below.
 	</p>
-
-	<p>The table contains several columns of data that are measurements of gene expression in cells after
+	<p>
+	To clarify the issues related to the spreadsheet parsing and analysis, we first present an example extrapolated from it.
+	</p>
+<pre class="example">
+	  Supplementary Table 2. Genes more potently regulated by IL-15																		
+																		
+gene_name	symbol		RPKM									Fold Change							
+				4 hour							24 hour							4 hour	...	
+		Cont		IL2_1nM	IL2_500nM	IL15_1nM	IL15_500nM	IL2_1nM	IL2_500nM	IL15_1nM	IL15_500nM	IL2_1nM	...
+{snip}
+NM_001033122	Cd69		15,67	46,63		216,01		30,71		445,58	9,21		77,32		4,56		77,21	...
+NM_026618	Ccdc56		9,07	12,55		9,25		5,88		14,33	20,08		20,91		11,97		22,69	...
+NM_008637	Nudt1		9,31	7,51		8,60		11,21		6,84	15,85		25,14		7,56		22,77	...
+NM_008638	Mthfd2		58,67	33,99		245,87		44,66		167,87	55,62		204,50		24,52		176,51	...
+NM_178185	Hist1h2ao	7,13	16,52		7,82		7,79		16,99	75,04		290,72		21,99		164,93	...
+{snip}	
+	</pre>
+	<p>As we can see from the example, the table contains several columns of data that are measurements of gene expression in cells after
 	treatment with two concentrations of two cytokines, measured after two periods of time, presented as both actual values and fold
-	change. This can be represented in a table, but needs 3 levels of headings and several merged cells.</p>
+	change. This can be represented in a table, but needs 3 levels of headings and several merged cells. In fact, the first row is the title of the table,
+	the second to fourth rows are the table headers, and the first two columns are also headers. It would be useful to be able to describe this in a way that a
+	parser could understand. Cell borders are also used to communicate information, though this table would still be understandable without them.</p>
 	<p>
           <strong>Requires:</strong>
           <a href="#R-MultipleHeadingRows">MultipleHeadingRows</a>
+	  <a href="#R-HeadingColumns">HeadingColumns</a>
 	</p>
+	
+	
 	<p>The first column contains a GenBank identifier for each gene, with the column name
-	"gene_name". It would be useful to be able to describe the type of data in this column, either using a URL prefix
-	("http://www.ncbi.nlm.nih.gov/nuccore/"), or a standard name ("genbank"), so that the parser can convert each cell to a URL
-	(e.g. "http://www.ncbi.nlm.nih.gov/nuccore/NM_008638") to uniquely identify each gene.</p>
+	"gene_name". The first column contains a GenBank identifier for each gene, with the column name "gene_name". The GenBank identifier
+	provides a local identifier for each gene. This local identifier, e.g. “NM_008638”, can be converted to a fully qualified URI by
+	adding a URI prefix, e.g. “http://www.ncbi.nlm.nih.gov/nuccore/NM_008638” allowing the gene to be uniquely and unambiguously identified.</p>
 	<p>The second column contains the standard symbol for each gene, labelled as "symbol".
 	These appear to be HUGO gene nomenclature symbols, but as there's no mapping it's hard to be sure which namespace these symbols
 	are from.</p>
@@ -1014,13 +1038,7 @@ Department for Business Innovation and Skills,Higher Education Funding Council f
           <strong>Requires:</strong>
           <a href="#R-SemanticTypeDefinition">SemanticTypeDefinition</a>
         </p>
-	<p>The first row is the title of the table; the second to fourth rows are the table headers, and the first two
-	columns are also headers. It would be useful to be able to describe this in a way that a parser could understand. Cell borders are
-	also used to communicate information, though this table would still be understandable without them.</p>
-	<p>
-          <strong>Requires:</strong>
-          <a href="#R-MultipleHeadingRows">MultipleHeadingRows</a>
-        </p>
+	
 	<p>Half of the cells represent measurements, but the details of what those measurements are can only be found
 	in the article text. The other half of the cells represent the change in expression over the background level. It is difficult to
 	tell the difference without annotation that describes the relationship between the cells (or understanding of the nested headings).
@@ -1565,7 +1583,8 @@ Department for Business Innovation and Skills,Higher Education Funding Council f
             <em id="_R-MultipleHeadingRows">
               <strong>Ability to handle headings spread across multiple initial rows, as well as to distinguish between single column headings and file headings.</strong>
             </em>
-	    <p>Row headings should be distinguished from file headings (if present).</p>
+	    <p>Row headings should be distinguished from file headings (if present). Also, in case subheadings are present, it should be possible to define their coverage
+	    (i.e. how many columns they refer to).</p>
             <p>
               <strong>Motivation:</strong>
               <a href="#UC-PublicationOfNationalStatistics">PublicationOfNationalStatistics</a>,
@@ -1598,6 +1617,16 @@ Department for Business Innovation and Skills,Higher Education Funding Council f
               <a href="#UC-AnalyzingScientificSpreadsheets">AnalyzingScientificSpreadsheets</a>,
 	      <a href="#UC-OpenSpendingData">OpenSpendingData</a>,
 	      <a href="#UC-IntelligentlyPreviewingCSVFiles">IntelligentlyPreviewingCSVFiles</a>
+            </p>
+          </dd>
+	  <dt id="R-HeadingColumns">R-HeadingColumns</dt>
+          <dd>
+            <em id="_R-HeadingColumns">
+              <strong>Ability to handle columns as row headers.</strong>
+            </em>
+	    <p>Heading columns, if present, should be distinguished from the data columns.</p>
+	      <strong>Motivation:</strong>
+              <a href="#UC-AnalyzingScientificSpreadsheets">AnalyzingScientificSpreadsheets</a>
             </p>
           </dd>
         </dl>
