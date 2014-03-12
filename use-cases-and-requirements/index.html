@@ -892,6 +892,84 @@ Department for Business Innovation and Skills,Higher Education Funding Council f
         </p>
         
       </section>
+      <section id="JournalArticleSearch">
+        <h2>Use Case #7 - Journal Article Solr Search Results </h2>
+        <p>
+          <span style="font-size: 10pt">(Contributed by Alf Eaton)</span>
+        </p>
+        <p> The aim of this use case is to build a local personal journal article publication database
+            based on the search results from PLOS ONE. The <a href="http://www.plosone.org//">Public Library 
+            of Science</a> PLOS is a nonprofit open access scientific publishing project aimed at creating 
+            a library of open access journals and other scientific literature under an open content license.  
+          </p>
+          <p>
+          In general this use case also illustrates the utility of CSV as a convenient exchange format for pushing
+          tabular data between software components: 
+          </p> 
+          <ul>
+          <li> making it easier to interpret the data on subsequent ingest
+          </li>
+          <li> being able to work with manageable chunks of a tabular data set (e.g. only subsets of the tabular dataset 
+               are ever materialised in a single CSV file, and we often want to know how that subset fits within the larger 
+               whole). I also note that the use case talks about extracting subsets of data.
+          </li>
+          </ul>
+          </p>
+    
+       <p> The PLOS website features a <a href="https://lucene.apache.org/solr/">Solr</a> index search 
+           engine which can return query results in 
+           <a href="http://api.plos.org/search/?q=doc_type:full+AND+cross_published_journal_key:PLoSONE&fl=id,doi,publication_date,title_display,author&sort=publication_date+desc&wt=json&rows=5">JSON</a>, 
+           <a href="http://api.plos.org/search/?q=doc_type:full+AND+cross_published_journal_key:PLoSONE&fl=id,doi,publication_date,title_display,author&sort=publication_date+desc&rows=5">XML</a> 
+           or in a more concise format <a href="http://api.plos.org/search/?q=doc_type:full+AND+cross_published_journal_key:PLoSONE&fl=id,doi,publication_date,title_display,author&sort=publication_date+desc&wt=csv&rows=5">CSV</a>: 
+       </p> 
+       <pre class="example">
+id,publication_date,title_display,author
+10.1371/journal.pone.0087584,2014-02-14T00:00:00Z,Healthcare Worker Perceived Barriers to Early Initiation of Antiretroviral and Tuberculosis Therapy among Tanzanian Inpatients,&quot;Bahati M K Wajanga,Robert N Peck,Samuel Kalluvya,Daniel W Fitzgerald,Luke R Smart,Jennifer A Downs&quot;
+10.1371/journal.pone.0087286,2014-02-14T00:00:00Z,&quot;Subditine, a New Monoterpenoid Indole Alkaloid from Bark of &lt;i&gt;Nauclea subdita&lt;/i&gt; (Korth.) Steud. Induces Apoptosis in Human Prostate Cancer Cells&quot;,&quot;Sook Yee Liew,Chung Yeng Looi,Mohammadjavad Paydar,Foo Kit Cheah,Kok Hoong Leong,Won Fen Wong,Mohd Rais Mustafa,Marc Litaudon,Khalijah Awang&quot;
+10.1371/journal.pone.0087630,2014-02-14T00:00:00Z,Spatiotemporal Characterizations of Dengue Virus in Mainland China: Insights into the Whole Genome from 1978 to 2011,&quot;Hao Zhang,Yanru Zhang,Rifat Hamoudi,Guiyun Yan,Xiaoguang Chen,Yuanping Zhou&quot;
+10.1371/journal.pone.0086587,2014-02-14T00:00:00Z,&lt;i&gt;optGpSampler&lt;/i&gt;: An Improved Tool for Uniformly Sampling the Solution-Space of Genome-Scale Metabolic Networks,&quot;Wout Megchelenbrink,Martijn Huynen,Elena Marchiori&quot;
+10.1371/journal.pone.0082694,2014-02-14T00:00:00Z,Prophylactic Antibiotics to Prevent Cellulitis of the Leg: Economic Analysis of the PATCH I &amp; II Trials,&quot;James M Mason,Kim S Thomas,Angela M Crook,Katharine A Foster,Joanne R Chalmers,Andrew J Nunn,Hywel C Williams&quot;
+       </pre>
+       <p> 
+        The key characteristics are:  
+        <ul>
+        <li> CSV uses fixed number of fields
+        </li>
+        <li> First row provides header field tags.
+        </li>
+        <li> All values are comma separated values
+        </li>
+        <li> Text fields are surrounded by quotes so that commas in text will be ignored
+        </li>
+        </ul>
+       <p> 
+        The following observations were made while interacting with the search engine:   
+       </p>
+       <ul>
+          <li>As the "rows" parameter is set to "5", the first 5 rows are returned. To paginate through the 
+              collection, add "&start={offset}" (e.g. "&start=5") to the query.
+          </li> 
+          <li> It would be useful to receive, at the start of the response, an indication of the total number of
+               results (as is present in the JSON version of the response, as OpenSearch fields). </li>
+          <li> It would also be useful to be able to continue fetching rows using the last known identifier
+               with "&before={id}" or "&since={id}", to avoid issues of pagination if the result set is altered 
+               while while it is being fetched. 
+          </li>
+          <li> To allow incremental updates to the local collection, it would again be useful to support "&since={id}"
+               (or an If-Modified-Since header), to fetch all the items since the query was last update. </li>
+          <li> For archiving, it might also be desirable to break the data up into separate CSV files - one per day - 
+               that can easily be synchronized between machines and recombined when needed.
+          </li>
+          <li> For converting to linked data, it would be useful to be able to specify the data type of each cell, 
+               and to map the column headers and values to URLs. 
+          </li>
+           <li> The author field contains multiple names separated by commas (and so the field is quoted). It would be 
+               useful if the description of the column could specify that the column can contain multiple values, and 
+               what the delimiter between them is.
+          </li>
+       </ul>
+
+      </section>
       
       <section id="UC-ReliabilityAnalysesOfPoliceOpenData">
 	<h2>Use Case #8 - Reliability Analyses of Police Open Data</h2>
