@@ -1369,7 +1369,7 @@ HETATM  132  OXT ACY   401       4.306  23.101  12.291  1.00 21.19           O
       </section>
 
       <section id="UC-RepresentingEntitiesAndFactsExtractedFromText">
-	<h2>Use Case #20 - Representing Entitles and Facts Extracted From Text</h2>
+	<h2>Use Case #20 - Representing Entities and Facts Extracted From Text</h2>
         <p>
           <span style="font-size: 10pt">(Contributed by Tim Finin)</span>
         </p>
@@ -1406,12 +1406,82 @@ HETATM  132  OXT ACY   401       4.306  23.101  12.291  1.00 21.19           O
 	a document ID and offset pair and domain predicates like per:age have one or two provenance records each of which
 	has a document ID and three offset pairs.
 	</p>
+	<p>The file format exemplified above opens for a number of issues described as follows.</p>
+	Each row is intended to describe an entity (“:e4” in the example above) that thus represents a primary key and needs
+	to be identified as such.</p>
 	<p>
-	  <strong>Requires:</strong>
-	  <a href="#R-AnnotationAndSupplementaryInfo">AnnotationAndSupplementaryInfo</a>,
-	  <a href="#R-MissingValueDefinition">MissingValueDefinition</a>,
-	  <a href="#R-SemanticTypeDefinition">SemanticTypeDefinition</a>,
-	  <a href="#R-SynctacticTypeDefinition">SyntacticTypeDefinition</a>
+	<strong>Requires:</strong>
+	<a href="#R-PrimaryKey">PrimaryKey</a>
+	</p>
+	<p>After each triple, there is a variable number of annotations representing the provenance of the triple and, occasionally
+	its certainty. This information has to be properly identified and managed.</p>
+	<p>
+	<strong>Requires:</strong>
+	<a href="#R-AnnotationAndSupplementaryInfo">AnnotationAndSupplementaryInfo</a>
+	</p>
+	<p>
+	Entities “:e4”, “:e7” and “:e9” appear to be (foreign key) references to other entities described in this or in external tables. Likewise, also the
+	identifiers “D00124” and “D00101” are ambiguous identifiers. It would be useful to identify the resources that these references represent.</p>
+	<p>Moreover, “PER” appears to be a term from a controlled vocabulary. How do we know which controlled vocabulary it is a member of and what its authoritative
+	definition is?</p>	
+	<strong>Requires:</strong>
+	<a href="#R-ForeignKeyReferences">ForeignKeyReferences</a>,
+	<a href="R-AssociationOfCodeValuesWithExternalDefinitions">AssociationOfCodeValuesWithExternalDefinitions</a>,
+	<a href="R-LinksToExternallyManagedDefinitions">LinksToExternallyManagedDefinitions</a>,
+	<a href="#R-SemanticTypeDefinition">SemanticTypeDefinition</a>
+	</p>
+	<p>“:e4” is an ambiguous local identifier (as are “:e7” and “:e9”). How can one make the identifier an unambiguous URI?
+	Also the identifiers used for the predicates (e.g. “type”, “mention”, “per:siblings” etc.) are ambiguous local identifiers. How can one make the identifier an unambiguous URI?
+	A similar requirement regards the row annotations. In particular, provenance annotations are composed by document (e.g. “D00124”) and page number ranges.
+	(e.g. “180-181”). Page number ranges are clearly valid only in the context of the preceding document identifier. The interesting assertion about provenance
+	is the reference (document plus page range). Thus we might
+	want to give the reference a unique identifier comprising from document ID and page range (e.g. D00124#180-181).</p>
+	<p>
+	<strong>Requires:</strong>
+	<a href="#R-URIMapping">URIMapping</a>
+	</p>
+	<p>
+	Besides the entities, the table presents also some values. Some of these are strings (e.g. “10”, “Bart”), some of them are probably floating point values (e.g. “0.9”).
+	It would be useful to have an explicit syntactic type definition for these values.
+	</p>
+	<p>
+	<strong>Requires:</strong>
+	<a href="#R-SyntacticTypeDefinition">SyntacticTypeDefinition</a>
+	</p>
+	<p>Entity “:e4” is the subject of many rows, meaning that many rows can be combined to make a composite set of statements about this entity.</p>
+	<p>Moreover, a single row in the table comprises a triple (subject-predicate-object), one or more provenance references and an optional certainty measure.
+	The provenance references have been normalised for compactness (e.g. so they fit on a single row). However, each provenance statement has the same target triple so one
+	could unbundle the composite row into multiple simple statements that have a regular number of columns (see the two equivalent examples below).
+	<pre class="example">
+	  {snip}
+:e4 per:age      "10"    D00124 180-181 173-179 182-191 0.9
+:e4 per:parent   :e9     D00124 180-181 381-380 399-406 D00101 220-225 230-233 201-210
+{snip}
+	</pre>
+	<pre class="example">
+{snip}
+:e4 per:age      "10"    D00124 180-181 0.9
+:e4 per:age      "10"    D00124 173-179 0.9
+:e4 per:age      "10"    D00124 182-191 0.9
+:e4 per:parent   :e9     D00124 180-181
+:e4 per:parent   :e9     D00124 381-380
+:e4 per:parent   :e9     D00124 399-406
+:e4 per:parent   :e9     D00101 220-225
+:e4 per:parent   :e9     D00101 230-233
+:e4 per:parent   :e9     D00101 201-210
+{snip}
+	</pre>
+	</p>
+	<strong>Requires:</strong>
+	<a href="#R-TableNormalization">TableNormalization</a>
+	</p>
+	<p>Lastly, since we already observed that rows comprise triples, that there is a frequent reference to externally
+	defined vocabularies, that values are defined as text (literals), and that triples are also composed by entities,
+	for which we aim to obtain a URI (as described above), it may be useful to be able to convert such a table in RDF.
+	</p>
+	<p>
+	<strong>Requires:</strong>
+	<a href="#R-CsvToRdfTransformation">CsvToRdfTransformation</a>
 	</p>
 	</section>
       <section id="UC-IntelligentlyPreviewingCSVFiles">
@@ -1445,7 +1515,6 @@ HETATM  132  OXT ACY   401       4.306  23.101  12.291  1.00 21.19           O
 	so that it could offer options to filter/sort these by date/numerically.</p>
 	<p>	
 	<strong>Requires:</strong>
-	  <a href="#R-SyntacticTypeDefinition">SyntacticTypeDefinition</a>,
 	  <a href="#R-SemanticTypeDefinition">SemanticTypeDefinition</a>,
 	  <a href="#R-UnitMeasureDefinition">UnitMeasureDefinition</a>
 	</p>
@@ -1501,7 +1570,8 @@ HETATM  132  OXT ACY   401       4.306  23.101  12.291  1.00 21.19           O
               <a href="#UC-DigitalPreservationOfGovernmentRecords"
                 >DigitalPreservationOfGovernmentRecords</a>,
               <a href="#UC-OrganogramData">OrganogramData</a>, 
-              <a href="#UC-PublicationOfPropertyTransactionData">PublicationOfPropertyTransactionData</a>
+              <a href="#UC-PublicationOfPropertyTransactionData">PublicationOfPropertyTransactionData</a>,
+	      <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>
             </p>
           </dd>
           <dt id="R-ForeignKeyReferences">R-ForeignKeyReferences</dt>
@@ -1518,7 +1588,8 @@ HETATM  132  OXT ACY   401       4.306  23.101  12.291  1.00 21.19           O
               <a href="#UC-DigitalPreservationOfGovernmentRecords"
                 >DigitalPreservationOfGovernmentRecords</a>, 
               <a href="#UC-OrganogramData">OrganogramData</a>, 
-              <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>
+              <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>,
+	      <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>
             </p>
           </dd>
           <dt id="R-ExternalDataDefinitionResource">R-ExternalDataDefinitionResource</dt>
@@ -1537,7 +1608,8 @@ HETATM  132  OXT ACY   401       4.306  23.101  12.291  1.00 21.19           O
             <p>
               <strong>Motivation:</strong>
               <a href="#UC-DigitalPreservationOfGovernmentRecords"
-                >DigitalPreservationOfGovernmentRecords</a>
+                >DigitalPreservationOfGovernmentRecords</a>,
+		<a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>
             </p>
           </dd>
           <dt id="R-WellFormedCsvCheck">R-WellFormedCsvCheck</dt>
@@ -1606,7 +1678,8 @@ HETATM  132  OXT ACY   401       4.306  23.101  12.291  1.00 21.19           O
               <strong>Motivation:</strong>
               <a href="#UC-DigitalPreservationOfGovernmentRecords">DigitalPreservationOfGovernmentRecords</a>,
               <a href="#UC-OrganogramData">OrganogramData</a>,
-              <a href="#UC-PublicationOfPropertyTransactionData">PublicationOfPropertyTransactionData</a>
+              <a href="#UC-PublicationOfPropertyTransactionData">PublicationOfPropertyTransactionData</a>,
+	      <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>
             </p>
           </dd>
 
@@ -1696,7 +1769,8 @@ HETATM  132  OXT ACY   401       4.306  23.101  12.291  1.00 21.19           O
               <strong>Motivation:</strong>
               <a href="#UC-PublicationOfNationalStatistics">PublicationOfNationalStatistics</a>, 
               <a href="#UC-PublicationOfPropertyTransactionData">PublicationOfPropertyTransactionData</a>,
-              <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>
+              <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>,
+	      <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>
             </p>
           </dd>
           <dt id="R-ZeroEditCompatibility">R-ZeroEditCompatibility</dt>
@@ -1740,7 +1814,8 @@ HETATM  132  OXT ACY   401       4.306  23.101  12.291  1.00 21.19           O
             <p>description to be added here</p>
             <p>
               <strong>Motivation:</strong>
-              <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>, <a href="#UC-OpenSpendingData">OpenSpendingData</a>
+              <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>, <a href="#UC-OpenSpendingData">OpenSpendingData</a>,
+	      <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>
             </p>
           </dd>
           <dt id="R-SyntacticTypeDefinition">R-SyntacticTypeDefinition</dt>
@@ -1814,8 +1889,7 @@ HETATM  132  OXT ACY   401       4.306  23.101  12.291  1.00 21.19           O
               <strong>Motivation:</strong>
               <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>,
               <a href="#UC-OrganogramData">OrganogramData</a>,
-	      <a href="#UC-OpenSpendingData">OpenSpendingData</a>,
-	      <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>
+	      <a href="#UC-OpenSpendingData">OpenSpendingData</a>
             </p>
           </dd>
           <dt id="R-ZeroEditAdditionOfSupplementaryMetadata"
@@ -1856,7 +1930,8 @@ HETATM  132  OXT ACY   401       4.306  23.101  12.291  1.00 21.19           O
 	    <a href="#R-ExternalDataDefinitionResource">R-ExternalDataDefinitionResource</a>, although here we talk explicitly about URIs.</p>
             <p>
               <strong>Motivation:</strong>
-              <a href="#UC-AnalyzingScientificSpreadsheets">AnalyzingScientificSpreadsheets</a>
+              <a href="#UC-AnalyzingScientificSpreadsheets">AnalyzingScientificSpreadsheets</a>,
+	      <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>
             </p>
           </dd>
 	  <dt id="R-UnitMeasureDefinition">R-UnitMeasureDefinition</dt>
@@ -1881,6 +1956,17 @@ HETATM  132  OXT ACY   401       4.306  23.101  12.291  1.00 21.19           O
 	    <p>Heading columns, if present, should be distinguished from the data columns.</p>
 	      <strong>Motivation:</strong>
               <a href="#UC-AnalyzingScientificSpreadsheets">AnalyzingScientificSpreadsheets</a>
+            </p>
+          </dd>
+	  <dt id="R-TableNormalization">R-TableNormalization</dt>
+          <dd>
+            <em id="_R-TableNormalization">
+              <strong>Ability to normalize data that is not in normal form and possibly vice-versa.</strong>
+            </em>
+	    <p>Tables could presented in normal form or not. We should be able to handle both and to transform one in the
+	    other, when necessary.</p>
+	      <strong>Motivation:</strong>
+              <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>
             </p>
           </dd>
         </dl>
