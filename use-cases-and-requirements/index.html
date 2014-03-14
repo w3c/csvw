@@ -1575,6 +1575,116 @@ HETATM  132  OXT ACY   401       4.306  23.101  12.291  1.00 21.19           O
 	  <a href="#R-UnitMeasureDefinition">UnitMeasureDefinition</a>
 	</p>
 
+      </section>
+      <section id="UC-NetCdFcDl">
+        <h2>Use Case #25 Tabular Representations of NetCDF data Using CDL Syntax</h2>
+         <p>
+          <span style="font-size: 10pt">(Contributed by Eric Stephan)</span>
+        </p>
+         <p> NetCDF is a set of binary data formats, programming interfaces, and software libraries that help read and write scientific data files.
+             NetCDF provides scientists a means to share measured or simulated experiments with one another across the web.  What makes
+             NetCDF useful is its ability to be self describing and provide a means for scientists to rely on existing data model
+             as opposed to needing to write their own. The classic netCDF data model consists of variables, dimensions, and attributes. 
+             This way of thinking about data was introduced with the very first netCDF release, and is still the core of all netCDF files.
+          </p>
+          <p>Among the tools available to the NetCDF community, two tools:  ncdump and ncgen.  The ncdump tool is used
+             by scientists wanting to inspect variables and attributes (metadata) contained in the NetCDF file.  It also 
+             can provide a full text extraction of data including blocks of tabular data representing by variables.
+             While NetCDF files are typically written by a software client, it is possible to generate NetCDF files using
+             ncgen and ncgen3 from a text format.  The ncgen tool parses the text file and stores it in a binary format. 
+          </p>
+      <p>    Both ncdump and ncgen rely on a text format to represent the NetCDF file called network Common Data form
+             Language (CDL).  The CDL syntax as shown below contains annotation along with blocks of data denoted by the
+             "data:" key.  For the results to be legible for visual inspection the measurement data is written as delimited
+             blocks of scalar values.  As shown in the example below CDL supports multiple variables or blocks of data.
+             The blocks of data while delimited need to be thought of as a vector or single column of tabular data
+             wrapped around to the next line in a similar way that characters can be wrapped around in a single cell block
+             of a spreadsheet to make the spreadsheet more visually appealing to the user.
+      </p>
+       <pre class="example">
+     netcdf foo {    // example netCDF specification in CDL
+     
+     dimensions:
+     lat = 10, lon = 5, time = unlimited;
+     
+     variables:
+       int     lat(lat), lon(lon), time(time);
+       float   z(time,lat,lon), t(time,lat,lon);
+       double  p(time,lat,lon);
+       int     rh(time,lat,lon);
+     
+       lat:units = "degrees_north";
+       lon:units = "degrees_east";
+       time:units = "seconds";
+       z:units = "meters";
+       z:valid_range = 0., 5000.;
+       p:_FillValue = -9999.;
+       rh:_FillValue = -1;
+     
+     data:
+       lat   = 0, 10, 20, 30, 40, 50, 60, 70, 80, 90;
+       lon   = -140, -118, -96, -84, -52;
+     }
+
+      </pre>
+
+     <p>   
+           The next example shows a small subset of data block taken from an actual NetCDF file. 
+           The blocks of data while delimited need to be thought of as a vector or single column 
+           of tabular data wrapped around to the next line in a similar way that characters can be 
+           wrapped around in a single cell block of a spreadsheet to make the spreadsheet more 
+           visually appealing to the user.
+     </p>
+        <pre class="example">
+data:
+
+ base_time = 1020770640 ;
+
+ time_offset = 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 
+    34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 66, 68, 
+    70, 72, 74, 76, 78, 80, 82, 84, 86, 88, 90, 92, 94, 96, 98, 100, 102, 
+    104, 106, 108, 110, 112, 114, 116, 118, 120, 122, 124, 126, 128, 130, 
+    132, 134, 136, 138, 140, 142, 144, 146, 148, 150, 152, 154, 156, 158, 
+    160, 162, 164, 166, 168, 170, 172, 174, 176, 178, 180, 182, 184, 186, 
+    188, 190, 192, 194, 196, 198, 200, 202, 204, 206, 208, 210, 212, 214, 
+    216, 218, 220, 222, 224, 226, 228, 230, 232, 234, 236, 238, 240, 242, 
+    244, 246, 248, 250, 252, 254, 256, 258, 260, 262, 264, 266, 268, 270, 
+    272, 274, 276, 278, 280, 282, 284, 286, 288, 290, 292, 294, 296, 298, 
+    300, 302, 304, 306, 308, 310, 312, 314, 316, 318, 320, 322, 324, 326, 
+    328, 330, 332, 334, 336, 338, 340, 342, 344, 346, 348, 350, 352, 354, 
+    356, 358, 360, 362, 364, 366, 368, 370, 372, 374, 376, 378, 380, 382, 
+    384, 386, 388, 390, 392, 394, 396, 398, 400, 402, 404, 406, 408, 410, 
+    412, 414, 416, 418, 420, 422, 424, 426, 428, 430, 432, 434, 436, 438, 
+    440, 442, 444, 446, 448, 450, 452, 454, 456, 458, 460, 462, 464, 466, 
+    468, 470, 472, 474, 476, 478, 480, 482, 484, 486, 488, 490, 492, 494, 
+    496, 498, 500, 502, 504, 506, 508, 510, 512, 514, 516, 518, 520, 522;
+        </pre>
+
+       <p>  
+          The format allows for error codes and missing values to be included.
+       </p>
+        <p>
+          <strong>Requires:</strong>
+          <a href="#R-WellFormedCsvCheck">WellFormedCsvCheck</a>, 
+          <a href="#R-CsvValidation">CsvValidation</a>, 
+          <a href="#R-UnitMeasurementDefinition">UnitMeasureDefinition</a>,
+          <a href="#R-MissingValueDefinition">MissingValueDefinition</a>
+          <a href="#R-GroupingOfMultipleTables">GroupingOfMultipleTables</a>
+        </p> 
+        <p>
+        Lastly, NetCDF files are typically collected together in larger datasets
+        where they can be analyzed, so the Csv data can be thought of a subset
+        of a larger dataset.
+        <p>
+          <strong>Requires:</strong>
+          <a href="#R-CsvAsSubsetOfLargerDataset">CsvAsSubsetOfLargerDataset</a> 
+        </p> 
+        <p>
+          <strong>Requires:</strong>
+          <a href="#R-AnnotationAndSupplementaryInfo">AnnotationAndSupplementaryInfo</a> 
+        </p> 
+
+
       </section>  
       <section id="other-uc">
         <h2>Other Use Cases</h2>
