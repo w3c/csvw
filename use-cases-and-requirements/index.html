@@ -354,22 +354,6 @@ var respecConfig = {
           <strong>Requires:</strong>
           <a href="#R-SemanticTypeDefinition">SemanticTypeDefinition</a>
         </p>
-        
-        <div class="issue">
-          <p><em>Orphaned requirement as a result of re-editing this use case:</em></p>
-        <p>Statistical data is currently published in Microsoft Excel Workbook format in order
-          overcome limitations inherent in simple data formats such as CSV. However, it is also
-          important to remember that the data user community also have preferred tools for consuming
-          the statistical data. Spreadsheet applications such as Microsoft Excel, Numbers for Mac
-          and LibreOffice Calc are a mainstay of the ubiquitously deployed desktop productivity
-          software, enabling a large swath of users to work with data provided in Microsoft Excel
-          Workbook format. It is important that compatibility, at least at a basic level, is
-          maintained with the data analysis tools in common usage. </p>
-        <p>
-          <strong>Requires:</strong>
-          <a href="#R-ZeroEditCompatibility">ZeroEditCompatibility</a>
-        </p>
-        </div>
       </section>
       <section id="UC-SurfaceTemperatureDatabank">
         <h2>Use Case #3 - Creation of consolidated global land surface temperature climate
@@ -1795,13 +1779,129 @@ data:
 
 
       </section>  
+      <section id="UC-CanonicalMappingOfCSV">
+        <h2>Use Case #26 - Canonical mapping of CSV</h2>
+        <p>
+          <span style="font-size: 10pt">(Contributed by David Booth and Jeremy Tandy)</span>
+        </p>
+        
+        <p>CSV is by far the commonest format within which open data is published, and is thus
+          typical of the data that application developers need to work with.</p>
+        
+        <p>However, an object / object graph serialisation (of open data) is easier to consume within
+          software applications. For example, web applications (using HTML5 & Javascript) require
+          no extra libraries to work with data in JSON format. Similarly, RDF-encoded data in from 
+          multiple sources can be simply combined or merged using SPARQL queries once persisted
+          within a triple store.</p>
+        
+        <p>The <a href="https://www.gov.uk/government/publications/open-data-white-paper-unleashing-the-potential">
+          UK Government policy paper "Open Data: unleashing the potential"</a> outlines a 
+          <a href="https://www.gov.uk/government/uploads/system/uploads/attachment_data/file/78946/CM8353_acc.pdf#page=23">
+            set of principles for publishing open data</a>. Within this document, <dfn>principle 9</dfn> states:</p>
+        
+        <p>
+          <em>Release data quickly, and then work to make sure that it is available in open standard 
+            formats, including linked data formats.</em>
+        </p>
+        
+        <p>The open data principles recognise how the additional utility to be gained from publishing in 
+          <em>linked data formats</em> must be balanced against the additional effort incurred by the
+          data publisher to do so and the resulting delay to publication of the data. Data publishers
+          are required to <em>release data quickly</em> - which means making the data available in
+          a format convenient for them such as CSV dumps from databases or spread sheets.</p>
+        
+        <p>One of the hindrances to publishing in <em>linked data formats</em> is the difficulty in
+          determining the ontology or vocabulary (e.g. the classes, predicates, namespaces and 
+          other usage patterns) that should be used to describe the data. Whilst it is
+          only reasonable to assume that a data publisher best knows the intended meaning of their
+          data, they cannot be expected to determine the ontology or vocabulary most applicable to 
+          to a consuming application!</p>
+        
+        <p>Furthermore, in lieu of agreed de facto standard vocabularies or ontologies for a given 
+          application domain, it is highly likely that disparate applications will conform to different data 
+          models. How should the data publisher choose which of the available vocabularies or 
+          ontologies to use when publishing (if indeed they are aware of those applications at all)!</p>
+        
+        <p>In order to assist data publishers provide data in <em>linked data formats</em> without 
+          the need to determine ontologies or vocabularies, it is necessary to separate the <em>syntactic
+            mapping</em> (e.g. changing format from CSV to JSON) from the <em>semantic mapping</em>
+          (e.g. defining the transformations required to achieve semantic alignment with a target
+          data model).</p>
+        
+        <p>As a result of such separation, it will be possible to establish a <em>canonical</em> 
+          transformation from CSV conforming to the 
+          <a href="http://w3c.github.io/csvw/syntax/#core-model">core tabular data model</a> 
+          to an object graph serialisation such as JSON.</p>
+        
+        <p>
+          <strong>Requires:</strong> 
+          <a href="#R-WellFormedCsvCheck">WellFormedCsvCheck</a>, 
+          <a href="#R-CsvToJsonTransformation">CsvToJsonTransformation</a>, 
+          <a href="#R-CanonicalMappingInLieuOfAnnotation">CanonicalMappingInLieuOfAnnotation</a>
+        </p>
+        
+        <p>This use case assumes that JSON is the target serialisation for application developers
+          given the general utility of that format. However, by considering [[JSON-LD]], it becomes 
+          trivial to map CSV-encoded tabular data via JSON into a canonical RDF model. In doing so
+          this enables CSV-encoded tabular data to be published in <em>linked data formats</em> 
+          as required in the open data <a>principle 9</a> at no extra effort to the data publisher as
+          standard mechanisms are available for a data user to transform the data from CSV to RDF.</p>
+        
+        <p>
+          <strong>Requires:</strong> 
+          <a href="#R-CsvToRdfTransformation">CsvToRdfTransformation</a>
+        </p>
+        
+        <p>In addition, open data principle 14 requires that:</p>
+        
+        <p>
+          <em>Public bodies should publish relevant metadata about their datasets […]; and they
+            should publish supporting descriptions of the format, provenance and meaning of the data. </em>
+        </p>
+        
+        <p>To achieve this, data publishers need to be able to publish supplementary metadata concerning
+          their tabular datasets, such as title, usage license and description.</p>
+        
+        <p>
+          <strong>Requires:</strong> 
+          <a href="#R-AnnotationAndSupplementaryInfo">AnnotationAndSupplementaryInfo</a>
+        </p>
+        
+        <p>Applications may automatically determine the data type (e.g. date-time, number) associated 
+          with fields in a CSV file by parsing the data values. However, on occasion, this is prone to 
+          mistakes where data <em>appears</em> to resemble something else. This is especially
+          prevalent for dates. For example, <code>1/4</code> is often confused with <code>1 April</code>
+          rather than <code>0.25</code>. In such situations, it is beneficial if guidance can be given to the
+          transformation process indicating the data type for given columns.</p>
+        
+        <p>
+          <strong>Requires:</strong> 
+          <a href="#R-SyntacticTypeDefinition">SyntacticTypeDefinition</a>
+        </p>
+        
+        <p>Provision of CSV data coupled with a canonical mapping provides significant utility by itself. However, 
+          there is nothing stopping a data publisher from adding annotation defining data semantics once, say,
+          an appropriate de facto standard vocabulary has been agreed within the community of use. Similarly, a 
+          data consumer may wish to work directly with the canonical mapping and wish to ignore any semantic
+          annotations provided by the publisher.</p>
+        
+        <div class="issue">
+          <p>This use case lacks a concrete example to further illustrate the concerns. Whilst the concerns
+            outlined above are relevant for a gamut of open data publication, it would be useful to include 
+            an example dataset here - which might be subsequently used in test suites relating to the 
+            motivating requirements of this use case.</p>
+          
+          <p>It may be appropriate to merge this use case with <a href="http://w3c.github.io/csvw/use-cases-and-requirements/#UC-IntelligentlyPreviewingCSVFiles">
+            UC-IntelligentlyPreviewingCSVFiles</a> as that is concerned with using an interim JSON
+            encoding to support intelligent preview of unannotated tabular data.</p>
+          </div>
+      </section>
 
     </section>
     <section id="req">
       <h2>Requirements</h2>
       <section id="acc-req">
         <h2>Accepted Requirements</h2>
-        <p>...</p>
         <div class="issue">
           <p>Proposal to cluster requirements - candidate clusters are:</p>
           <ul>
@@ -1842,7 +1942,7 @@ data:
                 >DigitalPreservationOfGovernmentRecords</a>,
               <a href="#UC-OrganogramData">OrganogramData</a>, 
               <a href="#UC-PublicationOfPropertyTransactionData">PublicationOfPropertyTransactionData</a>,
-	      <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>, 
+	            <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>, 
               <a href="#UC-ChemicalImaging">ChemicalImaging</a>, 
               <a href="#UC-ChemicalStructures">ChemicalStructures</a>
 
@@ -1859,11 +1959,10 @@ data:
               not, be packaged together.</p>
             <p>
               <strong>Motivation:</strong>
-              <a href="#UC-DigitalPreservationOfGovernmentRecords"
-                >DigitalPreservationOfGovernmentRecords</a>, 
+              <a href="#UC-DigitalPreservationOfGovernmentRecords">DigitalPreservationOfGovernmentRecords</a>, 
               <a href="#UC-OrganogramData">OrganogramData</a>, 
               <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>,
-	      <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>
+	            <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>
             </p>
           </dd>
           <dt id="R-ExternalDataDefinitionResource">R-ExternalDataDefinitionResource</dt>
@@ -1881,10 +1980,9 @@ data:
               file.</p>
             <p>
               <strong>Motivation:</strong>
-              <a href="#UC-DigitalPreservationOfGovernmentRecords"
-                >DigitalPreservationOfGovernmentRecords</a>,
-		<a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>,
-		<a href="#UC-IntelligentlyPreviewingCSVFiles">IntelligentlyPreviewingCSVFiles</a>
+              <a href="#UC-DigitalPreservationOfGovernmentRecords">DigitalPreservationOfGovernmentRecords</a>,
+		          <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>,
+		          <a href="#UC-IntelligentlyPreviewingCSVFiles">IntelligentlyPreviewingCSVFiles</a>
             </p>
           </dd>
           <dt id="R-WellFormedCsvCheck">R-WellFormedCsvCheck</dt>
@@ -1897,13 +1995,13 @@ data:
               <a href="http://w3c.github.io/csvw/syntax/">syntax for tabular data</a>.</p>
             <p>
               <strong>Motivation:</strong>
-              <a href="#UC-DigitalPreservationOfGovernmentRecords"
-                >DigitalPreservationOfGovernmentRecords</a>, 
+              <a href="#UC-DigitalPreservationOfGovernmentRecords">DigitalPreservationOfGovernmentRecords</a>, 
               <a href="#UC-OrganogramData">OrganogramData</a>,
               <a href="#UC-ChemicalImaging">ChemicalImaging</a>,
-              <a href="#UC-ChemicalStructures">ChemicalStructures</a>
-              <a href="#UC-NetCdFcDl">UC-NetCdFcDl</a>
-              <a href="#UC-PaloAltoTreeData">UC-PaloAltoTreeData</a>
+              <a href="#UC-ChemicalStructures">ChemicalStructures</a>,
+              <a href="#UC-NetCdFcDl">UC-NetCdFcDl</a>,
+              <a href="#UC-PaloAltoTreeData">UC-PaloAltoTreeData</a>,
+              <a href="#UC-CanonicalMappingOfCSV">CanonicalMappingOfCSV</a>
             </p>
           </dd>
           <dt id="R-CsvValidation">R-CsvValidation</dt>
@@ -1923,13 +2021,12 @@ data:
                 <a href="#R-WellFormedCsvCheck">R-WellFormedCsvCheck</a>
               </p>
               <strong>Motivation:</strong>
-              <a href="#UC-DigitalPreservationOfGovernmentRecords"
-                >DigitalPreservationOfGovernmentRecords</a>, 
+              <a href="#UC-DigitalPreservationOfGovernmentRecords">DigitalPreservationOfGovernmentRecords</a>, 
               <a href="#UC-OrganogramData">OrganogramData</a>,
               <a href="#UC-ChemicalImaging">ChemicalImaging</a>,
               <a href="#UC-ChemicalStructures">ChemicalStructures</a>,
-	      <a href="#UC-DisplayingLocationsOfCareHomesOnAMap">DisplayingLocationsOfCareHomesOnAMap</a>
-              <a href="#UC-NetCdFcDl">UC-NetCdFcDl</a>
+	            <a href="#UC-DisplayingLocationsOfCareHomesOnAMap">DisplayingLocationsOfCareHomesOnAMap</a>,
+              <a href="#UC-NetCdFcDl">UC-NetCdFcDl</a>,
               <a href="#UC-PaloAltoTreeData">UC-PaloAltoTreeData</a>
             </p>
           </dd>
@@ -1962,7 +2059,8 @@ data:
               <a href="#UC-DigitalPreservationOfGovernmentRecords">DigitalPreservationOfGovernmentRecords</a>,
               <a href="#UC-OrganogramData">OrganogramData</a>,
               <a href="#UC-PublicationOfPropertyTransactionData">PublicationOfPropertyTransactionData</a>,
-	      <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>
+	            <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>,
+              <a href="#UC-CanonicalMappingOfCSV">CanonicalMappingOfCSV</a>
             </p>
           </dd>
 
@@ -1998,7 +2096,7 @@ data:
               <strong>Motivation:</strong>
               <a href="#UC-PublicationOfNationalStatistics">PublicationOfNationalStatistics</a>, 
               <a href="#UC-OrganogramData">OrganogramData</a>,
-              <a href="#UC-ChemicalStructures">ChemicalStructures</a>
+              <a href="#UC-ChemicalStructures">ChemicalStructures</a>,
               <a href="#UC-NetCdFcDl">UC-NetCdFcDl</a>
             </p>
           </dd>
@@ -2032,7 +2130,8 @@ data:
 	          	<a href="#UC-ReliabilityAnalysesOfPoliceOpenData">ReliabilityAnalysesOfPoliceOpenData</a>,
           		<a href="#UC-OpenSpendingData">OpenSpendingData</a>,
 	          	<a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>,
-	          	<a href="#UC-IntelligentlyPreviewingCSVFiles">IntelligentlyPreviewingCSVFiles</a>	
+	          	<a href="#UC-IntelligentlyPreviewingCSVFiles">IntelligentlyPreviewingCSVFiles</a>,
+              <a href="#UC-CanonicalMappingOfCSV">CanonicalMappingOfCSV</a>
             </p>
           </dd>
           <dt id="R-AssociationOfCodeValuesWithExternalDefinitions"
@@ -2065,7 +2164,7 @@ data:
               <a href="#UC-PublicationOfNationalStatistics">PublicationOfNationalStatistics</a>, 
               <a href="#UC-PublicationOfPropertyTransactionData">PublicationOfPropertyTransactionData</a>,
               <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>,
-	      <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>
+	            <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>
             </p>
           </dd>
           <dt id="R-ZeroEditCompatibility">R-ZeroEditCompatibility</dt>
@@ -2082,10 +2181,20 @@ data:
                 list of tools with which we expect, or aspire, to retain compatibility with.</p>
               <p>We also do not have an authoritative set of conformance tests yet.</p>
             </div>
-            <p>
-              <strong>Motivation:</strong>
-              <a href="#UC-PublicationOfNationalStatistics">PublicationOfNationalStatistics</a>
-            </p>
+                        
+            <div class="issue">
+              <p><em>Orphaned requirement as a result of re-editing use case: <a href="#UC-PublicationOfNationalStatistics">
+                PublicationOfNationalStatistics</a></em></p>
+              <p>This use case used to assert:</p>
+              <p><em>Statistical data is currently published in Microsoft Excel Workbook format in order
+                overcome limitations inherent in simple data formats such as CSV. However, it is also
+                important to remember that the data user community also have preferred tools for consuming
+                the statistical data. Spreadsheet applications such as Microsoft Excel, Numbers for Mac
+                and LibreOffice Calc are a mainstay of the ubiquitously deployed desktop productivity
+                software, enabling a large swath of users to work with data provided in Microsoft Excel
+                Workbook format. It is important that compatibility, at least at a basic level, is
+                maintained with the data analysis tools in common usage.</em></p>
+            </div>
           </dd>
           <dt id="R-CsvAsSubsetOfLargerDataset">R-CsvAsSubsetOfLargerDataset</dt>
           <dd>
@@ -2097,9 +2206,9 @@ data:
             <p>
               <strong>Motivation:</strong>
               <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>,
-              <a href="#UC-PublicationOfPropertyTransactionData">PublicationOfPropertyTransactionData</a>
+              <a href="#UC-PublicationOfPropertyTransactionData">PublicationOfPropertyTransactionData</a>,
               <a href="#UC-ChemicalImaging">ChemicalImaging</a>,
-              <a href="#UC-ChemicalStructures">ChemicalStructures</a>
+              <a href="#UC-ChemicalStructures">ChemicalStructures</a>,
               <a href="#UC-NetCdFcDl">UC-NetCdFcDl</a>
 
             </p>
@@ -2113,8 +2222,9 @@ data:
             <p>description to be added here</p>
             <p>
               <strong>Motivation:</strong>
-              <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>, <a href="#UC-OpenSpendingData">OpenSpendingData</a>,
-	      <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>
+              <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>, 
+              <a href="#UC-OpenSpendingData">OpenSpendingData</a>,
+	            <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>
             </p>
           </dd>
           <dt id="R-SyntacticTypeDefinition">R-SyntacticTypeDefinition</dt>
@@ -2126,14 +2236,14 @@ data:
               description to be added</p>
             <p>
               <strong>Motivation:</strong>
-              <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>, <a
-                href="#UC-DigitalPreservationOfGovernmentRecords"
-                >DigitalPreservationOfGovernmentRecords</a>
-		, <a href="#UC-ReliabilityAnalysesOfPoliceOpenData">ReliabilityAnalysesOfPoliceOpenData</a>
-		, <a href="#UC-AnalyzingScientificSpreadsheets">AnalyzingScientificSpreadsheets</a>,
-		<a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>,
-		<a href="#UC-DisplayingLocationsOfCareHomesOnAMap">DisplayingLocationsOfCareHomesOnAMap</a>,
-		<a href="#UC-IntelligentlyPreviewingCSVFiles">IntelligentlyPreviewingCSVFiles</a>
+              <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>, 
+              <a href="#UC-DigitalPreservationOfGovernmentRecords">DigitalPreservationOfGovernmentRecords</a>, 
+              <a href="#UC-ReliabilityAnalysesOfPoliceOpenData">ReliabilityAnalysesOfPoliceOpenData</a>, 
+              <a href="#UC-AnalyzingScientificSpreadsheets">AnalyzingScientificSpreadsheets</a>,
+		          <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>,
+		          <a href="#UC-DisplayingLocationsOfCareHomesOnAMap">DisplayingLocationsOfCareHomesOnAMap</a>,
+		          <a href="#UC-IntelligentlyPreviewingCSVFiles">IntelligentlyPreviewingCSVFiles</a>,
+              <a href="#UC-CanonicalMappingOfCSV">CanonicalMappingOfCSV</a>
             </p>
           </dd>
           <dt id="R-SemanticTypeDefinition">R-SemanticTypeDefinition</dt>
@@ -2163,14 +2273,13 @@ data:
             </div>
             <p>
               <strong>Motivation:</strong>
-              <a href="#UC-DigitalPreservationOfGovernmentRecords"
-                >DigitalPreservationOfGovernmentRecords</a>, <a
-                href="#UC-PublicationOfNationalStatistics">PublicationOfNationalStatistics</a>,<a
-                href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>,
-		<a href="#UC-ReliabilityAnalysesOfPoliceOpenData">ReliabilityAnalysesOfPoliceOpenData</a>,
-		<a href="#UC-AnalyzingScientificSpreadsheets">AnalyzingScientificSpreadsheets</a>,
-		<a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>,
-		<a href="#UC-IntelligentlyPreviewingCSVFiles">IntelligentlyPreviewingCSVFiles</a>
+              <a href="#UC-DigitalPreservationOfGovernmentRecords">DigitalPreservationOfGovernmentRecords</a>, 
+              <a href="#UC-PublicationOfNationalStatistics">PublicationOfNationalStatistics</a>,
+              <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>,
+	          	<a href="#UC-ReliabilityAnalysesOfPoliceOpenData">ReliabilityAnalysesOfPoliceOpenData</a>,
+	          	<a href="#UC-AnalyzingScientificSpreadsheets">AnalyzingScientificSpreadsheets</a>,
+	          	<a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>,
+	          	<a href="#UC-IntelligentlyPreviewingCSVFiles">IntelligentlyPreviewingCSVFiles</a>
             </p>
           </dd>
           <dt id="R-MissingValueDefinition">R-MissingValueDefinition</dt>
@@ -2189,8 +2298,8 @@ data:
               <strong>Motivation:</strong>
               <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>,
               <a href="#UC-OrganogramData">OrganogramData</a>,
-	      <a href="#UC-OpenSpendingData">OpenSpendingData</a>,
-              <a href="#UC-NetCdFcDl">UC-NetCdFcDl</a>
+	            <a href="#UC-OpenSpendingData">OpenSpendingData</a>,
+              <a href="#UC-NetCdFcDl">UC-NetCdFcDl</a>,
               <a href="#UC-PaloAltoTreeData">UC-PaloAltoTreeData</a>
             </p>
           </dd>
@@ -2233,7 +2342,7 @@ data:
             <p>
               <strong>Motivation:</strong>
               <a href="#UC-AnalyzingScientificSpreadsheets">AnalyzingScientificSpreadsheets</a>,
-	      <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>
+	            <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>
             </p>
           </dd>
 	  <dt id="R-UnitMeasureDefinition">R-UnitMeasureDefinition</dt>
@@ -2244,11 +2353,11 @@ data:
 	    <p>
               <strong>Motivation:</strong>
               <a href="#UC-AnalyzingScientificSpreadsheets">AnalyzingScientificSpreadsheets</a>,
-	      <a href="#UC-OpenSpendingData">OpenSpendingData</a>,
-	      <a href="#UC-IntelligentlyPreviewingCSVFiles">IntelligentlyPreviewingCSVFiles</a>,
+	            <a href="#UC-OpenSpendingData">OpenSpendingData</a>,
+	            <a href="#UC-IntelligentlyPreviewingCSVFiles">IntelligentlyPreviewingCSVFiles</a>,
               <a href="#UC-ChemicalImaging">ChemicalImaging</a>,
-              <a href="#UC-ChemicalStructures">ChemicalStructures</a>
-              <a href="#UC-NetCdFcDl">UC-NetCdFcDl</a>
+              <a href="#UC-ChemicalStructures">ChemicalStructures</a>,
+              <a href="#UC-NetCdFcDl">UC-NetCdFcDl</a>,
               <a href="#UC-PaloAltoTreeData">UC-PaloAltoTreeData</a>
             </p>
           </dd>
@@ -2285,7 +2394,7 @@ data:
                a scalar value.
             </p>
 	      <strong>Motivation:</strong>
-              <a href="#UC-JournalArticleSearch">JournalArticleSearch</a>
+              <a href="#UC-JournalArticleSearch">JournalArticleSearch</a>,
               <a href="#UC-PaloAltoTreeData">UC-PaloAltoTreeData</a>
             </p>
           </dd>
@@ -2298,10 +2407,28 @@ data:
 	    thus simplifying the exploitation of CSV data<p>
             <p>
               <strong>Motivation:</strong>
-              <a href="#UC-DisplayingLocationsOfCareHomesOnAMap">DisplayingLocationsOfCareHomesOnAMap</a>
+              <a href="#UC-DisplayingLocationsOfCareHomesOnAMap">DisplayingLocationsOfCareHomesOnAMap</a>,
+              <a href="#UC-CanonicalMappingOfCSV">CanonicalMappingOfCSV</a>
             </p>
           </dd>
 
+          <dt id="R-CanonicalMappingInLieuOfAnnotation">R-CanonicalMappingInLieuOfAnnotation</dt>
+          <dd>
+            <em id="_R-CanonicalMappingInLieuOfAnnotation">
+              <strong>Ability to transform CSV conforming to the core tabular data model yet lacking further 
+                annotation into a object / object graph serialisation</strong>
+            </em>
+            <p>Establish a canonical mapping from CSV conforming with the 
+              <a href="http://w3c.github.io/csvw/syntax/#core-model">core tabular data model</a>, yet lacking
+              any annotation that defines rich semantics for that data, into an object / object graph serialisation 
+              such as JSON or RDF.</p>
+            <p>The canonical mapping should provide automatic scoping of local identifiers (e.g. conversion to
+              URI), identification of primary keys and detection of data types.</p>
+            <p>
+              <strong>Motivation:</strong>
+              <a href="#UC-CanonicalMappingOfCSV">CanonicalMappingOfCSV</a>
+            </p>
+          </dd>
 
         </dl>
       </section>
