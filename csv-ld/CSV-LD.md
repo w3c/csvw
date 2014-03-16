@@ -1,5 +1,6 @@
 # CSV-LD Working Notes
 There are many parallels between the goals of JSON-LD and the CSV on the Web efforts:
+
 * Both JSON and CSV are common formats for representing data on the web,
 * Both are open formats, unencumbered by propriatary Intellectual Property restrictions,
 * Both are used for publishing simple data, where the "schema" is often application-specific,
