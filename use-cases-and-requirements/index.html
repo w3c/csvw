@@ -1894,7 +1894,127 @@ data:
             encoding to support intelligent preview of unannotated tabular data.</p>
           </div>
       </section>
+      <section id="UC-SupportingSemantic-basedRecommendations">
+        <h2>Use Case #18 - Supporting Semantic-based Recommendations</h2>
+        <p>
+          <span style="font-size: 10pt">(Contributed by Davide Ceolin)</span>
+        </p>
+	<p>In the <a href="http://challenges.2014.eswc-conferences.org/index.php/RecSys">ESWC-14 Challenge: Linked Open Data-enabled Recommender Systems</a>,
+	participants are provided with a series of datasets about books in TSV format.</p>
+	<p>A first dataset contains a set of user identifiers and their ratings for a bunch of books each. Each book is represented by means of a numeric identifier.</p>
+	<pre class="example">
+	DBbook_userID	DBbook_itemID	rate
+	{snip}
+	6873		5950		1
+	6873		8010		1
+	6873		5232		1
+	{snip}
+	</pre>
+	<p>Ratings can be boolean (0,1) or Likert scale values (from 1 to 5), depending on the challenge task considered.</p>
+	<p>
+          <strong>Requires:</strong> 
+          <a href="#R-SyntacticTypeDefinition">SyntacticTypeDefinition</a>,
+	  <a href="#R-SemanticTypeDefinition">SemanticTypeDefinition</a>,
+	  <a href="#R-NonStandardFieldDelimiter">NonStandardFieldDelimiter</a>
+        </p>
 
+	<p>A second file provides a mapping between book ids and their names and dbpedia URIs:</p>
+
+	<pre class="example">
+	DBbook_ItemID	name				DBpedia_uri
+	{snip}
+	1		Dragonfly in Amber		http://dbpedia.org/resource/Dragonfly_in_Amber
+	10		Unicorn Variations		http://dbpedia.org/resource/Unicorn_Variations
+	100		A Stranger in the Mirror	http://dbpedia.org/resource/A_Stranger_in_the_Mirror
+	1000		At All Costs			http://dbpedia.org/resource/At_All_Costs
+	{snip}
+	</pre>
+	<p>
+          <strong>Requires:</strong> 
+          <a href="#R-ForeignKeyReferences">ForeignKeyReferences</a>
+	</p>
+
+	<p>Participants are requested to estimate the ratings or relevance scores (depending on the task) that users would
+	attribute to a set of books reported in an evaluation dataset:</p>
+
+	<pre class="example">
+	DBbook_userID	DBbook_itemID
+	{snip}
+	6873		5946
+	6873		5229
+	6873		3151
+	{snip}
+	</pre>
+	<p>
+          <strong>Requires:</strong> 
+          <a href="#R-LinksToExternallyManagedDefinitions">LinksToExternallyManagedDefinitions</a>,
+	  <a href="#R-AssociationOfCodeValuesWithExternalDefinitions">R-AssociationOfCodeValuesWithExternalDefinitions</a>
+	</p>
+	<p>The challenge mandates the use ofLinked Open Data resources in the recommendations.</p>
+	<p>An effective manner to satisfy this requirement is to make use of semantic patterns. 
+	A semantic pattern represents a sequence of types and properties that link two items, for instance: </p>
+
+	<pre>
+	{Book1 property1 Object1 property2 Book2}
+	</pre>
+
+	<p>This sequence results from considering the triples (subject-predicate-object) in a given Linked Open Data resource (e.g. DBpedia),
+	independently of their direction such that the starting and the ending entities are the desired items.
+	For example, the sequence above may result from the following triples:</p>
+
+	<pre>
+	Book1 property1 Object1
+	Book2 property1 Object1
+	</pre>
+
+	<p>
+	Semantic patterns are classified according to their length. Fixed a length, one can extract all the semantic patterns of that length
+	that link two items within a Linked Open Data resource by running a set of sparql queries.
+	This is necessary because an indirected path actually corresponds to the union of a set of directed paths. In the source, data are stored
+	in terms of directed triples (subject-predicate-object).
+	</p>
+	<p>
+	  The number of queries that is necessary to run in order to obtain all the semantic patterns that link to items is exponential of the
+	  length of the pattern itself (2<sup>n</sup>). Because of the complexity of this task and of the possible latency times deriving from
+	  it, it might be useful to cache these results.
+	</p>
+
+	<p>CSV is a good candidate for caching ontology patterns, because of its ease of use, sharing, reuse. However, there are some open issues
+	related to this.
+	First, since patterns may present a variable number of components, one might want to represent patterns in a single cell,
+	while being able to separate the pattern elements when necessary.
+	</p>
+	<p>For example, in <a href="http://www.few.vu.nl/~vmo600/binary_book_patterns.tar.gz">this file</a>, semantic patterns are grouped by means
+	of double quotes, and pattern components are separated by commas.
+	</p>
+
+	<pre class="example">
+	Book1	Book2	Pattern
+	{snip}
+	1	7680	"http://dbpedia.org/ontology/language,http://dbpedia.org/ontology/Language,http://dbpedia.org/ontology/language"
+	1	7680	"http://dbpedia.org/ontology/language,http://schema.org/Language,http://dbpedia.org/ontology/language"
+	1	7680	"http://dbpedia.org/ontology/language,http://www.w3.org/2002/07/owl#Thing,http://dbpedia.org/ontology/language"
+	1	7680	"http://dbpedia.org/ontology/language,http://www.w3.org/2000/01/rdf-schema#Resource,http://dbpedia.org/ontology/language"
+	1	2	"http://dbpedia.org/ontology/author,http://dbpedia.org/ontology/Writer,http://dbpedia.org/ontology/author"
+	{snip}
+	</pre>
+	<p>
+          <strong>Requires:</strong> 
+          <a href="#R-CellValueMicroSyntax">CellValueMicroSyntax</a>
+	</p>
+	<p>
+	Second, the size of these caching files may be remarkable. For example, the size of this file described above is ~2GB, and that may imply prohibitive
+	loading times, especially when making a limited number of recommendations.</p>
+	<p>Since rows are sorted according to the starting and the ending book of the pattern, then all the patterns that link two books
+	are present in a region of the table formed by consecutive rows.</p>
+	<p>By having at our disposal an annotation of such regions indicating which book they describe, one might be able to select the "slice" of
+	the file he needs to make a recommendation, without having to load it entirely.</p>
+	<p>
+          <strong>Requires:</strong> 
+          <a href="#R-AnnotationAndSupplementaryInfo">AnnotationAndSupplementaryInfo</a>,
+	  <a href="#R-RandomAccess">RandomAccess</a>
+	</p>
+      </section>
     </section>
     <section id="req">
       <h2>Requirements</h2>
@@ -1971,7 +2091,8 @@ data:
               </p>
               <strong>Motivation:</strong>
               <a href="#UC-JournalArticleSearch">JournalArticleSearch</a>,
-              <a href="#UC-PaloAltoTreeData">UC-PaloAltoTreeData</a>
+              <a href="#UC-PaloAltoTreeData">PaloAltoTreeData</a>,
+	      <a href="#UC-UC-SupportingSemantic-basedRecommendations">SupportingSemantic-basedRecommendations</a>
               </p>
             </dd>
             <dt id="R-NonStandardFieldDelimiter">R-NonStandardFieldDelimiter</dt>
@@ -1986,7 +2107,8 @@ data:
               <p>
                 <strong>Motivation:</strong>
                 <a href="#UC-DisplayingLocationsOfCareHomesOnAMap">DisplayingLocationsOfCareHomesOnAMap</a>,
-                <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>
+                <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>,
+		<a href="#UC-SupportingSemantic-basedRecommendations">SupportingSemantic-basedRecommendations</a>
               </p>
             </dd>
           </dl>
@@ -2040,7 +2162,8 @@ data:
                 <a href="#UC-DigitalPreservationOfGovernmentRecords">DigitalPreservationOfGovernmentRecords</a>, 
                 <a href="#UC-OrganogramData">OrganogramData</a>, 
                 <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>,
-                <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>
+                <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>,
+		<a href="#UC-SupportingSemantic-basedRecommendations">SupportingSemantic-basedRecommendations</a>
               </p>
             </dd>
             <dt id="R-ExternalDataDefinitionResource">R-ExternalDataDefinitionResource</dt>
@@ -2075,14 +2198,12 @@ data:
                 <li>a row</li>
                 <li>a column</li>
                 <li>an individual cell</li>
+		<li>range (or region) of cells within a table</li>
               </ul>
               <p>Annotations and supplementary information may be literal values or references to a
                 remote resource. The presence of annotations or supplementary information must not
                 adversely impact parsing of the tabular data (e.g. the annotations and supplementary
                 information must be logically separate).</p>
-              
-              <p class="issue"> "range (or region) of cells within a table" removed from list above - there's no concrete evidence
-                that this is a real requirement</p>
               
               <p>
                 <strong>Motivation:</strong>
@@ -2094,7 +2215,8 @@ data:
                 <a href="#UC-OpenSpendingData">OpenSpendingData</a>,
                 <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>,
                 <a href="#UC-IntelligentlyPreviewingCSVFiles">IntelligentlyPreviewingCSVFiles</a>,
-                <a href="#UC-CanonicalMappingOfCSV">CanonicalMappingOfCSV</a>
+                <a href="#UC-CanonicalMappingOfCSV">CanonicalMappingOfCSV</a>,
+		<a href="#UC-SupportingSemantic-basedRecommendations">SupportingSemantic-basedRecommendations</a>
               </p>
             </dd>
             <dt id="R-AssociationOfCodeValuesWithExternalDefinitions"
@@ -2127,7 +2249,8 @@ data:
                 <a href="#UC-PublicationOfNationalStatistics">PublicationOfNationalStatistics</a>, 
                 <a href="#UC-PublicationOfPropertyTransactionData">PublicationOfPropertyTransactionData</a>,
                 <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>,
-                <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>
+                <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>,
+		<a href="#UC-SupportingSemantic-basedRecommendations">SupportingSemantic-basedRecommendations</a>
               </p>
             </dd>
             <dt id="R-CsvAsSubsetOfLargerDataset">R-CsvAsSubsetOfLargerDataset</dt>
@@ -2158,7 +2281,8 @@ data:
                 <strong>Motivation:</strong>
                 <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>, 
                 <a href="#UC-OpenSpendingData">OpenSpendingData</a>,
-                <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>
+                <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>,
+		<a href="#UC-SupportingSemantic-basedRecommendations">SupportingSemantic-basedRecommendations</a>
               </p>
             </dd>
             <dt id="R-SyntacticTypeDefinition">R-SyntacticTypeDefinition</dt>
@@ -2177,7 +2301,8 @@ data:
                 <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>,
                 <a href="#UC-DisplayingLocationsOfCareHomesOnAMap">DisplayingLocationsOfCareHomesOnAMap</a>,
                 <a href="#UC-IntelligentlyPreviewingCSVFiles">IntelligentlyPreviewingCSVFiles</a>,
-                <a href="#UC-CanonicalMappingOfCSV">CanonicalMappingOfCSV</a>
+                <a href="#UC-CanonicalMappingOfCSV">CanonicalMappingOfCSV</a>,
+		<a href="#UC-SupportingSemantic-basedRecommendations">SupportingSemantic-basedRecommendations</a>
               </p>
             </dd>
             <dt id="R-SemanticTypeDefinition">R-SemanticTypeDefinition</dt>
@@ -2213,7 +2338,8 @@ data:
                 <a href="#UC-ReliabilityAnalysesOfPoliceOpenData">ReliabilityAnalysesOfPoliceOpenData</a>,
                 <a href="#UC-AnalyzingScientificSpreadsheets">AnalyzingScientificSpreadsheets</a>,
                 <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>,
-                <a href="#UC-IntelligentlyPreviewingCSVFiles">IntelligentlyPreviewingCSVFiles</a>
+                <a href="#UC-IntelligentlyPreviewingCSVFiles">IntelligentlyPreviewingCSVFiles</a>,
+		<a href="#UC-SupportingSemantic-basedRecommendations">SupportingSemantic-basedRecommendations</a>
               </p>
             </dd>
             <dt id="R-MissingValueDefinition">R-MissingValueDefinition</dt>
@@ -2390,6 +2516,17 @@ data:
               <p>
                 <strong>Motivation:</strong>
                 <a href="#UC-CanonicalMappingOfCSV">CanonicalMappingOfCSV</a>
+              </p>
+            </dd>
+	    <dt id="R-RandomAccess">R-RandomAccess</dt>
+	    <dd>
+              <em id="_R-RandomAccess">
+                <strong>Ability to access and/or extract part of a CSV file in a non-sequential manner.</strong>
+              </em>
+		<p>Large datasets may be hard to process in a sequential manner. It may be useful to have the
+		possibility to directly access part of them, possibly by means of a pointer to a given row, cell or region.</p>
+                <strong>Motivation:</strong>
+                <a href="#UC-SupportingSemantic-basedRecommendations">SupportingSemantic-basedRecommendations</a>
               </p>
             </dd>
           </dl>
