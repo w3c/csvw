@@ -1609,9 +1609,41 @@ HETATM  132  OXT ACY   401       4.306  23.101  12.291  1.00 21.19           O
         <p>
           <span style="font-size: 10pt">(Contributed by Jeni Tennison)</span>
         </p>
-	<p>Many data repositories, such as data.gov.uk and GOV.UK, provide a mechanism for previewing CSV datasets.
-	But these previews are currently limited in their ability to provide intelligent displays and sorting because
-	it is not possible for the preview code to know what types the different values are.</p>
+        <p>
+          All of the data repositories based on the <a href="http://ckan.org">CKAN</a> software, such 
+          as <a href="http://data.gov.uk">data.gov.uk</a>, <a href="http://data.gov">data.gov</a>, and many 
+          others, use JSON as the representation of the data when providing a preview of CSV data within a browser. 
+          Server side pre-processing of the CSV files is performed to try and determine column 
+          types, clean the data and transform the CSV-encoded data to JSON in order to provide the preview. JSON has many 
+          features which make it ideal for delivering a preview of the data, originally in CSV format, 
+          to the browser.
+        </p>
+        <p>
+          Javascript is a hard dependency for interacting with data in the browser and as such
+          JSON was used as the serialization format because it was the most appropriate format for 
+          delivering those data.  As the object notation for Javascript JSON is natively understood 
+          by Javascript it is therefore possible to use the data without any external dependencies.  
+          The values in the data delivered map directly to common Javascript types and libraries for 
+          processing and generating JSON, with appropriate type conversion, are widely available for 
+          many programming languages.
+        </p>
+        <p>
+          Beyond basic knowledge of how to work with JSON, there is no further burden on the user 
+          to understand complex semantics around how the data should be interpreted. The user of the 
+          data can be assured that the data is correctly encoded as UTF-8 and it is easily queryable 
+          using common patterns used in everyday Javascript. None of the encoding and 
+          serialization flaws with CSV are apparent, although badly structured CSV files will be 
+          mirrored in the JSON.
+        </p>
+        <p>
+          <strong>Requires:</strong> 
+          <a href="#R-WellFormedCsvCheck">WellFormedCsvCheck</a>, 
+          <a href="#R-CsvToJsonTransformation">CsvToJsonTransformation</a>
+        </p>
+        <p>When providing the in-browser previews of CSV-formatted data, the utility of the preview application 
+          is limited because the server-side processing of the CSV is not always able to determine 
+          the data types (e.g. date-time) associated with data columns. As a result it is not possible 
+          for the in-browser preview to offer functions such as sorting rows by date.</p>
 
 	<p>As an example, see the <a href="http://data.gov.uk/dataset/financial-transactions-data-royal-wolverhampton-hospitals-nhs-trust/resource/e85b1d22-948d-461f-9a29-7b43dee0fc03">
 	Spend over £25,000 in The Royal Wolverhampton Hospitals NHS Trust</a> example.
@@ -1660,32 +1692,6 @@ HETATM  132  OXT ACY   401       4.306  23.101  12.291  1.00 21.19           O
 	  <a href="#R-AnnotationAndSupplementaryInfo">AnnotationAndSupplementaryInfo</a>
 	</p>
 
-     <p>
-         All of the data repositories based on the <a href="http://ckan.org">CKAN</a> software, such 
-         as <a href="http://data.gov.uk">data.gov.uk</a>, <a href="http://data.gov">data.gov</a>, and many 
-         others, use JSON as the representation of the data when delivering the CSV preview to the browser. 
-         All of the pre-processing of the CSV files is performed on the server to try and determine column 
-         types and clean the data before preview. JSON has many features which make it ideal for delivering 
-         the preview data, originally in CSV format, to the browser.
-     </p>
-      <p>
-         Javascript is a hard dependency for interacting with data in the browser and as such
-         JSON was used as the serialization format because it was the most appropriate format for 
-         delivering those data.  As the object notation for Javascript JSON is natively understood 
-         by Javascript it is therefore possible to use the data without any external dependencies.  
-         The values in the data delivered map directly to common Javascript types and libraries for 
-         processing and generating JSON, with appropriate type conversion, are widely available for 
-         many programming languages.
-      </p>
-      <p>
-          Beyond basic knowledge of how to work with JSON, there is no further burden on the user 
-          to understand complex semantics around how the data should be interpreted. The user of the 
-          data can be assured that the data is correctly encoded as UTF-8 and it is easily queryable 
-          using common patterns used in everyday Javascript. None of the encoding and 
-          serialization flaws with CSV are apparent, although badly structured CSV files will be 
-          mirrored in the JSON.
-      </p>
-  
       </section>
       <section id="UC-NetCdFcDl">
         <h2>Use Case #16 Tabular Representations of NetCDF data Using CDL Syntax</h2>
@@ -1942,7 +1948,8 @@ data:
                 <a href="#UC-ChemicalStructures">ChemicalStructures</a>,
                 <a href="#UC-NetCdFcDl">UC-NetCdFcDl</a>,
                 <a href="#UC-PaloAltoTreeData">UC-PaloAltoTreeData</a>,
-                <a href="#UC-CanonicalMappingOfCSV">CanonicalMappingOfCSV</a>
+                <a href="#UC-CanonicalMappingOfCSV">CanonicalMappingOfCSV</a>,
+                <a href="#UC-IntelligentlyPreviewingCSVFiles">IntelligentlyPreviewingCSVFiles</a>
               </p>
             </dd>
             <dt id="R-MultipleHeadingRows">R-MultipleHeadingRows</dt>
@@ -2392,7 +2399,8 @@ data:
                   <p>
                     <strong>Motivation:</strong>
                     <a href="#UC-DisplayingLocationsOfCareHomesOnAMap">DisplayingLocationsOfCareHomesOnAMap</a>,
-                    <a href="#UC-CanonicalMappingOfCSV">CanonicalMappingOfCSV</a>
+                    <a href="#UC-CanonicalMappingOfCSV">CanonicalMappingOfCSV</a>, 
+                    <a href="#UC-IntelligentlyPreviewingCSVFiles">IntelligentlyPreviewingCSVFiles</a>
                   </p>
             </dd>
             <dt id="R-CanonicalMappingInLieuOfAnnotation">R-CanonicalMappingInLieuOfAnnotation</dt>
