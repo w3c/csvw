@@ -1,0 +1,828 @@
+= CSV-LD Working Notes =
+
+There are many parallels between the goals of JSON-LD and the CSV on the Web efforts: * Both JSON and CSV are common formats for representing data on the web, * Both are open formats, unencumbered by propriatary Intellectual Property restrictions, * Both are used for publishing simple data, where the &quot;schema&quot; is often application-specific, * Both have communitites that have different expectations for how to represent tabular data, * Both are often used as intermediate formats for transforming into a native representation.
+
+JSON-LD had as one of it's design goals to allow zero-edit use of existing JSON to obtain a reasonable representation of JSON as Linked Data. I think that we should have a similar objective for CSV. A principle mechanism in JSON-LD was the use of a ''Context''; this allowed simple terms to be given IRIs and values to be given datatypes. CSV has a similar issue, where column names typically identify entities or properties of those entities, and values have an assumed type. In some cases (e.g., Excel), the format may also allow a native representation of a given datatype, which is also the case in JSON, but for a limited set of datatypes.
+
+== Simple JSON-LD mapping ==
+
+One way in which JSON-LD can achieve zero edits is by allowing a JSON-LD Context to be specified externally, and applied to a given JSON document; this can be done algorithmically, when a specific transformation is invoked by specifying the context as an argument. It can also be done by adding the context to the JSON, which allows the rest of the data to be left untouched. Another mechanism is through the use of an HTTP Link header:
+
+<pre>GET /ordinary-json-document.json HTTP/1.1
+Host: example.com
+Accept: application/ld+json,application/json,*/*;q=0.1
+
+====================================
+
+HTTP/1.1 200 OK
+...
+Content-Type: application/json
+Link: &lt;http://json-ld.org/contexts/person.jsonld&gt;; rel=&quot;http://www.w3.org/ns/json-ld#context&quot;; type=&quot;application/ld+json&quot;
+
+{
+  &quot;name&quot;: &quot;Gregg Kellogg&quot;,
+  &quot;homepage&quot;: &quot;http://greggkellogg.net/&quot;,
+  &quot;image&quot;: &quot;http://www.gravatar.com/avatar/42f948adff3afaa52249d963117af7c8.png&quot;
+}</pre>
+In one use case, a CSV may represent multiple entities, with one line per entity description and each column represents a property of that entity, for example, the above JSON could be represented as follows:
+
+<table>
+  <tr><th>
+name
+</th><th>
+homepage
+</th><th>
+image
+</th></tr>
+  <tr><td>
+Gregg Kellogg
+</td><td>
+http://greggkellogg.net/
+</td><td>
+http://www.gravatar.com/avatar/42f948adff3afaa52249d963117af7c8.png
+</td></tr>
+</table>
+
+In such case, using the JSON-LD context to interpret the tabular data is clear. Alternatively, CSV could be transformed directly to JSON by turning each row into a JSON object using the column names and data values appropriately, and the JSON-LD algorithms may be used directly.
+
+By specifying a ''CSV-LD mapping frame'' through a Link header, a mapping from CSV records using the mapping frame gives a CSV-LD knowledgeable client the ability to transform teh accompanying CSV into JSON-LD, and therefore into RDF.
+
+<pre>GET /ordinary-json-document.json HTTP/1.1
+Host: example.com
+Accept: text/ld+csv,*/*;q=0.1
+
+====================================
+
+HTTP/1.1 200 OK
+...
+Content-Type: text/ld+csv
+Link: &amp;lt;http://example/mapping.jsonld&amp;gt;; rel=&amp;quot;http://www.w3.org/ns/csv-ld#mapping&amp;quot;; type=&amp;quot;application/ld+json&amp;quot;
+
+name,homepage,image
+&quot;Gregg Kellogg&quot;,http://greggkellogg.net/,http://www.gravatar.com/avatar/42f948adff3afaa52249d963117af7c8.png</pre>
+The mapping file is referenced in the Link header and known to be a CSV-LD mapping frame due to the type attribute of that Link header. This is a file formatted as JSON-LD which is used to specify how each record is transformed into a JSON-LD node using the column names from the CSV to identify members of the JSON and replacing the associated null value with the field from each record processed. The <code>http://example/mapping.jsonld</code> file could then be represented as follows:
+
+<pre>{
+  &quot;@context&quot;: {
+    &quot;@extension&quot;: &quot;http://www.w3.org/ns/csv-ld&quot;,
+    &quot;@vocab&quot;: &quot;http://schema.org/&quot;,
+    &quot;homepage&quot;: {&quot;@type&quot;: &quot;@id&quot;},
+    &quot;image&quot;: {&quot;@type&quot;: &quot;@id&quot;},
+  },
+  &quot;name&quot;: null,
+  &quot;homepage&quot;: null,
+  &quot;image&quot;: null
+}</pre>
+(Note that the JSON-LD document is extended with concepts from CSV-LD using the <code>@extension</code> member of the <code>@context</code>).
+
+Applying the mapping to each CSV record creates an array of node definitions:
+
+<pre>[
+  {
+    &quot;@context&quot;: {
+      &quot;@extension&quot;: &quot;http://www.w3.org/ns/csv-ld&quot;,
+      &quot;@vocab&quot;: &quot;http://schema.org/&quot;,
+      &quot;homepage&quot;: {&quot;@type&quot;: &quot;@id&quot;},
+      &quot;image&quot;: {&quot;@type&quot;: &quot;@id&quot;},
+    },
+    &quot;name&quot;: &quot;Gregg Kellogg&quot;,
+    &quot;homepage&quot;: &quot;http://greggkellogg.net/&quot;,
+    &quot;image&quot;: &quot;http://www.gravatar.com/avatar/42f948adff3afaa52249d963117af7c8.png&quot;
+  }
+]</pre>
+== Structured Content ==
+
+Much data on the web, including both CSV and JSON, includes more structure in the form of embedded entity descriptions. For example, the following JSON-LD can be used to describe a simple FOAF relationship:
+
+<pre>{
+...
+  &quot;@type&quot;: &quot;Person&quot;,
+  &quot;name&quot;: &quot;Manu Sporny&quot;,
+  &quot;knows&quot;:
+  {
+    &quot;@type&quot;: &quot;Person&quot;,
+    &quot;name&quot;: &quot;Gregg Kellogg&quot;,
+  }
+...
+}</pre>
+JSON-LD allows such data to be algorithmically &quot;flattened&quot;:
+
+<pre>[{
+  &quot;@id&quot;: &quot;_:manu&quot;,
+  &quot;@type&quot;: &quot;Person&quot;,
+  &quot;name&quot;: &quot;Manu Sporny&quot;,
+  &quot;knows&quot;: {&quot;@id&quot;: &quot;_:gregg&quot;}
+}, {
+  &quot;@id&quot;: &quot;_:gregg&quot;,
+  &quot;@type&quot;: &quot;Person&quot;,
+  &quot;name&quot;: &quot;Gregg Kellogg&quot;,
+  &quot;knows&quot;: {&quot;@id&quot;: &quot;_:manu&quot;}
+}]</pre>
+The corresponding tabular representation could then be the following:
+
+<table>
+  <tr><th>
+@id
+</th><th>
+@type
+</th><th>
+name
+</th><th>
+knows
+</th></tr>
+  <tr><td>
+_:manu
+</td><td>
+Person
+</td><td>
+Manu Sporny
+</td><td>
+_:gregg
+</td></tr>
+  <tr><td>
+_:gregg
+</td><td>
+Person
+</td><td>
+Gregg Kellogg
+</td><td>
+_:manu
+</td></tr>
+</table>
+
+Of course, with multiple datatypes, this becomes more difficult, and does not really represent the way that CSV is commonly used.
+
+== Table Join representation ==
+
+A common way to use CSV for data-dumps is as the result of a SQL (or SPARQL) JOIN. When joining data different columns contain data from different tables, or entities, with data repeated where there is a one-to-many relationship between the tables. For example consider the result of running the following SPARQL query on http://rdf.greggkellogg.net/sparql:
+
+<pre>PREFIX doap: &lt;http://usefulinc.com/ns/doap#&gt;
+PREFIX foaf: &lt;http://xmlns.com/foaf/0.1/&gt;
+SELECT *
+WHERE {
+  ?doap_id a doap:Project; doap:name ?doap_name; doap:developer ?foaf_id .
+  ?foaf_id foaf:name ?foaf_name .
+}
+LIMIT 10</pre>
+<table class="sparql">
+  <tbody>
+    <tr>
+      <th>
+doap_id
+</th>
+      <th>
+doap_name
+</th>
+      <th>
+foaf_id
+</th>
+      <th>
+foaf_name
+</th>
+    </tr>
+    <tr>
+      <td>
+http://rubygems.org/gems/json-ld
+</td>
+      <td>
+JSON::LD
+</td>
+      <td>
+http://greggkellogg.net/foaf#me
+</td>
+      <td>
+Gregg Kellogg
+</td>
+    </tr>
+    <tr>
+      <td>
+http://rubygems.org/gems/rdf
+</td>
+      <td>
+RDF.rb
+</td>
+      <td>
+http://ar.to/#self
+</td>
+      <td>
+Arto Bendiken
+</td>
+    </tr>
+    <tr>
+      <td>
+http://rubygems.org/gems/rdf
+</td>
+      <td>
+RDF.rb
+</td>
+      <td>
+http://bhuga.net/#ben
+</td>
+      <td>
+Ben Lavender
+</td>
+    </tr>
+    <tr>
+      <td>
+http://rubygems.org/gems/rdf
+</td>
+      <td>
+RDF.rb
+</td>
+      <td>
+http://greggkellogg.net/foaf#me
+</td>
+      <td>
+Gregg Kellogg
+</td>
+    </tr>
+    <tr>
+      <td>
+http://rubygems.org/gems/rdf-aggregate-repo
+</td>
+      <td>
+RDF::AggregateRepo
+</td>
+      <td>
+http://greggkellogg.net/foaf#me
+</td>
+      <td>
+Gregg Kellogg
+</td>
+    </tr>
+    <tr>
+      <td>
+http://rubygems.org/gems/rdf-json
+</td>
+      <td>
+RDF::JSON
+</td>
+      <td>
+http://ar.to/#self
+</td>
+      <td>
+Arto Bendiken
+</td>
+    </tr>
+    <tr>
+      <td>
+http://rubygems.org/gems/rdf-microdata
+</td>
+      <td>
+RDF::Microdata
+</td>
+      <td>
+http://greggkellogg.net/foaf#me
+</td>
+      <td>
+Gregg Kellogg
+</td>
+    </tr>
+    <tr>
+      <td>
+http://rubygems.org/gems/rdf-n3
+</td>
+      <td>
+RDF::N3
+</td>
+      <td>
+http://greggkellogg.net/foaf#me
+</td>
+      <td>
+Gregg Kellogg
+</td>
+    </tr>
+    <tr>
+      <td>
+http://rubygems.org/gems/rdf-rdfa
+</td>
+      <td>
+RDF::RDFa
+</td>
+      <td>
+http://greggkellogg.net/foaf#me
+</td>
+      <td>
+Gregg Kellogg
+</td>
+    </tr>
+    <tr>
+      <td>
+http://rubygems.org/gems/rdf-rdfxml
+</td>
+      <td>
+RDF::RDFXML
+</td>
+      <td>
+http://greggkellogg.net/foaf#me
+</td>
+      <td>
+Gregg Kellogg
+</td>
+    </tr>
+  </tbody>
+</table>
+
+Note that the <code>doap_*</code> columns are replicated for <code>&lt;http://rubygems.org/gems/rdf&gt;</code>, as there are multiple values for the <code>doap:contributor</code> property. These columns represent the same entity and the <code>doap_name</code> column does not represent multiple (identical) values for that field. However, the <code>foaf_id</code> columns do represent multiple values. In some cases, the fact that the values are distinct indicates they are the same value, however it is also common for data to include multiple values with replication.
+
+Data such as this does not readily transform to JSON-LD, and some for of ''entity mapping'' is necessary, and this requires some extension to the JSON-LD context schema.
+
+== Entity Mapping ==
+
+The previous example shows a natural way of representing joined entities in CSV; in JSON-LD this is more naturally down using <code>embedding</code>:
+
+<pre>{
+  &quot;@context&quot;: {
+    &quot;foaf&quot;: &quot;http://xmlns.com/foaf/0.1/&quot;,
+    &quot;doap&quot;: &quot;http://usefulinc.com/ns/doap#&quot;,
+    &quot;doap_developer&quot;: {&quot;@id&quot;: &quot;doap:developer&quot;, &quot;@type&quot;: &quot;@id&quot;},
+    &quot;doap_id&quot;: &quot;@id&quot;,
+    &quot;doap_name&quot;: &quot;doap:name&quot;
+    &quot;foaf_id&quot;: &quot;@id&quot;,
+    &quot;foaf_name&quot;: &quot;foaf:name&quot;
+  },
+  &quot;@graph&quot;: [{
+    &quot;doap_id&quot;: &quot;http://rubygems.org/gems/json-ld&quot;,
+    &quot;doap_developer&quot;: {
+      &quot;doap_id&quot;: &quot;http://greggkellogg.net/foaf#me&quot;,
+      &quot;foaf_name&quot;: &quot;Gregg Kellogg&quot;
+    },
+    &quot;doap_name&quot;: &quot;JSON::LD&quot;
+  }, {
+    &quot;doap_id&quot;: &quot;http://rubygems.org/gems/rdf&quot;,
+    &quot;doap_developer&quot;: [
+      {&quot;foaf_id&quot;: &quot;http://ar.to/#self&quot;, &quot;foaf_name&quot;: &quot;Arto Bendiken&quot;},
+      {&quot;foaf_id&quot;: &quot;http://bhuga.net/#ben&quot;, &quot;foaf_name&quot;: &quot;Ben Lavender&quot;},
+      {&quot;foaf_id&quot;: &quot;http://greggkellogg.net/foaf#me&quot;, &quot;foaf_name&quot;: &quot;Gregg Kellogg&quot;}
+    ],
+    &quot;doap_name&quot;: &quot;RDF.rb&quot;
+  }, {
+    &quot;doap_id&quot;: &quot;http://rubygems.org/gems/rdf-aggregate-repo&quot;,
+    &quot;doap_developer&quot;: {&quot;foaf_id&quot;: &quot;http://greggkellogg.net/foaf#me&quot;, &quot;foaf_name&quot;: &quot;Gregg Kellogg&quot;},
+    &quot;doap_name&quot;: &quot;RDF::AggregateRepo&quot;
+  }, {
+    &quot;doap_id&quot;: &quot;http://rubygems.org/gems/rdf-json&quot;,
+    &quot;doap_developer&quot;: {&quot;foaf_id&quot;: &quot;http://ar.to/#self&quot;, &quot;foaf_name&quot;: &quot;Arto Bendiken&quot;},
+    &quot;doap_name&quot;: &quot;RDF::JSON&quot;
+  }, {
+    &quot;doap_id&quot;: &quot;http://rubygems.org/gems/rdf-microdata&quot;,
+    &quot;doap_developer&quot;: {&quot;foaf_id&quot;: &quot;http://greggkellogg.net/foaf#me&quot;, &quot;foaf_name&quot;: &quot;Gregg Kellogg&quot;},
+    &quot;doap_name&quot;: &quot;RDF::Microdata&quot;
+  }, {
+    &quot;doap_id&quot;: &quot;http://rubygems.org/gems/rdf-n3&quot;,
+    &quot;doap_developer&quot;: {&quot;foaf_id&quot;: &quot;http://greggkellogg.net/foaf#me&quot;, &quot;foaf_name&quot;: &quot;Gregg Kellogg&quot;},
+    &quot;doap_name&quot;: &quot;RDF::N3&quot;
+  }, {
+    &quot;doap_id&quot;: &quot;http://rubygems.org/gems/rdf-rdfa&quot;,
+    &quot;doap_developer&quot;: {&quot;foaf_id&quot;: &quot;http://greggkellogg.net/foaf#me&quot;, &quot;foaf_name&quot;: &quot;Gregg Kellogg&quot;},
+    &quot;doap_name&quot;: &quot;RDF::RDFa&quot;
+  }, {
+    &quot;doap_id&quot;: &quot;http://rubygems.org/gems/rdf-rdfxml&quot;,
+    &quot;doap_developer&quot;: {&quot;foaf_id&quot;: &quot;http://greggkellogg.net/foaf#me&quot;, &quot;foaf_name&quot;: &quot;Gregg Kellogg&quot;},
+    &quot;doap_name&quot;: &quot;RDF::RDFXML&quot;
+  }]
+}</pre>
+CSV-LD uses the concept of a [http://json-ld.org/spec/latest/json-ld-framing/ JSON-LD Frame] to specify the structure of a JSON-LD document to represent each record of a CSV. Such a ''CSV-LD mapping frame'' takes advantage of embedded nodes to reverse the record joining used in the example:
+
+<pre>{
+  &quot;@context&quot;: {
+    &quot;@extension&quot;: &quot;http://www.w3.org/ns/csv-ld&quot;,
+    &quot;foaf&quot;: &quot;http://xmlns.com/foaf/0.1/&quot;,
+    &quot;doap&quot;: &quot;http://usefulinc.com/ns/doap#&quot;,
+    &quot;doap_id&quot;: &quot;@id&quot;,
+    &quot;doap_name&quot;: &quot;doap:name&quot;,
+    &quot;doap_developer&quot;: {&quot;@id&quot;: &quot;doap:developer&quot;, &quot;@type&quot;: &quot;@id&quot;},
+    &quot;foaf_id&quot;: &quot;@id&quot;,
+    &quot;foaf_name&quot;: &quot;foaf:name&quot;
+  },
+  &quot;doap_id&quot;: null,
+  &quot;doap_name&quot;: null,
+  &quot;doap_developer&quot;: {
+    &quot;foaf_id&quot;: null,
+    &quot;foaf_name&quot;: null
+  }
+}</pre>
+By applying each record using the mapping results in the following document (note that the common context is extracted, and each record is added to the <code>@graph</code> array):
+
+<pre>{
+  &quot;@context&quot;: {
+    &quot;@extension&quot;: &quot;http://www.w3.org/ns/csv-ld&quot;,
+    &quot;foaf&quot;: &quot;http://xmlns.com/foaf/0.1/&quot;,
+    &quot;doap&quot;: &quot;http://usefulinc.com/ns/doap#&quot;,
+    &quot;doap_id&quot;: &quot;@id&quot;,
+    &quot;doap_name&quot;: &quot;doap:name&quot;,
+    &quot;doap_developer&quot;: {&quot;@id&quot;: &quot;doap:developer&quot;, &quot;@type&quot;: &quot;@id&quot;},
+    &quot;foaf_id&quot;: &quot;@id&quot;,
+    &quot;foaf_name&quot;: &quot;foaf:name&quot;
+  },
+  &quot;@graph&quot;: [{
+    &quot;doap_id&quot;: &quot;http://rubygems.org/gems/json-ld&quot;,
+    &quot;doap_name&quot;: &quot;JSON::LD&quot;,
+    &quot;doap_developer&quot;: {&quot;foaf_id&quot;: &quot;http://greggkellogg.net/foaf#me&quot;, &quot;foaf_name&quot;: &quot;Gregg Kellogg&quot;}
+  }, {
+    &quot;doap_id&quot;: &quot;http://rubygems.org/gems/rdf&quot;,
+    &quot;doap_name&quot;: &quot;RDF.rb&quot;,
+    &quot;doap_developer&quot;: {&quot;foaf_id&quot;: &quot;http://ar.to/#self&quot;, &quot;foaf_name&quot;: &quot;Arto Bendiken&quot;}
+  }, {
+    &quot;doap_id&quot;: &quot;http://rubygems.org/gems/rdf&quot;,
+    &quot;doap_name&quot;: &quot;RDF.rb&quot;,
+    &quot;doap_developer&quot;: {&quot;foaf_id&quot;: &quot;http://bhuga.net/#ben&quot;, &quot;foaf_name&quot;: &quot;Ben Lavender&quot;}
+    ]
+  }, {
+    &quot;doap_id&quot;: &quot;http://rubygems.org/gems/rdf&quot;,
+    &quot;doap_name&quot;: &quot;RDF.rb&quot;,
+    &quot;doap_developer&quot;: {&quot;foaf_id&quot;: &quot;http://greggkellogg.net/foaf#me&quot;, &quot;foaf_name&quot;: &quot;Gregg Kellogg&quot;}
+  }, {
+    &quot;doap_id&quot;: &quot;http://rubygems.org/gems/rdf-aggregate-repo&quot;,
+    &quot;doap_name&quot;: &quot;RDF::AggregateRepo&quot;,
+    &quot;doap_developer&quot;: {&quot;foaf_id&quot;: &quot;http://greggkellogg.net/foaf#me&quot;, &quot;foaf_name&quot;: &quot;Gregg Kellogg&quot;}
+  }, {
+    &quot;doap_id&quot;: &quot;http://rubygems.org/gems/rdf-json&quot;,
+    &quot;doap_name&quot;: &quot;RDF::JSON&quot;,
+    &quot;doap_developer&quot;: {&quot;foaf_id&quot;: &quot;http://ar.to/#self&quot;, &quot;foaf_name&quot;: &quot;Arto Bendiken&quot;}
+  }, {
+    &quot;doap_id&quot;: &quot;http://rubygems.org/gems/rdf-microdata&quot;,
+    &quot;doap_name&quot;: &quot;RDF::Microdata&quot;,
+    &quot;doap_developer&quot;: {&quot;foaf_id&quot;: &quot;http://greggkellogg.net/foaf#me&quot;, &quot;foaf_name&quot;: &quot;Gregg Kellogg&quot;}
+  }, {
+    &quot;doap_id&quot;: &quot;http://rubygems.org/gems/rdf-n3&quot;,
+    &quot;doap_name&quot;: &quot;RDF::N3&quot;,
+    &quot;doap_developer&quot;: {&quot;foaf_id&quot;: &quot;http://greggkellogg.net/foaf#me&quot;, &quot;foaf_name&quot;: &quot;Gregg Kellogg&quot;}
+  }, {
+    &quot;doap_id&quot;: &quot;http://rubygems.org/gems/rdf-rdfa&quot;,
+    &quot;doap_name&quot;: &quot;RDF::RDFa&quot;,
+    &quot;doap_developer&quot;: {&quot;foaf_id&quot;: &quot;http://greggkellogg.net/foaf#me&quot;, &quot;foaf_name&quot;: &quot;Gregg Kellogg&quot;}
+  }, {
+    &quot;doap_id&quot;: &quot;http://rubygems.org/gems/rdf-rdfxml&quot;,
+    &quot;doap_name&quot;: &quot;RDF::RDFXML&quot;,
+    &quot;doap_developer&quot;: {&quot;foaf_id&quot;: &quot;http://greggkellogg.net/foaf#me&quot;, &quot;foaf_name&quot;: &quot;Gregg Kellogg&quot;}
+  }]
+}</pre>
+If re-framed, using the JSON-LD framing algorithm, it would essentially reproduce the same framed document shown before, consolidating embedded nodes as necessary. ## Representing Multiple Values Two rows in a table might vary by just one a couple of column values. This often represents a join with a one-to-many mapping. In this case, values may be duplicated in other columns, which are not intended to represent duplicate values. For RDF, this does not represent a problem, as multiple statements having the same subject-predicate-object are effectively removed when added to an RDF graph.
+
+== Representing Lists ==
+
+List data represents instances where order matters, and it is possible for values to be duplicated within a list. Unlike the RDF data model, JSON-LD does have native representation for lists. By using different column names for consecutive values in a list, the associated fields can be placed in a JSON-LD list definition, and the ordered values will be preserved.
+
+Alternatively a micro-syntax within a given table-cell could indicate multiple values of a list. For example, this could be with embedded newline characters separating each element of the list. However, this would require some extra mechanism for identifying such columns, and ensuring the content is properly escaped.
+
+== Composite Primary Keys ==
+
+In many cases, CSV files are generated without primary keys, but multiple records may still refer to the same entity. CSV-LD introduces the concept of a <code>idTemplate</code>, which can be used to format a value from one or more fields within the CSV. By defining a term to be of type <code>@idTemplate</code>, that term may be used any place a key or string value may be used within JSON, and the processor will evaluate that term relative to the current record. For example, consider the following:
+
+<pre>{
+  &quot;@context&quot;: {
+    &quot;@extension&quot;: &quot;http://www.w3.org/ns/csv-ld&quot;,
+    &quot;region_id&quot;: {&quot;@id&quot;: &quot;_:{Sales Region}&quot;, &quot;@type&quot;: &quot;@idTemplate&quot;}
+  },
+  &quot;@id&quot;: &quot;region_id&quot;,
+  ...
+}</pre>
+By declaring <code>region\_id</code> to be of type <code>@idTemplate</code>, the processor knows that the <code>@id</code> field defines a template that should be applied to the current record to come up with the value to use in it's place. A substitution is specified using <code>{Column Name}</code> within the string. This is replaced with the value of the associated field(s) in the current record, after suitable normalization such as IRI escaping. Multiple such substitutions may be used within an ''idTemplate'', and a record may use many ''idTemplates''.
+
+== Field Micro-Syntaxes ==
+
+In many cases, CSV files use specific formatting for different fields, for example a date may be formatted using an American or European convention. In this case, turning this into reasonable Linked Data where the field values can be represented using standard XSD data formats is desirable. Extending a JSON-LD term definition with additional information about field micro-syntaxes may be useful. However, if a node definition already indicates the type is <code>xsd:date</code> or <code>xsd:dateTime</code>, processing software could automatically process information using standard parsers for these types.
+
+Another common field micro-syntax is to have embedded sub-field separators. For example, a field may be quoted and contain comma-separated values. By indicating this in the node definition, processing software could separate each value and apply them as separate values using the JSON array notation. This would allow preservation of multiple values within JSON-LD, or even allow the order of these values to be maintained in a list.
+
+== Inline Context Reference/Definition ==
+
+Typical use would indicate using an external context definition as a JSON-LD document, however it may be desirable to contain the reference within the body of the CSV. Moreover, it may be desirable to be able to include an entire context definition within the CSV itself.
+
+One way to do this might be to allow a special case where the value of the first column is <code>@context</code>, regardless of the column label. (Alternatively, something like <code>$context</code> might be more CSV/Excel like, but escaping will be an issue whatever is chosen). In this case, context definitions could use pre-defined column mappings, or additional columns who's labels correspond with JSON-LD context elements. For example, consider the following hypothetical example:
+
+<table>
+ <tr>
+  <td>
+doap_id
+</td>
+  <td>
+doap_name
+</td>
+  <td>
+foaf_id
+</td>
+  <td>
+foaf_name
+</td>
+  <td>
+@id
+</td>
+  <td>
+@type
+</td>
+  <td>
+@container
+</td>
+  <td>
+@language
+</td>
+ </tr>
+ <tr>
+  <td>
+@context
+</td>
+  <td colspan=3>
+http://example/context.jsonld
+</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+ </tr>
+ <tr>
+  <td>
+@context
+</td>
+  <td>
+foaf
+</td>
+  <td></td>
+  <td></td>
+  <td colspan=3>
+http://xmlns.com/foaf/0.1/
+</td>
+  <td></td>
+ </tr>
+ <tr>
+  <td>
+@context
+</td>
+  <td>
+doap
+</td>
+  <td></td>
+  <td></td>
+  <td colspan=3>
+http://usefulinc.com/ns/doap#
+</td>
+  <td></td>
+ </tr>
+ <tr>
+  <td>
+@context
+</td>
+  <td colspan=2>
+doap_developer
+</td>
+  <td></td>
+  <td>
+doap:developer
+</td>
+  <td>
+@id
+</td>
+  <td></td>
+  <td></td>
+ </tr>
+ <tr>
+  <td>
+@context
+</td>
+  <td>
+doap_id
+</td>
+  <td></td>
+  <td></td>
+  <td>
+@id
+</td>
+  <td></td>
+  <td></td>
+  <td></td>
+ </tr>
+ <tr>
+  <td>
+@context
+</td>
+  <td>
+doap_name
+</td>
+  <td></td>
+  <td></td>
+  <td>
+doap:name
+</td>
+  <td></td>
+  <td></td>
+  <td></td>
+ </tr>
+ <tr>
+  <td>
+@context
+</td>
+  <td>
+foaf_id
+</td>
+  <td></td>
+  <td></td>
+  <td>
+@id
+</td>
+  <td></td>
+  <td></td>
+  <td></td>
+ </tr>
+ <tr>
+  <td>
+@context
+</td>
+  <td>
+foaf_name
+</td>
+  <td></td>
+  <td></td>
+  <td>
+foaf:name
+</td>
+  <td></td>
+  <td></td>
+  <td></td>
+ </tr>
+ <tr>
+  <td>
+@context
+</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+ </tr>
+ <tr>
+  <td>
+http://rubygems.org/gems/json-ld
+</td>
+  <td>
+JSON::LD
+</td>
+  <td>
+http://greggkellogg.net/foaf#me
+</td>
+  <td colspan=2>
+Gregg Kellogg
+</td>
+  <td></td>
+  <td></td>
+  <td></td>
+ </tr>
+ <tr>
+  <td>
+http://rubygems.org/gems/rdf
+</td>
+  <td>
+RDF.rb
+</td>
+  <td>
+http://ar.to/#self
+</td>
+  <td colspan=2>
+Arto Bendiken
+</td>
+  <td></td>
+  <td></td>
+  <td></td>
+ </tr>
+ <tr>
+  <td>
+http://rubygems.org/gems/rdf
+</td>
+  <td>
+RDF.rb
+</td>
+  <td>
+http://bhuga.net/#ben
+</td>
+  <td colspan=2>
+Ben Lavender
+</td>
+  <td></td>
+  <td></td>
+  <td></td>
+ </tr>
+ <tr>
+  <td>
+http://rubygems.org/gems/rdf
+</td>
+  <td>
+RDF.rb
+</td>
+  <td>
+http://greggkellogg.net/foaf#me
+</td>
+  <td colspan=2>
+Gregg Kellogg
+</td>
+  <td></td>
+  <td></td>
+  <td></td>
+ </tr>
+ <tr>
+  <td>
+http://rubygems.org/gems/rdf-aggregate-repo
+</td>
+  <td>
+RDF::AggregateRepo
+</td>
+  <td>
+http://greggkellogg.net/foaf#me
+</td>
+  <td colspan=2>
+Gregg Kellogg
+</td>
+  <td></td>
+  <td></td>
+  <td></td>
+ </tr>
+ <tr>
+  <td>
+http://rubygems.org/gems/rdf-json
+</td>
+  <td>
+RDF::JSON
+</td>
+  <td>
+http://ar.to/#self
+</td>
+  <td colspan=2>
+Arto Bendiken
+</td>
+  <td></td>
+  <td></td>
+  <td></td>
+ </tr>
+ <tr>
+  <td>
+http://rubygems.org/gems/rdf-microdata
+</td>
+  <td>
+RDF::Microdata
+</td>
+  <td>
+http://greggkellogg.net/foaf#me
+</td>
+  <td colspan=2>
+Gregg Kellogg
+</td>
+  <td></td>
+  <td></td>
+  <td></td>
+ </tr>
+ <tr>
+  <td>
+http://rubygems.org/gems/rdf-n3
+</td>
+  <td>
+RDF::N3
+</td>
+  <td>
+http://greggkellogg.net/foaf#me
+</td>
+  <td colspan=2>
+Gregg Kellogg
+</td>
+  <td></td>
+  <td></td>
+  <td></td>
+ </tr>
+ <tr>
+  <td>
+http://rubygems.org/gems/rdf-rdfa
+</td>
+  <td>
+RDF::RDFa
+</td>
+  <td>
+http://greggkellogg.net/foaf#me
+</td>
+  <td colspan=2>
+Gregg Kellogg
+</td>
+  <td></td>
+  <td></td>
+  <td></td>
+ </tr>
+ <tr>
+  <td>
+http://rubygems.org/gems/rdf-rdfxml
+</td>
+  <td>
+RDF::RDFXML
+</td>
+  <td>
+http://greggkellogg.net/foaf#me
+</td>
+  <td colspan=2>
+Gregg Kellogg
+</td>
+  <td></td>
+  <td></td>
+  <td></td>
+ </tr>
+</table>
+
+In this case, if the value of the first column is <code>@context</code>, the record is presumed to specify something similar to a JSON-LD Context. If all but the first two columns are empty, the second column is presumed to be the URL of a remote context document. Otherwise, the subsequent columns are taken to be ''term definitions'' with the second column being the term. Any other columns MUST be defined using JSON-LD keyword labels, and allow for expanded term definitions using <code>@id</code>, <code>@reverse</code>, <code>@type</code>, <code>@container</code> and <code>@language</code>. Processing is not defined at this time, but is equivalent to processing a JSON-LD context definition.
+
