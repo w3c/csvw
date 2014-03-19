@@ -1,73 +1,297 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width,initial-scale=1" name="viewport" />
+<html lang="en" dir="ltr" typeof="bibo:Document " about="" property="dcterms:language" content="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width,initial-scale=1" name="viewport">
     <title>CSV on the Web: Use Cases and Requirements</title>
-    <script class="remove" src="http://www.w3.org/Tools/respec/respec-w3c-common">
-		</script>
-    <script class="remove">
-var respecConfig = {
-    specStatus: "FPWD",
-    shortName: "csvw-ucr",
-    publishDate:  "2014-03-27",
-    previousPublishDate:  "",
-    edDraftURI: "http://w3c.github.io/csvw/use-cases-and-requirements/",
-    // lcEnd: "3000-01-01",
-    // crEnd: "3000-01-01",
-    editors: [{
-            name: "Jeremy Tandy",
-            company: "Met Office",
-            companyURL: "http://www.metoffice.gov.uk/"
-        },{
-	          name: "Davide Ceolin",
-	          company: "VU University Amsterdam",
-	          companyURL: "http://www.vu.nl"
-	      },{
-            name: "Eric Stephan",
-            company: "Pacific Northwest National Laboratory",
-            companyURL: "http://www.pnnl.gov"
-    }],
-    wg: "CSV on the Web Working Group",
-    noRecTrack: true,
-    wgURI: "https://www.w3.org/2013/csvw/",
-    wgPublicList: "public-csv-wg",
-    wgPatentURI: "http://www.w3.org/2004/01/pp-impl/68238/status",
-    otherLinks: [{
-            key: "Repository",
-            data: [{
-                    value: "We are on Github",
-                    href: "https://github.com/w3c/csvw"
-                }, {
-                    value: "File a bug",
-                    href: "https://github.com/w3c/csvw"
-                }, {
-                    value: "Commit history",
-                    href: "https://github.com/w3c/csvw/commits/gh-pages"
-                }
-            ]
-        }
-    ],
-    localBiblio: {
-      "rdf11-concepts": {
-          "authors": [
-              "Richard Cyganiak",
-              "David Wood",
-              "Markus Lanthaler"
-          ],
-          "href": "http://www.w3.org/TR/rdf11-concepts/",
-          "title": "RDF 1.1 Concepts and Abstract Syntax",
-          "rawDate": "2014-02-25",
-          "status": "REC",
-          "publisher": "W3C",
-        },
+    
+    
+    <style>/* --- EXAMPLES --- */
+div.example-title {
+    min-width: 7.5em;
+    color: #b9ab2d;
+}
+div.example-title span {
+    text-transform: uppercase;   
+}
+aside.example, div.example, div.illegal-example {
+    padding: 0.5em;
+    margin: 1em 0;
+    position: relative;
+    clear: both;
+}
+div.illegal-example { color: red }
+div.illegal-example p { color: black }
+aside.example, div.example {
+    padding: .5em;
+    border-left-width: .5em;
+    border-left-style: solid;
+    border-color: #e0cb52;
+    background: #fcfaee;    
+}
+
+aside.example div.example {
+    border-left-width: .1em;
+    border-color: #999;
+    background: #fff;
+}
+aside.example div.example div.example-title {
+    color: #999;
+}
+</style><style>/* --- ISSUES/NOTES --- */
+div.issue-title, div.note-title {
+    padding-right:  1em;
+    min-width: 7.5em;
+    color: #b9ab2d;
+}
+div.issue-title { color: #e05252; }
+div.note-title { color: #2b2; }
+div.issue-title span, div.note-title span {
+    text-transform: uppercase;
+}
+div.note, div.issue {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+.note > p:first-child, .issue > p:first-child { margin-top: 0 }
+.issue, .note {
+    padding: .5em;
+    border-left-width: .5em;
+    border-left-style: solid;
+}
+div.issue, div.note {
+    padding: 1em 1.2em 0.5em;
+    margin: 1em 0;
+    position: relative;
+    clear: both;
+}
+span.note, span.issue { padding: .1em .5em .15em; }
+
+.issue {
+    border-color: #e05252;
+    background: #fbe9e9;
+}
+.note {
+    border-color: #52e052;
+    background: #e9fbe9;
+}
+
+
+</style><link href="editorial.css" rel="stylesheet" type="text/css">
+  <style>/*****************************************************************
+ * ReSpec 3 CSS
+ * Robin Berjon - http://berjon.com/
+ *****************************************************************/
+
+/* --- INLINES --- */
+em.rfc2119 { 
+    text-transform:     lowercase;
+    font-variant:       small-caps;
+    font-style:         normal;
+    color:              #900;
+}
+
+h1 acronym, h2 acronym, h3 acronym, h4 acronym, h5 acronym, h6 acronym, a acronym,
+h1 abbr, h2 abbr, h3 abbr, h4 abbr, h5 abbr, h6 abbr, a abbr {
+    border: none;
+}
+
+dfn {
+    font-weight:    bold;
+}
+
+a.internalDFN {
+    color:  inherit;
+    border-bottom:  1px solid #99c;
+    text-decoration:    none;
+}
+
+a.externalDFN {
+    color:  inherit;
+    border-bottom:  1px dotted #ccc;
+    text-decoration:    none;
+}
+
+a.bibref {
+    text-decoration:    none;
+}
+
+cite .bibref {
+    font-style: normal;
+}
+
+code {
+    color:  #ff4500;
+}
+
+/* --- TOC --- */
+.toc a, .tof a {
+    text-decoration:    none;
+}
+
+a .secno, a .figno {
+    color:  #000;
+}
+
+ul.tof, ol.tof {
+    list-style: none outside none;
+}
+
+.caption {
+    margin-top: 0.5em;
+    font-style:   italic;
+}
+
+/* --- TABLE --- */
+table.simple {
+    border-spacing: 0;
+    border-collapse:    collapse;
+    border-bottom:  3px solid #005a9c;
+}
+
+.simple th {
+    background: #005a9c;
+    color:  #fff;
+    padding:    3px 5px;
+    text-align: left;
+}
+
+.simple th[scope="row"] {
+    background: inherit;
+    color:  inherit;
+    border-top: 1px solid #ddd;
+}
+
+.simple td {
+    padding:    3px 10px;
+    border-top: 1px solid #ddd;
+}
+
+.simple tr:nth-child(even) {
+    background: #f0f6ff;
+}
+
+/* --- DL --- */
+.section dd > p:first-child {
+    margin-top: 0;
+}
+
+.section dd > p:last-child {
+    margin-bottom: 0;
+}
+
+.section dd {
+    margin-bottom:  1em;
+}
+
+.section dl.attrs dd, .section dl.eldef dd {
+    margin-bottom:  0;
+}
+
+@media print {
+    .removeOnSave {
+        display: none;
     }
-    };
-    </script>
-    <!-- <link href="editorial.css" rel="stylesheet" type="text/css" /> -->
-  </head>
-  <body>
-    <section id="abstract">
+}
+</style><link rel="stylesheet" href="https://www.w3.org/StyleSheets/TR/W3C-WD"><!--[if lt IE 9]><script src='https://www.w3.org/2008/site/js/html5shiv.js'></script><![endif]--></head>
+  <body style="" class="h-entry" role="document" id="respecDocument"><div class="head" role="contentinfo" id="respecHeader">
+  <p>
+    
+      <a href="http://www.w3.org/"><img width="72" height="48" src="https://www.w3.org/Icons/w3c_home" alt="W3C"></a>
+    
+  </p>
+  <h1 class="title p-name" id="title" property="dcterms:title">CSV on the Web: Use Cases and Requirements</h1>
+  
+  <h2 property="dcterms:issued" datatype="xsd:dateTime" content="2014-03-26T23:00:00.000Z" id="w3c-first-public-working-draft-27-march-2014"><abbr title="World Wide Web Consortium">W3C</abbr> First Public Working Draft <time class="dt-published" datetime="2014-03-27">27 March 2014</time></h2>
+  <dl>
+    
+      <dt>This version:</dt>
+      <dd><a class="u-url" href="http://www.w3.org/TR/2014/WD-csvw-ucr-20140327/">http://www.w3.org/TR/2014/WD-csvw-ucr-20140327/</a></dd>
+      <dt>Latest published version:</dt>
+      <dd><a href="http://www.w3.org/TR/csvw-ucr/">http://www.w3.org/TR/csvw-ucr/</a></dd>
+    
+    
+      <dt>Latest editor's draft:</dt>
+      <dd><a href="http://w3c.github.io/csvw/use-cases-and-requirements/">http://w3c.github.io/csvw/use-cases-and-requirements/</a></dd>
+    
+    
+    
+    
+    
+    
+    
+    <dt>Editors:</dt>
+    <dd class="p-author h-card vcard" rel="bibo:editor" inlist=""><span typeof="foaf:Person"><span property="foaf:name" class="p-name fn">Jeremy Tandy</span>, <a rel="foaf:workplaceHomepage" class="p-org org h-org h-card" href="http://www.metoffice.gov.uk/">Met Office</a></span>
+</dd>
+<dd class="p-author h-card vcard" rel="bibo:editor" inlist=""><span typeof="foaf:Person"><span property="foaf:name" class="p-name fn">Davide Ceolin</span>, <a rel="foaf:workplaceHomepage" class="p-org org h-org h-card" href="http://www.vu.nl">VU University Amsterdam</a></span>
+</dd>
+<dd class="p-author h-card vcard" rel="bibo:editor" inlist=""><span typeof="foaf:Person"><span property="foaf:name" class="p-name fn">Eric Stephan</span>, <a rel="foaf:workplaceHomepage" class="p-org org h-org h-card" href="http://www.pnnl.gov">Pacific Northwest National Laboratory</a></span>
+</dd>
+
+    
+    
+      
+        
+          <dt>Repository:</dt>
+          
+             
+                
+                  <dd>
+                    <a href="https://github.com/w3c/csvw">
+                      We are on Github
+                    </a>
+                  </dd>
+                
+             
+                
+                  <dd>
+                    <a href="https://github.com/w3c/csvw">
+                      File a bug
+                    </a>
+                  </dd>
+                
+             
+                
+                  <dd>
+                    <a href="https://github.com/w3c/csvw/commits/gh-pages">
+                      Commit history
+                    </a>
+                  </dd>
+                
+             
+          
+        
+      
+    
+  </dl>
+  
+  
+  
+  
+    
+      <p class="copyright">
+        <a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> ©
+        2014
+        
+        <a href="http://www.w3.org/"><abbr title="World Wide Web Consortium">W3C</abbr></a><sup>®</sup>
+        (<a href="http://www.csail.mit.edu/"><abbr title="Massachusetts Institute of Technology">MIT</abbr></a>,
+        <a href="http://www.ercim.eu/"><abbr title="European Research Consortium for Informatics and Mathematics">ERCIM</abbr></a>,
+        <a href="http://www.keio.ac.jp/">Keio</a>, <a href="http://ev.buaa.edu.cn/">Beihang</a>), 
+        
+        All Rights Reserved.
+        
+        <abbr title="World Wide Web Consortium">W3C</abbr> <a href="http://www.w3.org/Consortium/Legal/ipr-notice#Legal_Disclaimer">liability</a>,
+        <a href="http://www.w3.org/Consortium/Legal/ipr-notice#W3C_Trademarks">trademark</a> and
+        
+          <a href="http://www.w3.org/Consortium/Legal/copyright-documents">document use</a>
+        
+        rules apply.
+      </p>
+    
+  
+  <hr>
+</div>
+    <section id="abstract" class="introductory" property="dcterms:abstract" datatype="" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter"><h2 aria-level="1" role="heading" id="h2_abstract">Abstract</h2>
       <p> A large percentage of the data published on the Web is tabular data, commonly published as
         comma separated values (CSV) files. The CSV on the Web Working Group aim to specify
         technologies that provide greater interoperability for data dependent applications on the
@@ -79,13 +303,79 @@ var respecConfig = {
         illustrating shortcomings or limitations of existing formats or technologies. This document
         also provides a set of requirements derived from these use cases that have been used to
         guide the specification design. </p>
-    </section>
-    <section id="sotd">
+    </section><section id="sotd" class="introductory" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter"><h2 aria-level="1" role="heading" id="h2_sotd">Status of This Document</h2>
+  
+    
+      
+        <p>
+          <em>This section describes the status of this document at the time of its publication.
+          Other documents may supersede this document. A list of current <abbr title="World Wide Web Consortium">W3C</abbr> publications and the
+          latest revision of this technical report can be found in the <a href="http://www.w3.org/TR/"><abbr title="World Wide Web Consortium">W3C</abbr> technical reports index</a> at
+          http://www.w3.org/TR/.</em>
+        </p>
+        
       <p> This is a draft document which may be merged into another document or eventually make its
         way into being a standalone Working Draft. </p>
-    </section>
-    <section id="intro">
-      <h2>Introduction</h2>
+    
+        <p>
+          This document was published by the <a href="https://www.w3.org/2013/csvw/">CSV on the Web Working Group</a> as a First Public Working Draft.
+          
+          
+            If you wish to make comments regarding this document, please send them to 
+            <a href="mailto:public-csv-wg@w3.org">public-csv-wg@w3.org</a> 
+            (<a href="mailto:public-csv-wg-request@w3.org?subject=subscribe">subscribe</a>,
+            <a href="http://lists.w3.org/Archives/Public/public-csv-wg/">archives</a>).
+          
+          
+          
+          
+            All comments are welcome.
+          
+        </p>
+        
+        
+          <p>
+            Publication as a First Public Working Draft does not imply endorsement by the <abbr title="World Wide Web Consortium">W3C</abbr>
+            Membership. This is a draft document and may be updated, replaced or obsoleted by other
+            documents at any time. It is inappropriate to cite this document as other than work in
+            progress.
+          </p>
+        
+        
+        
+        <p>
+          
+            This document was produced by a group operating under the 
+            <a id="sotd_patent" about="" rel="w3p:patentRules" href="http://www.w3.org/Consortium/Patent-Policy-20040205/">5 February 2004 <abbr title="World Wide Web Consortium">W3C</abbr> Patent
+            Policy</a>.
+          
+          
+            The group does not expect this document to become a <abbr title="World Wide Web Consortium">W3C</abbr> Recommendation.
+          
+          
+            
+              <abbr title="World Wide Web Consortium">W3C</abbr> maintains a <a href="http://www.w3.org/2004/01/pp-impl/68238/status" rel="disclosure">public list of any patent
+              disclosures</a> 
+            
+            made in connection with the deliverables of the group; that page also includes
+            instructions for disclosing a patent. An individual who has actual knowledge of a patent
+            which the individual believes contains
+            <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/#def-essential">Essential
+            Claim(s)</a> must disclose the information in accordance with
+            <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/#sec-Disclosure">section
+            6 of the <abbr title="World Wide Web Consortium">W3C</abbr> Patent Policy</a>.
+          
+          
+        </p>
+        
+      
+    
+  
+</section><section id="toc"><h2 class="introductory" aria-level="1" role="heading" id="h2_toc">Table of Contents</h2><ul class="toc" role="directory" id="respecContents"><li class="tocline"><a href="#intro" class="tocxref"><span class="secno">1. </span>Introduction</a></li><li class="tocline"><a href="#term" class="tocxref"><span class="secno">2. </span>Terminology</a></li><li class="tocline"><a href="#uc" class="tocxref"><span class="secno">3. </span>Use Cases</a><ul class="toc"><li class="tocline"><a href="#UC-DigitalPreservationOfGovernmentRecords" class="tocxref"><span class="secno">3.1 </span>Use Case #1 - Digital preservation of government records</a></li><li class="tocline"><a href="#UC-PublicationOfNationalStatistics" class="tocxref"><span class="secno">3.2 </span>Use Case #2 - Publication of National Statistics</a></li><li class="tocline"><a href="#UC-SurfaceTemperatureDatabank" class="tocxref"><span class="secno">3.3 </span>Use Case #3 - Creation of consolidated global land surface temperature climate
+          databank</a></li><li class="tocline"><a href="#UC-OrganogramData" class="tocxref"><span class="secno">3.4 </span>Use Case #4 - Publication of public sector roles and salaries</a></li><li class="tocline"><a href="#UC-PublicationOfPropertyTransactionData" class="tocxref"><span class="secno">3.5 </span>Use Case #5 - Publication of property transaction data</a></li><li class="tocline"><a href="#UC-JournalArticleSearch" class="tocxref"><span class="secno">3.6 </span>Use Case #6 - Journal Article Solr Search Results </a></li><li class="tocline"><a href="#UC-ReliabilityAnalysesOfPoliceOpenData" class="tocxref"><span class="secno">3.7 </span>Use Case #7 - Reliability Analyses of Police Open Data</a></li><li class="tocline"><a href="#UC-AnalyzingScientificSpreadsheets" class="tocxref"><span class="secno">3.8 </span>Use Case #8 - Analyzing Scientific Spreadsheets</a></li><li class="tocline"><a href="#UC-ChemicalImaging" class="tocxref"><span class="secno">3.9 </span>Use Case #9 Chemical Imaging</a></li><li class="tocline"><a href="#UC-OpenSpendingData" class="tocxref"><span class="secno">3.10 </span>Use Case #10 - OpenSpending Data</a></li><li class="tocline"><a href="#UC-PaloAltoTreeData" class="tocxref"><span class="secno">3.11 </span>Use Case #11 City of Palo Alto Tree Data</a></li><li class="tocline"><a href="#UC-ChemicalStructures" class="tocxref"><span class="secno">3.12 </span>Use Case #12 Chemical Structures</a></li><li class="tocline"><a href="#UC-RepresentingEntitiesAndFactsExtractedFromText" class="tocxref"><span class="secno">3.13 </span>Use Case #13 - Representing Entities and Facts Extracted From Text</a></li><li class="tocline"><a href="#UC-DisplayingLocationsOfCareHomesOnAMap" class="tocxref"><span class="secno">3.14 </span>Use Case #14 - Displaying Locations of Care Homes on a Map</a></li><li class="tocline"><a href="#UC-IntelligentlyPreviewingCSVFiles" class="tocxref"><span class="secno">3.15 </span>Use Case #15 - Intelligently Previewing CSV files</a></li><li class="tocline"><a href="#UC-NetCdFcDl" class="tocxref"><span class="secno">3.16 </span>Use Case #16 Tabular Representations of NetCDF data Using CDL Syntax</a></li><li class="tocline"><a href="#UC-CanonicalMappingOfCSV" class="tocxref"><span class="secno">3.17 </span>Use Case #17 - Canonical mapping of CSV</a></li><li class="tocline"><a href="#UC-SupportingSemantic-basedRecommendations" class="tocxref"><span class="secno">3.18 </span>Use Case #18 - Supporting Semantic-based Recommendations</a></li></ul></li><li class="tocline"><a href="#req" class="tocxref"><span class="secno">4. </span>Requirements</a><ul class="toc"><li class="tocline"><a href="#acc-req" class="tocxref"><span class="secno">4.1 </span>Accepted Requirements</a></li><li class="tocline"><a href="#can-req" class="tocxref"><span class="secno">4.2 </span>Candidate Requirements</a><ul class="toc"><li class="tocline"><a href="#can-req-parsing" class="tocxref"><span class="secno">4.2.1 </span>Requirements relating to parsing of CSV</a></li><li class="tocline"><a href="#can-req-annotation" class="tocxref"><span class="secno">4.2.2 </span>Requirements relating to annotation of CSV</a></li><li class="tocline"><a href="#can-req-metadata-discovery" class="tocxref"><span class="secno">4.2.3 </span>Requirements relating to metadata discovery</a></li><li class="tocline"><a href="#can-req-applications" class="tocxref"><span class="secno">4.2.4 </span>Requirements relating to applications</a></li><li class="tocline"><a href="#can-req-non-func" class="tocxref"><span class="secno">4.2.5 </span>Non-functional requirements</a></li></ul></li></ul></li><li class="tocline"><a href="#references" class="tocxref"><span class="secno">A. </span>References</a><ul class="toc"><li class="tocline"><a href="#informative-references" class="tocxref"><span class="secno">A.1 </span>Informative references</a></li></ul></li></ul></section>
+    
+    <section id="intro" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+      <!--OddPage--><h2 aria-level="1" role="heading" id="h2_intro"><span class="secno">1. </span>Introduction</h2>
       <p> A large percentage of the data published on the Web is tabular data, commonly published as
         comma separated values (CSV) files. CSV files may be of a significant size but they can be
         generated and manipulated easily, and there is a significant body of software available to
@@ -121,27 +411,22 @@ var respecConfig = {
       <p> A set of requirements, used to guide the development of the CSV+ specification, have been
         derived from the compiled use cases. </p>
     </section>
-    <section id="term">
-      <h2>Terminology</h2>
+    <section id="term" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+      <!--OddPage--><h2 aria-level="1" role="heading" id="h2_term"><span class="secno">2. </span>Terminology</h2>
       <p> ... </p>
     </section>
-    <section id="uc">
-      <h2>Use Cases</h2>
-      <section id="UC-DigitalPreservationOfGovernmentRecords">
-        <h2>Use Case #1 - Digital preservation of government records</h2>
+    <section id="uc" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+      <!--OddPage--><h2 aria-level="1" role="heading" id="h2_uc"><span class="secno">3. </span>Use Cases</h2>
+      <section id="UC-DigitalPreservationOfGovernmentRecords" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+        <h3 aria-level="2" role="heading" id="h3_UC-DigitalPreservationOfGovernmentRecords"><span class="secno">3.1 </span>Use Case #1 - Digital preservation of government records</h3>
         <p>
           <span style="font-size: 10pt">(Contributed by Adam Retter)</span>
         </p>
-        <p>The laws of England and Wales place obligations upon departments and <a
-            href="http://www.nationalarchives.gov.uk/">The National Archives</a> for the collection,
-          disposal and preservation of records. Government departments are obliged within the <a
-            href="http://www.nationalarchives.gov.uk/information-management/legislation/public-records-act.htm"
-            >Public Records Act 1958</a> sections 3, 4 and 5 to select, transfer, preserve and make
+        <p>The laws of England and Wales place obligations upon departments and <a href="http://www.nationalarchives.gov.uk/">The National Archives</a> for the collection,
+          disposal and preservation of records. Government departments are obliged within the <a href="http://www.nationalarchives.gov.uk/information-management/legislation/public-records-act.htm">Public Records Act 1958</a> sections 3, 4 and 5 to select, transfer, preserve and make
           available those records that have been defined as public records. These obligations apply
           to records in all formats and media, including paper and digital records. Details
-          concerning the selection and transfer of records can be found <a
-            href="http://www.nationalarchives.gov.uk/information-management/our-services/selection-and-transfer.htm"
-            >here</a>.</p>
+          concerning the selection and transfer of records can be found <a href="http://www.nationalarchives.gov.uk/information-management/our-services/selection-and-transfer.htm">here</a>.</p>
         <p>Departments transferring records to TNA must catalogue or list the selected records
           according to The National Archives' defined cataloguing principles and standards.
           Cataloguing is the process of writing a description, or <em>Transcriptions of Records</em>
@@ -164,8 +449,7 @@ var respecConfig = {
 
         <p>
           <strong>Requires:</strong>
-          <a href="#R-PrimaryKey">PrimaryKey</a> and <a href="#R-ForeignKeyReferences"
-            >ForeignKeyReferences</a>
+          <a href="#R-PrimaryKey">PrimaryKey</a> and <a href="#R-ForeignKeyReferences">ForeignKeyReferences</a>
         </p>
 
         <p>Upon receipt by TNA, each of the Transcriptions of Records is validated against the (set
@@ -203,18 +487,16 @@ var respecConfig = {
 
         <p>
           <strong>Requires:</strong>
-          <a href="#R-SyntacticTypeDefinition">SyntacticTypeDefinition</a>, <a
-            href="#R-SemanticTypeDefinition">SemanticTypeDefinition</a> and <a
-            href="#R-CsvToRdfTransformation">CsvToRdfTransformation</a>
+          <a href="#R-SyntacticTypeDefinition">SyntacticTypeDefinition</a>, <a href="#R-SemanticTypeDefinition">SemanticTypeDefinition</a> and <a href="#R-CsvToRdfTransformation">CsvToRdfTransformation</a>
         </p>
 
-        <div class="issue">
-          <p>Inclusion of CSV Schema examples (e.g. Data Definition Resource <a>DDR</a>) is anticipated.</p>
-        </div>
+        <div class="issue"><div class="issue-title" aria-level="3" role="heading" id="h_issue_1"><span>Issue 1</span></div><div class="">
+          <p>Inclusion of CSV Schema examples (e.g. Data Definition Resource <a href="#dfn-ddr" class="internalDFN">DDR</a>) is anticipated.</p>
+        </div></div>
 
       </section>
-      <section id="UC-PublicationOfNationalStatistics">
-        <h2>Use Case #2 - Publication of National Statistics</h2>
+      <section id="UC-PublicationOfNationalStatistics" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+        <h3 aria-level="2" role="heading" id="h3_UC-PublicationOfNationalStatistics"><span class="secno">3.2 </span>Use Case #2 - Publication of National Statistics</h3>
         <p>
           <span style="font-size: 10pt">(Contributed by Jeni Tennison)</span>
         </p>
@@ -235,8 +517,7 @@ var respecConfig = {
           Excel Workbooks that have been manually assembled from the underlying data.</p>
         <p>For example, refer to dataset <strong>QS601EW Economic activity</strong>, derived from the 
           2011 Census, is available as a precompiled Microsoft Excel Workbook for several sets of 
-          administrative geographies, e.g. <a 
-            href="http://www.ons.gov.uk/ons/rel/census/2011-census/key-statistics-and-quick-statistics-for-wards-and-output-areas-in-england-and-wales/rft-qs601ew.xls">
+          administrative geographies, e.g. <a href="http://www.ons.gov.uk/ons/rel/census/2011-census/key-statistics-and-quick-statistics-for-wards-and-output-areas-in-england-and-wales/rft-qs601ew.xls">
             2011 Census: QS601EW Economic activity, local authorities in England and Wales</a>, and in 
           CSV form via the <a href="http://www.ons.gov.uk/ons/data/web/explorer">ONS Data Explorer</a>.</p>
         <p>The ONS Data Explorer presents the user with a list of available datasets. A user may choose
@@ -288,8 +569,7 @@ var respecConfig = {
           for clarity. File = <a type="application/zip" href="CSV_QS601EW2011WARDH_151277.zip">
           CSV_QS601EW2011WARDH_151277.zip</a></p>
         
-        <pre class="example">
-"QS601EW"
+        <div class="example"><div class="example-title"><span>Example 1</span></div><pre class="example">"QS601EW"
 "Economic activity"
 "19/10/13"
 
@@ -298,8 +578,7 @@ var respecConfig = {
                ,                 ,               "Economic activity (T016A)",        "Economic activity (T016A)",               "Economic activity (T016A)",               "Economic activity (T016A)",                                   "Economic activity (T016A)",                                   "Economic activity (T016A)",                                      "Economic activity (T016A)",                                      "Economic activity (T016A)",      "Economic activity (T016A)",             "Economic activity (T016A)",          "Economic activity (T016A)",     "Economic activity (T016A)",                                    "Economic activity (T016A)",                          "Economic activity (T016A)",                        "Economic activity (T016A)",   "Economic activity (T016A)"
 "Geographic ID","Geographic Area","Total: All categories: Economic activity","Total: Economically active: Total","Economically active: Employee: Part-time","Economically active: Employee: Full-time","Economically active: Self-employed with employees: Part-time","Economically active: Self-employed with employees: Full-time","Economically active: Self-employed without employees: Part-time","Economically active: Self-employed without employees: Full-time","Economically active: Unemployed","Economically active: Full-time student","Total: Economically inactive: Total","Economically inactive: Retired","Economically inactive: Student (including full-time students)","Economically inactive: Looking after home or family","Economically inactive: Long-term sick or disabled","Economically inactive: Other"
     "E92000001",        "England",                                "38881374",                         "27183134",                                 "5333268",                                "15016564",                                                      "148074",                                                      "715271",                                                         "990573",                                                        "1939714",                        "1702847",                               "1336823",                           "11698240",                       "5320691",                                                      "2255831",                                            "1695134",                                          "1574134",                      "852450"
-    "W92000004",          "Wales",                                 "2245166",                          "1476735",                                  "313022",                                  "799348",                                                        "7564",                                                       "42107",                                                          "43250",                                                         "101108",                          "96689",                                 "73647",                             "768431",                        "361501",                                                       "133880",                                              "86396",                                           "140760",                       "45894"
-          </pre>
+    "W92000004",          "Wales",                                 "2245166",                          "1476735",                                  "313022",                                  "799348",                                                        "7564",                                                       "42107",                                                          "43250",                                                         "101108",                          "96689",                                 "73647",                             "768431",                        "361501",                                                       "133880",                                              "86396",                                           "140760",                       "45894"</pre></div>
         
         <p>Key characteristics of the CSV file are:</p>
         <ul>
@@ -317,15 +596,13 @@ var respecConfig = {
         </p>	
         
         
-        <div class="issue">
+        <div class="issue"><div class="issue-title" aria-level="3" role="heading" id="h_issue_2"><span>Issue 2</span></div><div class="">
           <p>Do we want to be able to assert within the CSV+ metadata that the "data" exists at a
             particular region within the CSV? When talking about multiple tables within a single CSV
-            file, AndyS <a
-              href="http://lists.w3.org/Archives/Public/public-csv-wg/2014Feb/0108.html"
-              >stated</a>:</p>
+            file, AndyS <a href="http://lists.w3.org/Archives/Public/public-csv-wg/2014Feb/0108.html">stated</a>:</p>
           <p> "<em>Maybe put the location of the data table within a single CSV file into the
             associated metadata: a package description for a single file.</em>" </p>
-        </div>
+        </div></div>
         
         
         <p>Correct interpretation of the statistics requires additional qualification or
@@ -357,8 +634,7 @@ var respecConfig = {
           provided as plain text, with their authoritative definitions.</p>
         <p>
           <strong>Requires:</strong>
-          <a href="#R-AssociationOfCodeValuesWithExternalDefinitions"
-            >AssociationOfCodeValuesWithExternalDefinitions</a>
+          <a href="#R-AssociationOfCodeValuesWithExternalDefinitions">AssociationOfCodeValuesWithExternalDefinitions</a>
         </p>
         <p>Finally, reuse of the statistical data is also inhibited by a lack of explicit definition
           of the meaning of column headings.</p>
@@ -367,9 +643,9 @@ var respecConfig = {
           <a href="#R-SemanticTypeDefinition">SemanticTypeDefinition</a>
         </p>
       </section>
-      <section id="UC-SurfaceTemperatureDatabank">
-        <h2>Use Case #3 - Creation of consolidated global land surface temperature climate
-          databank</h2>
+      <section id="UC-SurfaceTemperatureDatabank" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+        <h3 aria-level="2" role="heading" id="h3_UC-SurfaceTemperatureDatabank"><span class="secno">3.3 </span>Use Case #3 - Creation of consolidated global land surface temperature climate
+          databank</h3>
         <p>
           <span style="font-size: 10pt">(Contributed by Jeremy Tandy)</span>
         </p>
@@ -386,17 +662,14 @@ var respecConfig = {
           as an open and freely available resource to climate scientists.</p>
 
         <p>To achieve this goal, climate datasets, known as “decks”, are gathered from participating
-          organisations and merged into a combined dataset using a scientifically peer reviewed <a
-            href="ftp://ftp.ncdc.noaa.gov/pub/data/globaldatabank/monthly/stage3/merging_methodology.pdf"
-            > method</a> which assesses the data records for inclusion against a variety of
+          organisations and merged into a combined dataset using a scientifically peer reviewed <a href="ftp://ftp.ncdc.noaa.gov/pub/data/globaldatabank/monthly/stage3/merging_methodology.pdf"> method</a> which assesses the data records for inclusion against a variety of
           criteria.</p>
 
         <p>Given the need for openness and transparency in creating the databank, it is essential
           that the provenance of the source data is clear. Original source data, particularly for
           records captured prior to the mid-twentieth century, may be in hard-copy form. In order to
           incorporate the widest possible scope of source data, the International Surface
-          Temperature Initiative is supported by <a
-            href="http://www.surfacetemperatures.org/databank/data-rescue-task-team">data rescue
+          Temperature Initiative is supported by <a href="http://www.surfacetemperatures.org/databank/data-rescue-task-team">data rescue
             activities</a> to digitise hard copy records.</p>
 
         <p>The data is, where possible, published in the following four stages:</p>
@@ -416,11 +689,7 @@ var respecConfig = {
           supplementary information. Summary information is often embedded at the top of each
           file.</p>
 
-        <p>For example, see the <a
-            href="ftp://ftp.ncdc.noaa.gov/pub/data/globaldatabank/monthly/stage1/uganda/uganda.monthly.stage1.20120301.tar.gz"
-            > Ugandan Stage 1 data deck</a> and associated <a
-            href="ftp://ftp.ncdc.noaa.gov/pub/data/globaldatabank/monthly/stage1/uganda/1-readme-uganda.txt"
-            > readme file</a>.</p>
+        <p>For example, see the <a href="ftp://ftp.ncdc.noaa.gov/pub/data/globaldatabank/monthly/stage1/uganda/uganda.monthly.stage1.20120301.tar.gz"> Ugandan Stage 1 data deck</a> and associated <a href="ftp://ftp.ncdc.noaa.gov/pub/data/globaldatabank/monthly/stage1/uganda/1-readme-uganda.txt"> readme file</a>.</p>
 
         <p>The Ugandan Stage 1 data deck appears to be comprised of two discrete datasets, each
           partitioned into a sub-directory within the tar ball: <code>uganda-raw</code> and
@@ -448,29 +717,26 @@ var respecConfig = {
         </p>
 
         <p>A snippet of the data indicating maximum monthly temperature for Entebbe, Uganda, from
-            <code>uganda-raw</code> is provided below. File = <a type="text/plain"
-            href="637050_ENTEBBE_tmx.txt">637050_ENTEBBE_tmx.txt</a></p>
+            <code>uganda-raw</code> is provided below. File = <a type="text/plain" href="637050_ENTEBBE_tmx.txt">637050_ENTEBBE_tmx.txt</a></p>
 
-        <pre class="example">
-            637050  ENTEBBE
-            5
-            ENTEBBE BEA     0.05    32.45   3761F
-            ENTEBBE GHCNv3G 0.05    32.45   1155M
-            ENTEBBE ColArchive      0.05    32.45   1155M
-            ENTEBBE GSOD    0.05    32.45   1155M
-            ENTEBBE NCARds512       0.05    32.755  1155M
-            
-            Tmax
-            {snip}
-            1935.04	27.83	27.80	27.80	-999.00	-999.00
-            1935.12	25.72	25.70	25.70	-999.00	-999.00
-            1935.21	26.44	26.40	26.40	-999.00	-999.00
-            1935.29	25.72	25.70	25.70	-999.00	-999.00
-            1935.37	24.61	24.60	24.60	-999.00	-999.00
-            1935.46	24.33	24.30	24.30	-999.00	-999.00
-            1935.54	24.89	24.90	24.90	-999.00	-999.00
-            {snip}
-          </pre>
+        <div class="example"><div class="example-title"><span>Example 2</span></div><pre class="example">637050  ENTEBBE
+5
+ENTEBBE BEA     0.05    32.45   3761F
+ENTEBBE GHCNv3G 0.05    32.45   1155M
+ENTEBBE ColArchive      0.05    32.45   1155M
+ENTEBBE GSOD    0.05    32.45   1155M
+ENTEBBE NCARds512       0.05    32.755  1155M
+
+Tmax
+{snip}
+1935.04	27.83	27.80	27.80	-999.00	-999.00
+1935.12	25.72	25.70	25.70	-999.00	-999.00
+1935.21	26.44	26.40	26.40	-999.00	-999.00
+1935.29	25.72	25.70	25.70	-999.00	-999.00
+1935.37	24.61	24.60	24.60	-999.00	-999.00
+1935.46	24.33	24.30	24.30	-999.00	-999.00
+1935.54	24.89	24.90	24.90	-999.00	-999.00
+{snip}</pre></div>
 
         <p>The key characteristics are:</p>
         <ul>
@@ -490,26 +756,21 @@ var respecConfig = {
               <code>GHCNv3G</code>, <code>ColArchive</code>, <code>GSOD</code> and
               <code>NCARds512</code></li>
           <li>the provenance of specific cell values cannot be asserted; for example, data values
-            for 1935 observed at Entebbe are digitised from <a
-              href="ftp://ftp.ncdc.noaa.gov/pub/data/globaldatabank/monthly/stage0/uganda/Uganda_1935-1938.pdf#page=3"
-              > digital images published in PDF</a></li>
+            for 1935 observed at Entebbe are digitised from <a href="ftp://ftp.ncdc.noaa.gov/pub/data/globaldatabank/monthly/stage0/uganda/Uganda_1935-1938.pdf#page=3"> digital images published in PDF</a></li>
         </ul>
         <p>A snippet of the data indicating maximum monthly temperature for all stations in Uganda
-          from <code>uganda-bestguess</code> is provided below (truncated to 9 columns). File = <a
-            type="text/plain" href="ug_tmx_jrc_bg_v1.0.txt">ug_tmx_jrc_bg_v1.0.txt</a></p>
+          from <code>uganda-bestguess</code> is provided below (truncated to 9 columns). File = <a type="text/plain" href="ug_tmx_jrc_bg_v1.0.txt">ug_tmx_jrc_bg_v1.0.txt</a></p>
 
-        <pre class="example">
-            ARUA	BOMBO	BUKALASA	BUTIABA	DWOLI	ENTEBBE AIR	FT PORTAL	GONDOKORO	[…]
-            {snip}
-            1935.04	-99.00	-99.00	-99.00	-99.00	-99.00	27.83	-99.00	-99.00	[…]
-            1935.12	-99.00	-99.00	-99.00	-99.00	-99.00	25.72	-99.00	-99.00	[…]
-            1935.21	-99.00	-99.00	-99.00	-99.00	-99.00	26.44	-99.00	-99.00	[…]
-            1935.29	-99.00	-99.00	-99.00	-99.00	-99.00	25.72	-99.00	-99.00	[…]
-            1935.37	-99.00	-99.00	-99.00	-99.00	-99.00	24.61	-99.00	-99.00	[…]
-            1935.46	-99.00	-99.00	-99.00	-99.00	-99.00	24.33	-99.00	-99.00	[…]
-            1935.54	-99.00	-99.00	-99.00	-99.00	-99.00	24.89	-99.00	-99.00	[…]
-            {snip}
-          </pre>
+        <div class="example"><div class="example-title"><span>Example 3</span></div><pre class="example">ARUA	BOMBO	BUKALASA	BUTIABA	DWOLI	ENTEBBE AIR	FT PORTAL	GONDOKORO	[…]
+{snip}
+1935.04	-99.00	-99.00	-99.00	-99.00	-99.00	27.83	-99.00	-99.00	[…]
+1935.12	-99.00	-99.00	-99.00	-99.00	-99.00	25.72	-99.00	-99.00	[…]
+1935.21	-99.00	-99.00	-99.00	-99.00	-99.00	26.44	-99.00	-99.00	[…]
+1935.29	-99.00	-99.00	-99.00	-99.00	-99.00	25.72	-99.00	-99.00	[…]
+1935.37	-99.00	-99.00	-99.00	-99.00	-99.00	24.61	-99.00	-99.00	[…]
+1935.46	-99.00	-99.00	-99.00	-99.00	-99.00	24.33	-99.00	-99.00	[…]
+1935.54	-99.00	-99.00	-99.00	-99.00	-99.00	24.89	-99.00	-99.00	[…]
+{snip}</pre></div>
 
         <p>Many of the characteristics concerning the “raw” file are exhibited here too.
           Additionally, we see that:</p>
@@ -529,21 +790,17 @@ var respecConfig = {
             temperature</code>, <code>mean monthly temperature</code> plus additional provenance
           information.</p>
 
-        <p>An example Stage 2 data file is given for Entebbe, Uganda, below. File = <a
-            type="text/plain" href="uganda_000000000005_monthly_stage2"
-            >uganda_000000000005_monthly_stage2</a></p>
+        <p>An example Stage 2 data file is given for Entebbe, Uganda, below. File = <a type="text/plain" href="uganda_000000000005_monthly_stage2">uganda_000000000005_monthly_stage2</a></p>
 
-        <pre class="example">
-            {snip}
-            ENTEBBE                            0.0500    32.4500  1146.35 193501XX  2783  1711  2247 301/109/101/104/999/999/999/000/000/000/102
-            ENTEBBE                            0.0500    32.4500  1146.35 193502XX  2572  1772  2172 301/109/101/104/999/999/999/000/000/000/102
-            ENTEBBE                            0.0500    32.4500  1146.35 193503XX  2644  1889  2267 301/109/101/104/999/999/999/000/000/000/102
-            ENTEBBE                            0.0500    32.4500  1146.35 193504XX  2572  1817  2194 301/109/101/104/999/999/999/000/000/000/102
-            ENTEBBE                            0.0500    32.4500  1146.35 193505XX  2461  1722  2092 301/109/101/104/999/999/999/000/000/000/102
-            ENTEBBE                            0.0500    32.4500  1146.35 193506XX  2433  1706  2069 301/109/101/104/999/999/999/000/000/000/102
-            ENTEBBE                            0.0500    32.4500  1146.35 193507XX  2489  1628  2058 301/109/101/104/999/999/999/000/000/000/102
-            {snip}
-          </pre>
+        <div class="example"><div class="example-title"><span>Example 4</span></div><pre class="example">{snip}
+ENTEBBE                            0.0500    32.4500  1146.35 193501XX  2783  1711  2247 301/109/101/104/999/999/999/000/000/000/102
+ENTEBBE                            0.0500    32.4500  1146.35 193502XX  2572  1772  2172 301/109/101/104/999/999/999/000/000/000/102
+ENTEBBE                            0.0500    32.4500  1146.35 193503XX  2644  1889  2267 301/109/101/104/999/999/999/000/000/000/102
+ENTEBBE                            0.0500    32.4500  1146.35 193504XX  2572  1817  2194 301/109/101/104/999/999/999/000/000/000/102
+ENTEBBE                            0.0500    32.4500  1146.35 193505XX  2461  1722  2092 301/109/101/104/999/999/999/000/000/000/102
+ENTEBBE                            0.0500    32.4500  1146.35 193506XX  2433  1706  2069 301/109/101/104/999/999/999/000/000/000/102
+ENTEBBE                            0.0500    32.4500  1146.35 193507XX  2489  1628  2058 301/109/101/104/999/999/999/000/000/000/102
+{snip}</pre></div>
 
         <p>Because of the heterogeneity of the Stage 1 data decks, bespoke data processing programs
           were required for each data deck consuming valuable effort and resource in simple data
@@ -565,32 +822,23 @@ var respecConfig = {
 
         <p>The data pre-processing tools created to parse each Stage 1 data deck into the standard
           Stage 2 format and the merge process to create the consolidated Stage 3 data set were
-          written using the software most familiar to the participating scientists: <a
-            href="http://en.wikipedia.org/wiki/Fortran_95_language_features">Fortran 95</a>. The
-          merge software source code is available <a
-            href="ftp://ftp.ncdc.noaa.gov/pub/data/globaldatabank/monthly/stage3/recommended/code/recommended.code.v1.0.0-beta4.20130614.tar.gz"
-            >online</a>. It is worth noting that this sector of the scientific community also
+          written using the software most familiar to the participating scientists: <a href="http://en.wikipedia.org/wiki/Fortran_95_language_features">Fortran 95</a>. The
+          merge software source code is available <a href="ftp://ftp.ncdc.noaa.gov/pub/data/globaldatabank/monthly/stage3/recommended/code/recommended.code.v1.0.0-beta4.20130614.tar.gz">online</a>. It is worth noting that this sector of the scientific community also
           commonly uses <a href="http://www.exelisvis.com/ProductsServices/IDL.aspx">IDL</a> and is
           gradually adopting <a href="http://www.python.org/">Python</a> as the default software
           language choice. </p>
 
         <p>The resulting merged dataset is published in several formats – including tabular text.
-          The <a
-            href="ftp://ftp.ncdc.noaa.gov/pub/data/globaldatabank/monthly/stage3/recommended/results/recommended-ghcn_format.monthly.stage3.v1.0.0-beta4.20130614.tar.gz"
-            > GHCN-format merged dataset</a> comprises of several files: merged data and withheld
+          The <a href="ftp://ftp.ncdc.noaa.gov/pub/data/globaldatabank/monthly/stage3/recommended/results/recommended-ghcn_format.monthly.stage3.v1.0.0-beta4.20130614.tar.gz"> GHCN-format merged dataset</a> comprises of several files: merged data and withheld
           data (e.g. those data that did not meet the merge criteria) each with an associated
           “inventory” file.</p>
 
         <p>A snippet of the inventory for merged data is provided below; each row describing one of
-          the 31,427 sites in the dataset. File = <a type="text/plain"
-            href="merged.monthly.stage3.v1.0.0-beta4.inv"
-          >merged.monthly.stage3.v1.0.0-beta4.inv</a></p>
+          the 31,427 sites in the dataset. File = <a type="text/plain" href="merged.monthly.stage3.v1.0.0-beta4.inv">merged.monthly.stage3.v1.0.0-beta4.inv</a></p>
 
-        <pre class="example">
-            {snip}
-            REC41011874   0.0500  32.4500 1155.0 ENTEBBE_AIRPO
-            {snip}
-          </pre>
+        <div class="example"><div class="example-title"><span>Example 5</span></div><pre class="example">{snip}
+REC41011874   0.0500  32.4500 1155.0 ENTEBBE_AIRPO
+{snip}</pre></div>
 
         <p>The columns are: <code>station identifier</code>, <code>latitude</code>,
             <code>longitude</code>, <code>altitude (m)</code> and <code>station name</code>. The
@@ -598,16 +846,13 @@ var respecConfig = {
 
         <p>Similarly, a snippet of the merged data itself is provided. Given that the original
             <code>.dat</code> file is a largely unmanageable 422.6 MB in size, a subset is provided.
-          File = <a type="text/plain" href="merged.monthly.stage3.v1.0.0-beta4.snip"
-            >merged.monthly.stage3.v1.0.0-beta4.snip</a></p>
+          File = <a type="text/plain" href="merged.monthly.stage3.v1.0.0-beta4.snip">merged.monthly.stage3.v1.0.0-beta4.snip</a></p>
 
-        <pre class="example">
-            {snip}
-            REC410118741935TAVG 2245    2170    2265    2195    2090    2070    2059    2080    2145    2190    2225    2165   
-            REC410118741935TMAX 2780    2570    2640    2570    2460    2430    2490    2520    2620    2630    2660    2590   
-            REC410118741935TMIN 1710    1770    1890    1820    1720    1710    1629    1640    1670    1750    1790    1740   
-            {snip}
-          </pre>
+        <div class="example"><div class="example-title"><span>Example 6</span></div><pre class="example">{snip}
+REC410118741935TAVG 2245    2170    2265    2195    2090    2070    2059    2080    2145    2190    2225    2165   
+REC410118741935TMAX 2780    2570    2640    2570    2460    2430    2490    2520    2620    2630    2660    2590   
+REC410118741935TMIN 1710    1770    1890    1820    1720    1710    1629    1640    1670    1750    1790    1740   
+{snip}</pre></div>
 
         <p>The columns are: <code>station identifier</code>, <code>year</code>, <code>quantity
             kind</code> and the quantity values for months January to December in that year. Again,
@@ -647,8 +892,8 @@ var respecConfig = {
         
       </section>
       
-      <section id="UC-OrganogramData">
-        <h2>Use Case #4 - Publication of public sector roles and salaries</h2>
+      <section id="UC-OrganogramData" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+        <h3 aria-level="2" role="heading" id="h3_UC-OrganogramData"><span class="secno">3.4 </span>Use Case #4 - Publication of public sector roles and salaries</h3>
         <p>
           <span style="font-size: 10pt">(Contributed by Jeni Tennison)</span>
         </p>
@@ -670,29 +915,26 @@ var respecConfig = {
           <a href="#R-CsvValidation">CsvValidation</a>
         </p>
         
-        <p class="issue">Is there a reference to the Cabinet Office's data definition schema for "Public Roles and Salaries"?</p>
+        <div class="issue"><div class="issue-title" aria-level="3" role="heading" id="h_issue_3"><span>Issue 3</span></div><p class="">Is there a reference to the Cabinet Office's data definition schema for "Public Roles and Salaries"?</p></div>
         
         <p>The submission for senior roles from the Higher Education Funding Council for England (HEFCE) is provided 
           below to illustrate. White space has been added for clarity. File = <a href="HEFCE_organogram_senior_data_31032011.csv">HEFCE_organogram_senior_data_31032011.csv</a></p>
         
-        <pre class="example">
-Post Unique Reference,              Name,Grade,             Job Title,                Job/Team Function,                            Parent Department,                                Organisation,                             Unit,     Contact Phone,         Contact E-mail,Reports to Senior Post,Salary Cost of Reports (£),FTE,Actual Pay Floor (£),Actual Pay Ceiling (£),,Profession,Notes,Valid?
+        <div class="example"><div class="example-title"><span>Example 7</span></div><pre class="example">Post Unique Reference,              Name,Grade,             Job Title,                Job/Team Function,                            Parent Department,                                Organisation,                             Unit,     Contact Phone,         Contact E-mail,Reports to Senior Post,Salary Cost of Reports (£),FTE,Actual Pay Floor (£),Actual Pay Ceiling (£),,Profession,Notes,Valid?
                 90115,        Steve Egan,SCS1A,Deputy Chief Executive,  Finance and Corporate Resources,Department for Business Innovation and Skills,Higher Education Funding Council for England,  Finance and Corporate Resources,     0117 931 7408,     s.egan@hefce.ac.uk,                 90334,                   5883433,  1,              120000,                124999,,   Finance,     ,     1
                 90250,     David Sweeney,SCS1A,              Director,"Research, Innovation and Skills",Department for Business Innovation and Skills,Higher Education Funding Council for England,"Research, Innovation and Skills",     0117 931 7304, d.sweeeney@hefce.ac.uk,                 90334,                   1207171,  1,              110000,                114999,,    Policy,     ,     1
                 90284,       Heather Fry,SCS1A,              Director,      Education and Participation,Department for Business Innovation and Skills,Higher Education Funding Council for England,      Education and Participation,     0117 931 7280,      h.fry@hefce.ac.uk,                 90334,                   1645195,  1,              100000,                104999,,    Policy,     ,     1
-                90334,Sir Alan Langlands, SCS4,       Chief Executive,                  Chief Executive,Department for Business Innovation and Skills,Higher Education Funding Council for England,                            HEFCE,0117 931 7300/7341,a.langlands@hefce.ac.uk,                    xx,                         0,  1,              230000,                234999,,    Policy,     ,     1
-        </pre>
+                90334,Sir Alan Langlands, SCS4,       Chief Executive,                  Chief Executive,Department for Business Innovation and Skills,Higher Education Funding Council for England,                            HEFCE,0117 931 7300/7341,a.langlands@hefce.ac.uk,                    xx,                         0,  1,              230000,                234999,,    Policy,     ,     1</pre></div>
         
         <p>Similarly, a snippet of the junior role submission from HEFCE is provided. Again, 
           white space has been added for clarity. File = <a href="HEFCE_organogram_junior_data_31032011.csv">HEFCE_organogram_junior_data_31032011.csv</a></p>
         
-        <pre class="example">
-.                           Parent Department,                                Organisation,                           Unit,Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic Job Title,Number of Posts in FTE,          Profession
+        <div class="example"><div class="example-title"><span>Example 8</span></div><pre class="example">.                           Parent Department,                                Organisation,                           Unit,Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic Job Title,Number of Posts in FTE,          Profession
 Department for Business Innovation and Skills,Higher Education Funding Council for England,    Education and Participation,                90284,    4,               17426,               20002,    Administrator,                     2,Operational Delivery
 Department for Business Innovation and Skills,Higher Education Funding Council for England,    Education and Participation,                90284,    5,               19546,               22478,    Administrator,                     1,Operational Delivery
 Department for Business Innovation and Skills,Higher Education Funding Council for England,Finance and Corporate Resources,                90115,    4,               17426,               20002,    Administrator,                  8.67,Operational Delivery
 Department for Business Innovation and Skills,Higher Education Funding Council for England,Finance and Corporate Resources,                90115,    5,               19546,               22478,    Administrator,                   0.5,Operational Delivery
-{snip}        </pre>
+{snip}        </pre></div>
         
         <p>Key characteristics of the CSV files are:</p>
         <ul>
@@ -750,8 +992,8 @@ Department for Business Innovation and Skills,Higher Education Funding Council f
         </p>
       </section>
       
-      <section id="UC-PublicationOfPropertyTransactionData">
-        <h2>Use Case #5 - Publication of property transaction data</h2>
+      <section id="UC-PublicationOfPropertyTransactionData" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+        <h3 aria-level="2" role="heading" id="h3_UC-PublicationOfPropertyTransactionData"><span class="secno">3.5 </span>Use Case #5 - Publication of property transaction data</h3>
         <p>
           <span style="font-size: 10pt">(Contributed by Andy Seaborne)</span>
         </p>
@@ -773,21 +1015,17 @@ Department for Business Innovation and Skills,Higher Education Funding Council f
         
         <p><a href="http://publicdata.landregistry.gov.uk/market-trend-data/price-paid-data/b/pp-monthly-update.txt">
           pp-monthly-update.txt</a></p>
-        <pre class="example">
-{C6428808-DC2A-4CE7-8576-0000303EF81B},137000,2013-12-13 00:00, "B67 5HE","T","N","F","130","",       "WIGORN ROAD",       "",   "SMETHWICK",            "SANDWELL",       "WEST MIDLANDS","A"
+        <div class="example"><div class="example-title"><span>Example 9</span></div><pre class="example">{C6428808-DC2A-4CE7-8576-0000303EF81B},137000,2013-12-13 00:00, "B67 5HE","T","N","F","130","",       "WIGORN ROAD",       "",   "SMETHWICK",            "SANDWELL",       "WEST MIDLANDS","A"
 {16748E59-A596-48A0-B034-00007533B0C1}, 99950,2014-01-03 00:00, "PE3 8QR","T","N","F", "11","",             "RISBY","BRETTON","PETERBOROUGH","CITY OF PETERBOROUGH","CITY OF PETERBOROUGH","A"
 {F10C5B50-92DD-4A69-B7F1-0000C3899733},355000,2013-12-19 00:00,"BH24 1SW","D","N","F", "55","","NORTH POULNER ROAD",       "",    "RINGWOOD",          "NEW FOREST",           "HAMPSHIRE","A"
-{snip}
-        </pre>
+{snip}</pre></div>
         
         <p><a href="http://publicdata.landregistry.gov.uk/market-trend-data/price-paid-data/b/pp-monthly-update-new-version.csv">
           pp-monthly-update-new-version.csv</a></p>
-        <pre class="example">
-"{C6428808-DC2A-4CE7-8576-0000303EF81B}","137000","2013-12-13 00:00", "B67 5HE","T","N","F","130","",       "WIGORN ROAD",       "",   "SMETHWICK",            "SANDWELL",       "WEST MIDLANDS","A"
+        <div class="example"><div class="example-title"><span>Example 10</span></div><pre class="example">"{C6428808-DC2A-4CE7-8576-0000303EF81B}","137000","2013-12-13 00:00", "B67 5HE","T","N","F","130","",       "WIGORN ROAD",       "",   "SMETHWICK",            "SANDWELL",       "WEST MIDLANDS","A"
 "{16748E59-A596-48A0-B034-00007533B0C1}", "99950","2014-01-03 00:00", "PE3 8QR","T","N","F", "11","",             "RISBY","BRETTON","PETERBOROUGH","CITY OF PETERBOROUGH","CITY OF PETERBOROUGH","A"
 "{F10C5B50-92DD-4A69-B7F1-0000C3899733}","355000","2013-12-19 00:00","BH24 1SW","D","N","F", "55","","NORTH POULNER ROAD",       "",    "RINGWOOD",          "NEW FOREST",           "HAMPSHIRE","A"
-{snip}
-        </pre>
+{snip}</pre></div>
         
         <p>There seems to be little difference between the two formats with the exception that all 
           fields within the <code>.csv</code> file are escaped with a pair of double quotes (<code>""</code>).</p>
@@ -864,8 +1102,8 @@ Department for Business Innovation and Skills,Higher Education Funding Council f
           <a href="#R-CsvToRdfTransformation">CsvToRdfTransformation</a>
         </p>
         
-        <p class="note">The monthly transaction dataset contains in the order of 100,000 records;
-          any transformation will need to scale accordingly.</p>
+        <div class="note"><div class="note-title" aria-level="3" role="heading" id="h_note_1"><span>Note</span></div><p class="">The monthly transaction dataset contains in the order of 100,000 records;
+          any transformation will need to scale accordingly.</p></div>
         
         <p>In parallel to providing access via the <a href="http://landregistry.data.gov.uk/landregistry/sparql/sparql.html">
           SPARQL end-point</a>, the Land Registry also provides aggregated sets of transaction data. Data is
@@ -882,8 +1120,8 @@ Department for Business Innovation and Skills,Higher Education Funding Council f
         </p>
         
       </section>
-      <section id="UC-JournalArticleSearch">
-        <h2>Use Case #6 - Journal Article Solr Search Results </h2>
+      <section id="UC-JournalArticleSearch" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+        <h3 aria-level="2" role="heading" id="h3_UC-JournalArticleSearch"><span class="secno">3.6 </span>Use Case #6 - Journal Article Solr Search Results </h3>
         <p>
           <span style="font-size: 10pt">(Contributed by Alf Eaton)</span>
         </p>
@@ -910,22 +1148,20 @@ Department for Business Innovation and Skills,Higher Education Funding Council f
     
        <p> The PLOS website features a <a href="https://lucene.apache.org/solr/">Solr</a> index search 
            engine which can return query results in 
-           <a href="http://api.plos.org/search/?q=doc_type:full+AND+cross_published_journal_key:PLoSONE&fl=id,doi,publication_date,title_display,author&sort=publication_date+desc&wt=json&rows=5">JSON Live Search</a>
+           <a href="http://api.plos.org/search/?q=doc_type:full+AND+cross_published_journal_key:PLoSONE&amp;fl=id,doi,publication_date,title_display,author&amp;sort=publication_date+desc&amp;wt=json&amp;rows=5">JSON Live Search</a>
            <a type="image/png" href="plosone-json-search-results.png"> (JSON Screen dump) </a> 
-           <a href="http://api.plos.org/search/?q=doc_type:full+AND+cross_published_journal_key:PLoSONE&fl=id,doi,publication_date,title_display,author&sort=publication_date+desc&rows=5">XML Live Search </a>
+           <a href="http://api.plos.org/search/?q=doc_type:full+AND+cross_published_journal_key:PLoSONE&amp;fl=id,doi,publication_date,title_display,author&amp;sort=publication_date+desc&amp;rows=5">XML Live Search </a>
            <a type="image/png" href="plosone-xml-search-results.png"> (XML Screen dump) </a>  
            or in a more concise format 
-           <a href="http://api.plos.org/search/?q=doc_type:full+AND+cross_published_journal_key:PLoSONE&fl=id,doi,publication_date,title_display,author&sort=publication_date+desc&wt=csv&rows=5">CSV Live Search </a>
+           <a href="http://api.plos.org/search/?q=doc_type:full+AND+cross_published_journal_key:PLoSONE&amp;fl=id,doi,publication_date,title_display,author&amp;sort=publication_date+desc&amp;wt=csv&amp;rows=5">CSV Live Search </a>
            <a type="image/png" href="plosone-csv-search-results.png"> (CSV Screen dump) </a> : 
        </p> 
-       <pre class="example">
-id,publication_date,title_display,author
-10.1371/journal.pone.0087584,2014-02-14T00:00:00Z,Healthcare Worker Perceived Barriers to Early Initiation of Antiretroviral and Tuberculosis Therapy among Tanzanian Inpatients,&quot;Bahati M K Wajanga,Robert N Peck,Samuel Kalluvya,Daniel W Fitzgerald,Luke R Smart,Jennifer A Downs&quot;
-10.1371/journal.pone.0087286,2014-02-14T00:00:00Z,&quot;Subditine, a New Monoterpenoid Indole Alkaloid from Bark of &lt;i&gt;Nauclea subdita&lt;/i&gt; (Korth.) Steud. Induces Apoptosis in Human Prostate Cancer Cells&quot;,&quot;Sook Yee Liew,Chung Yeng Looi,Mohammadjavad Paydar,Foo Kit Cheah,Kok Hoong Leong,Won Fen Wong,Mohd Rais Mustafa,Marc Litaudon,Khalijah Awang&quot;
-10.1371/journal.pone.0087630,2014-02-14T00:00:00Z,Spatiotemporal Characterizations of Dengue Virus in Mainland China: Insights into the Whole Genome from 1978 to 2011,&quot;Hao Zhang,Yanru Zhang,Rifat Hamoudi,Guiyun Yan,Xiaoguang Chen,Yuanping Zhou&quot;
-10.1371/journal.pone.0086587,2014-02-14T00:00:00Z,&lt;i&gt;optGpSampler&lt;/i&gt;: An Improved Tool for Uniformly Sampling the Solution-Space of Genome-Scale Metabolic Networks,&quot;Wout Megchelenbrink,Martijn Huynen,Elena Marchiori&quot;
-10.1371/journal.pone.0082694,2014-02-14T00:00:00Z,Prophylactic Antibiotics to Prevent Cellulitis of the Leg: Economic Analysis of the PATCH I &amp; II Trials,&quot;James M Mason,Kim S Thomas,Angela M Crook,Katharine A Foster,Joanne R Chalmers,Andrew J Nunn,Hywel C Williams&quot;
-       </pre>
+       <div class="example"><div class="example-title"><span>Example 11</span></div><pre class="example">id,publication_date,title_display,author
+10.1371/journal.pone.0087584,2014-02-14T00:00:00Z,Healthcare Worker Perceived Barriers to Early Initiation of Antiretroviral and Tuberculosis Therapy among Tanzanian Inpatients,"Bahati M K Wajanga,Robert N Peck,Samuel Kalluvya,Daniel W Fitzgerald,Luke R Smart,Jennifer A Downs"
+10.1371/journal.pone.0087286,2014-02-14T00:00:00Z,"Subditine, a New Monoterpenoid Indole Alkaloid from Bark of &lt;i&gt;Nauclea subdita&lt;/i&gt; (Korth.) Steud. Induces Apoptosis in Human Prostate Cancer Cells","Sook Yee Liew,Chung Yeng Looi,Mohammadjavad Paydar,Foo Kit Cheah,Kok Hoong Leong,Won Fen Wong,Mohd Rais Mustafa,Marc Litaudon,Khalijah Awang"
+10.1371/journal.pone.0087630,2014-02-14T00:00:00Z,Spatiotemporal Characterizations of Dengue Virus in Mainland China: Insights into the Whole Genome from 1978 to 2011,"Hao Zhang,Yanru Zhang,Rifat Hamoudi,Guiyun Yan,Xiaoguang Chen,Yuanping Zhou"
+10.1371/journal.pone.0086587,2014-02-14T00:00:00Z,&lt;i&gt;optGpSampler&lt;/i&gt;: An Improved Tool for Uniformly Sampling the Solution-Space of Genome-Scale Metabolic Networks,"Wout Megchelenbrink,Martijn Huynen,Elena Marchiori"
+10.1371/journal.pone.0082694,2014-02-14T00:00:00Z,Prophylactic Antibiotics to Prevent Cellulitis of the Leg: Economic Analysis of the PATCH I &amp; II Trials,"James M Mason,Kim S Thomas,Angela M Crook,Katharine A Foster,Joanne R Chalmers,Andrew J Nunn,Hywel C Williams"</pre></div>
        <p> 
         To be useful to a user maintaining a PLOS One search results need to be returned in an organized and
         consistent tabular format.  This includes:</p>
@@ -953,27 +1189,27 @@ id,publication_date,title_display,author
         able to store a single author's name or multiple authors names separated by a comma delimiter.
         Because each author cell value is surrounded by quotes a parser can choose to ignore the
         data structure or address it.
-        <p>
+        </p><p>
           <strong>Requires:</strong>
           <a href="#R-CellValueMicroSyntax">CellValueMicroSyntax</a> 
         </p>
 
-       <div class="issue">
+       <div class="issue"><div class="issue-title" aria-level="3" role="heading" id="h_issue_4"><span>Issue 4</span></div><div class="">
        <p> 
         Is this information in scope? How can it be incorporated better into the use case? The following 
         additional observations were made while interacting with the search engine:   
        </p>
        <ul>
           <li>As the "rows" parameter is set to "5", the first 5 rows are returned. To paginate through the 
-              collection, add "&start={offset}" (e.g. "&start=5") to the query.
+              collection, add "&amp;start={offset}" (e.g. "&amp;start=5") to the query.
           </li> 
           <li> It would be useful to receive, at the start of the response, an indication of the total number of
                results (as is present in the JSON version of the response, as OpenSearch fields). </li>
           <li> It would also be useful to be able to continue fetching rows using the last known identifier
-               with "&before={id}" or "&since={id}", to avoid issues of pagination if the result set is altered 
+               with "&amp;before={id}" or "&amp;since={id}", to avoid issues of pagination if the result set is altered 
                while while it is being fetched. 
           </li>
-          <li> To allow incremental updates to the local collection, it would again be useful to support "&since={id}"
+          <li> To allow incremental updates to the local collection, it would again be useful to support "&amp;since={id}"
                (or an If-Modified-Since header), to fetch all the items since the query was last update. </li>
           <li> For archiving, it might also be desirable to break the data up into separate CSV files - one per day - 
                that can easily be synchronized between machines and recombined when needed.
@@ -983,10 +1219,10 @@ id,publication_date,title_display,author
           </li>
        </ul>
        <div>
-      </section>
+      </div></div></div></ul></ul></section>
       
-      <section id="UC-ReliabilityAnalysesOfPoliceOpenData">
-	<h2>Use Case #7 - Reliability Analyses of Police Open Data</h2>
+      <section id="UC-ReliabilityAnalysesOfPoliceOpenData" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+	<h3 aria-level="2" role="heading" id="h3_UC-ReliabilityAnalysesOfPoliceOpenData"><span class="secno">3.7 </span>Use Case #7 - Reliability Analyses of Police Open Data</h3>
         <p>
           <span style="font-size: 10pt">(Contributed by Davide Ceolin)</span>
         </p>
@@ -1012,21 +1248,17 @@ id,publication_date,title_display,author
 	it is crucial to understand the meaning of the columns, the relationships between columns, and how the
 	data rows have been computed.</p>
 	<p>For instance, here is a snippet from a dataset about crime happened in Hampshire in April 2012:</p>
-	<pre class="example">
-        Month	Force			Neighbourhood	Burglary	Robbery		Vehicle crime	Violent crime	Anti-social behaviour	Other crime
+	<div class="example"><div class="example-title"><span>Example 12</span></div><pre class="example">Month	Force			Neighbourhood	Burglary	Robbery		Vehicle crime	Violent crime	Anti-social behaviour	Other crime
 {snip}
 2011-04	Hampshire Constabulary	2LE11		2		0		1		6		14			6
 2011-04	Hampshire Constabulary	2LE10		1		0		2		4		15			6
 2011-04	Hampshire Constabulary	2LE12		3		0		0		4		25			21
-{snip}
-	</pre>
+{snip}</pre></div>
 	<p>and that dataset reports 248 entries, while in October 2012, the crime types we can see are increased to 11:</p>
-	<pre class = "example">
-	  Month	Force			Neighbourhood Burglary	Robbery	Vehicle crime	Violent crime	ASB	CDA	Shoplifting	OT	Drugs	PDW	OC
+	<div class="example"><div class="example-title"><span>Example 13</span></div><pre class="example">Month	Force			Neighbourhood Burglary	Robbery	Vehicle crime	Violent crime	ASB	CDA	Shoplifting	OT	Drugs	PDW	OC
 2012-10	Hampshire Constabulary	2LE11	       1	0	1		2		8	0	0		1	1	0	1
 2012-10	Hampshire Constabulary	1SY01	       9	1	12		8		87	17	12		14	13	7	4
-2012-10	Hampshire Constabulary	1SY02	      11	0	11		20		144	39	2		12	9	8	5
-	</pre>
+2012-10	Hampshire Constabulary	1SY02	      11	0	11		20		144	39	2		12	9	8	5</pre></div>
 	<ul>
 	  <li>ASB = Anti-social behaviour</li>
 	  <li>PDW = Public Disorder and Weapons</li>
@@ -1062,8 +1294,8 @@ id,publication_date,title_display,author
           <a href="#R-AnnotationAndSupplementaryInfo">AnnotationAndSupplementaryInfo</a>
         </p>
       </section>
-      <section id="UC-AnalyzingScientificSpreadsheets">
-	<h2>Use Case #8 - Analyzing Scientific Spreadsheets</h2>
+      <section id="UC-AnalyzingScientificSpreadsheets" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+	<h3 aria-level="2" role="heading" id="h3_UC-AnalyzingScientificSpreadsheets"><span class="secno">3.8 </span>Use Case #8 - Analyzing Scientific Spreadsheets</h3>
         <p>
           <span style="font-size: 10pt">(Contributed by Alf Eaton, Davide Ceolin, Martine de Vos)</span>
         </p>
@@ -1086,8 +1318,7 @@ id,publication_date,title_display,author
 	<p>
 	To clarify the issues related to the spreadsheet parsing and analysis, we first present an example extrapolated from it.
 	</p>
-<pre class="example">
-	  Supplementary Table 2. Genes more potently regulated by IL-15																		
+<div class="example"><div class="example-title"><span>Example 14</span></div><pre class="example">Supplementary Table 2. Genes more potently regulated by IL-15																		
 																		
 gene_name	symbol		RPKM									Fold Change							
 				4 hour							24 hour							4 hour	...	
@@ -1098,8 +1329,7 @@ NM_026618	Ccdc56		9,07	12,55		9,25		5,88		14,33	20,08		20,91		11,97		22,69	...
 NM_008637	Nudt1		9,31	7,51		8,60		11,21		6,84	15,85		25,14		7,56		22,77	...
 NM_008638	Mthfd2		58,67	33,99		245,87		44,66		167,87	55,62		204,50		24,52		176,51	...
 NM_178185	Hist1h2ao	7,13	16,52		7,82		7,79		16,99	75,04		290,72		21,99		164,93	...
-{snip}	
-	</pre>
+{snip}	</pre></div>
 	<p>As we can see from the example, the table contains several columns of data that are measurements of gene expression in cells after
 	treatment with two concentrations of two cytokines, measured after two periods of time, presented as both actual values and fold
 	change. This can be represented in a table, but needs 3 levels of headings and several merged cells. In fact, the first row is the title of the table,
@@ -1156,8 +1386,8 @@ NM_178185	Hist1h2ao	7,13	16,52		7,82		7,79		16,99	75,04		290,72		21,99		164,93	.
           <a href="#R-AnnotationAndSupplementaryInfo">AnnotationAndSupplementaryInfo</a>
         </p>
 	</section>
-      <section id="UC-ChemicalImaging">
-        <h2>Use Case #9 Chemical Imaging</h2>
+      <section id="UC-ChemicalImaging" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+        <h3 aria-level="2" role="heading" id="h3_UC-ChemicalImaging"><span class="secno">3.9 </span>Use Case #9 Chemical Imaging</h3>
          <p>
           <span style="font-size: 10pt">(Contributed by Mathew Thomas)</span>
         </p>
@@ -1190,7 +1420,7 @@ NM_178185	Hist1h2ao	7,13	16,52		7,82		7,79		16,99	75,04		290,72		21,99		164,93	.
           </ul>
       <p> 
         The key characteristics are:  
-        <ul>
+        </p><ul>
         <li> CSV uses fixed number of fields
         </li>
         <li> First row provides header field tags, although the FTIR header begins with a comma
@@ -1203,7 +1433,7 @@ NM_178185	Hist1h2ao	7,13	16,52		7,82		7,79		16,99	75,04		290,72		21,99		164,93	.
         <li> Left column is typically regarded as the row primary key.
         </li>
         </ul>
-       </p>
+       <p></p>
         <p>
           <strong>Requires:</strong>
           <a href="#R-WellFormedCsvCheck">WellFormedCsvCheck</a>, 
@@ -1213,36 +1443,32 @@ NM_178185	Hist1h2ao	7,13	16,52		7,82		7,79		16,99	75,04		290,72		21,99		164,93	.
         </p> 
         <p>
         Lastly, for Mass Spectrometry multiple CSV files need to be examined to view the sample image in its entirety.
-        <p>
+        </p><p>
           <strong>Requires:</strong>
           <a href="#R-CsvAsSubsetOfLargerDataset">CsvAsSubsetOfLargerDataset</a> 
         </p> 
-        </p>
+        <p></p>
        <p> Below are Mass Spectrometry instrument measurements (3 of 316 CSV rows) for a single line on a sample. It gives
            the mass-to-charge ranges, peak values, acquisition times and total ion current.
        </p>
-       <pre class="example">
-scan_num,scan_time,type,bpi,bpi_mz,tic,num_peaks,num_deisotoped,info 
+       <div class="example"><div class="example-title"><span>Example 15</span></div><pre class="example">scan_num,scan_time,type,bpi,bpi_mz,tic,num_peaks,num_deisotoped,info 
 1,0,1,4.45E+07,576.27308,1.06E+09,132,0,FTMS + p NSI Full ms [100.00-2000.00] 
 2,0.075,1,1.26E+08,576.27306,2.32E+09,86,0,FTMS + p NSI Full ms [100.00-2000.00] 
-3,0.1475,1,9.53E+07,576.27328,1.66E+09,102,0,FTMS + p NSI Full ms [100.00-2000.00] 
-      </pre>
+3,0.1475,1,9.53E+07,576.27328,1.66E+09,102,0,FTMS + p NSI Full ms [100.00-2000.00] </pre></div>
        <p>
          Below is a example FTIR data.  The files from the instrument are baseline corrected, normalized and saved as csv files automatically. Column 1 represents the 
          wavelength # or range and the represent different formations like bound eps (extracellular polymeric substance), lose eps, shewanella etc. 
          Below are (5 of 3161 rows) is a example:
        </p>
-       <pre class="example">
-,wt beps,wt laeps,so16533 beps,so167333 laeps,so31 beps,so313375 lAPS,so3176345 bEPS,so313376 laEPS,so3193331 bEPS,so3191444 laeps,so3195553beps,so31933333 laeps
+       <div class="example"><div class="example-title"><span>Example 16</span></div><pre class="example">,wt beps,wt laeps,so16533 beps,so167333 laeps,so31 beps,so313375 lAPS,so3176345 bEPS,so313376 laEPS,so3193331 bEPS,so3191444 laeps,so3195553beps,so31933333 laeps
  1999.82,-0.0681585,-0.04114415,-0.001671781,0.000589855,0.027188073,0.018877371,-0.066532177,-0.016899697,-0.077690018,0.001594551,-0.086573831,-0.08155035
  1998.855,-0.0678255,-0.0409804,-0.001622611,0.000552989,0.027188073,0.01890847,-0.066132737,-0.016857071,-0.077346835,0.001733207,-0.086115107,-0.081042424
  1997.89,-0.067603,-0.0410459,-0.001647196,0.000423958,0.027238845,0.018955119,-0.065904461,-0.016750515,-0.077101756,0.001733207,-0.085656382,-0.080590934
- 1996.925,-0.0673255,-0.04114415,-0.001647196,0.000258061,0.027289616,0.018970669,-0.065790412,-0.01664396,-0.076856677,0.001629215,-0.085281062,-0.080365189
-       </pre>
+ 1996.925,-0.0673255,-0.04114415,-0.001647196,0.000258061,0.027289616,0.018970669,-0.065790412,-0.01664396,-0.076856677,0.001629215,-0.085281062,-0.080365189</pre></div>
       </section>
 
-      <section id="UC-OpenSpendingData">
-        <h2>Use Case #10 - OpenSpending Data</h2>
+      <section id="UC-OpenSpendingData" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+        <h3 aria-level="2" role="heading" id="h3_UC-OpenSpendingData"><span class="secno">3.10 </span>Use Case #10 - OpenSpending Data</h3>
         <p>
           <span style="font-size: 10pt">(Contributed by Stasinos Konstantopoulos)</span>
         </p>
@@ -1291,21 +1517,21 @@ scan_num,scan_time,type,bpi,bpi_mz,tic,num_peaks,num_deisotoped,info
 		    <a href="#R-MissingValueDefinition">MissingValueDefinition</a>
 		  </p>
 		</ul>
-		<p class="note">The <a href="http://datahub.io/">datahub.io</a> platform that collects both OpenSpending and Budgit data allows publishing data in Simple Data Format (SDF), RDF
+		<div class="note"><div class="note-title" aria-level="3" role="heading" id="h_note_2"><span>Note</span></div><p class="">The <a href="http://datahub.io/">datahub.io</a> platform that collects both OpenSpending and Budgit data allows publishing data in Simple Data Format (SDF), RDF
 		and other formats providing explicit semantics. Nevertheless, the datasets mentioned above present either implicit semantics and/or additional metadata files provided only
-		as attachment.</p>
+		as attachment.</p></div>
       </section>
 
 
 
-      <section id="UC-PaloAltoTreeData">
-        <h2>Use Case #11 City of Palo Alto Tree Data</h2>
+      <section id="UC-PaloAltoTreeData" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+        <h3 aria-level="2" role="heading" id="h3_UC-PaloAltoTreeData"><span class="secno">3.11 </span>Use Case #11 City of Palo Alto Tree Data</h3>
          <p>
           <span style="font-size: 10pt">(Contributed by Eric Stephan)</span>
         </p>
          <p> The City of Palo Alto, <a href="http://www.cityofpaloalto.org/services/sustainability/trees.asp">
              California Urban Forest Section</a> is responsible for maintaining and tracking
-             the cities public trees and urban forest.   In a W3C Data on the Web Best Practices (DWBP) use case 
+             the cities public trees and urban forest.   In a <abbr title="World Wide Web Consortium">W3C</abbr> Data on the Web Best Practices (DWBP) use case 
              discussion with Jonathan Reichental City of Palo Alto CIO, he brought to the working groups attention 
              a Tree Inventory maintained by the city in a 
              <a href="https://www.google.com/fusiontables/DataSource?docid=1XKUADil8qq1PT6xkJV3FF9bqLAZj2tBXwTTI_rc#rows:id=1">spreadsheet</a>  
@@ -1316,12 +1542,10 @@ scan_num,scan_time,type,bpi,bpi_mz,tic,num_peaks,num_deisotoped,info
           </p>
        <p>   Example output from first three rows of CSV file.
        </p>
-       <pre class="example">
-GID,Private,Tree ID,Admin Area,Side of Street,On Street,From Street,To Street,Street_Name,Situs Number,Address Estimated,Lot Side,Serial Number,Tree Site,Species,Trim Cycle,Diameter at Breast Ht,Trunk Count,Height Code,Canopy Width,Trunk Condition,Structure Condition,Crown Condition,Pest Condition,Condition Calced,Condition Rating,Vigor,Cable Presence,Stake Presence,Grow Space,Utility Presence,Distance from Property,Inventory Date,Staff Name,Comments,Zip,City Name,Longitude,Latitude,Protected,Designated,Heritage,Appraised Value,Hardscape,Identifier,Location Feature ID,Install Date,Feature Name,KML,FusionMarkerIcon
-1,True,29,,,ADDISON AV,EMERSON ST,RAMONA ST,ADDISON AV,203,,Front,,2,Celtis australis,Large Tree Routine Prune,11,1,25-30,15-30,,Good,5,,,Good,2,False,False,Planting Strip,,44,10/18/2010,BK,,,Palo Alto,-122.1565172,37.4409561,False,False,False,,None,40,13872,,"Tree: 29 site 2 at 203 ADDISON AV, on ADDISON AV 44 from pl","<Point><coordinates>-122.156485,37.440963</coordinates></Point>",small_green
-2,True,30,,,EMERSON ST,CHANNING AV,ADDISON AV,ADDISON AV,203,,Left,,1,Liquidambar styraciflua,Large Tree Routine Prune,11,1,50-55,15-30,Good,Good,5,,,Good,2,False,False,Planting Strip,,21,6/2/2010,BK,,,Palo Alto,-122.1567812,37.440951,False,False,False,,None,41,13872,,"Tree: 30 site 1 at 203 ADDISON AV, on EMERSON ST 21 from pl","<Point><coordinates>-122.156749,37.440958</coordinates></Point>",small_green
-3,True,31,,,EMERSON ST,CHANNING AV,ADDISON AV,ADDISON AV,203,,Left,,2,Liquidambar styraciflua,Large Tree Routine Prune,11,1,40-45,15-30,Good,Good,5,,,Good,2,False,False,Planting Strip,,54,6/2/2010,BK,,,Palo Alto,-122.1566921,37.4408948,False,False,False,,Low,42,13872,,"Tree: 31 site 2 at 203 ADDISON AV, on EMERSON ST 54 from pl","<Point><coordinates>-122.156659,37.440902</coordinates></Point>",small_green
-       </pre>
+       <div class="example"><div class="example-title"><span>Example 17</span></div><pre class="example">GID,Private,Tree ID,Admin Area,Side of Street,On Street,From Street,To Street,Street_Name,Situs Number,Address Estimated,Lot Side,Serial Number,Tree Site,Species,Trim Cycle,Diameter at Breast Ht,Trunk Count,Height Code,Canopy Width,Trunk Condition,Structure Condition,Crown Condition,Pest Condition,Condition Calced,Condition Rating,Vigor,Cable Presence,Stake Presence,Grow Space,Utility Presence,Distance from Property,Inventory Date,Staff Name,Comments,Zip,City Name,Longitude,Latitude,Protected,Designated,Heritage,Appraised Value,Hardscape,Identifier,Location Feature ID,Install Date,Feature Name,KML,FusionMarkerIcon
+1,True,29,,,ADDISON AV,EMERSON ST,RAMONA ST,ADDISON AV,203,,Front,,2,Celtis australis,Large Tree Routine Prune,11,1,25-30,15-30,,Good,5,,,Good,2,False,False,Planting Strip,,44,10/18/2010,BK,,,Palo Alto,-122.1565172,37.4409561,False,False,False,,None,40,13872,,"Tree: 29 site 2 at 203 ADDISON AV, on ADDISON AV 44 from pl","<point><coordinates>-122.156485,37.440963</coordinates></point>",small_green
+2,True,30,,,EMERSON ST,CHANNING AV,ADDISON AV,ADDISON AV,203,,Left,,1,Liquidambar styraciflua,Large Tree Routine Prune,11,1,50-55,15-30,Good,Good,5,,,Good,2,False,False,Planting Strip,,21,6/2/2010,BK,,,Palo Alto,-122.1567812,37.440951,False,False,False,,None,41,13872,,"Tree: 30 site 1 at 203 ADDISON AV, on EMERSON ST 21 from pl","<point><coordinates>-122.156749,37.440958</coordinates></point>",small_green
+3,True,31,,,EMERSON ST,CHANNING AV,ADDISON AV,ADDISON AV,203,,Left,,2,Liquidambar styraciflua,Large Tree Routine Prune,11,1,40-45,15-30,Good,Good,5,,,Good,2,False,False,Planting Strip,,54,6/2/2010,BK,,,Palo Alto,-122.1566921,37.4408948,False,False,False,,Low,42,13872,,"Tree: 31 site 2 at 203 ADDISON AV, on EMERSON ST 54 from pl","<point><coordinates>-122.156659,37.440902</coordinates></point>",small_green</pre></div>
        <p> 
         Google Fusion allows a user to download the tree data either from a filtered view or the entire spreadsheet.
         The exported spreadsheet is organized and consistent tabular format.  This includes:</p>
@@ -1344,10 +1568,10 @@ GID,Private,Tree ID,Admin Area,Side of Street,On Street,From Street,To Street,St
           <a href="#R-UnitMeasureDefinition">UnitMeasureDefinition</a>
           <a href="#R-CellValueMicroSyntax">CellValueMicroSyntax</a>
         </p>
-     </section>
+     </ul></ul></section>
 
-      <section id="UC-ChemicalStructures">
-        <h2>Use Case #12 Chemical Structures</h2>
+      <section id="UC-ChemicalStructures" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+        <h3 aria-level="2" role="heading" id="h3_UC-ChemicalStructures"><span class="secno">3.12 </span>Use Case #12 Chemical Structures</h3>
          <p>
           <span style="font-size: 10pt">(Contributed by Eric Stephan)</span>
         </p>
@@ -1377,10 +1601,10 @@ GID,Private,Tree ID,Admin Area,Side of Street,On Street,From Street,To Street,St
           <li> making it possible to combine all scans to examine full 2D composite image.
           </li> 
           </ul>
-          </p>
+          <p></p>
       <p> 
         The key characteristics of the XYZ format are:  
-        <ul>
+        </p><ul>
         <li> CSV contains two header rows, the first row containing the number of atoms in molecule (number of rows in data block).
              The second is a comment line.
         </li>
@@ -1397,21 +1621,19 @@ GID,Private,Tree ID,Admin Area,Side of Street,On Street,From Street,To Street,St
           <a href="#R-PrimaryKey">PrimaryKey</a> and
           <a href="#R-UnitMeasurementDefinition">UnitMeasureDefinition</a>
         </p>
-       </p> 
+       <p></p> 
        <p> Below is a Methane molecular structure organized in an XYZ format.
        </p>
-       <pre class="example">
-5
+       <div class="example"><div class="example-title"><span>Example 18</span></div><pre class="example">5
 methane molecule (in angstroms)
 C        0.000000        0.000000        0.000000
 H        0.000000        0.000000        1.089000
 H        1.026719        0.000000       -0.363000
 H       -0.513360       -0.889165       -0.363000
-H       -0.513360        0.889165       -0.363000
-      </pre>
+H       -0.513360        0.889165       -0.363000</pre></div>
       <p> 
         The key characteristics of the PDB format are:  
-        <ul>
+        </p><ul>
         <li> Each PDB record is self describing and contains different ways to document each protein. 
         </li>
         <li> Each row of the file uses a token to depict the purpose of that row.
@@ -1425,7 +1647,7 @@ H       -0.513360        0.889165       -0.363000
              file "...". 
         </li>
         </ul>
-       </p> 
+       <p></p> 
        <p>
            <strong>Requires:</strong>
            <a href="#R-GroupingOfMultipleTables">GroupingOfMultipleTables</a>
@@ -1434,8 +1656,7 @@ H       -0.513360        0.889165       -0.363000
        <p>
          Below is a example PDB file:
        </p>
-       <pre class="example">
-HEADER    EXTRACELLULAR MATRIX                    22-JAN-98   1A3I
+       <div class="example"><div class="example-title"><span>Example 19</span></div><pre class="example">HEADER    EXTRACELLULAR MATRIX                    22-JAN-98   1A3I
 TITLE     X-RAY CRYSTALLOGRAPHIC DETERMINATION OF A COLLAGEN-LIKE
 TITLE    2 PEPTIDE WITH THE REPEATING SEQUENCE (PRO-PRO-GLY)
 ...
@@ -1460,12 +1681,11 @@ ATOM      5  CB  PRO A   1       6.460  21.723  20.211  1.00 22.26           C
 ...
 HETATM  130  C   ACY   401       3.682  22.541  11.236  1.00 21.19           C
 HETATM  131  O   ACY   401       2.807  23.097  10.553  1.00 21.19           O
-HETATM  132  OXT ACY   401       4.306  23.101  12.291  1.00 21.19           O
-       </pre>
+HETATM  132  OXT ACY   401       4.306  23.101  12.291  1.00 21.19           O</pre></div>
       </section>
 
-      <section id="UC-RepresentingEntitiesAndFactsExtractedFromText">
-	<h2>Use Case #13 - Representing Entities and Facts Extracted From Text</h2>
+      <section id="UC-RepresentingEntitiesAndFactsExtractedFromText" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+	<h3 aria-level="2" role="heading" id="h3_UC-RepresentingEntitiesAndFactsExtractedFromText"><span class="secno">3.13 </span>Use Case #13 - Representing Entities and Facts Extracted From Text</h3>
         <p>
           <span style="font-size: 10pt">(Contributed by Tim Finin)</span>
         </p>
@@ -1487,16 +1707,14 @@ HETATM  132  OXT ACY   401       4.306  23.101  12.291  1.00 21.19           O
 	and the strings like 283-286 refer to strings in a document using the offsets of the first and last characters.
 	The final floating point value on some lines is the optional certainty value.</p>
 	
-	<pre class="example">
-	  {snip}
-	  :e4 type         PER
-	  :e4 mention      "Bart"  D00124 283-286
-	  :e4 mention      "JoJo"  D00124 145-149 0.9
-	  :e4 per:siblings :e7     D00124 283-286 173-179 274-281
-	  :e4 per:age      "10"    D00124 180-181 173-179 182-191 0.9
-	  :e4 per:parent   :e9     D00124 180-181 381-380 399-406 D00101 220-225 230-233 201-210
-	  {snip}
-	</pre>
+	<div class="example"><div class="example-title"><span>Example 20</span></div><pre class="example">{snip}
+:e4 type         PER
+:e4 mention      "Bart"  D00124 283-286
+:e4 mention      "JoJo"  D00124 145-149 0.9
+:e4 per:siblings :e7     D00124 283-286 173-179 274-281
+:e4 per:age      "10"    D00124 180-181 173-179 182-191 0.9
+:e4 per:parent   :e9     D00124 180-181 381-380 399-406 D00101 220-225 230-233 201-210
+{snip}</pre></div>
 	<p>The submission format does not require that each line have the same number of columns. The expected provenance
 	information for a triple depends on the predicate. For example, “type” typically has no provenance, “mention” has
 	a document ID and offset pair, and domain predicates like “per:age” have one or two provenance records each of which
@@ -1504,7 +1722,7 @@ HETATM  132  OXT ACY   401       4.306  23.101  12.291  1.00 21.19           O
 	</p>
 	<p>The file format exemplified above opens up for a number of issues described as follows.</p>
 	Each row is intended to describe an entity (“:e4”) that thus represents a primary key and needs
-	to be identified as such.</p>
+	to be identified as such.<p></p>
 	<p>
 	<strong>Requires:</strong>
 	<a href="#R-PrimaryKey">PrimaryKey</a>
@@ -1525,7 +1743,7 @@ HETATM  132  OXT ACY   401       4.306  23.101  12.291  1.00 21.19           O
 	<a href="#R-AssociationOfCodeValuesWithExternalDefinitions">AssociationOfCodeValuesWithExternalDefinitions</a>,
 	<a href="#R-LinksToExternallyManagedDefinitions">LinksToExternallyManagedDefinitions</a>,
 	<a href="#R-SemanticTypeDefinition">SemanticTypeDefinition</a>
-	</p>
+	<p></p>
 	<p>The identifiers used for the entities (“:e4”, “:e7” and “:e9”), as well as those used for the predicates (e.g. “type”, “mention”,
 	“per:siblings” etc.), are ambiguous local identifiers. How can one make the identifier an unambiguous URI?
 	A similar requirement regards the provenance annotations. These are composed by document (e.g. “D00124”) and page number ranges.
@@ -1548,14 +1766,11 @@ HETATM  132  OXT ACY   401       4.306  23.101  12.291  1.00 21.19           O
 	<p>Moreover, a single row in the table comprises a triple (subject-predicate-object), one or more provenance references and an optional certainty measure.
 	The provenance references have been normalised for compactness (e.g. so they fit on a single row). However, each provenance statement has the same target triple so one
 	could unbundle the composite row into multiple simple statements that have a regular number of columns (see the two equivalent examples below).
-	<pre class="example">
-	  {snip}
+	</p><div class="example"><div class="example-title"><span>Example 21</span></div><pre class="example">{snip}
 :e4 per:age      "10"    D00124 180-181 173-179 182-191 0.9
 :e4 per:parent   :e9     D00124 180-181 381-380 399-406 D00101 220-225 230-233 201-210
-{snip}
-	</pre>
-	<pre class="example">
-{snip}
+{snip}</pre></div>
+	<div class="example"><div class="example-title"><span>Example 22</span></div><pre class="example">{snip}
 :e4 per:age      "10"    D00124 180-181 0.9
 :e4 per:age      "10"    D00124 173-179 0.9
 :e4 per:age      "10"    D00124 182-191 0.9
@@ -1565,12 +1780,11 @@ HETATM  132  OXT ACY   401       4.306  23.101  12.291  1.00 21.19           O
 :e4 per:parent   :e9     D00101 220-225
 :e4 per:parent   :e9     D00101 230-233
 :e4 per:parent   :e9     D00101 201-210
-{snip}
-	</pre>
-	</p>
+{snip}</pre></div>
+	<p></p>
 	<strong>Requires:</strong>
 	<a href="#R-TableNormalization">TableNormalization</a>
-	</p>
+	<p></p>
 	<p>Lastly, since we already observed that rows comprise triples, that there is a frequent reference to externally
 	defined vocabularies, that values are defined as text (literals), and that triples are also composed by entities,
 	for which we aim to obtain a URI (as described above), it may be useful to be able to convert such a table in RDF.
@@ -1580,8 +1794,8 @@ HETATM  132  OXT ACY   401       4.306  23.101  12.291  1.00 21.19           O
 	<a href="#R-CsvToRdfTransformation">CsvToRdfTransformation</a>
 	</p>
 	</section>
-      <section id="UC-DisplayingLocationsOfCareHomesOnAMap">
-	<h2>Use Case #14 - Displaying Locations of Care Homes on a Map</h2>
+      <section id="UC-DisplayingLocationsOfCareHomesOnAMap" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+	<h3 aria-level="2" role="heading" id="h3_UC-DisplayingLocationsOfCareHomesOnAMap"><span class="secno">3.14 </span>Use Case #14 - Displaying Locations of Care Homes on a Map</h3>
 	<p>
           <span style="font-size: 10pt">(Contributed by Jeni Tennison)</span>
 	</p>
@@ -1593,7 +1807,7 @@ HETATM  132  OXT ACY   401       4.306  23.101  12.291  1.00 21.19           O
 	<li>the field separator is the not sign (¬, \u00AC) rather than a comma</li>
 	<li>no fields are wrapped in double quotes; some fields contain (unescaped) double quotes</li>
 	</ul>
-	</p>
+	<p></p>
 	<p>
 	  <strong>Requires:</strong>
 	  <a href="#R-WellFormedCsvCheck">WellFormedCsvCheck</a>,
@@ -1602,11 +1816,10 @@ HETATM  132  OXT ACY   401       4.306  23.101  12.291  1.00 21.19           O
 	</p>
 	<p>I want to be able to embed a map of these locations easily into my web page using a <a href="http://w3c.github.io/webcomponents/explainer/">
 	web component</a>, such that I can use markup like:
-	<pre>
-	&lt;emap src="http://media.nhschoices.nhs.uk/data/foi/SCL.csv" latcol="Latitude" longcol="Longitude"&gt;
+	</p><pre>	&lt;emap src="http://media.nhschoices.nhs.uk/data/foi/SCL.csv" latcol="Latitude" longcol="Longitude"&gt;
 	</pre>
 	and see a map similar to that shown at <a href="https://github.com/JeniT/nhs-choices/blob/master/SCP.geojson">
-	https://github.com/JeniT/nhs-choices/blob/master/SCP.geojson</a>, without converting the CSV file into GeoJSON.</p>
+	https://github.com/JeniT/nhs-choices/blob/master/SCP.geojson</a>, without converting the CSV file into GeoJSON.<p></p>
 	
 	<p>To make the web component easy to define, there should be a native API on
 	to the data in the CSV file within the browser.</p>
@@ -1616,8 +1829,8 @@ HETATM  132  OXT ACY   401       4.306  23.101  12.291  1.00 21.19           O
 	</p>
 	
       </section>
-      <section id="UC-IntelligentlyPreviewingCSVFiles">
-	<h2>Use Case #15 - Intelligently Previewing CSV files</h2>
+      <section id="UC-IntelligentlyPreviewingCSVFiles" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+	<h3 aria-level="2" role="heading" id="h3_UC-IntelligentlyPreviewingCSVFiles"><span class="secno">3.15 </span>Use Case #15 - Intelligently Previewing CSV files</h3>
         <p>
           <span style="font-size: 10pt">(Contributed by Jeni Tennison)</span>
         </p>
@@ -1660,14 +1873,12 @@ HETATM  132  OXT ACY   401       4.306  23.101  12.291  1.00 21.19           O
 	<p>As an example, see the <a href="http://data.gov.uk/dataset/financial-transactions-data-royal-wolverhampton-hospitals-nhs-trust/resource/e85b1d22-948d-461f-9a29-7b43dee0fc03">
 	Spend over £25,000 in The Royal Wolverhampton Hospitals NHS Trust</a> example.
 	  Note that the underlying data begins with:</p>
-	<pre class="example">
-	"Expenditure over £25,000- Payment made in January 2014",,,,,,,,
-	,,,,,,,,
-	Department Family,Entity,Date,Expense Type,Expense Area,Supplier,Transaction Number,Amount in Sterling,
-	Department of Health,The Royal Wolverhampton Hospitals NHS Trust RL4,31/01/2014,Capital Project,Capital,STRYKER UK LTD,0001337928,31896.06,
-	Department of Health,The Royal Wolverhampton Hospitals NHS Trust RL4,17/01/2014,SERVICE AGREEMENTS,Pathology,ABBOTT LABORATORIES LTD,0001335058,77775.13,
-	...
-	</pre>
+	<div class="example"><div class="example-title"><span>Example 23</span></div><pre class="example">"Expenditure over £25,000- Payment made in January 2014",,,,,,,,
+,,,,,,,,
+Department Family,Entity,Date,Expense Type,Expense Area,Supplier,Transaction Number,Amount in Sterling,
+Department of Health,The Royal Wolverhampton Hospitals NHS Trust RL4,31/01/2014,Capital Project,Capital,STRYKER UK LTD,0001337928,31896.06,
+Department of Health,The Royal Wolverhampton Hospitals NHS Trust RL4,17/01/2014,SERVICE AGREEMENTS,Pathology,ABBOTT LABORATORIES LTD,0001335058,77775.13,
+...</pre></div>
 	<p>The header line here comes below an empty row, and there is metadata about the table in the row above the empty row. The preview code manages to
         identify the headers from the CSV, and displays the metadata as the value in the first cell of the first row.</p>
 	<p>	
@@ -1680,7 +1891,7 @@ HETATM  132  OXT ACY   401       4.306  23.101  12.291  1.00 21.19           O
 	<p>	
 	<strong>Requires:</strong>
 	  <a href="#R-SemanticTypeDefinition">SemanticTypeDefinition</a>,
-	  <a href='#R-SyntacticTypeDefinition'>SyntacticTypeDefinition</a>,
+	  <a href="#R-SyntacticTypeDefinition">SyntacticTypeDefinition</a>,
 	  <a href="#R-UnitMeasureDefinition">UnitMeasureDefinition</a>
 	</p>
 	<p>Moreover, some of the values reported may refer to external definitions (from dictionaries or other sources). It would be useful to know where it is
@@ -1705,8 +1916,8 @@ HETATM  132  OXT ACY   401       4.306  23.101  12.291  1.00 21.19           O
 	</p>
 
       </section>
-      <section id="UC-NetCdFcDl">
-        <h2>Use Case #16 Tabular Representations of NetCDF data Using CDL Syntax</h2>
+      <section id="UC-NetCdFcDl" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+        <h3 aria-level="2" role="heading" id="h3_UC-NetCdFcDl"><span class="secno">3.16 </span>Use Case #16 Tabular Representations of NetCDF data Using CDL Syntax</h3>
          <p>
           <span style="font-size: 10pt">(Contributed by Eric Stephan)</span>
         </p>
@@ -1730,32 +1941,29 @@ HETATM  132  OXT ACY   401       4.306  23.101  12.291  1.00 21.19           O
              wrapped around to the next line in a similar way that characters can be wrapped around in a single cell block
              of a spreadsheet to make the spreadsheet more visually appealing to the user.
       </p>
-       <pre class="example">
-     netcdf foo {    // example netCDF specification in CDL
-     
-     dimensions:
-     lat = 10, lon = 5, time = unlimited;
-     
-     variables:
-       int     lat(lat), lon(lon), time(time);
-       float   z(time,lat,lon), t(time,lat,lon);
-       double  p(time,lat,lon);
-       int     rh(time,lat,lon);
-     
-       lat:units = "degrees_north";
-       lon:units = "degrees_east";
-       time:units = "seconds";
-       z:units = "meters";
-       z:valid_range = 0., 5000.;
-       p:_FillValue = -9999.;
-       rh:_FillValue = -1;
-     
-     data:
-       lat   = 0, 10, 20, 30, 40, 50, 60, 70, 80, 90;
-       lon   = -140, -118, -96, -84, -52;
-     }
+       <div class="example"><div class="example-title"><span>Example 24</span></div><pre class="example">netcdf foo {    // example netCDF specification in CDL
 
-      </pre>
+dimensions:
+lat = 10, lon = 5, time = unlimited;
+
+variables:
+  int     lat(lat), lon(lon), time(time);
+  float   z(time,lat,lon), t(time,lat,lon);
+  double  p(time,lat,lon);
+  int     rh(time,lat,lon);
+
+  lat:units = "degrees_north";
+  lon:units = "degrees_east";
+  time:units = "seconds";
+  z:units = "meters";
+  z:valid_range = 0., 5000.;
+  p:_FillValue = -9999.;
+  rh:_FillValue = -1;
+
+data:
+  lat   = 0, 10, 20, 30, 40, 50, 60, 70, 80, 90;
+  lon   = -140, -118, -96, -84, -52;
+}</pre></div>
 
      <p>   
            The next example shows a small subset of data block taken from an actual NetCDF file. 
@@ -1764,8 +1972,7 @@ HETATM  132  OXT ACY   401       4.306  23.101  12.291  1.00 21.19           O
            wrapped around in a single cell block of a spreadsheet to make the spreadsheet more 
            visually appealing to the user.
      </p>
-        <pre class="example">
-data:
+        <div class="example"><div class="example-title"><span>Example 25</span></div><pre class="example">data:
 
  base_time = 1020770640 ;
 
@@ -1786,8 +1993,7 @@ data:
     412, 414, 416, 418, 420, 422, 424, 426, 428, 430, 432, 434, 436, 438, 
     440, 442, 444, 446, 448, 450, 452, 454, 456, 458, 460, 462, 464, 466, 
     468, 470, 472, 474, 476, 478, 480, 482, 484, 486, 488, 490, 492, 494, 
-    496, 498, 500, 502, 504, 506, 508, 510, 512, 514, 516, 518, 520, 522;
-        </pre>
+    496, 498, 500, 502, 504, 506, 508, 510, 512, 514, 516, 518, 520, 522;</pre></div>
 
        <p>  
           The format allows for error codes and missing values to be included.
@@ -1804,7 +2010,7 @@ data:
         Lastly, NetCDF files are typically collected together in larger datasets
         where they can be analyzed, so the Csv data can be thought of a subset
         of a larger dataset.
-        <p>
+        </p><p>
           <strong>Requires:</strong>
           <a href="#R-CsvAsSubsetOfLargerDataset">CsvAsSubsetOfLargerDataset</a> 
         </p> 
@@ -1815,8 +2021,8 @@ data:
 
 
       </section>  
-      <section id="UC-CanonicalMappingOfCSV">
-        <h2>Use Case #17 - Canonical mapping of CSV</h2>
+      <section id="UC-CanonicalMappingOfCSV" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+        <h3 aria-level="2" role="heading" id="h3_UC-CanonicalMappingOfCSV"><span class="secno">3.17 </span>Use Case #17 - Canonical mapping of CSV</h3>
         <p>
           <span style="font-size: 10pt">(Contributed by David Booth and Jeremy Tandy)</span>
         </p>
@@ -1825,7 +2031,7 @@ data:
           typical of the data that application developers need to work with.</p>
         
         <p>However, an object / object graph serialisation (of open data) is easier to consume within
-          software applications. For example, web applications (using HTML5 & Javascript) require
+          software applications. For example, web applications (using HTML5 &amp; Javascript) require
           no extra libraries to work with data in JSON format. Similarly, RDF-encoded data in from 
           multiple sources can be simply combined or merged using SPARQL queries once persisted
           within a triple store.</p>
@@ -1833,7 +2039,7 @@ data:
         <p>The <a href="https://www.gov.uk/government/publications/open-data-white-paper-unleashing-the-potential">
           UK Government policy paper "Open Data: unleashing the potential"</a> outlines a 
           <a href="https://www.gov.uk/government/uploads/system/uploads/attachment_data/file/78946/CM8353_acc.pdf#page=23">
-            set of principles for publishing open data</a>. Within this document, <dfn>principle 9</dfn> states:</p>
+            set of principles for publishing open data</a>. Within this document, <dfn id="dfn-principle-9">principle 9</dfn> states:</p>
         
         <p>
           <em>Release data quickly, and then work to make sure that it is available in open standard 
@@ -1877,10 +2083,10 @@ data:
         </p>
         
         <p>This use case assumes that JSON is the target serialisation for application developers
-          given the general utility of that format. However, by considering [[json-ld]], it becomes 
+          given the general utility of that format. However, by considering [<cite><a class="bibref" href="#bib-json-ld">json-ld</a></cite>], it becomes 
           trivial to map CSV-encoded tabular data via JSON into a canonical RDF model. In doing so
           this enables CSV-encoded tabular data to be published in <em>linked data formats</em> 
-          as required in the open data <a>principle 9</a> at no extra effort to the data publisher as
+          as required in the open data <a href="#dfn-principle-9" class="internalDFN">principle 9</a> at no extra effort to the data publisher as
           standard mechanisms are available for a data user to transform the data from CSV to RDF.</p>
         
         <p>
@@ -1921,7 +2127,7 @@ data:
           data consumer may wish to work directly with the canonical mapping and wish to ignore any semantic
           annotations provided by the publisher.</p>
         
-        <div class="issue">
+        <div class="issue"><div class="issue-title" aria-level="3" role="heading" id="h_issue_5"><span>Issue 5</span></div><div class="">
           <p>This use case lacks a concrete example to further illustrate the concerns. Whilst the concerns
             outlined above are relevant for a gamut of open data publication, it would be useful to include 
             an example dataset here - which might be subsequently used in test suites relating to the 
@@ -1930,24 +2136,22 @@ data:
           <p>It may be appropriate to merge this use case with <a href="http://w3c.github.io/csvw/use-cases-and-requirements/#UC-IntelligentlyPreviewingCSVFiles">
             UC-IntelligentlyPreviewingCSVFiles</a> as that is concerned with using an interim JSON
             encoding to support intelligent preview of unannotated tabular data.</p>
-          </div>
+          </div></div>
       </section>
-      <section id="UC-SupportingSemantic-basedRecommendations">
-        <h2>Use Case #18 - Supporting Semantic-based Recommendations</h2>
+      <section id="UC-SupportingSemantic-basedRecommendations" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+        <h3 aria-level="2" role="heading" id="h3_UC-SupportingSemantic-basedRecommendations"><span class="secno">3.18 </span>Use Case #18 - Supporting Semantic-based Recommendations</h3>
         <p>
           <span style="font-size: 10pt">(Contributed by Davide Ceolin and Valentina Maccatrozzo)</span>
         </p>
 	<p>In the <a href="http://challenges.2014.eswc-conferences.org/index.php/RecSys">ESWC-14 Challenge: Linked Open Data-enabled Recommender Systems</a>,
 	participants are provided with a series of datasets about books in TSV format.</p>
 	<p>A first dataset contains a set of user identifiers and their ratings for a bunch of books each. Each book is represented by means of a numeric identifier.</p>
-	<pre class="example">
-	DBbook_userID	DBbook_itemID	rate
-	{snip}
-	6873		5950		1
-	6873		8010		1
-	6873		5232		1
-	{snip}
-	</pre>
+	<div class="example"><div class="example-title"><span>Example 26</span></div><pre class="example">DBbook_userID	DBbook_itemID	rate
+{snip}
+6873		5950		1
+6873		8010		1
+6873		5232		1
+{snip}</pre></div>
 	<p>Ratings can be boolean (0,1) or Likert scale values (from 1 to 5), depending on the challenge task considered.</p>
 	<p>
           <strong>Requires:</strong> 
@@ -1958,15 +2162,13 @@ data:
 
 	<p>A second file provides a mapping between book ids and their names and dbpedia URIs:</p>
 
-	<pre class="example">
-	DBbook_ItemID	name				DBpedia_uri
-	{snip}
-	1		Dragonfly in Amber		http://dbpedia.org/resource/Dragonfly_in_Amber
-	10		Unicorn Variations		http://dbpedia.org/resource/Unicorn_Variations
-	100		A Stranger in the Mirror	http://dbpedia.org/resource/A_Stranger_in_the_Mirror
-	1000		At All Costs			http://dbpedia.org/resource/At_All_Costs
-	{snip}
-	</pre>
+	<div class="example"><div class="example-title"><span>Example 27</span></div><pre class="example">DBbook_ItemID	name				DBpedia_uri
+{snip}
+1		Dragonfly in Amber		http://dbpedia.org/resource/Dragonfly_in_Amber
+10		Unicorn Variations		http://dbpedia.org/resource/Unicorn_Variations
+100		A Stranger in the Mirror	http://dbpedia.org/resource/A_Stranger_in_the_Mirror
+1000		At All Costs			http://dbpedia.org/resource/At_All_Costs
+{snip}</pre></div>
 	<p>
           <strong>Requires:</strong> 
           <a href="#R-ForeignKeyReferences">ForeignKeyReferences</a>
@@ -1975,14 +2177,12 @@ data:
 	<p>Participants are requested to estimate the ratings or relevance scores (depending on the task) that users would
 	attribute to a set of books reported in an evaluation dataset:</p>
 
-	<pre class="example">
-	DBbook_userID	DBbook_itemID
-	{snip}
-	6873		5946
-	6873		5229
-	6873		3151
-	{snip}
-	</pre>
+	<div class="example"><div class="example-title"><span>Example 28</span></div><pre class="example">DBbook_userID	DBbook_itemID
+{snip}
+6873		5946
+6873		5229
+6873		3151
+{snip}</pre></div>
 	<p>
           <strong>Requires:</strong> 
           <a href="#R-LinksToExternallyManagedDefinitions">LinksToExternallyManagedDefinitions</a>,
@@ -1992,16 +2192,14 @@ data:
 	<p>An effective manner to satisfy this requirement is to make use of semantic patterns. 
 	A semantic pattern represents a sequence of types and properties that link two items, for instance: </p>
 
-	<pre>
-	{Book1 property1 Object1 property2 Book2}
+	<pre>	{Book1 property1 Object1 property2 Book2}
 	</pre>
 
 	<p>This sequence results from considering the triples (subject-predicate-object) in a given Linked Open Data resource (e.g. DBpedia),
 	independently of their direction such that the starting and the ending entities are the desired items.
 	For example, the sequence above may result from the following triples:</p>
 
-	<pre>
-	Book1 property1 Object1
+	<pre>	Book1 property1 Object1
 	Book2 property1 Object1
 	</pre>
 
@@ -2026,16 +2224,14 @@ data:
 	of double quotes, and pattern components are separated by commas.
 	</p>
 
-	<pre class="example">
-	Book1	Book2	Pattern
-	{snip}
-	1	7680	"http://dbpedia.org/ontology/language,http://dbpedia.org/ontology/Language,http://dbpedia.org/ontology/language"
-	1	7680	"http://dbpedia.org/ontology/language,http://schema.org/Language,http://dbpedia.org/ontology/language"
-	1	7680	"http://dbpedia.org/ontology/language,http://www.w3.org/2002/07/owl#Thing,http://dbpedia.org/ontology/language"
-	1	7680	"http://dbpedia.org/ontology/language,http://www.w3.org/2000/01/rdf-schema#Resource,http://dbpedia.org/ontology/language"
-	1	2	"http://dbpedia.org/ontology/author,http://dbpedia.org/ontology/Writer,http://dbpedia.org/ontology/author"
-	{snip}
-	</pre>
+	<div class="example"><div class="example-title"><span>Example 29</span></div><pre class="example">Book1	Book2	Pattern
+{snip}
+1	7680	"http://dbpedia.org/ontology/language,http://dbpedia.org/ontology/Language,http://dbpedia.org/ontology/language"
+1	7680	"http://dbpedia.org/ontology/language,http://schema.org/Language,http://dbpedia.org/ontology/language"
+1	7680	"http://dbpedia.org/ontology/language,http://www.w3.org/2002/07/owl#Thing,http://dbpedia.org/ontology/language"
+1	7680	"http://dbpedia.org/ontology/language,http://www.w3.org/2000/01/rdf-schema#Resource,http://dbpedia.org/ontology/language"
+1	2	"http://dbpedia.org/ontology/author,http://dbpedia.org/ontology/Writer,http://dbpedia.org/ontology/author"
+{snip}</pre></div>
 	<p>
           <strong>Requires:</strong> 
           <a href="#R-CellValueMicroSyntax">CellValueMicroSyntax</a>
@@ -2054,15 +2250,15 @@ data:
 	</p>
       </section>
     </section>
-    <section id="req">
-      <h2>Requirements</h2>
-      <section id="acc-req">
-        <h2>Accepted Requirements</h2>
+    <section id="req" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+      <!--OddPage--><h2 aria-level="1" role="heading" id="h2_req"><span class="secno">4. </span>Requirements</h2>
+      <section id="acc-req" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+        <h3 aria-level="2" role="heading" id="h3_acc-req"><span class="secno">4.1 </span>Accepted Requirements</h3>
       </section>
-      <section id="can-req">
-        <h2>Candidate Requirements</h2>
-        <section id="can-req-parsing">
-          <h2>Requirements relating to parsing of CSV</h2>
+      <section id="can-req" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+        <h3 aria-level="2" role="heading" id="h3_can-req"><span class="secno">4.2 </span>Candidate Requirements</h3>
+        <section id="can-req-parsing" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+          <h4 aria-level="3" role="heading" id="h4_can-req-parsing"><span class="secno">4.2.1 </span>Requirements relating to parsing of CSV</h4>
           <dl>
             <dt id="R-WellFormedCsvCheck">R-WellFormedCsvCheck</dt>
             <dd>
@@ -2106,7 +2302,7 @@ data:
               <p>Heading columns, if present, should be distinguished from the data columns.</p>
               <strong>Motivation:</strong>
               <a href="#UC-AnalyzingScientificSpreadsheets">AnalyzingScientificSpreadsheets</a>
-              </p>
+              <p></p>
             </dd>
             <dt id="R-TableNormalization">R-TableNormalization</dt>
             <dd>
@@ -2117,7 +2313,7 @@ data:
                 other, when necessary.</p>
               <strong>Motivation:</strong>
               <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>
-              </p>
+              <p></p>
             </dd>
             <dt id="R-CellValueMicroSyntax">R-CellValueMicroSyntax</dt>
             <dd>
@@ -2132,7 +2328,7 @@ data:
               <a href="#UC-JournalArticleSearch">JournalArticleSearch</a>,
               <a href="#UC-PaloAltoTreeData">PaloAltoTreeData</a>,
 	            <a href="#UC-SupportingSemantic-basedRecommendations">SupportingSemantic-basedRecommendations</a>
-              </p>
+              <p></p>
             </dd>
             <dt id="R-NonStandardFieldDelimiter">R-NonStandardFieldDelimiter</dt>
             <dd>
@@ -2152,8 +2348,8 @@ data:
             </dd>
           </dl>
         </section>
-        <section id="can-req-annotation">
-          <h2>Requirements relating to annotation of CSV</h2>
+        <section id="can-req-annotation" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+          <h4 aria-level="3" role="heading" id="h4_can-req-annotation"><span class="secno">4.2.2 </span>Requirements relating to annotation of CSV</h4>
           <dl>
             <dt id="R-PrimaryKey">R-PrimaryKey</dt>
             <dd>
@@ -2167,18 +2363,17 @@ data:
               <p>Typically within a CSV file, primary key identifiers are only unique within the scope
                 of the CSV file within which they are stated (e.g. a local identifier). In order for
                 the entity to be unambiguously identified, the local identifier needs to be converted
-                to a URI (as defined in [[RFC3986]]).</p>
+                to a URI (as defined in [<cite><a class="bibref" href="#bib-RFC3986">RFC3986</a></cite>]).</p>
               <ol>
                 <li>need to determine which cell provides the primary key in a given row.</li>
                 <li>where the primary key is defined as a local identfier, need to determine how to
                   convert the local identifier to a URI.</li>
               </ol>
-              <p class="note">Assumption that a row within a CSV file describes a <em>single</em>
-                entity for which a primary key can be assigned.</p>
+              <div class="note"><div class="note-title" aria-level="4" role="heading" id="h_note_3"><span>Note</span></div><p class="">Assumption that a row within a CSV file describes a <em>single</em>
+                entity for which a primary key can be assigned.</p></div>
               <p>
                 <strong>Motivation:</strong>
-                <a href="#UC-DigitalPreservationOfGovernmentRecords"
-                  >DigitalPreservationOfGovernmentRecords</a>,
+                <a href="#UC-DigitalPreservationOfGovernmentRecords">DigitalPreservationOfGovernmentRecords</a>,
                 <a href="#UC-OrganogramData">OrganogramData</a>, 
                 <a href="#UC-PublicationOfPropertyTransactionData">PublicationOfPropertyTransactionData</a>,
                 <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>, 
@@ -2213,10 +2408,10 @@ data:
               </em>
               <p>To allow automated processing of a CSV file additional metadata is required to
                 describe the structure and semantics of that file. This additional metadata is termed
-                a <em>Data Definition Resource</em> (<dfn>DDR</dfn>). The <a>DDR</a> may be defined
+                a <em>Data Definition Resource</em> (<dfn id="dfn-ddr">DDR</dfn>). The <a href="#dfn-ddr" class="internalDFN">DDR</a> may be defined
                 outside the scope of the CSV file with which it is associated; for example, if the
-                <a>DDR</a> is common to many CSV files or the <a>DDR</a> is used to drive CSV file
-                validation. In such cases it must be possible to associate the <a>DDR</a> from the CSV
+                <a href="#dfn-ddr" class="internalDFN">DDR</a> is common to many CSV files or the <a href="#dfn-ddr" class="internalDFN">DDR</a> is used to drive CSV file
+                validation. In such cases it must be possible to associate the <a href="#dfn-ddr" class="internalDFN">DDR</a> from the CSV
                 file.</p>
               <p>
                 <strong>Motivation:</strong>
@@ -2258,8 +2453,7 @@ data:
 		<a href="#UC-SupportingSemantic-basedRecommendations">SupportingSemantic-basedRecommendations</a>
               </p>
             </dd>
-            <dt id="R-AssociationOfCodeValuesWithExternalDefinitions"
-              >R-AssociationOfCodeValuesWithExternalDefinitions</dt>
+            <dt id="R-AssociationOfCodeValuesWithExternalDefinitions">R-AssociationOfCodeValuesWithExternalDefinitions</dt>
             <dd>
               <em id="_R-AssociationOfCodeValuesWithExternalDefinitions">
                 <strong>Ability to associate a code value with externally managed definition</strong>
@@ -2269,7 +2463,7 @@ data:
                 tabular data with out an unambiguous definition of the code values used.</p>
               <p>It must be possible to unambiguously associate the notation used within a CSV file
                 with the appropriate external definition.</p>
-              <div class="note">
+              <div class="note"><div class="note-title" aria-level="4" role="heading" id="h_note_4"><span>Note</span></div><div class="">
                 <p>We cannot assume that the publisher of the CSV file will use a URI to reference the
                   code value; most likely they will use a local identifier that is unique within the
                   scope of a particular code list. For example, the Land Registry use the codes "A",
@@ -2282,7 +2476,7 @@ data:
                   <li>to determine the relevant entity within the code list using the notation
                     provided in the cell value.</li>
                 </ul>
-              </div>
+              </div></div>
               <p>
                 <strong>Motivation:</strong>
                 <a href="#UC-PublicationOfNationalStatistics">PublicationOfNationalStatistics</a>, 
@@ -2351,7 +2545,7 @@ data:
               </em>
               <p>supporting automated recognition of semantic type, typically expressed for each
                 column ... further description to be added</p>
-              <div class="note">
+              <div class="note"><div class="note-title" aria-level="4" role="heading" id="h_note_5"><span>Note</span></div><div class="">
                 <p>To express semantics in a machine readable form, RDF seems the appropriate choice.
                   Furthermore, best practice indicates that one should adopt common and widely adopted
                   patterns (e.g. RDF vocabularies, OWL ontologies) when publishing data to enable a
@@ -2362,13 +2556,12 @@ data:
                   we use an instance of <code>qudt:QuantityValue</code> to relate the numerical value
                   with the quantity kind (e.g. air temperature) and unit of measurement (e.g.
                   Celsius). Thus the semantics needed for a column containing temperature values might
-                  be: <code>qudt:value/qudt:numericValue</code> – more akin to a <a
-                    href="http://marmotta.apache.org/ldpath/language.html">LDPath</a>.</p>
+                  be: <code>qudt:value/qudt:numericValue</code> – more akin to a <a href="http://marmotta.apache.org/ldpath/language.html">LDPath</a>.</p>
                 <p>Furthermore, use of OWL axioms when defining a sub-property of
                   <code>qudt:value</code> would allow the quantity type and unit of measurement to
                   be inferred, with the column semantics then being specified as
                   <code>ex:temperature_Cel/qudt:numericValue</code>.</p>
-              </div>
+              </div></div>
               <p>
                 <strong>Motivation:</strong>
                 <a href="#UC-DigitalPreservationOfGovernmentRecords">DigitalPreservationOfGovernmentRecords</a>, 
@@ -2407,9 +2600,9 @@ data:
               <em id="_R-URIMapping">
                 <strong>Ability to map the values of a CSV row/column into corresponding URI (e.g. by concatenating those values with a prefix).</strong>
               </em>
-              <p class="note">Possibly partially covered by <a href="#R-ForeignKeyReferences">R-ForeignKeyReferences</a>, although here we do not aim at linking two CSV files,
+              <div class="note"><div class="note-title" aria-level="4" role="heading" id="h_note_6"><span>Note</span></div><p class="">Possibly partially covered by <a href="#R-ForeignKeyReferences">R-ForeignKeyReferences</a>, although here we do not aim at linking two CSV files,
                 and to <a href="#R-AssociationOfCodeValuesWithExternalDefinitions">R-AssociationOfCodeValuesWithExternalDefinitions</a> and
-                <a href="#R-ExternalDataDefinitionResource">R-ExternalDataDefinitionResource</a>, although here we talk explicitly about URIs.</p>
+                <a href="#R-ExternalDataDefinitionResource">R-ExternalDataDefinitionResource</a>, although here we talk explicitly about URIs.</p></div>
               <p>
                 <strong>Motivation:</strong>
                 <a href="#UC-AnalyzingScientificSpreadsheets">AnalyzingScientificSpreadsheets</a>,
@@ -2434,8 +2627,8 @@ data:
             </dd>
           </dl>
         </section>
-        <section id="can-req-metadata-discovery">
-          <h2>Requirements relating to metadata discovery</h2>
+        <section id="can-req-metadata-discovery" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+          <h4 aria-level="3" role="heading" id="h4_can-req-metadata-discovery"><span class="secno">4.2.3 </span>Requirements relating to metadata discovery</h4>
           <dl>
             <dt id="R-GroupingOfMultipleTables">R-GroupingOfMultipleTables</dt>
             <dd>
@@ -2465,22 +2658,22 @@ data:
             </dd>
           </dl>
         </section>
-        <section id="can-req-applications">
-          <h2>Requirements relating to applications</h2>
+        <section id="can-req-applications" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+          <h4 aria-level="3" role="heading" id="h4_can-req-applications"><span class="secno">4.2.4 </span>Requirements relating to applications</h4>
           <dl>
             <dt id="R-CsvValidation">R-CsvValidation</dt>
             <dd>
               <em id="_R-CsvValidation">
-                <strong>Ability to validate a CSV for conformance with a specified <a>DDR</a></strong>
+                <strong>Ability to validate a CSV for conformance with a specified <a href="#dfn-ddr" class="internalDFN">DDR</a></strong>
               </em>
               <p>The content of a CSV often needs to be validated for conformance against a
-                specification (e.g. a <a>DDR</a>).</p>
+                specification (e.g. a <a href="#dfn-ddr" class="internalDFN">DDR</a>).</p>
               <p>Validation shall assess conformance against structural definitions such as number of 
                 columns and the datatype for a given column. Further validation needs are to be 
                 determined. It is anticipated that validation may vary based on row-specific attributes 
                 such as the type of entity described in that row.</p>
               <p>
-                <p>
+                </p><p>
                   <strong>Dependency:</strong>
                   <a href="#R-WellFormedCsvCheck">R-WellFormedCsvCheck</a>
                 </p>
@@ -2492,7 +2685,7 @@ data:
                 <a href="#UC-DisplayingLocationsOfCareHomesOnAMap">DisplayingLocationsOfCareHomesOnAMap</a>,
                 <a href="#UC-NetCdFcDl">UC-NetCdFcDl</a>,
                 <a href="#UC-PaloAltoTreeData">UC-PaloAltoTreeData</a>
-              </p>
+              <p></p>
             </dd>
             <dt id="R-CsvToRdfTransformation">R-CsvToRdfTransformation</dt>
             <dd>
@@ -2505,18 +2698,15 @@ data:
                 file need to be converted to URIs. RDF properties (or <em>property paths</em>) need to
                 be determined to relate the entity described within a given row to the corresponding
                 data values for that row. Where available, the type of a data value should be
-                incorporated in the resulting RDF. Built-in types defined in [[rdf11-concepts]] (e.g.
+                incorporated in the resulting RDF. Built-in types defined in [<cite><a class="bibref" href="#bib-rdf11-concepts">rdf11-concepts</a></cite>] (e.g.
                 <code><a href="http://www.w3.org/2001/XMLSchema#dateTime">xsd:dateTime</a></code>,
                 <code><a href="http://www.w3.org/2001/XMLSchema#integer">xsd:integer</a></code>
-                etc.) and types defined in other RDF vocabularies / OWL ontologies (e.g. <code><a
-                  href="http://www.opengis.net/ont/geosparql#wktLiteral">geo:wktLiteral</a></code>
+                etc.) and types defined in other RDF vocabularies / OWL ontologies (e.g. <code><a href="http://www.opengis.net/ont/geosparql#wktLiteral">geo:wktLiteral</a></code>
                 from <a href="http://www.opengeospatial.org/standards/geosparql">GeoSPARQL</a>) shall
                 be supported.</p>
               <p>
                 <strong>Dependency:</strong>
-                <a href="#R-SemanticTypeDefinition">R-SemanticTypeDefinition</a>, <a
-                  href="#R-SyntacticTypeDefinition">R-SyntacticTypeDefinition</a>, <a
-                    href="#R-PrimaryKey">R-PrimaryKey</a>
+                <a href="#R-SemanticTypeDefinition">R-SemanticTypeDefinition</a>, <a href="#R-SyntacticTypeDefinition">R-SyntacticTypeDefinition</a>, <a href="#R-PrimaryKey">R-PrimaryKey</a>
               </p>
               <p>
                 <strong>Motivation:</strong>
@@ -2533,8 +2723,8 @@ data:
                 <strong>Ability to automatically transform a CSV into JSON</strong>
               </em>
               <p>Standardised CSV to JSON transformation mechanisms mitigate the need for bespoke transformation software to be developed by CSV data consumers,
-                thus simplifying the exploitation of CSV data<p>
-                  <p>
+                thus simplifying the exploitation of CSV data</p><p>
+                  </p><p>
                     <strong>Motivation:</strong>
                     <a href="#UC-DisplayingLocationsOfCareHomesOnAMap">DisplayingLocationsOfCareHomesOnAMap</a>,
                     <a href="#UC-CanonicalMappingOfCSV">CanonicalMappingOfCSV</a>, 
@@ -2567,12 +2757,12 @@ data:
 		possibility to directly access part of them, possibly by means of a pointer to a given row, cell or region.</p>
                 <strong>Motivation:</strong>
                 <a href="#UC-SupportingSemantic-basedRecommendations">SupportingSemantic-basedRecommendations</a>
-              </p>
+              <p></p>
             </dd>
           </dl>
         </section>
-        <section id="can-req-non-func">
-          <h2>Non-functional requirements</h2>
+        <section id="can-req-non-func" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter">
+          <h4 aria-level="3" role="heading" id="h4_can-req-non-func"><span class="secno">4.2.5 </span>Non-functional requirements</h4>
           <dl>
             <dt id="R-ZeroEditCompatibility">R-ZeroEditCompatibility</dt>
             <dd>
@@ -2581,15 +2771,14 @@ data:
               </em>
               <p>CSV+ format should be compatible, at least at a basic level, with the data analysis
                 tools in common usage. At a minimum, existing tools should be able to interpret CSV+
-                as though it were CSV (as defined in [[RFC4180]]).</p>
-              <div class="issue">
-                <p>Whilst we have a list of CSV tools emerging on the <a
-                  href="https://www.w3.org/2013/csvw/wiki/Tools">wiki</a> we are yet to define the
+                as though it were CSV (as defined in [<cite><a class="bibref" href="#bib-RFC4180">RFC4180</a></cite>]).</p>
+              <div class="issue"><div class="issue-title" aria-level="4" role="heading" id="h_issue_6"><span>Issue 6</span></div><div class="">
+                <p>Whilst we have a list of CSV tools emerging on the <a href="https://www.w3.org/2013/csvw/wiki/Tools">wiki</a> we are yet to define the
                   list of tools with which we expect, or aspire, to retain compatibility with.</p>
                 <p>We also do not have an authoritative set of conformance tests yet.</p>
-              </div>
+              </div></div>
               
-              <div class="issue">
+              <div class="issue"><div class="issue-title" aria-level="4" role="heading" id="h_issue_7"><span>Issue 7</span></div><div class="">
                 <p><em>Orphaned requirement as a result of re-editing use case: <a href="#UC-PublicationOfNationalStatistics">
                   PublicationOfNationalStatistics</a></em></p>
                 <p>This use case used to assert:</p>
@@ -2601,7 +2790,7 @@ data:
                   software, enabling a large swath of users to work with data provided in Microsoft Excel
                   Workbook format. It is important that compatibility, at least at a basic level, is
                   maintained with the data analysis tools in common usage.</em></p>
-              </div>
+              </div></div>
             </dd>
             <dt id="R-ZeroEditAdditionOfSupplementaryMetadata">R-ZeroEditAdditionOfSupplementaryMetadata</dt>
             <dd>
@@ -2621,5 +2810,10 @@ data:
 
       </section>
     </section>
-  </body>
-</html>
+  
+
+<section id="references" class="appendix" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter"><!--OddPage--><h2 aria-level="1" role="heading" id="h2_references"><span class="secno">A. </span>References</h2><section id="informative-references" typeof="bibo:Chapter" resource="#ref" rel="bibo:Chapter"><h3 aria-level="2" role="heading" id="h3_informative-references"><span class="secno">A.1 </span>Informative references</h3><dl class="bibliography" about=""><dt id="bib-RFC3986">[RFC3986]</dt><dd rel="dcterms:references">T. Berners-Lee; R. Fielding; L. Masinter. <a href="http://www.ietf.org/rfc/rfc3986.txt"><cite>Uniform Resource Identifier (URI): Generic Syntax (RFC 3986)</cite></a>. January 2005. RFC. URL: <a href="http://www.ietf.org/rfc/rfc3986.txt">http://www.ietf.org/rfc/rfc3986.txt</a>
+</dd><dt id="bib-RFC4180">[RFC4180]</dt><dd rel="dcterms:references">Y. Shafranovich. <a href="http://www.ietf.org/rfc/rfc4180.txt"> <cite>Common Format and MIME Type for Comma-Separated Values (CSV) Files</cite></a> October 2005. Internet RFC 3987. URL: <a href="http://www.ietf.org/rfc/rfc4180.txt">http://www.ietf.org/rfc/rfc4180.txt</a>
+</dd><dt id="bib-json-ld">[json-ld]</dt><dd rel="dcterms:references">Manu Sporny; Gregg Kellogg; Markus Lanthaler. <a href="http://www.w3.org/TR/json-ld/"><cite>JSON-LD 1.0</cite></a>. 16 January 2014. W3C Recommendation. URL: <a href="http://www.w3.org/TR/json-ld/">http://www.w3.org/TR/json-ld/</a>
+</dd><dt id="bib-rdf11-concepts">[rdf11-concepts]</dt><dd rel="dcterms:references">Richard Cyganiak; David Wood; Markus Lanthaler. <a href="http://www.w3.org/TR/rdf11-concepts/"><cite>RDF 1.1 Concepts and Abstract Syntax</cite></a>. W3C Recommendation. URL: <a href="http://www.w3.org/TR/rdf11-concepts/">http://www.w3.org/TR/rdf11-concepts/</a>
+</dd></dl></section></section></body></html>
