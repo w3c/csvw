@@ -12,18 +12,22 @@ var respecConfig = {
         "EBNF-NOTATION": "Tim Bray; Jean Paoli; C. M. Sperberg-McQueen; Eve Maler; François Yergeau. <a href=\"http://www.w3.org/TR/REC-xml/#sec-notation\"><cite>EBNF Notation</cite></a> 26 November 2008. W3C Recommendation. URL: <a href=\"http://www.w3.org/TR/REC-xml/#sec-notation\">http://www.w3.org/TR/REC-xml/#sec-notation</a>"
     },
     specStatus: "ED",
-    shortName: "tabular-syntax",
+    shortName: "tabular-model",
     //publishDate:  "2012-12-12",
     //previousPublishDate:  "",
     edDraftURI: "http://w3c.github.io/csvw/syntax/",
     // lcEnd: "3000-01-01",
     // crEnd: "3000-01-01",
     editors: [{
-            name: "Jeni Tennison",
-            company: "ODI",
-            companyURL: "http://www.theodi.org/"
-        }, { name: "Gregg Kellogg", url: "http://greggkellogg.net/",
-            company: "Kellogg Associates", companyURL: "http://kellogg-assoc.com/" }],
+      name: "Jeni Tennison",
+      company: "Open Data Institute",
+      companyURL: "http://www.theodi.org/"
+    }, { 
+      name: "Gregg Kellogg", 
+      url: "http://greggkellogg.net/",
+      company: "Kellogg Associates", 
+      companyURL: "http://kellogg-assoc.com/" 
+    }],
     wg: "CSV on the Web Working Group",
     wgURI: "https://www.w3.org/2013/csvw/",
     wgPublicList: "public-csv-wg",
@@ -48,7 +52,6 @@ var respecConfig = {
     noLegacyStyle: false
     };
     </script>
-    <link href="editorial.css" rel="stylesheet" type="text/css" />
     <style type="text/css">
       .grammar td { font-family: monospace; vertical-align: top; }
       .grammar-literal { color: gray;}
@@ -57,12 +60,12 @@ var respecConfig = {
   <body>
     <section id="abstract">
       <p>
-        Tabular data is routinely transferred on the web as "CSV", but the definition of "CSV" in practice is very loose. This document outlines a basic data model or infoset for tabular data, and a best practice syntax for mapping into that data model.
+        Tabular data is routinely transferred on the web as "CSV", but the definition of "CSV" in practice is very loose. This document outlines a basic data model or infoset for tabular data and metadata about that tabular data. It also contains some non-normative information about a best practice syntax for tabular data, for mapping into that data model, to contribute to the standardisation of CSV syntax by IETF. Various methods of locating metadata are also provided.
       </p>
     </section>
     <section id="sotd">
       <p>
-        This is a draft document which may be merged into another document or eventually make its way into being a standalone Working Draft.
+        This is a draft document which may be merged into another document or eventually make its way into being a standalone Working Draft. Non-normative sections of this document will remain non-normative.
       </p>
     </section>
     <section id="intro">
@@ -147,6 +150,84 @@ var respecConfig = {
         </p>
         <p class="note">
           Tables can be loosely related to each other simply through annotations; not all tables that are related to each other need to grouped together. Groups of tables are useful because they can be annotated with metadata that applies to all the tables in the group.
+        </p>
+      </section>
+    </section>
+    <section id="metadata">
+      <h2>Locating Metadata</h2>
+      <p>
+        As described in <a href="#annotated-model" class="sectionRef"></a>, tabular data may have a number of annotations associated with it. Here we describe the different methods that can be used to locate those annotations given a link to a CSV file.
+      </p>
+      <p>
+        In most methods of locating metadata described here, metadata is provided within a separate document. The syntax of this document is not defined here, but these documents can include things like:
+      </p>
+      <ul>
+        <li>metadata about the table, such as titles, descriptions, provenance, and links to other tables</li>
+        <li>metadata about columns in the table, such as labels, data types and other constraints, or flags to indicate values in the column are unique</li>
+        <li>metadata about rows in the table, such as certainty or provenance</li>
+        <li>metadata about values in the table, such as notes or type annotations</li>
+      </ul>
+      <p>
+        When creating a set of annotations from metadata, if the same property is specified in two locations then information closer to the document itself should override information further from the document. Explicitly, the order of preference is:
+      </p>
+      <ol>
+        <li>metadata embedded within the tabular data file itself, see <a href="#embedded-metadata" class="sectionRef"></a></li>
+        <li>metadata in a document linked to from a reference within the tabular data file, see <a href="#embedded-link" class="sectionRef"></a></li>
+        <li>metadata within a package that the tabular data file belongs to, see <a href="#package" class="sectionRef"></a></li>
+        <li>metadata in a document linked to using a <code>Link</code> header when retrieving the tabular data file, see <a href="#link-header" class="sectionRef"></a></li>
+        <li>metadata in a document located through a standard path from the tabular data file, see <a href="#standard-path" class="sectionRef"></a></li>
+      </ol>
+      <section id="embedded-metadata">
+        <h3>Embedded Metadata</h3>
+        <p>
+          Metadata may be directly embedded within a CSV file.
+        </p>
+        <p class="issue">
+          What should the syntax be for embedding metadata within a CSV file? An example approach is shown in <a href="http://jenit.github.io/linked-csv/">Linked CSV</a>. If this is allowed we should specify a new media type for the syntax.
+        </p>
+      </section>
+      <section id="embedded-link">
+        <h3>Embedded Link</h3>
+        <p>
+          A link to the metadata to be used with a CSV may be indicated within the CSV file itself.
+        </p>
+        <div class="issue">
+          <p>
+            How should a link be embedded? Perhaps something like:
+          </p>
+          <pre>
+#CSV;metadata=<var>link</var>
+          </pre>
+          <p>
+            as the first line? If this is allowed we should specify a new media type for the syntax.
+          </p>
+        </div>
+      </section>
+      <section id="package">
+        <h3>Package</h3>
+        <p>
+          Rather than providing CSV files directly on the web, they can be packaged up with a metadata file that includes annotations, and any other relevant CSV files.
+        </p>
+        <p class="issue">
+          What should that package look like? Just a zip? A multipart document? How is the metadata file within it identified? If this is allowed we should specify a new media type for the package.
+        </p>
+      </section>
+      <section id="link-header">
+        <h3>Link Header</h3>
+        <p>
+          When retrieving a CSV file via HTTP, the response can include a <code>Link</code> header with <code>rel=describedby</code> that points to a metadata file that describes the CSV file.
+        </p>
+        <p class="issue">
+          Is <code>rel=describedby</code> the right link relation to use?
+        </p>
+      </section>
+      <section id="standard-path">
+        <h3>Standard Path</h3>
+        <p>
+          When retrieving a CSV file via HTTP, the default location for a metadata file that describes that CSV file is set to <code>csv-metadata</code> in the same directory. If this metadata file does not explicitly point to the relevant CSV file then it MUST be ignored.
+        </p>
+        <p class="issue">
+          Deliberately not included a suffix here, because we haven't decided what format metadata documents should be in, or even if they should be conneg'd. Probably best for the file to be in the same directory as the CSV file, so that you can have one metadata document that describes a lot of them. Should there be a default navigational thing of continuing up the path hierarchy until you find a metadata document?
         </p>
       </section>
     </section>
