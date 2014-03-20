@@ -26,7 +26,9 @@ the ``/publishing-snapshot`` directory contains specific milestone publications,
 	1. Use the [W3C pub rules checker](http://www.w3.org/2005/07/pubrules) with this URI to check the validity of the document. If there are problems, go back to the first step.
 1. Once all pubrule issues are solved, you are ready. The next step is for the staff contact to make a copy of the snapshot and put it on the W3C server at ``http://www.w3.org/TR/2014/...``
 
-This process is based on the assumption that the ``index.html`` (i.e., ``respec`` format) differs from the final document only in terms of the specification status and the date. If that is not the case, then a local copy of the file has to be added to the snapshot and be manipulated locally in that directory.
+This process is based on the assumption that the ``index.html`` (i.e., ``respec`` format) differs from the final document only in terms of the specification status and the date. If that is not the case, then a local copy of the file has to be added to the snapshot and be manipulated locally in that directory; of course, in that case the simplest is to set the ``specStatus`` locally. The danger of course is to loose sync with the "master" copy.
+
+The process may become slightly simpler if you run a local Web server on your machine that has an access to the local github repository. Indeed, in that case step 4.2. can be ommitted, i.e., the ``Overview.html`` file can be generated locally. Alternatively, you may choose to make a local copy of the ``index.html`` file and open the file from your browser locally. Again, the danger, in this case, is to loose sync with the "master" copy.
  
 
 	 
