@@ -4,7 +4,7 @@ The working directories are on the 'top level', like ``/syntax``. The ``index.ht
 
 	specStatus: "ED",
 	// publishDate: "",
-	previousPublishDate: 2014-03-04, // whatever is appropriate, or "" for a FPWD
+	previousPublishDate: "2014-03-04", // whatever is appropriate, commented for a FPWD
 
 the ``/publishing-snapshot`` directory contains specific milestone publications, e.g., ``FPWD-syntax`` or, later, ``WD-syntax-2014-XX-XX`` for a copy of what is officially published at W3C. This means all the relevant data files from ``/syntax``, plus a **generated** ``Overview.html`` file as a pure HTML5 file (i.e., not a ``respec`` source).
 
