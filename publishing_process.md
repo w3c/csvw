@@ -10,7 +10,7 @@ the ``/publishing-snapshot`` directory contains specific milestone publications,
 
 ## The publication process
 
-(Obviously, all these steps are typically done in your local repo and then committed to github when appropriate.)
+(Obviously, many of these steps are typically done in your local repo and then committed to github when appropriate.)
 
 1. Create a new subdirectory in ``/publishing-snapshot``, say, ``publishing-snapshot/WD-syntax-2014-12-12``. 
 2. Copy all the auxiliary files (e.g., data files, BNF files, etc) from the main repo area.
@@ -19,16 +19,17 @@ the ``/publishing-snapshot`` directory contains specific milestone publications,
 	1. Finalize/change the ``index.html`` file in ``/syntax``
 	1. Commit all the files to github
 	1. From your Web browser, use the following URI: ``http://w3c.github.io/csvw/syntax/index.html?specStatus=WD;publishDate=2014-12-12`` (note the URI parameters to set the ``specStatus`` and ``publishDate`` values!). You should see the final format on your screen.
-	1. Check whether ``respec`` signals a possible problem (a red button should appear on the upper right hand corner in that case.)
-	1. Push the button called ``respec`` on the upper right hand corner, choose ``Save Snapshot``, then ``Save as HTML``. You should see the HTML source in your screen.
+	1. Check whether ``respec`` signals a possible problem (a red or orange button should appear on the upper right hand corner for errors or warnings, respectively).
+	1. Push the button called ``respec`` on the upper right hand corner, choose ``Save Snapshot``, then ``Save as HTML``. You should either see the HTML source in your screen (e.g., in Safari or IE) or asked to download the HTML file on your disk.
 	1. Create/update a file called ``Overview.html`` file in the snapshot directory, and commit it to github
 	1. ``http://w3c.github.io/csvw/publishing-snapshots/WD-syntax=2014-12-12/Overview.html`` is a local copy of the publication-to-be in pure HTML
 	1. Use the [W3C pub rules checker](http://www.w3.org/2005/07/pubrules) with this URI to check the validity of the document. If there are problems, go back to the first step.
 1. Once all pubrule issues are solved, you are ready. The next step is for the staff contact to make a copy of the snapshot and put it on the W3C server at ``http://www.w3.org/TR/2014/...``
 
-This process is based on the assumption that the ``index.html`` (i.e., ``respec`` format) differs from the final document only in terms of the specification status and the date. If that is not the case, then a local copy of the file has to be added to the snapshot and be manipulated locally in that directory; of course, in that case the simplest is to set the ``specStatus`` locally. The danger of course is to loose sync with the "master" copy.
+The process may become slightly simpler if you run a local Web server on your machine that has an access to the local github repository. Indeed, in that case step 4.2. can be omitted, i.e., the ``Overview.html`` file can be generated locally. Alternatively, you may choose to make a local copy of ``index.html`` and open the file from your browser locally. The danger, in this case, is to loose sync with the "master" copy.
 
-The process may become slightly simpler if you run a local Web server on your machine that has an access to the local github repository. Indeed, in that case step 4.2. can be ommitted, i.e., the ``Overview.html`` file can be generated locally. Alternatively, you may choose to make a local copy of the ``index.html`` file and open the file from your browser locally. Again, the danger, in this case, is to loose sync with the "master" copy.
+This process is based on the assumption that ``index.html`` (i.e., ``respec`` format) differs from the final document only in terms of the specification status and date (or other configuration option that can be set in the URI). If that is not the case, then a local copy of the file has to be added to the snapshot and be manipulated in that directory; of course, in that case the simplest is to set the ``specStatus`` and other options in that copy. Again, the danger of course is to loose sync with the "master" copy.
+
  
 
 	 
