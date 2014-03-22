@@ -24,6 +24,13 @@ the ``/publishing-snapshot`` directory contains specific milestone publications,
 	1. Create/update a file called ``Overview.html`` file in the snapshot directory, and commit it to github
 	1. ``http://w3c.github.io/csvw/publishing-snapshots/WD-syntax=2014-12-12/Overview.html`` is a local copy of the publication-to-be in pure HTML
 	1. Use the [W3C pub rules checker](http://www.w3.org/2005/07/pubrules) with this URI to check the validity of the document. If there are problems, go back to the first step.
+1. Generate diff from previous version:
+  1. Use <ALT><SHIFT><CTRL>S key sequence to bring up dialog.
+  1. Select "Diff" to generate diff from previous version.
+  1. Save diff to publication directory using path set in `otherLinks/Changes/Diff to previous version/href`.
+1. Update working version of file:
+  1. Set `otherLinks/Changes/Diff to previous version/href` based on last publication date.
+  1. Update `previousPublishDate`, `previousSpecStatus` and `previousURI` to based on publication snapshot.
 1. Once all pubrule issues are solved, you are ready. The next step is for the staff contact to make a copy of the snapshot and put it on the W3C server at ``http://www.w3.org/TR/2014/...``
 
 The process may become slightly simpler if you run a local Web server on your machine that has an access to the local github repository. Indeed, in that case step 4.2. can be omitted, i.e., the ``Overview.html`` file can be generated locally. Alternatively, you may choose to make a local copy of ``index.html`` and open the file from your browser locally. The danger, in this case, is to loose sync with the "master" copy.
