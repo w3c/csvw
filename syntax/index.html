@@ -111,7 +111,7 @@ var respecConfig = {
       <section id="annotated-model">
         <h3>Annotated Data Model</h3>
         <p>
-          An <dfn>annotated table</dfn> is a <a>table</a> that is annotated with additional metadata. The table has a number of <dfn title="property">properties</dfn> which provide additional information about the table as a whole. The <dfn title="value">values</dfn> of these properties may be lists, structured objects, or atomic values. Annotations on a table may include:
+          An <dfn>annotated table</dfn> is a <a>table</a> that is annotated with additional metadata. The table MAY have any number of <dfn title="property">properties</dfn> which provide additional information about the table as a whole. The <dfn title="value">values</dfn> of these properties may be lists, structured objects, or atomic values. Annotations on a table may include:
         </p>
         <ul>
           <li>titles or descriptions of the table</li>
@@ -119,7 +119,7 @@ var respecConfig = {
           <li>links to other tables (eg to indicate tables that include related information)</li>
         </ul>
         <p>
-          The <a title="column">columns</a> within an <a>annotated table</a> are all <dfn title="annotated column">annotated columns</dfn>. The annotations on a column provide information about how to interpret the <a title="field">fields</a> in the column.
+          The <a title="column">columns</a> within an <a>annotated table</a> are all <dfn title="annotated column">annotated columns</dfn>: columns which MAY have any number of <a title="property">properties</a>. The annotations on a column provide information about how to interpret the <a title="field">fields</a> in the column. Examples of annotations might be:
         </p>
         <ul>
           <li>a name or label for the column</li>
@@ -127,14 +127,14 @@ var respecConfig = {
           <li>an indication of whether the column contains unique values</li>
         </ul>
         <p>
-          The <a title="row">rows</a> within an <a>annotated table</a> are all <dfn title="annotated row">annotated rows</dfn>. The annotations on a row provide additional metadata about the information held in the row, such as:
+          The <a title="row">rows</a> within an <a>annotated table</a> are all <dfn title="annotated row">annotated rows</dfn>: rows which MAY have any number of <a title="property">properties</a>. The annotations on a row provide additional metadata about the information held in the row, such as:
         </p>
         <ul>
           <li>the certainty of the information in that row</li>
           <li>information about the source or provenance of the data in that row</li>
         </ul>
         <p>
-          The <a title="field">fields</a> within an <a>annotated row</a> are all <dfn title="annotated field">annotated fields</dfn>. The annotations on a field provide metadata about the value held in the field, particularly when this overrides the information provided for the <a>annotated column</a> and <a>annotated row</a> that the field falls within. Annotations on a field might be:
+          The <a title="field">fields</a> within an <a>annotated row</a> are all <dfn title="annotated field">annotated fields</dfn>: fields which MAY have any number of <a title="property">properties</a>. The annotations on a field provide metadata about the value held in the field, particularly when this overrides the information provided for the <a>annotated column</a> and <a>annotated row</a> that the field falls within. Annotations on a field might be:
         </p>
         <ul>
           <li>notes to aid the interpretation of the value</li>
@@ -186,13 +186,19 @@ var respecConfig = {
         <li>metadata in a document linked to using a <code>Link</code> header when retrieving the tabular data file, see <a href="#link-header" class="sectionRef"></a></li>
         <li>metadata in a document located through a standard path from the tabular data file, see <a href="#standard-path" class="sectionRef"></a></li>
       </ol>
+      <p class="issue">
+        We probably need to add some rules about conflicts as well. For example, if a metadata file says that the CSV should contain certain columns but the names of the columns are different in the CSV file itself, is this an error?
+      </p>
       <section id="embedded-metadata">
         <h3>Embedded Metadata</h3>
         <p>
-          Metadata may be directly embedded within a CSV file.
+          Metadata MAY be directly embedded within a CSV file, as described here.
+        </p>
+        <p>
+          The first line of a CSV+ file MUST be processed as a header line unless the CSV+ file is served with a <code>header=absent</code> parameter on the media type. Each non-null field in the header line provides a <strong>name</strong> annotation on the column in which it appears.
         </p>
         <p class="issue">
-          What should the syntax be for embedding metadata within a CSV file? An example approach is shown in <a href="http://jenit.github.io/linked-csv/">Linked CSV</a>. If this is allowed we should specify a new media type for the syntax.
+          Should we support any other embedding of metadata within a CSV file? An example approach is shown in <a href="http://jenit.github.io/linked-csv/">Linked CSV</a>. If this is allowed we should specify a new media type for the syntax.
         </p>
       </section>
       <section id="embedded-link">
@@ -224,19 +230,25 @@ var respecConfig = {
       <section id="link-header">
         <h3>Link Header</h3>
         <p>
-          When retrieving a CSV file via HTTP, the response can include a <code>Link</code> header with <code>rel=describedby</code> that points to a metadata file that describes the CSV file.
+          When retrieving a CSV file via HTTP, the response can include a <code>Link</code> header with <code>rel=describedby</code> that points to a metadata file that describes the CSV file. If, by inspection, the referenced file is not a valid metadata file then it MUST be ignored. If there is more than one valid metadata file linked to through multiple <code>Link</code> headers, then the metadata referenced by <code>Link</code> headers that appear later in the response override that referenced by earlier <code>Link</code> headers.
         </p>
         <p class="issue">
-          Is <code>rel=describedby</code> the right link relation to use?
+          Is <a href="http://www.w3.org/TR/powder-dr/#appD"><code>rel=describedby</code></a> the right link relation to use?
         </p>
       </section>
       <section id="standard-path">
         <h3>Standard Path</h3>
         <p>
-          When retrieving a CSV file via HTTP, the default location for a metadata file that describes that CSV file is set to <code>csv-metadata</code> in the same directory. If this metadata file does not explicitly point to the relevant CSV file then it MUST be ignored.
+          Given a CSV file, the default location for a metadata file that describes that CSV file is set to <code><var>filename</var>.csvm</code> in the same directory. If that file does not exist, then the application should look for a metadata file at <code>metadata.csvm</code> in the same directory. In both cases, if the metadata file does not explicitly point to the relevant CSV file then it MUST be ignored.
         </p>
         <p class="issue">
-          Deliberately not included a suffix here, because we haven't decided what format metadata documents should be in, or even if they should be conneg'd. Probably best for the file to be in the same directory as the CSV file, so that you can have one metadata document that describes a lot of them. Should there be a default navigational thing of continuing up the path hierarchy until you find a metadata document?
+          Used a suffix on filenames to find metadata about them, though we haven't decided what format metadata documents should be in, or even if they should be conneg'd.
+        </p>
+        <p class="issue">
+          Should there be a default navigational thing of continuing up the path hierarchy until you find a metadata document?
+        </p>
+        <p class="issue">
+          We have discussed using a <code>.well-known</code> location or something within a sitemap file to provide the location of a metadata file about a given CSV file, but these are just as unlikely to be editable as a <code>Link</code> header, so probably don't address the use case that the standard path method addresses, of being a really simple way to provide metadata about a CSV file.
         </p>
       </section>
     </section>
