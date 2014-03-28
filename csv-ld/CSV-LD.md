@@ -62,6 +62,8 @@ CSV-LD is defined within a standard JSON-LD document where string values may tak
 
 A _field reference_ may be used singly, or in combination with other field references within a pattern. A _field reference_ may be used in some structure such as an expanded value definition (although this may be redundant, if the term definition defines `@type`). The `@` form within a reference is used to extract metadata about the record or field: `@rowno` expands to the current row number from the table, `@colno=1` expands to the value of the field in the current record in the first column. `@term@colno` expands to the column number of the field referenced by `term`.
 
+If a pattern resolves to a string in the form of an Boolean, Integer, Decimal, or Floating Point value (as defined by their XSD datatype definitions), the pattern is replaced with that value. However, if the term referencing defines a @type, or the pattern is contained within an expanded value form having an @type, that type is used to coerce the pattern.
+
 If a pattern references an undefined field, the entire pattern evaluates to `null`, which when expanded in JSON-LD, causes the associated key/value to be removed. This can be useful when a single _mapping frame_ is used for multiple tables, where some tables may include different data than others.
 
 If a pattern is used as the value of `@id`, and that pattern resolves to `null`, the entire node definition is replaced with `null`.
