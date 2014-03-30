@@ -20,17 +20,17 @@ var respecConfig = {
     edDraftURI: "http://w3c.github.io/csvw/csv2rdf/",
     // lcEnd: "3000-01-01",
     // crEnd: "3000-01-01",
-    editors: [{name: "To be decided"}] ,
-    // [{
-    //   name: "Andy Seaborne"
-    //   , company: "Apache Software Foundation"
-    //   //, companyURL: ""
+    editors:
+     [{
+       name: "Andy Seaborne"
+       , company: "Apache Software Foundation"
+       , companyURL: ""
     // }, { 
     //   name: "Gregg Kellogg", 
     //   url: "http://greggkellogg.net/",
     //   company: "Kellogg Associates", 
     //   companyURL: "http://kellogg-assoc.com/" 
-    // }],
+    }],
     wg: "CSV on the Web Working Group",
     wgURI: "http://www.w3.org/2013/csvw/",
     wgPublicList: "public-csv-wg",
@@ -95,6 +95,128 @@ var respecConfig = {
       <p>
 		CSV RFC [[!RFC4180]] (to be revised).
       </p>
+
+      <p>
+        There are 2 different level of conversion, increasing levels of facilities:
+      </p>
+
+      <ul>
+        <li>Column mapping - each column is a predicate or a key.  Each
+          cell in a predicate column is converted to an RDF triples.  A key, if
+          present, provides the subject of the triples for a row.
+        </li>
+        <li>?? Mapping</li>
+        <li>CSV-LD for JSON-LD</li>
+      </ul>
+    </section>
+
+    <section id="examples">
+      <h2>Examples</h2>
+        
+      <section>
+        <h3>Example 1</h3>
+        <pre>GID,On Street,Species,Trim Cycle,Inventory Date
+1,ADDISON AV,Celtis australis,Large Tree Routine Prune,10/18/2010
+2,EMERSON ST,Liquidambar styraciflua,Large Tree Routine Prune,6/2/2010
+3,EMERSON ST,Liquidambar styraciflua,Large Tree Routine Prune,6/2/2010
+        </pre>
+        <p>gives the following RDF (in Turtle) for the data rows.</p>
+        <pre>
+# Data rows
+[ csv:row 2 ;
+  :GID 1;
+  :On%20Street "ADDISON AV";
+  :Species "Celtis australis";
+  :Trim%20Cycle "Large Tree Routine Prune";
+  :Inventory%20Date "10/18/2010"
+] .
+[ csv:row 3 ;
+  :GID 2;
+  :On%20Street "EMERSON ST";
+  :Species "Liquidambar styraciflua";
+  :Trim%20Cycle "Large Tree Routine Prune";
+  :Inventory%20Date "6/2/2010"
+] .
+[ csv:row 4 ;
+  :GID 3;
+  :On%20Street "EMERSON ST";
+  :Species "Liquidambar styraciflua";
+  :Trim%20Cycle "Large Tree Routine Prune";
+  :Inventory%20Date "6/2/2010"
+] .
+    </pre>
+        <p>In the full Column Mapping, metadata about the translation
+            applied is also included.
+        </p>
+          
+      </section>
+    </section>
+
+    <section id="column-mapping">
+      <h2>Column Mapping</h2>
+
+      <a href="https://www.w3.org/2013/csvw/wiki/CSV2RDF">CSV2RDF on the WG wiki</a>
+
+      <p>In column mapping, each row of the input tabular data is
+        translated to a number of triples, which with the same subject.
+      </p>
+
+      <p>In the absence of any column annotations for datatypes, cells will be
+        inspected to guess one of the types:
+      </p>
+      <ul>
+        <li>Numbers: integer, decimal or double</li>
+        <li>Boolean</li>
+      </ul>
+      <p>otherwise the cell value is processed as a string.</p>
+
+      <section>
+        <h3>Annotation</h3>
+
+        <p>Annotations may provide:</p>
+        <ul>
+          <li>Identify a column as a key, which together with a a URI
+            template, generates the subject used for triples for each row.
+          </li>
+          <li>Predicate to use for each non-key column</li>
+          <li>Datatypes for cells in the column. String that do not match the
+          expected form of the datatype are left as strings.</li>
+        </ul>
+
+        <div class="issue">How far to go with generating URI - whole
+          separate section?</div>
+
+      </section>
+
+
+      <section>
+        <h3>Determining Column Processing</h3>
+      </section>
+
+
+      <section>
+        <h3>Data Conversion</h3>
+      </section>
+
+    </section>
+
+    <section> <!-- id = ?? -->
+      <h2>Further Mapping</h2>
+      <p>
+        In this section, we describe mapping that goes beyond the 
+        column mapping described above.  The RDF triples may not correspond
+        simply to the rows of the input Annotated Tabular Data Model.
+      </p>
+      <div class="issue">Multi-table?</div>
+    </section>
+
+    <section id="csv-ld">
+      <p>
+        A further procedure mapping to JSON-LD.
+      </p>
+      
+      <div class="issue">Better as a separate document?</div>
+      
     </section>
 
   </body>
