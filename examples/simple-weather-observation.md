@@ -75,9 +75,9 @@ From this example, you can see that the relationship between the row subject (e.
 instance) and the values provided within the row is comprised of multiple triples by way of blank nodes.
  
 Using [LDPath][] syntax:
-* column "Date-time" maps to "ssn:observationSamplingTime/time:inXSDDateTime"
-* column "Air temperature (Cel)" maps to "ssn:observationResult/def-op:airTemperature_C/qudt:numericValue"
-* column "Dew-point temperature (Cel)" maps to "ssn:observationResult/def-op:dewPointTemperature_C/qudt:numericValue"
+* column `Date-time` maps to `ssn:observationSamplingTime/time:inXSDDateTime`
+* column `Air temperature (Cel)` maps to `ssn:observationResult/def-op:airTemperature_C/qudt:numericValue`
+* column `Dew-point temperature (Cel)` maps to `ssn:observationResult/def-op:dewPointTemperature_C/qudt:numericValue`
 
   [LDPath]: http://marmotta.apache.org/ldpath/language.html 
 
