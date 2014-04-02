@@ -1,4 +1,5 @@
-# Simple weather observation example
+Simple weather observation example
+==================================
 
 Example based on simple weather observation of air temperature and dew-point temperature at 
 fixed point location, with intent to map the tabular data to [Semantic Sensor Network (SSN)][ssn] 
@@ -11,7 +12,7 @@ not yet publish its data like this and I want to avoid confusion.
   [qudt]: http://qudt.org
   [wow]: http://wow.metoffice.gov.uk
  
-Tabular encoding:
+<h2 id="tabular-encoding">Tabular encoding</h2>
  
 <table>
   <tr><th>Date-time</th><th>Air temperature (Cel)</th><th>Dew-point temperature (Cel)</th></tr>
@@ -19,6 +20,8 @@ Tabular encoding:
   <tr><td>2013-12-13T09:00:00Z</td><td>12.0</td><td>10.2</td></tr>
 </table>
  
+<h2 id="rdf-encoding">RDF encoding</h2>
+
 (RDF is provided in TTL encoding)
  
 First of all, let’s establish a base URI for the dataset and uniquely identify each observation 
@@ -39,7 +42,113 @@ Second, let’s assume that because every observation in this tabular data set r
 point location and sensor, this “metadata” (e.g. ssn:featureOfInterest and ssn:observedBy properties) 
 is provided as annotation at the table level – and is out of scope of this particular example.
  
-Also, note that I can establish some local (OWL) object property definitions as sub-properties of 
+The actual weather observations themselves, using 
+[locally defined object properties for the observed quantity](#local-defs) are encoded as follows:
+ 
+    @base               <http://data.example.org/wow/data/weather-observations/> .
+    @prefix ssn:        <http://purl.oclc.org/NET/ssnx/ssn#> .
+    @prefix time:       <http://www.w3.org/2006/time#> .
+    @prefix xsd:        <http://www.w3.org/2001/XMLSchema#> . 
+    @prefix qudt:       <http://qudt.org/1.1/schema/qudt#> .
+    @prefix def-op:     <http://data.example.org/wow/def/observed-property#> .
+     
+    <site/22580943/date-time/20131213T0800Z>
+        a ssn:Observation ;
+        ssn:observationSamplingTime [ time:inXSDDateTime "2013-12-13T08:00:00Z"^^xsd:dateTime ] ;
+        ssn:observationResult [
+            a ssn:SensorOutput ;
+            def-op:airTemperature_C [ qudt:numericValue "11.2"^^xsd:double ] ;
+            def-op:dewPointTemperature_C [ qudt:numericValue "10.2"^^xsd:double ] ] .
+     
+    <site/22580943/date-time/20131213T0900Z>
+        a ssn:Observation ;
+        ssn:observationSamplingTime [ time:inXSDDateTime "2013-12-13T09:00:00Z"^^xsd:dateTime ] ;
+        ssn:observationResult [
+            a ssn:SensorOutput ;
+            def-op:airTemperature_C [ qudt:numericValue "12.0"^^xsd:double ] ;
+            def-op:dewPointTemperature_C [ qudt:numericValue "10.2"^^xsd:double ] ] .
+     
+<h2 id="relationships">Interpretting column headings</h2>
+
+From this example, you can see that the relationship between the row subject (e.g. the observation 
+instance) and the values provided within the row is comprised of multiple triples by way of blank nodes.
+ 
+Using [LDPath][] syntax:
+* column "Date-time" maps to "ssn:observationSamplingTime/time:inXSDDateTime"
+* column "Air temperature (Cel)" maps to "ssn:observationResult/def-op:airTemperature_C/qudt:numericValue"
+* column "Dew-point temperature (Cel)" maps to "ssn:observationResult/def-op:dewPointTemperature_C/qudt:numericValue"
+
+  [LDPath]: http://marmotta.apache.org/ldpath/language.html 
+
+<h2 id="json-ld-encoding">JSON-LD encoding</h2>
+
+The data expressed in JSON-LD (_please forgive errors owing to manual conversion!_) becomes:
+ 
+    {
+      "@context": {
+          "@base": "http://data.example.org/wow/data/weather-observations/",
+          "ssn":  "http://purl.oclc.org/NET/ssnx/ssn#",
+          "time": "http://www.w3.org/2006/time#",
+          "xsd": "http://www.w3.org/2001/XMLSchema#", 
+          "qudt": "http://qudt.org/1.1/schema/qudt#",
+          "def-op": "http://data.example.org/wow/def/observed-property#",
+          "phenomenonTime": { "@id": "ssn:observationSamplingTime", "@type": "time:Instant"},
+          "datetime": { "@id": "time:inXSDDateTime", "@type": "xsd:dateTime" },
+          "result": { "@id": "ssn:observationResult", "@type": "ssn:SensorOutput" },
+          "value": { "@id": "qudt:numericValue", "@type": "xsd:double" }
+      },
+      "@graph": [{
+          "@id": "site/22580943/date-time/20131213T0800Z",
+          "@type": "ssn:Observation",
+          "phenomenonTime": { "datetime": "2013-12-13T08:00:00Z" },
+          "result": {
+              "def-op:airTemperature_C": { "value": "11.2" },
+              "def-op:dewPointTemperature_C": { "value": "10.2" }
+          }
+      }, {
+          "@id": "site/22580943/date-time/20131213T0900Z",
+          "@type": "ssn:Observation",
+          "phenomenonTime": { "datetime": "2013-12-13T09:00:00Z" },
+          "result": {
+              "def-op:airTemperature_C": { "value": "12.0" },
+              "def-op:dewPointTemperature_C": { "value": "10.2" }
+          }
+      }]
+    }
+ 
+<h2 id="mapping-frame">CSV-LD mapping frame (guestimate)</h2>
+
+Looking at [Greg’s CSV-LD proposal][csv-ld], I think that the _mapping frame_ for this 
+example would be (_noting that I have made no attempt to apply string functions to modify 
+the ISO 8601 date-time to the simpler syntax I used for the observation identifier_):
+
+  [csv-ld]: https://github.com/w3c/csvw/blob/gh-pages/csv-ld/CSV-LD.md
+ 
+    {
+      "@context": {
+          "@base": "http://data.example.org/wow/data/weather-observations/",
+          "ssn":  "http://purl.oclc.org/NET/ssnx/ssn#",
+          "time": "http://www.w3.org/2006/time#",
+          "xsd": "http://www.w3.org/2001/XMLSchema#", 
+          "qudt": "http://qudt.org/1.1/schema/qudt#",
+          "def-op": "http://data.example.org/wow/def/observed-property#",
+          "phenomenonTime": { "@id": "ssn:observationSamplingTime", "@type": "time:Instant"},
+          "datetime": { "@id": "time:inXSDDateTime", "@type": "xsd:dateTime" },
+          "result": { "@id": "ssn:observationResult", "@type": "ssn:SensorOutput" },
+          "value": { "@id": "qudt:numericValue", "@type": "xsd:double" }
+      }, 
+      "@id": "site/22580943/date-time/{Date-time}",
+      "@type": "ssn:Observation",
+      "phenomenonTime": { "datetime": "{Date-time}" },
+      "result": {
+          "def-op:airTemperature_C": { "value": "{Air temperature (Cel)}" },
+          "def-op:dewPointTemperature_C": { "value": "{Dew-point temperature (Cel)}" }
+      }
+    }
+
+<h2 id="local-defs">Local object property definitions</h2>
+
+Note that I created some local (OWL) object property definitions as sub-properties of 
 qudt:value that are tightly bound to specific quantity kinds (e.g. air temperature and dew-point 
 temperature) and unit of measurement (e.g. Celsius). Whilst this is not a central element of the 
 example, it is important to show that these assertions can be easily included in the resulting RDF 
@@ -115,99 +224,3 @@ by inference from OWL axioms rather than having to express it in the data itself
             owl:onProperty qudt:quantityKind ;
             owl:hasValue <http://codes.wmo.int/common/c-15/me/dewPointTemperature> ] .
      
-The actual weather observations themselves are encoded as follows:
- 
-    @base               <http://data.example.org/wow/data/weather-observations/> .
-    @prefix ssn:        <http://purl.oclc.org/NET/ssnx/ssn#> .
-    @prefix time:       <http://www.w3.org/2006/time#> .
-    @prefix xsd:        <http://www.w3.org/2001/XMLSchema#> . 
-    @prefix qudt:       <http://qudt.org/1.1/schema/qudt#> .
-    @prefix def-op:     <http://data.example.org/wow/def/observed-property#> .
-     
-    <site/22580943/date-time/20131213T0800Z>
-        a ssn:Observation ;
-        ssn:observationSamplingTime [ time:inXSDDateTime "2013-12-13T08:00:00Z"^^xsd:dateTime ] ;
-        ssn:observationResult [
-            a ssn:SensorOutput ;
-            def-op:airTemperature_C [ qudt:numericValue "11.2"^^xsd:double ] ;
-            def-op:dewPointTemperature_C [ qudt:numericValue "10.2"^^xsd:double ] ] .
-     
-    <site/22580943/date-time/20131213T0900Z>
-        a ssn:Observation ;
-        ssn:observationSamplingTime [ time:inXSDDateTime "2013-12-13T09:00:00Z"^^xsd:dateTime ] ;
-        ssn:observationResult [
-            a ssn:SensorOutput ;
-            def-op:airTemperature_C [ qudt:numericValue "12.0"^^xsd:double ] ;
-            def-op:dewPointTemperature_C [ qudt:numericValue "10.2"^^xsd:double ] ] .
-     
-From this example, you can see that the relationship between the row subject (e.g. the observation 
-instance) and the values provided within the row is comprised of multiple triples by way of blank nodes.
- 
-Using [LDPath][] syntax:
-* column "Date-time" maps to "ssn:observationSamplingTime/time:inXSDDateTime"
-* column "Air temperature (Cel)" maps to "ssn:observationResult/def-op:airTemperature_C/qudt:numericValue"
-* column "Dew-point temperature (Cel)" maps to "ssn:observationResult/def-op:dewPointTemperature_C/qudt:numericValue"
-
-  [LDPath]: http://marmotta.apache.org/ldpath/language.html 
-
-The data expressed in JSON-LD (_please forgive errors owing to manual conversion!_) becomes:
- 
-    {
-      "@context": {
-          "@base": "http://data.example.org/wow/data/weather-observations/",
-          "ssn":  "http://purl.oclc.org/NET/ssnx/ssn#",
-          "time": "http://www.w3.org/2006/time#",
-          "xsd": "http://www.w3.org/2001/XMLSchema#", 
-          "qudt": "http://qudt.org/1.1/schema/qudt#",
-          "def-op": "http://data.example.org/wow/def/observed-property#",
-          "phenomenonTime": { "@id": "ssn:observationSamplingTime", "@type": "time:Instant"},
-          "datetime": { "@id": "time:inXSDDateTime", "@type": "xsd:dateTime" },
-          "result": { "@id": "ssn:observationResult", "@type": "ssn:SensorOutput" },
-          "value": { "@id": "qudt:numericValue", "@type": "xsd:double" }
-      },
-      "@graph": [{
-          "@id": "site/22580943/date-time/20131213T0800Z",
-          "@type": "ssn:Observation",
-          "phenomenonTime": { "datetime": "2013-12-13T08:00:00Z" },
-          "result": {
-              "def-op:airTemperature_C": { "value": "11.2" },
-              "def-op:dewPointTemperature_C": { "value": "10.2" }
-          }
-      }, {
-          "@id": "site/22580943/date-time/20131213T0900Z",
-          "@type": "ssn:Observation",
-          "phenomenonTime": { "datetime": "2013-12-13T09:00:00Z" },
-          "result": {
-              "def-op:airTemperature_C": { "value": "12.0" },
-              "def-op:dewPointTemperature_C": { "value": "10.2" }
-          }
-      }]
-    }
- 
-Looking at [Greg’s CSV-LD proposal][csv-ld], I think that the Mapping Template for this 
-example would be (_noting that I have made no attempt to apply string functions to modify 
-the ISO 8601 date-time to the simpler syntax I used for the observation identifier_):
-
-  [csv-ld]: https://github.com/w3c/csvw/blob/gh-pages/csv-ld/CSV-LD.md
- 
-    {
-      "@context": {
-          "@base": "http://data.example.org/wow/data/weather-observations/",
-          "ssn":  "http://purl.oclc.org/NET/ssnx/ssn#",
-          "time": "http://www.w3.org/2006/time#",
-          "xsd": "http://www.w3.org/2001/XMLSchema#", 
-          "qudt": "http://qudt.org/1.1/schema/qudt#",
-          "def-op": "http://data.example.org/wow/def/observed-property#",
-          "phenomenonTime": { "@id": "ssn:observationSamplingTime", "@type": "time:Instant"},
-          "datetime": { "@id": "time:inXSDDateTime", "@type": "xsd:dateTime" },
-          "result": { "@id": "ssn:observationResult", "@type": "ssn:SensorOutput" },
-          "value": { "@id": "qudt:numericValue", "@type": "xsd:double" }
-      }, 
-      "@id": "site/22580943/date-time/{Date-time}",
-      "@type": "ssn:Observation",
-      "phenomenonTime": { "datetime": "{Date-time}" },
-      "result": {
-          "def-op:airTemperature_C": { "value": "{Air temperature (Cel)}" },
-          "def-op:dewPointTemperature_C": { "value": "{Dew-point temperature (Cel)}" }
-      }
-    }
