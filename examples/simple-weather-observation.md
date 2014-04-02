@@ -43,7 +43,7 @@ point location and sensor, this “metadata” (e.g. ssn:featureOfInterest and s
 is provided as annotation at the table level – and is out of scope of this particular example.
  
 The actual weather observations themselves, using 
-[locally defined object properties for the observed quantity](#local-defs) (e.g. `def-op:airTemperature_C`
+[locally defined object properties for the observed quantity](#local-object-property-definitions) (e.g. `def-op:airTemperature_C`
 and `def-op:dewPointTemperature_C`) are encoded as follows:
  
     @base               <http://data.example.org/wow/data/weather-observations/> .
@@ -147,7 +147,7 @@ the ISO 8601 date-time to the simpler syntax I used for the observation identifi
       }
     }
 
-<h2 id="local-defs">Local object property definitions</h2>
+<h2 id="local-object-property-definitions">Local object property definitions</h2>
 
 Note that I created some local (OWL) object property definitions as sub-properties of 
 qudt:value that are tightly bound to specific quantity kinds (e.g. air temperature and dew-point 
