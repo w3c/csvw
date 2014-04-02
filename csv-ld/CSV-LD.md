@@ -274,7 +274,7 @@ The previous example shows a natural way of representing joined entities in CSV;
       "@graph": [{
         "doap_id": "http://rubygems.org/gems/json-ld",
         "doap_developer": {
-          "doap_id": "http://greggkellogg.net/foaf#me",
+          "foaf_id": "http://greggkellogg.net/foaf#me",
           "foaf_name": "Gregg Kellogg"
         },
         "doap_name": "JSON::LD"
