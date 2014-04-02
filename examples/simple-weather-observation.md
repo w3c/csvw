@@ -43,7 +43,8 @@ point location and sensor, this “metadata” (e.g. ssn:featureOfInterest and s
 is provided as annotation at the table level – and is out of scope of this particular example.
  
 The actual weather observations themselves, using 
-[locally defined object properties for the observed quantity](#local-defs) are encoded as follows:
+[locally defined object properties for the observed quantity](#local-defs) (e.g. `def-op:airTemperature_C`
+and `def-op:dewPointTemperature_C`) are encoded as follows:
  
     @base               <http://data.example.org/wow/data/weather-observations/> .
     @prefix ssn:        <http://purl.oclc.org/NET/ssnx/ssn#> .
