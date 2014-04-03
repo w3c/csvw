@@ -117,11 +117,36 @@ The data expressed in JSON-LD (_please forgive errors owing to manual conversion
       }]
     }
  
-<h2 id="mapping-frame">CSV-LD mapping frame (guestimate)</h2>
+<h2 id="transformation">CSV -to- JSON-LD transformation</h2>
 
-Looking at [Greg’s CSV-LD proposal][csv-ld], I think that the _mapping frame_ for this 
-example would be (_noting that I have made no attempt to apply string functions to modify 
-the ISO 8601 date-time to the simpler syntax I used for the observation identifier_):
+Assuming a lack of string-manipulation functions to convert the ISO 8601 date-time string 
+into _simple_ local identifier (e.g. `2013-12-13T08:00:00Z` to `20131213T0800Z`), an easy
+method to establish the local identifier string is to execute a pre-processing step prior 
+to the generic transformation. 
+
+The need for pre-processing of text-based tabular data seems fairly common, thus
+solution(s) established by the CSVW WG for transformation should consider the inclusion of
+a simple processing pipeline.
+
+<h3 id="pre-proc">String-manipulation pre-processing step</h3>
+
+Pre-processing step:
+1. insert new leading column for local identifier: `id`
+2. for each _data_ row, convert ISO 8601 date-time string to local identifier (e.g. 
+`2013-12-13T08:00:00Z` to `20131213T0800Z`) and insert into `id` column
+
+The processed table would be:
+
+<table>
+  <tr><th>id</th><th>Date-time</th><th>Air temperature (Cel)</th><th>Dew-point temperature (Cel)</th></tr>
+  <tr><td>20131213T0800Z</td><td>2013-12-13T08:00:00Z</td><td>11.2</td><td>10.2</td></tr>                
+  <tr><td>20131213T0900Z</td><td>2013-12-13T09:00:00Z</td><td>12.0</td><td>10.2</td></tr>
+</table>
+
+<h3 id="mapping-frame">CSV-LD mapping frame (guestimate)</h3>
+
+Looking at [Gregg’s CSV-LD proposal][csv-ld], I think that the _mapping frame_ for this 
+example would be:
 
   [csv-ld]: https://github.com/w3c/csvw/blob/gh-pages/csv-ld/CSV-LD.md
  
@@ -138,7 +163,7 @@ the ISO 8601 date-time to the simpler syntax I used for the observation identifi
           "result": { "@id": "ssn:observationResult", "@type": "ssn:SensorOutput" },
           "value": { "@id": "qudt:numericValue", "@type": "xsd:double" }
       }, 
-      "@id": "site/22580943/date-time/{Date-time}",
+      "@id": "site/22580943/date-time/{id}",
       "@type": "ssn:Observation",
       "phenomenonTime": { "datetime": "{Date-time}" },
       "result": {
