@@ -92,7 +92,7 @@ context block using various properties; e.g.
 }
 ```
 
-- but I'm expecting to be told that there are easier ways!
+... but I'm expecting to be told that there are easier ways!
 
 JSON Table Schema also has explicit support for geospatial elements (`geopoint` and 
 `geojson`) and expression of foreign keys (reference to the data package where those keys are defined) 
