@@ -172,6 +172,14 @@ example would be:
       }
     }
 
+<h3 id="jsonld2ntriples">Further transformation of JSON-LD to other RDF encodings</h3>
+
+Given the [standard API defined for conversion of JSON-LD to other RDF encodings]
+(http://www.w3.org/TR/json-ld-api/#rdf-serialization-deserialization-algorithms), JSON-LD may provide
+a useful step to serialising RDF into encodings such as [ntriples](http://www.w3.org/TR/n-triples/) or 
+[TTL](http://www.w3.org/TR/turtle/). A processing pipeline could be extended to include these subsequent
+rdf serialization steps.
+
 <h2 id="local-object-property-definitions">Local object property definitions</h2>
 
 Note that I created some local (OWL) object property definitions as sub-properties of 
