@@ -80,10 +80,23 @@ key already used in the Tabular Data Package spec to reference a
 [JSON Table Schema](http://dataprotocols.org/json-table-schema/) instance for the target CSV file.
 
 JSON Table Schema provides for annotating the columns (referred to within the spec as "fields") using a 
-`field-descriptor` key: `name`, `title`, `description` etc. ... currently I don't yet see how to do this 
-in the CSV-LD mapping frame. There is also explicit support for geospatial elements (`geopoint` and 
+`field-descriptor` key: `name`, `title`, `description` etc. I think that this can be done within the 
+context block using various properties; e.g. 
+
+```
+"@context": {
+    ...
+    "description": { "@id": "http://purl.org/dc/terms/description" },
+    "air-temp-cel": { "@id": "def-op:airTemperature_C", "description": "Air temperature record in Celsius" }
+    ...
+}
+```
+
+- but I'm expecting to be told that there are easier ways!
+
+JSON Table Schema also has explicit support for geospatial elements (`geopoint` and 
 `geojson`) and expression of foreign keys (reference to the data package where those keys are defined) 
-that would be interesting to consider.
+that would be interesting to consider further.
 
 The Tabular Data Package spec already provides a mechanism to describe tabular text files that _don't_ 
 conform to the standard CSV syntax using a `dialect` key that conforms to the that described in the 
