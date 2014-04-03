@@ -14,7 +14,7 @@ We want our metadata annotation to be able to describe multiple CSV files; see [
 
 > I took it as a strength that a metadata file would describe several CSV files, as that matched current usage.
 
-The [Tabular Data Package](http://dataprotocols.org/tabular-data-package/) spec, the renamed Simple Data Format, says:
+The [Tabular Data Package](http://dataprotocols.org/tabular-data-package/) spec, renamed from _Simple Data Format_, says:
 
 > Each \[CSV file in the data package\] MUST have an entry in the resources array in the datapackage.json file.
 
