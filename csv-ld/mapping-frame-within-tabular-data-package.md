@@ -1,4 +1,4 @@
-# CSV-LD meets dataprotocols.org/tabular-data-package
+# CSV-LD meets Tabular Data Package
 
 _(contributed by Jeremy as a rough idea)_
 
@@ -9,12 +9,12 @@ it struck me that this is operating in a similar space to the
 
 Looking at the two side-by-side, here are some suggestions.
 
-We want our metadata annotation to be able to describe multiple CSV files; see [WG meeting minutes](http://dataprotocols.org/json-table-schema/)
+We want our metadata annotation to be able to describe multiple CSV files; see [WG meeting minutes](http://www.w3.org/2014/03/26-csvw-minutes.html)
 ... quoting JeniT: 
 
 > I took it as a strength that a metadata file would describe several CSV files, as that matched current usage.
 
-The [Tabular Data Package spec](http://dataprotocols.org/tabular-data-package/), the renamed Simple Data Format, says:
+The [Tabular Data Package](http://dataprotocols.org/tabular-data-package/) spec, the renamed Simple Data Format, says:
 
 > Each \[CSV file in the data package\] MUST have an entry in the resources array in the datapackage.json file.
 
