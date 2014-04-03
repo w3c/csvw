@@ -131,8 +131,8 @@ a simple processing pipeline.
 <h3 id="pre-proc">String-manipulation pre-processing step</h3>
 
 Pre-processing step:
-1. insert new leading column for local identifier: `id`
-2. for each _data_ row, convert ISO 8601 date-time string to local identifier (e.g. 
+* insert new leading column for local identifier: `id`
+* for each _data_ row, convert ISO 8601 date-time string to local identifier (e.g. 
 `2013-12-13T08:00:00Z` to `20131213T0800Z`) and insert into `id` column
 
 The processed table would be:
