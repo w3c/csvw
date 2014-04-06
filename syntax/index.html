@@ -105,7 +105,10 @@ var respecConfig = {
           Each table has one or more <dfn title="column">columns</dfn>. The order of the columns is significant and must be preserved by applications.
         </p>
         <p>
-          Each table has one or more <dfn title="row">rows</dfn>. The order of the rows is significant and must be preserved by applications. Each row contains a <dfn>field</dfn> for each column in the table. Some of these fields may be <dfn title="null field">null fields</dfn>.
+          Each table has one or more <dfn title="row">rows</dfn>. The order of the rows is significant and must be preserved by applications. Each row contains a <dfn>field</dfn> for each column in the table. Some of these fields may be <dfn title="empty field">empty fields</dfn> (fields which have no value). There is no distinction between empty fields and fields whose value is an empty string.
+        </p>
+        <p class="issue">
+          Should there be a distinction made (in the core data model) between empty fields and fields whose value is an empty string? With a lack of other metadata, the only way to make the distinction would be to say there was a difference between a missing value in a CSV file (eg the second value in <code>a,,z</code>) and a quoted value (eg the second value in <code>a,"",z</code>). This seems dangerous as I don't think many clients will make a distinction between the two, so the semantics will be lost on round-tripping.
         </p>
       </section>
       <section id="annotated-model">
@@ -139,6 +142,7 @@ var respecConfig = {
         <ul>
           <li>notes to aid the interpretation of the value</li>
           <li>type annotations for the value</li>
+          <li>a flag that indicates the value is a null value</li>
         </ul>
         <div class="issue">
           <p>
@@ -195,7 +199,7 @@ var respecConfig = {
           Metadata MAY be directly embedded within a CSV file, as described here.
         </p>
         <p>
-          The first line of a CSV+ file MUST be processed as a header line unless the CSV+ file is served with a <code>header=absent</code> parameter on the media type. Each non-null field in the header line provides a <strong>name</strong> annotation on the column in which it appears.
+          The first line of a CSV+ file MUST be processed as a header line unless the CSV+ file is served with a <code>header=absent</code> parameter on the media type. Each non-<a>empty field</a> in the header line provides a <strong>name</strong> annotation on the column in which it appears.
         </p>
         <p class="issue">
           Should we support any other embedding of metadata within a CSV file? An example approach is shown in <a href="http://jenit.github.io/linked-csv/">Linked CSV</a>. If this is allowed we should specify a new media type for the syntax.
