@@ -5,7 +5,7 @@
     <meta content="width=device-width,initial-scale=1" name="viewport" />
     <title>Generating RDF from Web Tabular Data</title>
     <script class="remove" src="http://www.w3.org/Tools/respec/respec-w3c-common">
-	</script>
+	  </script>
     <script class="remove">
 var respecConfig = {
     // localBiblio: {
@@ -65,6 +65,7 @@ var respecConfig = {
       .grammar-literal { color: gray;}
     </style>
   </head>
+
   <body>
     <section id="abstract">
       <p>
@@ -78,26 +79,26 @@ var respecConfig = {
       <p>
         Work-in-progress. 
       </p>
-      <p>
-      </p>
     </section>
+
     <section id="intro">
       <h2>Introduction</h2>
       <p>
-      This document uses keywords from 
-      <a href="https://tools.ietf.org/html/rfc2119">RFC2119</a>
-      and
-      <a href="https://tools.ietf.org/html/rfc6919">RFC6919</a>.
+        This document uses keywords from 
+        <a href="https://tools.ietf.org/html/rfc2119">RFC2119</a>
+        and
+        <a href="https://tools.ietf.org/html/rfc6919">RFC6919</a>.
       </p>
       <p>
         <dfn title="tabular data">Tabular data</dfn> is data that is structured into rows, each of which contains information about some thing. Each row contains the same number of fields (although some of these fields may be empty), which provide values of properties of the thing described by the row. In tabular data, fields within the same column provide values for the same property of the thing described by the particular row. This is what differentiates tabular data from other line-oriented formats. 
       </p>
       <p>
-		CSV RFC [[!RFC4180]] (to be revised).
+        CSV RFC [[!RFC4180]] (to be revised).
       </p>
 
       <p>The input to the conversion is Tabular data. Exact details of translating the many 
-      existing tabular data forms 
+        existing tabular data forms.
+      </p>
 
       <p>
         There are 3 different level of conversion, increasing levels of facilities:
@@ -147,7 +148,7 @@ var respecConfig = {
   :Trim%20Cycle "Large Tree Routine Prune";
   :Inventory%20Date "6/2/2010"
 ] .
-    </pre>
+</pre>
         <p>In the full Column Mapping, metadata about the translation
             applied is also included.
         </p>
@@ -155,59 +156,150 @@ var respecConfig = {
       </section>
     </section>
 
-    <section id="column-mapping">
-      <h2>Column Mapping</h2>
+    <section id="basic-mapping">
+      <h2>Basic Mapping</h2>
 
-      <a href="https://www.w3.org/2013/csvw/wiki/CSV2RDF">CSV2RDF on the WG wiki</a>
+      <small>
+        <p>Previous description for just the column mapping: 
+          <a href="https://www.w3.org/2013/csvw/wiki/CSV2RDF">CSV2RDF on the WG wiki</a>
+        </p>
+      </small>
 
-      <p>In column mapping, each row of the input tabular data is
-        translated to a number of triples, which with the same subject.
+      <p>
+        In basic mapping, a process is applied to the CSV data that
+        takes each row in the input tabular data and emits a number for triples 
+        translated to a number of triples, which with the same subject. 
+        In addition, some table-wide RDF triples can also be added to the output.
       </p>
 
-      <p>If there is no header row and no annotations, then a dummy header row is
-      assumed with column names <tt>"col1", "col2", ....</tt>.
+      <section id="annotations">
+        <h3>Annotations</h3>
+        <p>Possible annotations.</p>
+        <section id="annotation-table">
+          <h4>Table</h4>
+          <ul>
+            <li>Base URI
+            </li>
+            <li>General information about the table
+              (title, source, publication date, provenance,...)
+            </li>
+          </ul>
+        </section>
 
-      <p>In the absence of any column annotations for datatypes, cells will be
-        inspected to guess one of the types:
-      </p>
-      <ul>
-        <li>Numbers: integer, decimal or double</li>
-        <li>Boolean</li>
-      </ul>
-      <p>otherwise the cell value is processed as a string.</p>
+        <section id="annotation-row">
+          <h4>Row</h4>
+          <ul>
+            <li>A template for generating a subject URI.
+              {COL} for value of a column.
+              (implies a default of "skip" on any column used.)
+            </li>
+            <li>rdf:type for each row (URI template?)
+            </li>
+          </ul>
+        </section>
 
-      <section>
-        <h3>Annotation</h3>
+        <section id="annotation-column">
+          <h4>Column Annotations</h4>
+          <ul>
+            <li>Predicate for this column. Default to <tt>base:colname</tt> 
+              for sanitized <tt>colname</tt>.
+            </li>
+            <li>Identify a column as a key, which together with a a URI
+              template, generates the subject used for triples for each row.
+            </li>
+            <li>Predicate to use for each non-key column</li>
+            <li>Datatypes for cells in the column. </li>
+            <li>skip - do not generate triples for this column (value maybe used in templates).</li>
+            <li>guess datatype</li>
+            <li>language tag</li>
+            <li>URI template</li>
+            <li>RDF template (path + bNodes is a special case of an RDF template).</li>
+            <li>Lexical form templates</li>
+          </ul>
+          <p>conditional forms? "skip if blank else ..."</p>
+        </section>
+      </section>
 
-        <p>Annotations may provide:</p>
+      <section id="uri-templates">
+        <h3>URI Templates</h3>
+        <p>{COL} value
+        </p>
+        <p>Lookup
+        </p>
+        <p>String functions (SPARQL? i.e. XSD functions and operators)
+        </p>
+      </section>
+
+      <section id="datatype-inspection">
+        <h3>Datatype by Appearance</h3>
+        <p>If guessing datatypes:
+        </p>
         <ul>
-          <li>Identify a column as a key, which together with a a URI
-            template, generates the subject used for triples for each row.
+          <li>Numbers: integer, decimal or double
           </li>
-          <li>Predicate to use for each non-key column</li>
-          <li>Datatypes for cells in the column. String that do not match the
-          expected form of the datatype are left as strings.</li>
+          <li>Boolean
+          </li>
+          <li>http: URIs.  Other? mailto:? urn:?
+          </li>
         </ul>
-
-        <div class="issue">How far to go with generating URI - whole
-          separate section?</div>
-
+        <p>otherwise the cell value is processed as a string.
+        </p>
       </section>
 
-
-      <section>
-        <h3>Determining Column Processing</h3>
+      <section id="mapping-outline">
+        <h3>Outline of the Mapping Process</h3>
+        <p>The process takes places in the following steps:
+        </p>
+        <ul>
+          <li>Table-level Generation
+          </li>
+          <li>Determine Column Translations.
+          </li>
+        </ul>
+<pre>
+For each row:
+  Subject is template or bnode
+  For each cell:
+    Predicate is column predicate
+    If skip, skip.
+    If a datatype is given :dt, the object is "string"^^:dt
+    If a language tag is given @tag, the object is "string"@tag
+    If a URI template is given ...
+    If guess, guess integer/decimal/double/boolean/http URI (URN?)
+    ...
+    Else xsd:string
+    Emit (s,p,o)
+</pre>
       </section>
 
-
-      <section>
+      <section id="data-conversion">
         <h3>Data Conversion</h3>
+        <p>More details on guessing datatypes.</p>
       </section>
 
+      <section id="minimal-mapping">
+        <h3>Minimal Mapping</h3>
+        <p>If there is no header row and no annotations, then a fixed process is applied to
+          generate sufficient annotations to generate output.  A header row is
+          assumed with column names <tt>"col1", "col2", ....</tt>; the fields of a CSV record
+          (row) are inspected to determine whether to generate numbers, booleans, links or strings
+          by inspecting the character value of a field.  Fields have whiste space trimmed.
+        </p>
+      </section>
     </section>
 
     <section> <!-- id = ?? -->
       <h2>Further Mapping</h2>
+
+      <p>By applying multiple conversions, with different setups, 
+      you can do some quite complicated things.
+      </p>
+
+      <p>Multiple templates producing different output over multiple passes (or in parallel).</p>
+      <p>"URI overlap" - intentional same URI between between conversions
+      leads to RDF that is not merely a reflection of the table.
+      </p>
+
       <p>
         In this section, we describe mapping that goes beyond the 
         column mapping described above.  The RDF triples may not correspond
@@ -217,12 +309,13 @@ var respecConfig = {
     </section>
 
     <section id="csv-ld">
+      <h2>CSV-LD</h2>
       <p>
         A further procedure mapping to JSON-LD.
       </p>
-      
+
       <div class="issue">Better as a separate document?</div>
-      
+
     </section>
 
   </body>
