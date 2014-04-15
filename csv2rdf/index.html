@@ -8,9 +8,10 @@
 	  </script>
     <script class="remove">
 var respecConfig = {
-    // localBiblio: {
+    localBiblio: {
     //     "EBNF-NOTATION": "Tim Bray; Jean Paoli; C. M. Sperberg-McQueen; Eve Maler; François Yergeau. <a href=\"http://www.w3.org/TR/REC-xml/#sec-notation\"><cite>EBNF Notation</cite></a> 26 November 2008. W3C Recommendation. URL: <a href=\"http://www.w3.org/TR/REC-xml/#sec-notation\">http://www.w3.org/TR/REC-xml/#sec-notation</a>"
-    // },
+    "RFC6570": "J. Gregorio; R. Fielding; M. Hadley; M. Nottingham; D. Orchard <a href=\"http://tools.ietf.org/html/rfc6570\"><cite>URI Template</cite></a> March 2012. Proposed Internet RFC 3987. URL: <a href=\"http://tools.ietf.org/html/rfc6570\">http://tools.ietf.org/html/rfc6570</a>"
+    },
     specStatus: "ED",
     shortName: "csv2rdf",
     publishDate:  "2014-04-01",
@@ -25,11 +26,11 @@ var respecConfig = {
        name: "Andy Seaborne"
        , company: "Apache Software Foundation"
        , companyURL: ""
-    // }, { 
-    //   name: "Gregg Kellogg", 
-    //   url: "http://greggkellogg.net/",
-    //   company: "Kellogg Associates", 
-    //   companyURL: "http://kellogg-assoc.com/" 
+     }, { 
+       name: "Gregg Kellogg", 
+       url: "http://greggkellogg.net/",
+       company: "Kellogg Associates", 
+       companyURL: "http://kellogg-assoc.com/" 
     }],
     wg: "CSV on the Web Working Group",
     wgURI: "http://www.w3.org/2013/csvw/",
@@ -222,8 +223,57 @@ var respecConfig = {
         </section>
       </section>
 
+      <section id="graph-template">
+        <h3>Graph Templates</h3>
+        <p>An RDF graph can be used as a template for mapping fields from a row by following
+          a couple of conventions.</p>
+        <ul>
+          <li>A literal may be composed of one or more <a title="field reference">Field References</a>.</li>
+          <li>A URI may be composed of one or more <a title="field reference">Field References</a>.</li>
+        </ul>
+        <p>A graph template is defined (as a named graph?) within a metadata mapping file
+          as set of RDF triples where any value may include one or more
+          <a title="field reference">Field References</a>. Each record is processed to emit triples
+          based on transforming the graph template into a series of triples created from the result
+          of substiting <a title="field reference">Field References</a> for their referenced
+          field values. Triples which result in any position having a value of <code>csv:nil</code>
+          are excluded from output.</p> 
+      </section>
+      <section id="field-references">
+        <h3>Field References</h3>
+        <p>A <dfn>Field Reference</dfn> is a brace-surrounded value matching a <a>column name</a>
+          from the CSV input. During record expansion, <a title="field reference">field references</a> are replaced
+          with the value of the field from the specific record being mapped.</p>
+        <pre class="example" title="Field Reference">
+          [
+            schema:name &quot;{name}&quot;@en;
+            schema:homepage &lt;{+homepage}&gt;;
+            schema:image &lt;{+image}&gt;
+          ] .
+        </pre>
+        <p>Given an input file such as the following:</p>
+        <table>
+          <tr><th>name</th><th>homepage</th><th>image</th></tr>
+          <tr><td>Homer Simpson</td><td>http://example/homer</td><td>http://example/avatar/homer.png</td></tr>
+        </table>
+        <p>The resulting output graph would be the following:</p>
+        <pre class="example" title="Field Reference Result">
+          [
+            schema:name "Homer Simpson"@en;
+            schema:homepage <http://example/homer>;
+            schema:image <http://example/avatar/homer.png>
+          ] .
+        </pre>
+      </section>
       <section id="uri-templates">
         <h3>URI Templates</h3>
+        <p>A URI Template is a URI containing one or more variables as described in [[!RFC6570]].
+          URI variables are treated as <a title="field reference">Field References</a>. The expansion of URI Templates
+          is modified so that if the URI template contains any unmapped <a>Field Reference</a>
+          the resulting URI is replaced with <code>csv:nil</code>. After processing,
+          all triples containing <code>csv:nil</code> in any position are removed.</p>
+        <p>A URI template having the scheme "_" (otherwise illegal) results in a blank node if all
+          <a title="field-reference">Field References</a> are substituted.</p>
         <p>{COL} value
         </p>
         <p>Lookup
