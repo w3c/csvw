@@ -14,14 +14,16 @@ var respecConfig = {
     specStatus: "ED",
     shortName: "tabular-data-model",
     //publishDate:  "2014-03-27",
-    previousPublishDate:  "",
+    previousPublishDate: "2014-03-27",
+    previousMaturity: "FPWD",
+    previousURI: "http://www.w3.org/TR/2014/WD-tabular-data-model-20140327/",
     edDraftURI: "http://w3c.github.io/csvw/syntax/",
     // lcEnd: "3000-01-01",
     // crEnd: "3000-01-01",
     editors: [{
       name: "Jeni Tennison",
       company: "Open Data Institute",
-      companyURL: "http://www.theodi.org/"
+      companyURL: "http://theodi.org/"
     }, { 
       name: "Gregg Kellogg", 
       url: "http://greggkellogg.net/",
@@ -29,24 +31,28 @@ var respecConfig = {
       companyURL: "http://kellogg-assoc.com/" 
     }],
     wg: "CSV on the Web Working Group",
-    wgURI: "https://www.w3.org/2013/csvw/",
+    wgURI: "http://www.w3.org/2013/csvw/",
     wgPublicList: "public-csv-wg",
     wgPatentURI: "http://www.w3.org/2004/01/pp-impl/68238/status",
     otherLinks: [{
-            key: "Repository",
-            data: [{
-                    value: "We are on Github",
-                    href: "https://github.com/w3c/csvw"
-                }, {
-                    value: "File a bug",
-                    href: "https://github.com/w3c/csvw"
-                }, {
-                    value: "Commit history",
-                    href: "https://github.com/w3c/csvw/commits/gh-pages"
-                }
-            ]
-        }
-    ],
+      key: "Repository",
+      data: [{
+          value: "We are on Github",
+          href: "https://github.com/w3c/csvw"
+      }, {
+          value: "File a bug",
+          href: "https://github.com/w3c/csvw"
+      }]
+      }, {
+      key: "Changes",
+        data: [{
+          value: "Diff to previous version",
+          href: "diff-20140327.html"
+        }, {
+          value: "Commit history",
+          href: "https://github.com/w3c/csvw/commits/gh-pages"
+      }]
+    }],
     inlineCSS: true,
     noIDLIn: true,
     noLegacyStyle: false
@@ -65,7 +71,7 @@ var respecConfig = {
     </section>
     <section id="sotd">
       <p>
-        The CSV on the Web Working Group was chartered to produce a Recommendation "Access methods for CSV Metadata" as well as Recommendations for "Metadata vocabulary for CSV data" and "Mapping mechanism to transforming CSV into various Formats (e.g., RDF, JSON, or XML)". This document aims to primarily satisfy the first of those Recommendations (see <a href="#metadata" class="sectionRef"></a>), though it also specifies an underlying model and therefore starting point for the other chartered Recommendations.
+        The CSV on the Web Working Group was chartered to produce a Recommendation "Access methods for CSV Metadata" as well as Recommendations for "Metadata vocabulary for CSV data" and "Mapping mechanism to transforming CSV into various Formats (e.g., RDF, JSON, or XML)". This document aims to primarily satisfy the first of those Recommendations (see <a href="#locating-metadata" class="sectionRef"></a>), though it also specifies an underlying model and therefore starting point for the other chartered Recommendations.
       </p>
       <p>
         This document is based on IETF's [[!RFC4180]] which is an Informational RFC. The working group's expectation is that future suggestions to refine RFC 4180 will be relayed to the IETF (e.g. around I18N and multi-part packaging) and contribute to its discussions about moving CSV to the Standards track.
@@ -81,17 +87,17 @@ var respecConfig = {
       </p>
     </section>
     <section id="model">
-      <h2>Tabular Data Model</h2>
+      <h2>Tabular Data Models</h2>
       <p>
         There are different levels of data models for tabular data:
       </p>
       <ul>
-        <li>The <strong>core data model</strong> described in <a href="#core-model" class="sectionRef"></a> defines the core model for a single table of basic data.</li>
-        <li>The <strong>annotated data model</strong> described in <a href="#annotated-model" class="sectionRef"></a> defines a model for tables that are annotated with metadata.</li>
-        <li>The <strong>grouped data model</strong> described in <a href="#grouped-model" class="sectionRef"></a> defines a model for tables that are related to each other in some way.</li>
+        <li>The <strong>core tabular data model</strong> described in <a href="#core-tabular-data-model" class="sectionRef"></a> defines the core model for a single table of basic data.</li>
+        <li>The <strong>annotated tabular data model</strong> described in <a href="#annotated-tabular-data-model" class="sectionRef"></a> defines a model for tables that are annotated with metadata.</li>
+        <li>The <strong>grouped tabular data model</strong> described in <a href="#grouped-tabular-data-model" class="sectionRef"></a> defines a model for tables that are related to each other in some way.</li>
       </ul>
-      <section id="core-model">
-        <h3>Core Data Model</h3>
+      <section>
+        <h3>Core Tabular Data Model</h3>
         <p>
           Data is held in a <dfn>table</dfn>.
         </p>
@@ -99,13 +105,16 @@ var respecConfig = {
           Each table has one or more <dfn title="column">columns</dfn>. The order of the columns is significant and must be preserved by applications.
         </p>
         <p>
-          Each table has one or more <dfn title="row">rows</dfn>. The order of the rows is significant and must be preserved by applications. Each row contains a <dfn>field</dfn> for each column in the table. Some of these fields may be <dfn title="null field">null fields</dfn>.
+          Each table has one or more <dfn title="row">rows</dfn>. The order of the rows is significant and must be preserved by applications. Each row contains a <dfn>field</dfn> for each column in the table. Some of these fields may be <dfn title="empty field">empty fields</dfn> (fields which have no value). There is no distinction between empty fields and fields whose value is an empty string.
+        </p>
+        <p class="issue">
+          Should there be a distinction made (in the core tabular data model) between empty fields and fields whose value is an empty string? With a lack of other metadata, the only way to make the distinction would be to say there was a difference between a missing value in a CSV file (eg the second value in <code>a,,z</code>) and a quoted value (eg the second value in <code>a,"",z</code>). This seems dangerous as I don't think many clients will make a distinction between the two, so the semantics will be lost on round-tripping.
         </p>
       </section>
-      <section id="annotated-model">
-        <h3>Annotated Data Model</h3>
+      <section>
+        <h3>Annotated Tabular Data Model</h3>
         <p>
-          An <dfn>annotated table</dfn> is a <a>table</a> that is annotated with additional metadata. The table has a number of <dfn title="property">properties</dfn> which provide additional information about the table as a whole. The <dfn title="value">values</dfn> of these properties may be lists, structured objects, or atomic values. Annotations on a table may include:
+          An <dfn>annotated table</dfn> is a <a>table</a> that is annotated with additional metadata. The table MAY have any number of <dfn title="property">properties</dfn> which provide additional information about the table as a whole. The <dfn title="value">values</dfn> of these properties may be lists, structured objects, or atomic values. Annotations on a table may include:
         </p>
         <ul>
           <li>titles or descriptions of the table</li>
@@ -113,7 +122,7 @@ var respecConfig = {
           <li>links to other tables (eg to indicate tables that include related information)</li>
         </ul>
         <p>
-          The <a title="column">columns</a> within an <a>annotated table</a> are all <dfn title="annotated column">annotated columns</dfn>. The annotations on a column provide information about how to interpret the <a title="field">fields</a> in the column.
+          The <a title="column">columns</a> within an <a>annotated table</a> are all <dfn title="annotated column">annotated columns</dfn>: columns which MAY have any number of <a title="property">properties</a>. The annotations on a column provide information about how to interpret the <a title="field">fields</a> in the column. Examples of annotations might be:
         </p>
         <ul>
           <li>a name or label for the column</li>
@@ -121,18 +130,19 @@ var respecConfig = {
           <li>an indication of whether the column contains unique values</li>
         </ul>
         <p>
-          The <a title="row">rows</a> within an <a>annotated table</a> are all <dfn title="annotated row">annotated rows</dfn>. The annotations on a row provide additional metadata about the information held in the row, such as:
+          The <a title="row">rows</a> within an <a>annotated table</a> are all <dfn title="annotated row">annotated rows</dfn>: rows which MAY have any number of <a title="property">properties</a>. The annotations on a row provide additional metadata about the information held in the row, such as:
         </p>
         <ul>
           <li>the certainty of the information in that row</li>
           <li>information about the source or provenance of the data in that row</li>
         </ul>
         <p>
-          The <a title="field">fields</a> within an <a>annotated row</a> are all <dfn title="annotated field">annotated fields</dfn>. The annotations on a field provide metadata about the value held in the field, particularly when this overrides the information provided for the <a>annotated column</a> and <a>annotated row</a> that the field falls within. Annotations on a field might be:
+          The <a title="field">fields</a> within an <a>annotated row</a> are all <dfn title="annotated field">annotated fields</dfn>: fields which MAY have any number of <a title="property">properties</a>. The annotations on a field provide metadata about the value held in the field, particularly when this overrides the information provided for the <a>annotated column</a> and <a>annotated row</a> that the field falls within. Annotations on a field might be:
         </p>
         <ul>
           <li>notes to aid the interpretation of the value</li>
           <li>type annotations for the value</li>
+          <li>a flag that indicates the value is a null value</li>
         </ul>
         <div class="issue">
           <p>
@@ -146,8 +156,8 @@ var respecConfig = {
           </p>
         </div>
       </section>
-      <section id="grouped-model">
-        <h3>Grouped Data Model</h3>
+      <section>
+        <h3>Grouped Tabular Data Model</h3>
         <p>
           A <dfn>group of tables</dfn> comprises a set of <a title="table">tables</a> (which may be <a title="annotated table">annotated tables</a>) and a set of annotations (<a title="property">properties</a> and <a title="value">values</a>) that relate to the set.
         </p>
@@ -156,10 +166,10 @@ var respecConfig = {
         </p>
       </section>
     </section>
-    <section id="metadata">
+    <section>
       <h2>Locating Metadata</h2>
       <p>
-        As described in <a href="#annotated-model" class="sectionRef"></a>, tabular data may have a number of annotations associated with it. Here we describe the different methods that can be used to locate those annotations given a link to a CSV file.
+        As described in <a href="#annotated-tabular-data-model" class="sectionRef"></a>, tabular data may have a number of annotations associated with it. Here we describe the different methods that can be used to locate those annotations given a link to a CSV file.
       </p>
       <p>
         In most methods of locating metadata described here, metadata is provided within a separate document. The syntax of this document is not defined here, but these documents can include things like:
@@ -180,16 +190,22 @@ var respecConfig = {
         <li>metadata in a document linked to using a <code>Link</code> header when retrieving the tabular data file, see <a href="#link-header" class="sectionRef"></a></li>
         <li>metadata in a document located through a standard path from the tabular data file, see <a href="#standard-path" class="sectionRef"></a></li>
       </ol>
-      <section id="embedded-metadata">
+      <p class="issue">
+        We probably need to add some rules about conflicts as well. For example, if a metadata file says that the CSV should contain certain columns but the names of the columns are different in the CSV file itself, is this an error?
+      </p>
+      <section>
         <h3>Embedded Metadata</h3>
         <p>
-          Metadata may be directly embedded within a CSV file.
+          Metadata MAY be directly embedded within a CSV file, as described here.
+        </p>
+        <p>
+          The first line of a CSV+ file MUST be processed as a header line unless the CSV+ file is served with a <code>header=absent</code> parameter on the media type. Each non-<a>empty field</a> in the header line provides a <strong>name</strong> annotation on the column in which it appears.
         </p>
         <p class="issue">
-          What should the syntax be for embedding metadata within a CSV file? An example approach is shown in <a href="http://jenit.github.io/linked-csv/">Linked CSV</a>. If this is allowed we should specify a new media type for the syntax.
+          Should we support any other embedding of metadata within a CSV file? An example approach is shown in <a href="http://jenit.github.io/linked-csv/">Linked CSV</a>. If this is allowed we should specify a new media type for the syntax.
         </p>
       </section>
-      <section id="embedded-link">
+      <section>
         <h3>Embedded Link</h3>
         <p>
           A link to the metadata to be used with a CSV may be indicated within the CSV file itself.
@@ -206,38 +222,49 @@ var respecConfig = {
           </p>
         </div>
       </section>
-      <section id="package">
+      <section>
         <h3>Package</h3>
         <p>
           Rather than providing CSV files directly on the web, they can be packaged up with a metadata file that includes annotations, and any other relevant CSV files.
         </p>
-        <p class="issue">
-          What should that package look like? Just a zip? A multipart document? How is the metadata file within it identified? If this is allowed we should specify a new media type for the package.
-        </p>
+        <div class="issue">
+          <p>
+            What should that package look like? Just a zip? A multipart document? How is the metadata file within it identified? If this is allowed we should specify a new media type for the package.
+          </p>
+          <p>
+            See <a href="http://w3ctag.github.io/packaging-on-the-web/">Packaging on the Web Editor's Draft</a> for a proposed generic approach for packaging on the web that could be used for packaging CSV files and metadata, and discovering those packages.
+          </p>
+        </div>
       </section>
-      <section id="link-header">
+      <section>
         <h3>Link Header</h3>
         <p>
-          When retrieving a CSV file via HTTP, the response can include a <code>Link</code> header with <code>rel=describedby</code> that points to a metadata file that describes the CSV file.
+          When retrieving a CSV file via HTTP, the response can include a <code>Link</code> header with <code>rel=describedby</code> that points to a metadata file that describes the CSV file. If, by inspection, the referenced file is not a valid metadata file then it MUST be ignored. If there is more than one valid metadata file linked to through multiple <code>Link</code> headers, then the metadata referenced by <code>Link</code> headers that appear later in the response override that referenced by earlier <code>Link</code> headers.
         </p>
         <p class="issue">
-          Is <code>rel=describedby</code> the right link relation to use?
+          Is <a href="http://www.w3.org/TR/powder-dr/#appD"><code>rel=describedby</code></a> the right link relation to use?
         </p>
       </section>
-      <section id="standard-path">
+      <section>
         <h3>Standard Path</h3>
         <p>
-          When retrieving a CSV file via HTTP, the default location for a metadata file that describes that CSV file is set to <code>csv-metadata</code> in the same directory. If this metadata file does not explicitly point to the relevant CSV file then it MUST be ignored.
+          Given a CSV file, the default location for a metadata file that describes that CSV file is set to <code><var>filename</var>.csvm</code> in the same directory. If that file does not exist, then the application should look for a metadata file at <code>metadata.csvm</code> in the same directory. In both cases, if the metadata file does not explicitly point to the relevant CSV file then it MUST be ignored.
         </p>
         <p class="issue">
-          Deliberately not included a suffix here, because we haven't decided what format metadata documents should be in, or even if they should be conneg'd. Probably best for the file to be in the same directory as the CSV file, so that you can have one metadata document that describes a lot of them. Should there be a default navigational thing of continuing up the path hierarchy until you find a metadata document?
+          Used a suffix on filenames to find metadata about them, though we haven't decided what format metadata documents should be in, or even if they should be conneg'd.
+        </p>
+        <p class="issue">
+          Should there be a default navigational thing of continuing up the path hierarchy until you find a metadata document?
+        </p>
+        <p class="issue">
+          We have discussed using a <code>.well-known</code> location or something within a sitemap file to provide the location of a metadata file about a given CSV file, but these are just as unlikely to be editable as a <code>Link</code> header, so probably don't address the use case that the standard path method addresses, of being a really simple way to provide metadata about a CSV file.
         </p>
       </section>
     </section>
     <section id="syntax" class="informative">
       <h2>CSV+ Syntax</h2>
       <p>
-        There is no standard for CSV, and there are many variants of CSV used on the web today. This section defines a method for outputting tabular data adhering to the core tabular data model described in <a href="#core-model" class="sectionRef"></a> into a standard, CSV-based, syntax. Compliant applications that output this format must meet each of the constraints.
+        There is no standard for CSV, and there are many variants of CSV used on the web today. This section defines a method for outputting tabular data adhering to the <a>core tabular data model</a> described in <a href="#core-tabular-data-model" class="sectionRef"></a> into a standard, CSV-based, syntax. Compliant applications that output this format must meet each of the constraints.
       </p>
       <p class="note">
         We are actively working with the IETF to develop a standard for CSV, which is outside the scope of the Working Group. The details here aim to help shape that standard based on our requirements.
@@ -352,7 +379,7 @@ Content-Type: text/csv;header=absent
         <dd>A character that, when it appears at the beginning of a skipped row, indicates a comment that should be associated as a comment annotation to the table. The default is <code>#</code>.</dd>
         <dt><dfn>header row count</dfn></dt>
         <dd>The number of header rows (following the skipped rows) in the file. The default is <code>1</code>.</dd>
-        <dt><dfn>delimiter<dfn></dt>
+        <dt><dfn>delimiter</dfn></dt>
         <dd>The separator between fields. The default is <code>,</code>.</dd>
         <dt><dfn>skip columns</dfn></dt>
         <dd>The number of columns to skip at the beginning of each row, before any header columns. The default is <code>0</code>.</dd>
@@ -465,7 +492,7 @@ TEXTDATA =  %x20-21 / %x23-2B / %x2D-7E
         <section>
           <h4>Opened CSV</h4>
           <p>
-            When opening CSV files, Excel interprets CSV files saved in UTF-8 as being encoded as Windows-1252 (whether or not a <a href="http://en.wikipedia.org/wiki/Byte_order_mark"><acronym title="Byte Order Mark">BOM</acronym></a> is present). It correctly deals with double quoted fields, except that it converts line breaks within fields into spaces. It understands <code>CRLF</code> as a line break. It detects dates (formatted as <code>YYYY-MM-DD</code>) and formats them in the default date formatting for files.
+            When opening CSV files, Excel interprets CSV files saved in UTF-8 as being encoded as Windows-1252 (whether or not a <a href="http://en.wikipedia.org/wiki/Byte_order_mark"><abbr title="Byte Order Mark">BOM</abbr></a> is present). It correctly deals with double quoted fields, except that it converts line breaks within fields into spaces. It understands <code>CRLF</code> as a line break. It detects dates (formatted as <code>YYYY-MM-DD</code>) and formats them in the default date formatting for files.
           </p>
         </section>
         <section>
@@ -489,7 +516,7 @@ TEXTDATA =  %x20-21 / %x23-2B / %x2D-7E
         <section>
           <h4>Downloading CSV</h4>
           <p>
-            Downloaded CSV files are encoded in UTF-8, without a <a href="http://en.wikipedia.org/wiki/Byte_order_mark"><acronym title="Byte Order Mark">BOM</acronym></a>, and with <code>LF</code> line endings. Dates and numbers are formatted as they appear within the spreadsheet.
+            Downloaded CSV files are encoded in UTF-8, without a <a href="http://en.wikipedia.org/wiki/Byte_order_mark"><abbr title="Byte Order Mark">BOM</abbr></a>, and with <code>LF</code> line endings. Dates and numbers are formatted as they appear within the spreadsheet.
           </p>
         </section>
         <section>
@@ -500,12 +527,12 @@ TEXTDATA =  %x20-21 / %x23-2B / %x2D-7E
         </section>
       </section>
       <section id="">
-        <h3>CSV Files in the Simple Data Format</h3>
+        <h3>CSV Files in a Tabular Data Package</h3>
         <p>
-          Ths <a href="http://dataprotocols.org/simple-data-format/#csv-files">Simple Data Format</a> places the following restrictions on CSV files:
+          <a href="http://dataprotocols.org/tabular-data-package/#csv-files">Tabular Data Packages</a> place the following restrictions on CSV files:
         </p>
         <blockquote>
-          <p>As a starting point, CSV files included in a Simple Data Format package must conform to the RFC for CSV (4180 - Common Format and MIME Type for Comma-Separated Values (CSV) Files). In addition:</p>
+          <p>As a starting point, CSV files included in a Tabular Data Package package must conform to the RFC for CSV (4180 - Common Format and MIME Type for Comma-Separated Values (CSV) Files). In addition:</p>
 
           <ul>
             <li>File names MUST end with <code>.csv</code></li>
@@ -532,7 +559,7 @@ TEXTDATA =  %x20-21 / %x23-2B / %x2D-7E
             <li>All fields in the CSV files MUST be described in the <code>schema</code></li>
           </ul>
 
-          <p>CSV files generated by different applications often vary in their syntax, e.g. use of quoting characters, delimiters, etc. To encourage conformance, CSV files in a Simple Data Format SHOULD</p>
+          <p>CSV files generated by different applications often vary in their syntax, e.g. use of quoting characters, delimiters, etc. To encourage conformance, CSV files in a CSV files in a Tabular Data Package SHOULD</p>
 
           <ul>
             <li>Use “,” as field delimiters</li>
