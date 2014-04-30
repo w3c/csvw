@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width,initial-scale=1" name="viewport" />
+    <title>Metadata Vocabulary for Tabular Data</title>
+    <script class="remove" src="http://www.w3.org/Tools/respec/respec-w3c-common">
+		</script>
+    <script class="remove">
+var respecConfig = {
+    specStatus: "ED",
+    shortName: "tabular-metadata",
+    //publishDate:  "2014-03-27",
+    //previousPublishDate: "2014-03-27",
+    //previousMaturity: "FPWD",
+    //previousURI: "http://www.w3.org/TR/2014/WD-tabular-data-model-20140327/",
+    edDraftURI: "http://w3c.github.io/csvw/metadata/",
+    // lcEnd: "3000-01-01",
+    // crEnd: "3000-01-01",
+    editors: [{ 
+      name: "Rufus Pollock", 
+      url: "http://rufuspollock.org/",
+      company: "Open Knowledge", 
+      companyURL: "https://okfn.org/" 
+    }, {
+      name: "Jeni Tennison",
+      company: "Open Data Institute",
+      companyURL: "http://theodi.org/"
+    }],
+    wg: "CSV on the Web Working Group",
+    wgURI: "http://www.w3.org/2013/csvw/",
+    wgPublicList: "public-csv-wg",
+    wgPatentURI: "http://www.w3.org/2004/01/pp-impl/68238/status",
+    otherLinks: [{
+      key: "Repository",
+      data: [{
+          value: "We are on Github",
+          href: "https://github.com/w3c/csvw"
+      }, {
+          value: "File a bug",
+          href: "https://github.com/w3c/csvw"
+      }]
+      }, {
+      key: "Changes",
+        data: [{
+        //  value: "Diff to previous version",
+        //  href: "diff-20140327.html"
+        //}, {
+          value: "Commit history",
+          href: "https://github.com/w3c/csvw/commits/gh-pages"
+      }]
+    }],
+    inlineCSS: true,
+    noIDLIn: true,
+    noLegacyStyle: false
+    };
+    </script>
+  </head>
+  <body>
+    <section id="abstract">
+      <p>
+        Validation and conversion of tabular data on the web requires additional metadata that describes how the data should be interpreted. This document defines a vocabulary for metadata that annotates tabular data. This can be used to provide metadata at various levels, from collections of data from CSV documents and how they relate to each other down to individual cells within a table.
+      </p>
+    </section>
+    <section id="sotd">
+      <p>
+        The CSV on the Web Working Group was chartered to produce a Recommendation "Access methods for CSV Metadata" as well as Recommendations for "Metadata vocabulary for CSV data" and "Mapping mechanism to transforming CSV into various Formats (e.g., RDF, JSON, or XML)". This document aims to primarily satisfy the second of those Recommendations.
+      </p>
+    </section>
+    <section>
+      <h2>Introduction</h2>
+      <p>
+        Interpreting tabular data that is available on the web, particularly as CSV, usually requires additional metadata. As an example, say that the following CSV file were available at <code>http://example.org/tree-ops.csv</code>
+      </p>
+      <pre class="example">
+GID,On Street,Species,Trim Cycle,Inventory Date
+1,ADDISON AV,Celtis australis,Large Tree Routine Prune,10/18/2010
+2,EMERSON ST,Liquidambar styraciflua,Large Tree Routine Prune,6/2/2010
+3,EMERSON ST,Liquidambar styraciflua,Large Tree Routine Prune,6/2/2010
+      </pre>
+      <p>
+        A human consumer of this data might be able to figure out the meaning of the different columns, particularly if there were some additional human-readable documentation made available. Automated processors would have a much harder time; realistically they would be limited to displaying the information in a table. Making available machine-readable metadata helps with the interpretation of the tabular data. For example, say that the following metadata file were available at <code>http://example.org/trees-ops.csv.csvm</code>:
+      </p>
+      <pre class="example">
+{
+  "name": "tree-ops",
+  "title": "Tree Operations",
+  "keywords": ["tree", "street", "maintenance"],
+  "publisher": [{
+    "name": "Example Municipality",
+    "web": "http://example.org"
+  }],
+  "license": "cc-by",
+  "resources": [{
+    "name": "tree-ops",
+    "path": "tree-ops.csv",
+    "modified": "2010-12-31",
+    "schema": {
+      "fields": [{
+        "name": "GID",
+        "title": "Generic Identifier",
+        "description": "An identifier for the operation on a tree.",
+        "type": "string",
+        "constraints": {
+          "required": true,
+          "unique": true
+        }
+      }, {
+        "name": "On Street",
+        "description": "The street that the tree is on.",
+        "type": "string"
+      }, {
+        "name": "Species",
+        "description": "The species of the tree.",
+        "type": "string"
+      }, {
+        "name": "Trim Cycle",
+        "description": "The operation performed on the tree.",
+        "type": "string"
+      }, {
+        "name": "Inventory Date",
+        "description": "The date of the operation that was performed.",
+        "type": "date",
+        "format": "M/D/YYYY"
+      }]
+    },
+    "primaryKey": "GID"  
+  }]
+}
+      </pre>
+      <p class="note">
+        This is unaltered datapackage JSON.
+      </p>
+      <p>
+        Given the location of the CSV file, this metadata file can be located by appending <code>.csvm</code> to the URL (as described in <a href="http://www.w3.org/TR/tabular-data-model/#standard-path">Model for Tabular Data and Metadata on the Web</a>). It provides information for different types of applications:
+      </p>
+      <ul>
+        <li><strong>Data Aggregators</strong> can use the indicated metadata, such as descriptions, titles, modification dates and licences, to enable more intelligent retrieval of relevant data on the web.</li>
+        <li><strong>Validators</strong> can check that the labels of the columns in the metadata file match those in the CSV file, that the values in the columns are of the right type and in the right format, and that values in the <code>GID</code> column are all present and unique.</li>
+        <li><strong>Converters</strong> can use the metadata to map the CSV data into other formats such as JSON, RDF and XML, or into databases or statistical applications, in intelligent ways.</li>
+      </ul>
+      <p>
+        The <a href="http://www.w3.org/TR/tabular-data-model/">Model for Tabular Data and Metadata on the Web</a> specification defines an <a href="http://www.w3.org/TR/tabular-data-model/#annotated-model">Annotated Tabular Data Model</a> in which tables, columns, rows and fields can be annotated with properties and values, and a <a href="http://www.w3.org/TR/tabular-data-model/#grouped-model">Grouped Tabular Data Model</a> in which a group of tables is annotated. That specification also describes <a href="http://www.w3.org/TR/tabular-data-model/#metadata">how to locate metadata</a> about a given CSV file.
+      </p>
+      <p>
+        This document defines the format and structure of metadata documents, and how these are interpreted to create an Annotated Tabular Data Model. It also defines how to validate tabular data based on some of these annotations. This metadata can be expressed as an RDF graph. However, all applications that conform to this specification (including validators and applications that read or convert tabular data) MUST read the JSON-based format described in <a href="#metadata-in-json" class="sectionRef"></a>.
+      </p>
+      <p class="issue">
+        We should aim, if we can, for the JSON format to be equivalent to a JSON-LD version of the RDF vocabulary, but without any requirement to include context within the JSON itself (to save people from having to do boilerplate).
+      </p>
+    </section>
+    <section>
+      <h2>Metadata Vocabulary</h2>
+      <p>
+        This section defines a set of properties and permitted values for annotating tabular data, and how these annotations should be interpreted by applications.
+      </p>
+      <section>
+        <h3>Table Groups</h3>
+        <p>
+          Groups of tabular data files are often provided within a self-contained package, though they do not have to be.
+        </p>
+        <p class="note">
+          The following is a more-or-less direct copy from <a href="http://dataprotocols.org/data-packages/">Data Package Format</a>, with added issues.
+        </p>
+        <section>
+          <h4>Required Fields</h4>
+          <p>A valid metadata document MUST include the following fields:</p>
+          <ul>
+            <li>
+              <p><code>name</code> (required) - short url-usable (and preferably human-readable) name of
+          the package. This MUST be lower-case and contain only alphanumeric characters
+          along with “.”, “_” or “-“ characters. It will function as a unique
+          identifier and therefore SHOULD be unique in relation to any registry in
+          which this package will be deposited (and preferably globally unique).</p>
+
+              <p>The name SHOULD be invariant, meaning that it SHOULD NOT change when a data
+          package is updated, unless the new package version should be considered a
+          distinct package, e.g. due to significant changes in structure or
+          interpretation. Version distinction SHOULD be left to the version field. As
+          a corollary, the name also SHOULD NOT include an indication of time range
+          covered.</p>
+            </li>
+          </ul>
+          <p class="issue">
+            The requirement for a name seems more like a requirement for metadata used within a package registry than when interpreting CSV files (which might or might not be in a package). Should <code>name</code> be required? Should it have the syntactic constraints described above?
+          </p>
+          <p>In addition to the above fields, it is recommended that the following fields SHOULD 
+        be included in every package descriptor:</p>
+          <p class="issue">
+            There are four levels of requirement here: MUST, SHOULD, MAY ("recommended") and optional. In practice, given that the metadata is completely extensible, there are probably only two practical levels: required (ie if the annotation is absent anything validating the metadata file MUST raise an error) and optional, so probably worth reclassifying in that way. Should anything be required?
+          </p>
+          <ul>
+            <li>
+              <p><code>resources</code> - a JSON array of hashes that describe the contents of 
+          the package. The structure of the resource hash is described in the “Resource Information”
+          section.</p>
+              <p class="issue">
+                This should be reworded not to be reliant as a property, not reliant on JSON.
+              </p>
+            </li>
+            <li>
+              <p><code>license</code> (or <code>licenses</code>) - is a field specifying the license (or licenses)
+          under which the package is provided. You MAY specify either a <code>license</code> field
+          or a <code>licenses</code> field but NOT both.</p>
+              <p class="issue">
+                Suggest having a single annotation (<code>license</code>) and leaving the pluralisation to the JSON serialisation.
+              </p>
+              <p><strong>This property is not legally binding and does not necessarily mean your
+          package is licensed under the terms you define in this property.</strong></p>
+              <p class="issue">
+                Not clear what the point is of providing licence information in the metadata file if it can't be interpreted by receivers of the metadata as indicating the licence that the data is being made available under?
+              </p>
+              <ul>
+                <li>
+                  <p><code>license</code> MUST be a string and its value SHOULD be an <a href="http://licenses.opendefinition.org/">Open Definition license
+          ID</a> (preferably one that is <a href="http://opendefinition.org/licenses/">Open Definition
+          approved</a>.</p>
+
+                  <pre><code>{ "license" : "PDDL-1.0" }
+          </code></pre>
+                  <p class="issue">
+                    Constrain to a URL instead?
+                  </p>
+                </li>
+                <li>
+                  <p><code>licenses</code> MUST be an array. Each entry MUST be a hash with a <code>type</code> and a
+          <code>url</code> property linking to the actual text. The <code>type</code> SHOULD be an [Open
+          Definition license ID][od-license] if an ID exists for the license and
+          otherwise may be the general license name or identifier. Here is an
+          Example:</p>
+
+                  <pre><code>"licenses": [{
+            "type": "PDDL-1.0",
+            "url": "http://opendatacommons.org/licenses/pddl/"
+          }]
+          </code></pre>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <p><code>datapackage_version</code> - the version of the data package specification this
+          datapackage.json conforms to. It should follow the Semantic Versioning
+          requirements (http://semver.org/). The current version of this specification is given at 
+          the top of this document.</p>
+              <p class="issue">
+                This should probably be a serialisation thing rather than a metadata property, as it's about the format of the metadata file rather than of the group of tables.
+              </p>
+            </li>
+          </ul>
+        </section>
+        <section>
+          <h4>Recommended Fields</h3>
+          <p class="issue">
+            Align these to Dublin Core / DCAT?
+          </p>
+          <p>Additionally, a package descriptor MAY include the following keys and values:</p>
+          <ul>
+            <li><code>title</code> - a title or one sentence description for this package</li>
+            <li><code>description</code> - a description of the package. The first paragraph (up to the
+          first double line break should be usable as summary information for the package)</li>
+            <li><code>homepage</code> - URL string for the data packages web site</li>
+            <li><code>version</code> - a version string identifying the version of the package. It should conform to the Semantic Versioning requirements
+          (http://semver.org/).</li>
+            <li>
+              <p><code>sources</code> - an array of source hashes. Each source hash may have <code>name</code>, <code>web</code> and <code>email</code> fields. Example:</p>
+
+              <pre><code>"sources": [{
+            "name": "World Bank and OECD",
+            "web": "http://data.worldbank.org/indicator/NY.GDP.MKTP.CD"
+          }]
+          </code></pre>
+            </li>
+            <li><code>keywords</code> - an Array of string keywords to assist users searching for the
+          package in catalogs.</li>
+            <li><code>image</code> - a link to an image to use for this data package</li>
+          </ul>
+        </section>
+        <section>
+          <h4>Optional Fields</h4>
+          <p class="issue">
+            Align these to Dublin Core / DCAT?
+          </p>
+          <ul>
+            <li><code>maintainers</code> - Array of maintainers of the package. Each maintainer is a hash
+          which must have a “name” property and may optionally provide “email” and
+          “web” properties.</li>
+            <li>
+              <p><code>contributors</code> - an Array of hashes each containing the details of a
+          contributor. Must contain a ‘name’ property and MAY contain an email and web
+          property. By convention, the first contributor is the original author of the
+          package. Example:</p>
+
+              <pre><code>"contributors":[ {
+            "name": "Joe Bloggs",
+            "email": "joe@bloggs.com",
+            "web": "http://www.bloggs.com"
+          }]
+          </code></pre>
+            </li>
+            <li><code>publisher</code> - like contributors </li>
+            <li><code>base</code> - a base URI used to resolve <code>resources</code> that specify relative paths in
+          the event that the actual data files specified by those resource paths are not
+          located in the same directory in which the descriptor file (<code>datapackage.json</code>)
+          resides.</li>
+            <li>
+              <p><code>dataDependencies</code> - Hash of prerequisite data packages on which this package
+          depends in order to install. Follows same format as CommonJS Packages spec
+          v1.1.Each dependency defines the lowest compatible MAJOR[.MINOR[.PATCH]]
+          dependency versions (only one per MAJOR version) with which the package has
+          been tested and is assured to work. The version may be a simple version
+          string (see the version property for acceptable forms), or it may be a hash
+          group of dependencies which define a set of options, any one of which
+          satisfies the dependency. The ordering of the group is significant and
+          earlier entries have higher priority. Example:</p>
+
+              <pre><code>"dataDependencies": {
+             "country-codes": "",
+             "unemployment": "2.1",
+             "geo-boundaires": {
+               "acmecorp-geo-boundaries": ["1.0", "2.0"],
+               "othercorp-geo-boundaries": "0.9.8",
+             },
+          }
+          </code></pre>
+              <p class="issue">
+                This is again about package management rather than interpretation of tabular data, so suggest omitting it from this specification.
+              </p>
+            </li>
+          </ul>
+
+          <div class="note">
+            <p>NOTE: A Data Package author MAY add any number of additional fields beyond those
+          listed in the specification here.  For example, suppose you were storing
+          time series data and want to list the temporal coverage of the data in the
+          Data Package you could add a field <code>temporal</code> (cf <a href="http://dublincore.org/documents/usageguide/qualifiers.shtml#temporal">Dublin Core</a>):</p>
+
+            <pre><code>"temporal": {
+            "name": "19th Century",
+            "start": "1800-01-01",
+            "end": "1899-12-31"
+          }
+          </code></pre>
+
+            <p>This flexibility enables specific communities to extend Data Packages as
+          appropriate for the data they manage. As an example, the <a href="/tabular-data-package/">Tabular Data
+          Package</a> specification extends Data Package to the case
+          where all the data is tabular and stored in CSV.</p>
+          </div>
+        </section>
+      </section>
+      <section>
+        <h3>Tables</h3>
+        <p>
+          Individual tables may also have associated metadata.
+        </p>
+        <p class="note">
+          The following is a more-or-less direct copy from <a href="http://dataprotocols.org/data-packages/">Data Package Format</a>, with added issues.
+        </p>
+        <p>Packaged data resources are described in the <code>resources</code> property of the package descriptor. 
+        This property is an array of values. Each value describes a single resource and 
+        MUST be a JSON hash.</p>
+        <section>
+          <h4>Required Fields</h4>
+          <p>Resource information MUST contain (at least) one of the following attributes which
+          specify the location of the associated data file (either online, ‘relative’
+          (local), or ‘inline’):</p>
+
+          <ul>
+            <li><code>url</code>: url of this data resource</li>
+            <li><code>path</code>: unix-style (‘/’) relative path to the resource. Path MUST be a relative
+          path, that is relative to the directory in which the descriptor file
+          (<code>datapackage.json</code>) listing this file resides, or relative to the URI specified
+          by the optional <code>base</code> property (if it is defined).</li>
+            <li><code>data</code>: (inline) a field containing the data directly inline in the
+          <code>datapackage.json</code> file. Further details below.</li>
+          </ul>
+
+          <div class="note">
+            <p>NOTE: the use of a <code>url</code> allows a data package to reference data not necessarily
+          contained locally in the Data Package. Of course, the <code>path</code> attribute may still
+          be used for Data Packages located online (in this case it determines the
+          relative URL) in combination with the optional <code>base</code> property if it is defined.</p>
+          </div>
+
+          <div class="note">
+            <p>NOTE: When more than one of <code>url</code>, <code>path</code> or <code>data</code> are specified consumers need to
+          determine which option to use (or in which order to try them). The
+          recommendation is to utilize the following order: <code>data</code>, <code>path</code>, <code>url</code>. A consumer
+          should also stop processing once one of these options yields data.</p>
+          </div>
+
+          <p class="issue">
+            Suggest that we just have a single property to reference a CSV file, which can be interpreted as a relative URL. For compatibility with JSON-LD, this should be called <code>@id</code>.
+          </p>
+
+          <p>There are NO other required fields. However, there are a variety of common
+          fields that can be used which we detail below.</p>
+        </section>
+        <section>
+          <h4>Recommended Fields</h4>
+          <p>It is recommended that a resource SHOULD contain the following fields:</p>
+
+          <ul>
+            <li>
+              <p><code>name</code>: a resource SHOULD contain an <code>name</code> attribute. The name is a simple name or
+          identifier to be used for this resource.</p>
+
+              <ul>
+                <li>If present, the name MUST be unique amongst all resources in this data
+          package.</li>
+                <li>The name SHOULD be usable in a url path and SHOULD therefore consist only
+          of alphanumeric characters plus “.”, “-“ and “_”.</li>
+                <li>It would be usual for the name to correspond to the file name (minus the
+          extension) of the data file the resource describes.</li>
+              </ul>
+              <p class="issue">
+                Should indicate how this might be used.
+              </p>
+            </li>
+          </ul>
+        </section>
+        <section>
+          <h4>Optional Fields</h4>
+          <p>A data package MAY contain any number of additional fields. Common fields include:</p>
+
+          <ul>
+            <li><code>format</code>: ‘csv’, ‘xls’, ‘json’ etc. Would be expected to be the the standard file
+          extension for this type of resource.</li>
+            <li><code>mediatype</code>: the mediatype/mimetype of the resource e.g. ‘text/csv’, ‘application/vnd.ms-excel’as </li>
+            <li><code>encoding</code>: specify the character encoding of a resource data file. The values should be one of 
+           the “Preferred MIME Names” for <a href="http://www.iana.org/assignments/character-sets/character-sets.xhtml">a character encoding registered with IANA</a>. If no 
+           value for this key is specified then the default is UTF-8.</li>
+            <li><code>bytes</code>: size of the file in bytes</li>
+            <li><code>hash</code>: the md5 hash for this resource</li>
+            <li><code>schema</code>: a schema for the resource - see below for more on this in the case of
+          tabular data.</li>
+            <li><code>sources</code>: as for data package metadata.</li>
+            <li><code>licenses</code>: as for data package metadata. If not specified the resource
+          inherits from the data package.</li>
+          </ul>
+          <p class="issue">
+            Some of these aren't necessary if we assume that all the referenced data files are in CSV.
+          </p>
+          <p class="issue">
+            Should we align <code>hash</code> to <a href="http://www.w3.org/TR/SRI/">Subresource Integrity</a>?
+          </p>
+        </section>
+      </section>
+      <section>
+        <h3>Columns</h3>
+        <p class="note">
+          The following is a more-or-less direct copy from <a href="http://dataprotocols.org/json-table-schema/">JSON Table Schema</a>, with added issues.
+        </p>
+        <p class="issue">
+          Is it worth distinguishing between a general schema for a CSV file (which is probably going to be shared across CSV files) and specific annotations on columns in particular CSV files? For example, it may well be useful to point to a schema in a separate document (for reusability).
+        </p>
+        <p>A JSON Table Schema consists of:</p>
+
+        <ul>
+          <li>a required list of <em>field descriptors</em></li>
+          <li>optionally, a <em>primary key</em> description</li>
+          <li>optionally, a <em>foreign _key</em> description</li>
+        </ul>
+
+        <p>A schema is described using JSON. This might exist as a standalone document
+        or may be embedded within another JSON structure, e.g. as part of a 
+        data package description.</p>
+
+        <section>
+          <h4>Schema</h4>
+
+          <p>A schema has the following structure:</p>
+
+          <pre><code>{
+            # fields is an ordered list of field descriptors
+            # one for each field (column) in the table
+            "fields": [
+              # a field-descriptor
+              {
+                "name": "name of field (e.g. column name)",
+                "title": "A nicer human readable label or title for the field",
+                "type": "A string specifying the type",
+                "format": "A string specifying a format",
+                "description": "A description for the field"
+                ...
+              },
+              ... more field descriptors
+            ],
+            # (optional) specification of the primary key
+            "primaryKey": ...
+            # (optional) specification of the foreign keys
+            "foreignKeys": ...
+
+          }
+          </code></pre>
+
+          <p class="issue">
+            Suggest renaming <code>fields</code> as <code>columns</code> as that's the terminology used in the Tabular Data Model.
+          </p>
+
+          <p>That is, a JSON Table Schema is:</p>
+
+          <ul>
+            <li>a Hash which <code>MUST</code> contain a key <code>fields</code></li>
+            <li><code>fields</code> MUST be an array where each entry in the array is a field
+          descriptor. (Structure and usage described below)</li>
+            <li>the Hash <code>MAY</code> contain an attribute <code>primaryKey</code> (structure and usage
+          specified below)</li>
+            <li>the Hash <code>MAY</code> contain an attribute <code>foreignKeys</code> (structure and usage
+          specified below)</li>
+          </ul>
+        </section>
+        <section>
+          <h4>Field Descriptors</h4>
+
+          <p>A field descriptor is a simple JSON hash that describes a single field. The 
+          descriptor provides additional human-readable documentation for a field, as 
+          well as additional information that may be used to validate the field or create 
+          a user interface for data entry.</p>
+
+          <p>At a minimum a field descriptor will contain at least a <code>name</code> key, but MAY 
+          have additional keys as described below:</p>
+
+          <pre><code>{
+            "name": "name of field (e.g. column name)",
+            "title": "A nicer human readable label or title for the field",
+            "type": "A string specifying the type",
+            "format": "A string specifying a format",
+            "description": "A description for the field",
+            "constraints": {
+                # a constraints-descriptor
+            }
+          }
+          </code></pre>
+
+          <p class="issue">
+            Are columns mapped to descriptors by the value of their <code>name</code>, or by position in the <code>fields</code> array? I guess it's by position? In that case, what's the purpose of having a separate <code>name</code> and <code>title</code>?
+          </p>
+
+          <ul>
+            <li>a field descriptor MUST be a Hash</li>
+            <li>the field descriptor Hash MUST contain a <code>name</code> attribute. This
+          attribute <code>SHOULD</code> correspond to the name of field/column in the
+          data file (if it has a name). As such it <code>SHOULD</code> be unique (though
+          it is possible, but very bad practice, for the data file to have
+          multiple columns with the same name)</li>
+            <li>the field descriptor Hash MAY contain any number of other attributes</li>
+            <li>
+              <p>specific attributes that MAY be included in the Hash and whose
+          meaning is defined in this spec are:</p>
+
+              <ul>
+                <li><code>title</code>: A nicer human readable label or title for the field</li>
+                <li>description: A description for this field e.g. “The recipient of
+          the funds”</li>
+                <li><code>type</code>: The type of the field (string, number etc) - see below for
+          more detail. If type is not provided a consumer should assume a
+          type of “string”</li>
+                <li><code>format</code>: A description of the format e.g. “DD.MM.YYYY” for a
+          date. See below for more detail.</li>
+                <li><code>constraints</code>: A constraints descriptor that can be used by consumers 
+          to validate field values</li>
+              </ul>
+            </li>
+          </ul>
+        </section>
+        <section>
+          <h4>Field Constraints</h4>
+
+          <p>A set of constraints can be associated with a field. These constraints can be used 
+          to validate data against a JSON Table Schema. The constraints might be used by consumers 
+          to validate, for example, the contents of a data package, or as a means to validate 
+          data being collected or updated via a data entry interface.</p>
+
+          <p>A constraints descriptor is a JSON hash. It <code>MAY</code> contain any of the following 
+          keys.</p>
+
+          <ul>
+            <li><code>required</code> – A boolean value which indicates whether a field must have a value 
+          in every row of the table. An empty string is considered to be a missing value.</li>
+            <li><code>minLength</code> – An integer that specifies the minimum number of characters for a value</li>
+            <li><code>maxLength</code> – An integer that specifies the maximum number of characters for a value</li>
+            <li><code>unique</code> – A boolean. If <code>true</code>, then all values for that field MUST be unique within the 
+          data file in which it is found. This defines a unique key for a row although a row could 
+          potentially have several such keys.</li>
+            <li><code>pattern</code> – A regular expression that can be used to test field values. If the regular 
+          expression matches then the value is valid. Values will be treated as a string of characters. 
+          It is recommended that values of this field conform to the standard 
+          <a href="http://www.w3.org/TR/xmlschema-2/#regexs">XML Schema regular expression syntax</a>. See also 
+          <a href="http://www.regular-expressions.info/xml.html">this reference</a>.</li>
+            <li><code>minimum</code> – specifies a minimum value for a field. This is different to <code>minLength</code> which 
+          checks number of characters. A <code>minimum</code> value constraint checks whether a field value is greater than 
+          or equal to the specified value. The range checking depends on the <code>type</code> of the field. E.g. an 
+          integer field may have a minimum value of 100; a date field might have a minimum date. If a 
+          <code>minimum</code> value constraint is specified then the field descriptor <code>MUST</code> contain a <code>type</code> key</li>
+            <li><code>maximum</code> – as above, but specifies a maximum value for a field.</li>
+          </ul>
+
+          <p>A constraints descriptor may contain multiple constraints, in which case a consumer <code>MUST</code> apply 
+          all the constraints when determining if a field value is valid.</p>
+
+          <p>A data file, e.g. an entry in a data package, is considered to be valid if all of its fields are valid 
+          according to their declared <code>type</code> and <code>constraints</code>.</p>
+
+        </section>
+        <section>
+          <h4>Field Types</h4>
+
+          <p>The <code>type</code> attribute is a string indicating the type of this field.</p>
+
+          <p>Types are based on the <a href="http://tools.ietf.org/html/draft-zyp-json-schema-03#section-5.1">type set of
+          json-schema</a>
+          with some additions and minor modifications (cf other type lists include
+          those in <a href="http://www.elasticsearch.org/guide/reference/mapping/">Elasticsearch
+          types</a>).</p>
+
+          <p>The type list is as follows:</p>
+
+          <ul>
+            <li><strong>string</strong>: a string (of arbitrary length)</li>
+            <li><strong>number</strong>: a number including floating point numbers.</li>
+            <li><strong>integer</strong>: an integer.</li>
+            <li><strong>date</strong>: a date. This MUST be in ISO6801 format YYYY-MM-DD or, if
+          not, a format field must be provided describing the structure.</li>
+            <li><strong>time</strong>: a time without a date</li>
+            <li><strong>datetime</strong>: a date-time. This MUST be in ISO 8601 format of
+          YYYY-MM-DDThh:mm:ssZ in UTC time or, if not, a format field must be
+          provided.</li>
+            <li><strong>boolean</strong>: a boolean value (1/0, true/false).</li>
+            <li><strong>binary</strong>: base64 representation of binary data.</li>
+            <li><strong>object</strong>: (alias json) an JSON-encoded object</li>
+            <li>
+              <p><strong>geopoint</strong>: has one of the following structures:</p>
+
+              <pre><code>{ lon: ..., lat: ... }
+
+          [lon,lat]
+
+          "lon, lat"
+          </code></pre>
+            </li>
+            <li><strong>geojson</strong>: as per &lt;&lt;http://geojson.org/&gt;&gt;</li>
+            <li><strong>array</strong>: an array</li>
+            <li><strong>any</strong>: value of field may be any type</li>
+          </ul>
+
+          <p class="issue">
+            Is this the right set of datatypes for CSV? Is it going to be more useful to use the XML Schema datatypes for conversion into RDF &amp; XML? The JSON-oriented structures of <code>object</code>, <code>geopoint</code>, <code>geojson</code> and <code>array</code> don't make sense for CSV, where we don't anticipate the embedding of JSON structures.
+          </p>
+        </section>
+        <section>
+          <h4>Field Formats</h4>
+
+          <p>The format field can be used to describe the format, especially for
+          dates. Possible examples are:</p>
+
+          <pre><code> # "type": "date" "format": "yyyy"
+           
+           # type=string "format": "markdown"
+          </code></pre>
+
+          <p class="issue">
+            This needs expansion to indicate what the format of the format property is. There's some discussion on the <a href="https://github.com/dataprotocols/dataprotocols/issues/95">JSON Table Schema</a> about what this might look like.
+          </p>
+        </section>
+        <section>
+          <h4>Primary Key</h4>
+
+          <p>A primary key is a field or set of fields that uniquely identifies each row in
+          the table.</p>
+
+          <p>The <code>primaryKey</code> entry in the schema Hash is optional. If present it specifies
+          the primary key for this table.</p>
+
+          <p>The <code>primaryKey</code>, if present, MUST be:</p>
+
+          <ul>
+            <li>Either: an array of strings with each string corresponding to one of the
+          field <code>name</code> values in the <code>fields</code> array (denoting that the primary key is
+          made up of those fields). It is acceptable to have an array with a single
+          value (indicating just one field in the primary key). Strictly, order of
+          values in the array does not matter. However, it is RECOMMENDED that one
+          follow the order the fields in the <code>fields</code> has as client applications may
+          utitlize the order of the primary key list (e.g. in concatenating values
+          together).</li>
+            <li>Or: a single string corresponding to one of the field <code>name</code> values in
+          the <code>fields</code> array (indicating that this field is the primary key). Note that
+          this version corresponds to the array form with a single value (and can be
+          seen as simply a more convenient way of specifying a single field primary
+          key).</li>
+          </ul>
+
+          <p>Here’s an example:</p>
+
+          <pre><code>  "fields": [
+              {
+                "name": "a"
+              },
+              ...
+            ]
+            "primaryKey": "a"
+          </code></pre>
+
+          <p>Here’s an example with an array primary key:</p>
+
+          <pre><code>"schema": {
+            "fields": [
+              {
+                "name": "a"
+              },
+              {
+                "name": "b"
+              },
+              {
+                "name": "c"
+              },
+              ...
+            ]
+            "primaryKey": ["a", "c"]
+           }
+          </code></pre>
+          <p class="issue">
+            How is the <code>primaryKey</code> used by applications? What's the relationship with <code>unique</code> on a column?
+          </p>
+        </section>
+        <section>
+          <h4>Foreign Keys</h4>
+
+          <div class="alert alert-success">
+          Foreign Keys by necessity must be able to reference other data objects. These
+          data objects require a specific structure for the spec to work. This spec
+          assumes the data objects being referenced are <a href="/data-packages/">Data
+          Packages</a>. Thus, to use Foreign Keys you must be referencing Data Packages.
+          </div>
+
+          <p>A foreign key is a reference where entries in a given field (or fields) on this
+          table (‘resource’ in data package terminology) is a reference to an entry in a
+          field (or fields) on a separate resource.</p>
+
+          <p>The <code>foreignKeys</code> attribute, if present, MUST be an Array. Each entry in the
+          array must be a <code>foreignKey</code>. A <code>foreignKey</code> MUST be a Hash and:</p>
+
+          <ul>
+            <li><code>MUST</code> have an attribute <code>fields</code>. <code>fields</code> is a string or array specifying the 
+          field or fields on this resource that form the source part of the foreign
+          key. The structure of the string or array is as per <code>primaryKey</code> above.</li>
+            <li><code>MUST</code> have an attribute <code>reference</code> which MUST be a Hash. The Hash
+              <ul>
+                <li><code>MAY</code> have an attribute <code>datapackage</code>. This attribute is a string being a url or
+          name to a datapackage. If absent the implication is that this is a
+          reference to a resource within the current data package.</li>
+                <li><code>MUST</code> have an attribute <code>resource</code> which is the name of the resource
+          within the referenced data package</li>
+                <li><code>MUST</code> have an attribute <code>fields</code> which is a string if the outer <code>fields</code> is a
+          string, else an array of the same length as the outer <code>fields</code>, describing the
+          field (or fields) references on the destination resource. The structure of
+          the string or array is as per <code>primaryKey</code> above.</li>
+              </ul>
+            </li>
+          </ul>
+
+          <p>Here’s an example:</p>
+
+          <pre><code>  "fields": [
+              {
+                "name": "state"
+              }
+            ],
+            "foreignKeys": [
+              {
+                "fields": "state"
+                "reference": {
+                  "datapackage": "http://data.okfn.org/data/mydatapackage/",
+                  "resource": "the-resource",
+                  "fields": "state_id"
+                }
+              }
+            ]
+          </code></pre>
+        </section>
+      </section>
+      <section>
+        <h3>Rows</h3>
+        <p class="issue">
+          There's no way I can see in JSON Table Schema to annotate rows.
+        </p>
+      </section>
+      <section>
+        <h3>Fields</h3>
+        <p class="issue">
+          There's no way I can see in JSON Table Schema to annotate individual fields.
+        </p>
+      </section>
+    </section>
+    <section>
+      <h2>Metadata in JSON</h2>
+      <p class="issue">
+        Add example of what it looks like.
+      </p>
+      <section>
+        <h3>JSON-LD Context</h3>
+        <p class="issue">
+          Provide the context file for JSON-LD-based processing of metadata files.
+        </p>
+      </section>
+      <section>
+        <h3><code>application/csvm+json</code> Media Type</h3>
+        <p class="issue">
+          Provide definition of the media type here.
+        </p>
+      </section>
+    </section>
+    <section class="appendix">
+      <h2>Acknowledgements</h2>
+      <p>
+        This document is largely a copy of content from the <a href="http://dataprotocols.org/data-packages/">Data Package</a> specification and the <a href="http://dataprotocols.org/json-table-schema/">JSON Table Schema</a>, which are maintained as part of <a href="http://dataprotocols.org/">Data Protocols</a>. Particular contributors to that work are Rufus Pollock, Paul Fitzpatrick, Andrew Berkeley, Francis Irving, Benoit Chesneau, Leigh Dodds, Martin Keegan, and Gunnlaugur Thor Briem.
+      </p>
+    </section>
+    <section class="appendix">
+      <h2>IANA Considerations</h2>
+      <section>
+        <h3>Registration of <code>application/csvm+json</code></h3>
+        <p class="issue">TODO</p>
+      </section>
+    </section>
+  </body>
+</html>
+
