@@ -133,7 +133,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           Above is unaltered datapackage JSON. If we focus on just single file metadata, try to throw in some JSON-LD naming conventions and use terminology from the model document, we get something more like:
         </p>
         <pre class="highlight">
-{
+[{
   "@id": "tree-ops.csv",
   "@type": "Table",
   "title": "Tree Operations",
@@ -171,7 +171,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
     "format": "M/D/YYYY"
   }]
   "primaryKey": "_:GID"  
-}
+}]
         </pre>
         <p>
           The JSON-LD context would roughly look like:
@@ -226,10 +226,14 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       </p>
     </section>
     <section>
-      <h2>Metadata Vocabulary</h2>
+      <h2>Metadata Format</h2>
       <p>
         This section defines a set of properties and permitted values for annotating tabular data, and how these annotations should be interpreted by applications.
       </p>
+      <p class="issue">
+        We intend to support metadata for packages, and to support externally-sourced schemas for tabular data. For now, we are scoping to single metadata files defining single CSV files.
+      </p>
+      <!--
       <section>
         <h3>Table Groups</h3>
         <p>
@@ -424,101 +428,94 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           </div>
         </section>
       </section>
+    -->
       <section>
         <h3>Tables</h3>
         <p>
-          Individual tables may also have associated metadata.
+          Metadata data associated with tables describes either the table itself or all the data in the table, depending on the property.
         </p>
-        <p class="note">
-          The following is a more-or-less direct copy from <a href="http://dataprotocols.org/data-packages/">Data Package Format</a>, with added issues.
-        </p>
-        <p>Packaged data resources are described in the <code>resources</code> property of the package descriptor. 
-        This property is an array of values. Each value describes a single resource and 
-        MUST be a JSON hash.</p>
         <section>
           <h4>Required Fields</h4>
-          <p>Resource information MUST contain (at least) one of the following attributes which
-          specify the location of the associated data file (either online, ‘relative’
-          (local), or ‘inline’):</p>
-
-          <ul>
-            <li><code>url</code>: url of this data resource</li>
-            <li><code>path</code>: unix-style (‘/’) relative path to the resource. Path MUST be a relative
-          path, that is relative to the directory in which the descriptor file
-          (<code>datapackage.json</code>) listing this file resides, or relative to the URI specified
-          by the optional <code>base</code> property (if it is defined).</li>
-            <li><code>data</code>: (inline) a field containing the data directly inline in the
-          <code>datapackage.json</code> file. Further details below.</li>
-          </ul>
-
-          <div class="note">
-            <p>NOTE: the use of a <code>url</code> allows a data package to reference data not necessarily
-          contained locally in the Data Package. Of course, the <code>path</code> attribute may still
-          be used for Data Packages located online (in this case it determines the
-          relative URL) in combination with the optional <code>base</code> property if it is defined.</p>
-          </div>
-
-          <div class="note">
-            <p>NOTE: When more than one of <code>url</code>, <code>path</code> or <code>data</code> are specified consumers need to
-          determine which option to use (or in which order to try them). The
-          recommendation is to utilize the following order: <code>data</code>, <code>path</code>, <code>url</code>. A consumer
-          should also stop processing once one of these options yields data.</p>
-          </div>
-
+          <dl>
+            <dt><code>@id</code></dt>
+            <dd>This gives the URL of the CSV file that the table is held in, relative to the location of the metadata document.</dd>
+          </dl>
           <p class="issue">
-            Suggest that we just have a single property to reference a CSV file, which can be interpreted as a relative URL. For compatibility with JSON-LD, this should be called <code>@id</code>.
+            It's possible to alias all the JSON-LD keywords, but would that be useful?
           </p>
-
-          <p>There are NO other required fields. However, there are a variety of common
-          fields that can be used which we detail below.</p>
-        </section>
-        <section>
-          <h4>Recommended Fields</h4>
-          <p>It is recommended that a resource SHOULD contain the following fields:</p>
-
-          <ul>
-            <li>
-              <p><code>name</code>: a resource SHOULD contain an <code>name</code> attribute. The name is a simple name or
-          identifier to be used for this resource.</p>
-
-              <ul>
-                <li>If present, the name MUST be unique amongst all resources in this data
-          package.</li>
-                <li>The name SHOULD be usable in a url path and SHOULD therefore consist only
-          of alphanumeric characters plus “.”, “-“ and “_”.</li>
-                <li>It would be usual for the name to correspond to the file name (minus the
-          extension) of the data file the resource describes.</li>
-              </ul>
-              <p class="issue">
-                Should indicate how this might be used.
-              </p>
-            </li>
-          </ul>
         </section>
         <section>
           <h4>Optional Fields</h4>
-          <p>A data package MAY contain any number of additional fields. Common fields include:</p>
-
-          <ul>
-            <li><code>format</code>: ‘csv’, ‘xls’, ‘json’ etc. Would be expected to be the the standard file
-          extension for this type of resource.</li>
-            <li><code>mediatype</code>: the mediatype/mimetype of the resource e.g. ‘text/csv’, ‘application/vnd.ms-excel’as </li>
-            <li><code>encoding</code>: specify the character encoding of a resource data file. The values should be one of 
-           the “Preferred MIME Names” for <a href="http://www.iana.org/assignments/character-sets/character-sets.xhtml">a character encoding registered with IANA</a>. If no 
-           value for this key is specified then the default is UTF-8.</li>
-            <li><code>bytes</code>: size of the file in bytes</li>
-            <li><code>hash</code>: the md5 hash for this resource</li>
-            <li><code>schema</code>: a schema for the resource - see below for more on this in the case of
-          tabular data.</li>
-            <li><code>sources</code>: as for data package metadata.</li>
-            <li><code>licenses</code>: as for data package metadata. If not specified the resource
-          inherits from the data package.</li>
-          </ul>
+          <p>
+            The description of a table MAY also contain:
+          </p>
+          <dl>
+            <dt><code>@type</code></dt>
+            <dd>If included, <code>@type</code> MUST be set to <code>"Table"</code>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.</dd>
+            <dt><code>columns</code></dt>
+            <dd>An array of column descriptions as described in <a href="#columns" class="sectionRef"></a>. These are matched to columns by position: the first column description in the array applies to the first column in the table, the second to the second and so on.</dd>
+          </dl>
           <p class="issue">
-            Some of these aren't necessary if we assume that all the referenced data files are in CSV.
+            Should we include any properties that help in the parsing of the file, eg data package includes <code>encoding</code>?
           </p>
           <p class="issue">
-            Should we align <code>hash</code> to <a href="http://www.w3.org/TR/SRI/">Subresource Integrity</a>?
+            Should we include any properties that help in checking the integrity of the file, eg data package includes <code>bytes</code> and <code>hash</code>? We could possibly reuse the <a href="http://www.w3.org/TR/SRI/">Subresource Integrity</a> work here.
+          </p>
+          <p>
+            The description MAY contain any fields defined by [[!DC-TERMS]] to describe the table. This specification does not define any application behaviour associated with these fields being present. The following fields are particularly recommended:
+          </p>
+          <ul>
+            <li><code>created</code></li>
+            <li><code>creator</code></li>
+            <li><code>description</code></li>
+            <li><code>language</code></li>
+            <li><code>license</code></li>
+            <li><code>modified</code></li>
+            <li><code>provenance</code></li>
+            <li><code>publisher</code></li>
+            <li><code>rights</code></li>
+            <li><code>rightsHolder</code></li>
+            <li><code>source</code></li>
+            <li><code>spatial</code></li>
+            <li><code>subject</code></li>
+            <li><code>temporal</code></li>
+            <li><code>title</code></li>
+          </ul>
+          <p>
+            The description MAY include fields for registered <a href="http://www.iana.org/assignments/link-relations/link-relations.xhtml">link relations</a>, prefixed by <code>link:</code>. This specification does not define any application behaviour associated with these fields being present. The following fields are particularly recommended:
+          </p>
+          <ul>
+            <li><code>link:alternate</code></li>
+            <li><code>link:canonical</code></li>
+            <li><code>link:collection</code></li>
+            <li><code>link:duplicate</code></li>
+            <li><code>link:glossary</code></li>
+            <li><code>link:help</code></li>
+            <li><code>link:icon</code></li>
+            <li><code>link:last</code></li>
+            <li><code>link:latest-version</code></li>
+            <li><code>link:next</code></li>
+            <li><code>link:original</code></li>
+            <li><code>link:predecessor-version</code></li>
+            <li><code>link:prev</code> or <code>link:previous</code></li>
+            <li><code>link:preview</code></li>
+            <li><code>link:profile</code></li>
+            <li><code>link:related</code></li>
+            <li><code>link:search</code></li>
+            <li><code>link:self</code></li>
+            <li><code>link:start</code></li>
+            <li><code>link:successor-version</code></li>
+            <li><code>link:terms-of-service</code></li>
+            <li><code>link:up</code></li>
+            <li><code>link:version-history</code></li>
+            <li><code>link:working-copy</code></li>
+            <li><code>link:working-copy-of</code></li>
+          </ul>
+          <p class="issue">
+            Unlike the Dublin Core terms, link relations are an ever-expanding list and there may eventually be clashes between link relation terms and those defined above. That's why the above list uses QNames for all link relations, so that they look like <code>link:<var>relation</var></code> rather than plain <code><var>relation</var></code>.
+          </p>
+          <p class="issue">
+            Any other lists of properties we should crib off?
           </p>
         </section>
       </section>
