@@ -9,7 +9,8 @@
     <script class="remove">
 var respecConfig = {
     localBiblio: {
-        "EBNF-NOTATION": "Tim Bray; Jean Paoli; C. M. Sperberg-McQueen; Eve Maler; François Yergeau. <a href=\"http://www.w3.org/TR/REC-xml/#sec-notation\"><cite>EBNF Notation</cite></a> 26 November 2008. W3C Recommendation. URL: <a href=\"http://www.w3.org/TR/REC-xml/#sec-notation\">http://www.w3.org/TR/REC-xml/#sec-notation</a>"
+        "EBNF-NOTATION": "Tim Bray; Jean Paoli; C. M. Sperberg-McQueen; Eve Maler; François Yergeau. <a href=\"http://www.w3.org/TR/REC-xml/#sec-notation\"><cite>EBNF Notation</cite></a> 26 November 2008. W3C Recommendation. URL: <a href=\"http://www.w3.org/TR/REC-xml/#sec-notation\">http://www.w3.org/TR/REC-xml/#sec-notation</a>",
+        "UNICODE-BIDI": "Mark Davis; Aharon Lanin; Andrew Glass. <a href=\"http://unicode.org/reports/tr9/\"><cite>TR9, Unicode Bidirectional Algorithm.</cite></a>. 24 September 2013, URL: <a href=\"http://unicode.org/reports/tr9/\">http://unicode.org/reports/tr9/</a>"
     },
     specStatus: "ED",
     shortName: "tabular-data-model",
@@ -322,6 +323,24 @@ Content-Type: text/csv;charset=ISO-8859-1
           <pre>
 Content-Type: text/csv;header=absent
           </pre>
+        </section>
+        <section>
+          <h4>Bidirectionality in CSV+ Files</h4>
+          <p>
+            CSV+ files should be displayed with attention to the bidirectionality of the content of the file. This is partially defined by [[UNICODE-BIDI]], but with some important overrides as CSV+ is a <a href="http://unicode.org/reports/tr9/#Higher-Level_Protocols">Higher-Level Protocol</a>, with its own internal structure.
+          </p>
+          <p class="note">
+            Bidirectional content does not alter the definition of rows or the assignment of fields to columns. Whether or not a CSV+ file contains right-to-left characters, the first column's content is the first field of each row, which is the text prior to the first occurrence of a comma within that row.
+          </p>
+          <p>
+            There are two levels of bidirectionality to consider when displaying CSV+ files: the directionality of the table (ie whether the columns should be arranged left-to-right or right-to-left) and the directionality of the content of individual fields.
+          </p>
+          <p>
+            The directionality of the table should be determined as if the CSV+ file were a single <a href="http://unicode.org/reports/tr9/#The_Paragraph_Level">paragraph</a>, as defined by the Unicode Bidirectional Algorithm (<acronym title="Unicode Bidirectional Algorithm">UBA</acronym>). As in the <acronym title="Unicode Bidirectional Algorithm">UBA</acronym>, if the first character in the CSV+ file with a <a href="http://unicode.org/reports/tr9/#Bidirectional_Character_Types">strong type</a> indicates a <acronym title="right-to-left">RTL</acronym> directionality, the CSV+ file should be displayed with the first column on the right and the last column on the left. Otherwise, the CSV+ file should be displayed with the first column on the left and the last column on the right. Characters such as whitespace, quotes, commas and numbers do not have a strong type, and therefore are skipped when identifying the character that determines the directionality of the table.
+          </p>
+          <p>
+            Once the directionality of the table has been determined, each field within the table should be considered as a separate <a href="http://unicode.org/reports/tr9/#The_Paragraph_Level">paragraph</a>, as defined by the <acronym title="Unicode Bidirectional Algorithm">UBA</acronym>, with the same default directionality as the table. Thus, if a field contains no characters with a strong type (if it's a number or date for example) then the way the field is displayed should be determined by the way the table is displayed.
+          </p>
         </section>
       </section>
 
