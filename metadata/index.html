@@ -81,7 +81,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       <p>
         A human consumer of this data might be able to figure out the meaning of the different columns, particularly if there were some additional human-readable documentation made available. Automated processors would have a much harder time; realistically they would be limited to displaying the information in a table. Making available machine-readable metadata helps with the interpretation of the tabular data. For example, say that the following metadata file were available at <code>http://example.org/trees-ops.csv.csvm</code>:
       </p>
-      <pre class="example">
+      <pre class="example highlight">
 {
   "name": "tree-ops",
   "title": "Tree Operations",
@@ -128,9 +128,85 @@ GID,On Street,Species,Trim Cycle,Inventory Date
   }]
 }
       </pre>
-      <p class="note">
-        This is unaltered datapackage JSON.
-      </p>
+      <div class="issue">
+        <p>
+          Above is unaltered datapackage JSON. If we focus on just single file metadata, try to throw in some JSON-LD naming conventions and use terminology from the model document, we get something more like:
+        </p>
+        <pre class="highlight">
+{
+  "@id": "tree-ops.csv",
+  "@type": "Table",
+  "title": "Tree Operations",
+  "keywords": ["tree", "street", "maintenance"],
+  "publisher": [{
+    "name": "Example Municipality",
+    "web": "http://example.org"
+  }],
+  "license": "http://opendefinition.org/licenses/cc-by/",
+  "modified": "2010-12-31",
+  "columns": [{
+    "@id": "_:GID",
+    "name": "GID",
+    "title": "Generic Identifier",
+    "description": "An identifier for the operation on a tree.",
+    "type": "string",
+    "required": true,
+    "unique": true
+  }, {
+    "name": "On Street",
+    "description": "The street that the tree is on.",
+    "type": "string"
+  }, {
+    "name": "Species",
+    "description": "The species of the tree.",
+    "type": "string"
+  }, {
+    "name": "Trim Cycle",
+    "description": "The operation performed on the tree.",
+    "type": "string"
+  }, {
+    "name": "Inventory Date",
+    "description": "The date of the operation that was performed.",
+    "type": "date",
+    "format": "M/D/YYYY"
+  }]
+  "primaryKey": "_:GID"  
+}
+        </pre>
+        <p>
+          The JSON-LD context would roughly look like:
+        </p>
+        <pre class="highlight">
+{
+  "@vocab": "http://w3.org/ns/table#",
+  "title": "http://purl.org/dc/terms/title",
+  "keywords": "http://purl.org/dc/terms/keywords",
+  "publisher": {
+    "@id": "http://purl.org/dc/terms/publisher",
+    "@type": "@id"
+    // something here that maps the publisher onto an appropriate schema.org type?    
+  }
+  "license": {
+    "@id": "http://purl.org/dc/terms/license",
+    "@type": "@id"
+  },
+  "modified": {
+    "@id": "http://purl.org/dc/terms/modified",
+    "@type": "http://www.w3.org/2001/XMLSchema#date"
+  },
+  "columns": {
+    "@id": "columns",
+    "@type": "@list"
+    // don't know how to say the list is of Column objects
+    // don't know how to detail the properties of the columns in context
+  },
+  "primaryKey": {
+    "@id": "primaryKey",
+    "@type": "@id"
+  }
+}
+        </pre>
+      </div>
       <p>
         Given the location of the CSV file, this metadata file can be located by appending <code>.csvm</code> to the URL (as described in <a href="http://www.w3.org/TR/tabular-data-model/#standard-path">Model for Tabular Data and Metadata on the Web</a>). It provides information for different types of applications:
       </p>
