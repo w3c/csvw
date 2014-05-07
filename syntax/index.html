@@ -76,6 +76,9 @@ var respecConfig = {
       <p>
         This document is based on IETF's [[!RFC4180]] which is an Informational RFC. The working group's expectation is that future suggestions to refine RFC 4180 will be relayed to the IETF (e.g. around I18N and multi-part packaging) and contribute to its discussions about moving CSV to the Standards track.
       </p>
+      <p>
+        Many "CSV" files embed metadata, for example in lines before the header row of the CSV document. This specification does not define any formats for embedding metadata within CSV files, aside from the names of columns in the header row.
+      </p>
     </section>
     <section id="intro">
       <h2>Introduction</h2>
@@ -92,9 +95,9 @@ var respecConfig = {
         There are different levels of data models for tabular data:
       </p>
       <ul>
-        <li>The <strong>core tabular data model</strong> described in <a href="#core-tabular-data-model" class="sectionRef"></a> defines the core model for a single table of basic data.</li>
-        <li>The <strong>annotated tabular data model</strong> described in <a href="#annotated-tabular-data-model" class="sectionRef"></a> defines a model for tables that are annotated with metadata.</li>
-        <li>The <strong>grouped tabular data model</strong> described in <a href="#grouped-tabular-data-model" class="sectionRef"></a> defines a model for tables that are related to each other in some way.</li>
+        <li>The <dfn>core tabular data model</dfn> described in <a href="#core-tabular-data-model" class="sectionRef"></a> defines the core model for a single table of basic data.</li>
+        <li>The <dfn>annotated tabular data model</dfn> described in <a href="#annotated-tabular-data-model" class="sectionRef"></a> defines a model for tables that are annotated with metadata.</li>
+        <li>The <dfn>grouped tabular data model</dfn> described in <a href="#grouped-tabular-data-model" class="sectionRef"></a> defines a model for tables that are related to each other in some way.</li>
       </ul>
       <section>
         <h3>Core Tabular Data Model</h3>
@@ -172,7 +175,7 @@ var respecConfig = {
         As described in <a href="#annotated-tabular-data-model" class="sectionRef"></a>, tabular data may have a number of annotations associated with it. Here we describe the different methods that can be used to locate those annotations given a link to a CSV file.
       </p>
       <p>
-        In most methods of locating metadata described here, metadata is provided within a separate document. The syntax of this document is not defined here, but these documents can include things like:
+        In most methods of locating metadata described here, metadata is provided within a separate document. The syntax of this document is defined in the <a href="http://w3c.github.io/csvw/metadata/">Metadata Vocabulary for Tabular Data</a> specification. These documents can include things like:
       </p>
       <ul>
         <li>metadata about the table, such as titles, descriptions, provenance, and links to other tables</li>
@@ -181,11 +184,10 @@ var respecConfig = {
         <li>metadata about values in the table, such as notes or type annotations</li>
       </ul>
       <p>
-        When creating a set of annotations from metadata, if the same property is specified in two locations then information closer to the document itself should override information further from the document. Explicitly, the order of preference is:
+        When creating a set of annotations from metadata, if the same property is specified in two locations then information "closer" to the document itself should override information "further" from the document. Explicitly, the order of preference is:
       </p>
       <ol>
         <li>metadata embedded within the tabular data file itself, see <a href="#embedded-metadata" class="sectionRef"></a></li>
-        <li>metadata in a document linked to from a reference within the tabular data file, see <a href="#embedded-link" class="sectionRef"></a></li>
         <li>metadata within a package that the tabular data file belongs to, see <a href="#package" class="sectionRef"></a></li>
         <li>metadata in a document linked to using a <code>Link</code> header when retrieving the tabular data file, see <a href="#link-header" class="sectionRef"></a></li>
         <li>metadata in a document located through a standard path from the tabular data file, see <a href="#standard-path" class="sectionRef"></a></li>
@@ -196,31 +198,11 @@ var respecConfig = {
       <section>
         <h3>Embedded Metadata</h3>
         <p>
-          Metadata MAY be directly embedded within a CSV file, as described here.
-        </p>
-        <p>
           The first line of a CSV+ file MUST be processed as a header line unless the CSV+ file is served with a <code>header=absent</code> parameter on the media type. Each non-<a>empty field</a> in the header line provides a <strong>name</strong> annotation on the column in which it appears.
         </p>
         <p class="issue">
-          Should we support any other embedding of metadata within a CSV file? An example approach is shown in <a href="http://jenit.github.io/linked-csv/">Linked CSV</a>. If this is allowed we should specify a new media type for the syntax.
+          The <strong>name</strong> annotation needs to be linked to the relevant annotation in the metadata vocabulary.
         </p>
-      </section>
-      <section>
-        <h3>Embedded Link</h3>
-        <p>
-          A link to the metadata to be used with a CSV may be indicated within the CSV file itself.
-        </p>
-        <div class="issue">
-          <p>
-            How should a link be embedded? Perhaps something like:
-          </p>
-          <pre>
-#CSV;metadata=<var>link</var>
-          </pre>
-          <p>
-            as the first line? If this is allowed we should specify a new media type for the syntax.
-          </p>
-        </div>
       </section>
       <section>
         <h3>Package</h3>
