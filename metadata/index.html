@@ -8,6 +8,10 @@
 		</script>
     <script class="remove">
 var respecConfig = {
+    localBiblio: {
+        "CSV-MODEL": "Jeni Tennison. <a href=\"http://w3c.github.io/csvw/syntax/\"><cite>Model for Tabular Data and Metadata on the Web</cite></a> Editor's Draft. URL: <a href=\"http://w3c.github.io/csvw/syntax/\">http://w3c.github.io/csvw/syntax/</a>",
+        "UNICODE-BIDI": "Mark Davis; Aharon Lanin; Andrew Glass. <a href=\"http://unicode.org/reports/tr9/\"><cite>TR9, Unicode Bidirectional Algorithm.</cite></a>. 24 September 2013, URL: <a href=\"http://unicode.org/reports/tr9/\">http://unicode.org/reports/tr9/</a>"
+    },
     specStatus: "ED",
     shortName: "tabular-metadata",
     //publishDate:  "2014-03-27",
@@ -211,9 +215,10 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         Given the location of the CSV file, this metadata file can be located by appending <code>.csvm</code> to the URL (as described in <a href="http://www.w3.org/TR/tabular-data-model/#standard-path">Model for Tabular Data and Metadata on the Web</a>). It provides information for different types of applications:
       </p>
       <ul>
-        <li><strong>Data Aggregators</strong> can use the indicated metadata, such as descriptions, titles, modification dates and licences, to enable more intelligent retrieval of relevant data on the web.</li>
+        <li><strong>Viewers</strong> can use the indicated metadata to provide a more user-friendly or human-readable view of the CSV file, which might include displaying it in a table or as graphs or charts.</li>
         <li><strong>Validators</strong> can check that the labels of the columns in the metadata file match those in the CSV file, that the values in the columns are of the right type and in the right format, and that values in the <code>GID</code> column are all present and unique.</li>
         <li><strong>Converters</strong> can use the metadata to map the CSV data into other formats such as JSON, RDF and XML, or into databases or statistical applications, in intelligent ways.</li>
+        <li><strong>Data Aggregators</strong> can use the indicated metadata, such as descriptions, titles, modification dates and licences, to enable more intelligent retrieval of relevant data on the web.</li>
       </ul>
       <p>
         The <a href="http://www.w3.org/TR/tabular-data-model/">Model for Tabular Data and Metadata on the Web</a> specification defines an <a href="http://www.w3.org/TR/tabular-data-model/#annotated-model">Annotated Tabular Data Model</a> in which tables, columns, rows and fields can be annotated with properties and values, and a <a href="http://www.w3.org/TR/tabular-data-model/#grouped-model">Grouped Tabular Data Model</a> in which a group of tables is annotated. That specification also describes <a href="http://www.w3.org/TR/tabular-data-model/#metadata">how to locate metadata</a> about a given CSV file.
@@ -224,6 +229,69 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       <p class="issue">
         We should aim, if we can, for the JSON format to be equivalent to a JSON-LD version of the RDF vocabulary, but without any requirement to include context within the JSON itself (to save people from having to do boilerplate).
       </p>
+    </section>
+    <section>
+      <h2>Processing Tables</h2>
+      <p>
+        This section describes how particular types of applications should use the metadata supplied about a CSV file when they process that CSV file.
+      </p>
+      <section>
+        <h3>Displaying Tables</h3>
+        <section>
+          <h4>Displaying Metadata</h4>
+          <p class="issue">TODO: Stuff about providing metadata about the table</p>
+        </section>
+        <section>
+          <h4>Bidirectional Tables</h4>
+          <p>
+            There are two levels of bidirectionality to consider when displaying tables: the directionality of the table (ie whether the columns should be arranged left-to-right or right-to-left) and the directionality of the content of individual fields.
+          </p>
+          <p>
+            The <a href="#table-bidi"><code>bidi</code> property of a table</a> provides information about the desired display of the table. If <code>bidi=ltr</code> then the first column SHOULD be displayed on the left and the last column on the right. If <code>bidi=rtl</code> then the first column SHOULD be displayed on the right and the last column on the left.
+          </p>
+          <p>
+            If <code>bidi=default</code> then tables SHOULD be displayed with attention to the bidirectionality of the content of the file. Specifically, the values of the cells in the table should be scanned breadth first: from the first cell in the first column through to the last cell in the first column, down to the last cell in the last column. If the first character in the table with a <a href="http://unicode.org/reports/tr9/#Bidirectional_Character_Types">strong type</a> as defined in [[!UNICODE-BIDI]] indicates a <acronym title="right-to-left">RTL</acronym> directionality, the table should be displayed with the first column on the right and the last column on the left. Otherwise, the table should be displayed with the first column on the left and the last column on the right. Characters such as whitespace, quotes, commas and numbers do not have a strong type, and therefore are skipped when identifying the character that determines the directionality of the table.
+          </p>
+          <p class="issue">
+            See [[CSV-MODEL]] for further discussion about the parsing of bidirectional CSV+ files into tables.
+          </p>
+          <p>
+            Implementations SHOULD enable user preferences to override the indicated metadata about the directionality of the table.
+          </p>
+          <p>
+            Once the directionality of the table has been determined, each field within the table should be considered as a separate <a href="http://unicode.org/reports/tr9/#The_Paragraph_Level">paragraph</a>, as defined by the <acronym title="Unicode Bidirectional Algorithm">UBA</acronym> in [[!UNICODE-BIDI]]. The default directionality for the field is determined by looking at:
+          </p>
+          <ol>
+            <li>the <a href="#field-bidi"><code>bidi</code> property of the field</a>, if it is <code>"rtl"</code> or <code>"ltr"</code></li>
+            <li>otherwise, the <a href="#row-bidi"><code>bidi</code> property of the row</a>, if it is <code>"rtl"</code> or <code>"ltr"</code></li>
+            <li>otherwise, the <a href="#column-bidi"><code>bidi</code> property of the column</a>, if it is <code>"rtl"</code> or <code>"ltr"</code></li>
+            <li>otherwise, the table directionality as determined above</li>
+          </ol>
+          <p>
+            If a field contains no characters with a strong type (if it's a number or date for example) then the way the field is displayed should be determined by the metadata provided about the field. However, when the field contains characters with a strong type (such as letters) then they MUST be displayed according to the Unicode Bidirectional Algorithm as described in [[!UNICODE-BIDI]].
+          </p>
+        </section>
+        <section>
+          <h4>Column and Row Headings</h4>
+          <p class="issue">TODO: stuff about using labels etc</p>
+        </section>
+        <section>
+          <h4>Displaying Fields</h4>
+          <p class="issue">TODO: stuff about formatting values, having access to notes &amp; annotations etc</p>
+        </section>
+      </section>
+      <section>
+        <h3>Validating Tables</h3>
+        <p class="issue">TODO</p>
+      </section>
+      <section>
+        <h3>Converting Tables</h3>
+        <p class="issue">TODO</p>
+      </section>
+      <section>
+        <h3>Aggregating Tables</h3>
+        <p class="issue">TODO</p>
+      </section>
     </section>
     <section>
       <h2>Metadata Format</h2>
@@ -437,7 +505,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         <section>
           <h4>Required Fields</h4>
           <dl>
-            <dt><code>@id</code></dt>
+            <dt id="table-id"><code>@id</code></dt>
             <dd>This gives the URL of the CSV file that the table is held in, relative to the location of the metadata document.</dd>
           </dl>
           <p class="issue">
@@ -450,10 +518,12 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             The description of a table MAY also contain:
           </p>
           <dl>
-            <dt><code>@type</code></dt>
+            <dt id="table-type"><code>@type</code></dt>
             <dd>If included, <code>@type</code> MUST be set to <code>"Table"</code>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.</dd>
-            <dt><code>columns</code></dt>
+            <dt id="table-columns"><code>columns</code></dt>
             <dd>An array of column descriptions as described in <a href="#columns" class="sectionRef"></a>. These are matched to columns by position: the first column description in the array applies to the first column in the table, the second to the second and so on.</dd>
+            <dt id="table-bidi"><code>bidi</code></dt>
+            <dd>One of <code>"rtl"</code>, <code>"ltr"</code> or <code>"default"</code>. Indicates whether the table should be displayed with the first column on the right, on the left, or based on the first character in the table that has a specific direction. See <a href="#display" class="sectionRef"></a> for more details.</dd>
           </dl>
           <p class="issue">
             Should we include any properties that help in the parsing of the file, eg data package includes <code>encoding</code>?
