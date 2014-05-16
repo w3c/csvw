@@ -241,7 +241,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           The metadata defined in this specification is used to construct an <a href="http://w3c.github.io/csvw/syntax/#dfn-annotated-table">annotated table</a> as defined in [[!CSV-MODEL]]. Annotated tables form the basis for all further processing. All compliant applications MUST create annotated tables based on the algorithm defined here.
         </p>
         <p>
-          The basis for an annotated table is an <a href="http://w3c.github.io/csvw/syntax/#dfn-table">un-annotated table</a>, usually created by parsing a CSV document. Syntactic artefacts (such as whether a field originally had double quotes around it or not) are not preserved in the table model, do not appear in an annotated table model, and therefore MUST NOT be used when displaying, validating, converting or aggregating tables.
+          The basis for an annotated table is an <a href="http://w3c.github.io/csvw/syntax/#dfn-table">table</a>, which may already have some annotations, usually created by parsing a CSV document. Syntactic artefacts (such as whether a field originally had double quotes around it or not) are not preserved in the table model, do not appear in an annotated table model, and therefore MUST NOT be used when displaying, validating, converting or aggregating tables.
         </p>
         <p class="issue">TODO: Add definition here!</p>
       </section>
@@ -333,6 +333,181 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       <p class="issue">
         We intend to support metadata for packages, and to support externally-sourced schemas for tabular data. For now, we are scoping to single metadata files defining single CSV files.
       </p>
+      <section>
+        <h3>Syntax</h3>
+        <p>
+          A metadata document is a JSON document which holds an object at the top level. This object is a <a>description object</a> of a table. A <dfn>description object</dfn> has one or more properties are mapped into properties on the annotated table. There are different types of properties:
+        </p>
+        <dl>
+          <dt><dfn title="link property">link properties</dfn></dt>
+          <dd>
+            <p>These hold one or more references to other resources by URL. Their values may be:</p>
+            <ul>
+              <li><strong>strings</strong> &mdash; resolved as URLs against the <a>base URL</a></li>
+              <li><strong>arrays</strong> &mdash; lists of strings which are resolved as URLs against the <a>base URL</a></li>
+            </ul>
+          </dd>
+          <dt><dfn title="object property">object properties</dfn></dt>
+          <dd>
+            <p>These hold one or more objects or references to objects by URL. Their values may be:</p>
+            <ul>
+              <li><strong>strings</strong> &mdash; resolved as URLs against the <a>base URL</a></li>
+              <li><strong>objects</strong> &mdash; interpreted as structured objects</li>
+              <li><strong>arrays</strong> &mdash; lists of strings and/or objects</li>
+            </ul>
+            <p>
+              Object properties are often used when the values can be or should be values within controlled vocabularies.
+            </p>
+            <p class="issue">
+              Add an example using frequency, which has a controlled vocabulary from DCT.
+            </p>
+          </dd>
+          <dt><dfn title="natural language property">natural language properties</dfn></dt>
+          <dd>
+            <p>These hold natural language strings. Their values may be:</p>
+            <ul>
+              <li><strong>strings</strong> &mdash; interpreted as natural language strings in the <a>default language</a></li>
+              <li><strong>objects</strong> whose properties MUST be language codes as defined by [[!REF]]</li>
+            </ul>
+            <p class="issue">
+              It would be nice to enable some markup in natural language strings, for example by stating that they are interpreted as HTML or Markdown.
+            </p>
+          </dd>
+          <dt><dfn title="atomic property">atomic properties</dfn></dt>
+          <dd>
+            <p>These hold atomic values such as dates, numbers or strings. Their values may be:</p>
+            <ul>
+              <li><strong>numbers</strong> &mdash; interpreted as integers or doubles</li>
+              <li><strong>booleans</strong> &mdash; interpreted as booleans</li>
+              <li><strong>strings</strong> &mdash; interpreted as defined by the property</li>
+              <li><strong>arrays</strong> &mdash; lists of numbers, booleans or strings</li>
+            </ul>
+          </dd>
+        </dl>
+        <p>
+          The top-level object MAY have a <code>@context</code> property. This holds an object that provides metadata for interpreting other properties, namely:
+        </p>
+        <dl>
+          <dt><code>@language</code></dt>
+          <dd>indicates the default language for the values of properties in the description; if present, its value MUST be a language code [[REF]] which is the <dfn>default language</dfn> for the values of other properties in the metadata document</dd>
+          <dt><code>@base</code></dt>
+          <dd>indicates the base URL against which other URLs within the description are resolved; if present, its value MUST be a URL which is resolved against the base URL of the metadata document (the location from which it was retrieved) to provide the <dfn>base URL</dfn> for other URLs in the metadata document</dd>
+        </dl>
+      </section>
+      <section>
+        <h3>Common Properties</h3>
+        <p>
+          Some properties may be applied to any structure within the tabular data model: tables, columns, rows or fields.
+        </p>
+        <p>
+          Descriptions MAY contain a <code>label</code> property which is a <a>natural language property</a> that has the same meaning as <code>rdfs:label</code> as defined by [[!RDF-SCHEMA]], providing a human-readable name for the table, column, row or field.
+        </p>
+        <p>
+          Descriptions MAY contain a <code>comment</code> property which is a <a>natural language property</a> that has the same meaning as <code>rdfs:comment</code> as defined by [[!RDF-SCHEMA]], providing a human-readable description of the table, column, row or field.
+        </p>
+        <section>
+          <h4>Dublin Core Terms</h4>
+          <p>
+            Descriptions MAY contain any properties defined by [[!DC-TERMS]] to describe the table. This specification does not define any application behaviour associated with these properties being present, except that validation of metadata files MUST check that, if they are present, they adhere to the syntax defined here.
+          </p>
+          <table>
+            <thead>
+              <tr><th>Property</th><th>Type</th><th>Details</th></tr>
+            </thead>
+            <tr><th><code>abstract</code></th><td><a>natural language property</a></td><td></td></tr>
+            <tr><th><code>accessRights</code></th><td><a>object property</a></td><td></td></tr>
+            <tr><th><code>accrualMethod</code></th><td><a>object property</a></td><td></td></tr>
+            <tr><th><code>accrualPeriodicity</code></th><td><a>object property</a></td><td></td></tr>
+            <tr><th><code>accrualPolicy</code></th><td><a>object property</a></td><td></td></tr>
+            <tr><th><code>alternative</code></th><td><a>natural language property</a></td><td></td></tr>
+            <tr><th><code>audience</code></th><td><a>object property</a></td><td></td></tr>
+            <tr><th><code>available</code></th><td><a>atomic property</a></td><td>dates in the format <code>YYYY-MM-DD</code></td></tr>
+            <tr><th><code>bibliographicCitation</code></th><td><a>natural language property</a></td><td></td></tr>
+            <tr><th><code>conformsTo</code></th><td><a>object property</a></td><td></td></tr>
+            <tr><th><code>contributor</code></th><td><a>object property</a></td><td></td></tr>
+            <tr><th><code>coverage</code></th><td><a>object property</a></td><td></td></tr>
+            <tr><th><code>created</code></th><td><a>atomic property</a></td><td>dates in the format <code>YYYY-MM-DD</code></td></tr>
+            <tr><th><code>creator</code></th><td><a>object property</a></td><td></td></tr>
+            <tr><th><code>date</code></th><td><a>atomic property</a></td><td>dates in the format <code>YYYY-MM-DD</code></td></tr>
+            <tr><th><code>dateAccepted</code></th><td><a>atomic property</a></td><td>dates in the format <code>YYYY-MM-DD</code></td></tr>
+            <tr><th><code>dateCopyrighted</code></th><td><a>atomic property</a></td><td>dates in the format <code>YYYY-MM-DD</code></td></tr>
+            <tr><th><code>dateSubmitted</code></th><td><a>atomic property</a></td><td>dates in the format <code>YYYY-MM-DD</code></td></tr>
+            <tr><th><code>description</code></th><td><a>natural language property</a></td><td></td></tr>
+            <tr><th><code>educationLevel</code></th><td><a>object property</a></td><td></td></tr>
+            <tr><th><code>extent</code></th><td><a>object property</a></td><td></td></tr>
+            <tr><th><code>format</code></th><td><a>object property</a></td><td></td></tr>
+            <tr><th><code>hasFormat</code></th><td><a>object property</a></td><td></td></tr>
+            <tr><th><code>hasPart</code></th><td><a>link property</a></td><td></td></tr>
+            <tr><th><code>hasVersion</code></th><td><a>link property</a></td><td></td></tr>
+            <tr><th><code>identifier</code></th><td><a>atomic property</a></td><td>a URL</td></tr>
+            <tr><th><code>instructionalMethod</code></th><td><a>object property</a></td><td></td></tr>
+            <tr><th><code>isFormatOf</code></th><td><a>link property</a></td><td></td></tr>
+            <tr><th><code>isPartOf</code></th><td><a>link property</a></td><td></td></tr>
+            <tr><th><code>isReferencedBy</code></th><td><a>link property</a></td><td></td></tr>
+            <tr><th><code>isReplacedBy</code></th><td><a>link property</a></td><td></td></tr>
+            <tr><th><code>isRequiredBy</code></th><td><a>link property</a></td><td></td></tr>
+            <tr><th><code>issued</code></th><td><a>atomic property</a></td><td>dates in the format <code>YYYY-MM-DD</code></td></tr>
+            <tr><th><code>isVersionOf</code></th><td><a>link property</a></td><td></td></tr>
+            <tr><th><code>language</code></th><td><a>atomic property</a></td><td>a language code as defined by [[!REF]]</td></tr>
+            <tr><th><code>license</code></th><td><a>object property</a></td><td></td></tr>
+            <tr><th><code>mediator</code></th><td><a>object property</a></td><td></td></tr>
+            <tr><th><code>medium</code></th><td><a>object property</a></td><td></td></tr>
+            <tr><th><code>modified</code></th><td><a>atomic property</a></td><td>dates in the format <code>YYYY-MM-DD</code></td></tr>
+            <tr><th><code>provenance</code></th><td><a>object property</a></td><td></td></tr>
+            <tr><th><code>publisher</code></th><td><a>object property</a></td><td></td></tr>
+            <tr><th><code>references</code></th><td><a>link property</a></td><td></td></tr>
+            <tr><th><code>relation</code></th><td><a>link property</a></td><td></td></tr>
+            <tr><th><code>replaces</code></th><td><a>link property</a></td><td></td></tr>
+            <tr><th><code>requires</code></th><td><a>link property</a></td><td></td></tr>
+            <tr><th><code>rights</code></th><td><a>object property</a></td><td></td></tr>
+            <tr><th><code>rightsHolder</code></th><td><a>object property</a></td><td></td></tr>
+            <tr><th><code>source</code></th><td><a>link property</a></td><td></td></tr>
+            <tr><th><code>spatial</code></th><td><a>object property</a></td><td></td></tr>
+            <tr><th><code>subject</code></th><td><a>object property</a></td><td></td></tr>
+            <tr><th><code>tableOfContents</code></th><td><a>natural language property</a></td><td></td></tr>
+            <tr><th><code>temporal</code></th><td><a>object property</a></td><td></td></tr>
+            <tr><th><code>title</code></th><td><a>natural language property</a></td><td></td></tr>
+            <tr><th><code>type</code></th><td><a>object property</a></td><td></td></tr>
+            <tr><th><code>valid</code></th><td><a>atomic property</a></td><td>dates in the format <code>YYYY-MM-DD</code></td></tr>
+          </table>
+        </section>
+        <section>
+          <h4>Links</h4>
+          <p>
+            Description MAY include properties for registered <a href="http://www.iana.org/assignments/link-relations/link-relations.xhtml">link relations</a>, prefixed by <code>link:</code>. This specification does not define any application behaviour associated with these properties being present, except that validation of metadata files MUST check that, if they are present, they have values that are URLs or arrays of URLs. The following properties are particularly applicable:
+          </p>
+          <ul>
+            <li><code>link:alternate</code></li>
+            <li><code>link:canonical</code></li>
+            <li><code>link:collection</code></li>
+            <li><code>link:duplicate</code></li>
+            <li><code>link:glossary</code></li>
+            <li><code>link:help</code></li>
+            <li><code>link:icon</code></li>
+            <li><code>link:last</code></li>
+            <li><code>link:latest-version</code></li>
+            <li><code>link:next</code></li>
+            <li><code>link:original</code></li>
+            <li><code>link:predecessor-version</code></li>
+            <li><code>link:prev</code> or <code>link:previous</code></li>
+            <li><code>link:preview</code></li>
+            <li><code>link:profile</code></li>
+            <li><code>link:related</code></li>
+            <li><code>link:search</code></li>
+            <li><code>link:self</code></li>
+            <li><code>link:start</code></li>
+            <li><code>link:successor-version</code></li>
+            <li><code>link:terms-of-service</code></li>
+            <li><code>link:up</code></li>
+            <li><code>link:version-history</code></li>
+            <li><code>link:working-copy</code></li>
+            <li><code>link:working-copy-of</code></li>
+          </ul>
+          <p class="issue">
+            Unlike the Dublin Core terms, link relations are an ever-expanding list and there may eventually be clashes between link relation terms and those defined above. That's why the above list uses QNames for all link relations, so that they look like <code>link:<var>relation</var></code> rather than plain <code><var>relation</var></code>.
+          </p>
+        </h4>
+      </section>
       <!--
       <section>
         <h3>Table Groups</h3>
@@ -541,7 +716,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <dd>This gives the URL of the CSV file that the table is held in, relative to the location of the metadata document.</dd>
           </dl>
           <p class="issue">
-            It's possible to alias all the JSON-LD keywords, but would that be useful?
+            It's possible to alias all the JSON-LD keywords, for example to use <code>url</code> instead of <code>@id</code>, but would that be useful?
           </p>
         </section>
         <section>
@@ -552,10 +727,10 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           <dl>
             <dt id="table-type"><code>@type</code></dt>
             <dd>If included, <code>@type</code> MUST be set to <code>"Table"</code>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.</dd>
+            <dt id="table-bidi"><code>bidi</code></dt>
+            <dd>One of <code>"rtl"</code>, <code>"ltr"</code> or <code>"default"</code>. Indicates whether the table should be displayed with the first column on the right, on the left, or based on the first character in the table that has a specific direction. See <a href="#bidirectional-tables" class="sectionRef"></a> for more details.</dd>
             <dt id="table-columns"><code>columns</code></dt>
             <dd>An array of column descriptions as described in <a href="#columns" class="sectionRef"></a>. These are matched to columns by position: the first column description in the array applies to the first column in the table, the second to the second and so on.</dd>
-            <dt id="table-bidi"><code>bidi</code></dt>
-            <dd>One of <code>"rtl"</code>, <code>"ltr"</code> or <code>"default"</code>. Indicates whether the table should be displayed with the first column on the right, on the left, or based on the first character in the table that has a specific direction. See <a href="#display" class="sectionRef"></a> for more details.</dd>
           </dl>
           <p class="issue">
             Should we include any properties that help in the parsing of the file, eg data package includes <code>encoding</code>?
@@ -563,64 +738,12 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           <p class="issue">
             Should we include any properties that help in checking the integrity of the file, eg data package includes <code>bytes</code> and <code>hash</code>? We could possibly reuse the <a href="http://www.w3.org/TR/SRI/">Subresource Integrity</a> work here.
           </p>
-          <p>
-            The description MAY contain any fields defined by [[!DC-TERMS]] to describe the table. This specification does not define any application behaviour associated with these fields being present. The following fields are particularly recommended:
-          </p>
-          <ul>
-            <li><code>created</code></li>
-            <li><code>creator</code></li>
-            <li><code>description</code></li>
-            <li><code>language</code></li>
-            <li><code>license</code></li>
-            <li><code>modified</code></li>
-            <li><code>provenance</code></li>
-            <li><code>publisher</code></li>
-            <li><code>rights</code></li>
-            <li><code>rightsHolder</code></li>
-            <li><code>source</code></li>
-            <li><code>spatial</code></li>
-            <li><code>subject</code></li>
-            <li><code>temporal</code></li>
-            <li><code>title</code></li>
-          </ul>
-          <p>
-            The description MAY include fields for registered <a href="http://www.iana.org/assignments/link-relations/link-relations.xhtml">link relations</a>, prefixed by <code>link:</code>. This specification does not define any application behaviour associated with these fields being present. The following fields are particularly recommended:
-          </p>
-          <ul>
-            <li><code>link:alternate</code></li>
-            <li><code>link:canonical</code></li>
-            <li><code>link:collection</code></li>
-            <li><code>link:duplicate</code></li>
-            <li><code>link:glossary</code></li>
-            <li><code>link:help</code></li>
-            <li><code>link:icon</code></li>
-            <li><code>link:last</code></li>
-            <li><code>link:latest-version</code></li>
-            <li><code>link:next</code></li>
-            <li><code>link:original</code></li>
-            <li><code>link:predecessor-version</code></li>
-            <li><code>link:prev</code> or <code>link:previous</code></li>
-            <li><code>link:preview</code></li>
-            <li><code>link:profile</code></li>
-            <li><code>link:related</code></li>
-            <li><code>link:search</code></li>
-            <li><code>link:self</code></li>
-            <li><code>link:start</code></li>
-            <li><code>link:successor-version</code></li>
-            <li><code>link:terms-of-service</code></li>
-            <li><code>link:up</code></li>
-            <li><code>link:version-history</code></li>
-            <li><code>link:working-copy</code></li>
-            <li><code>link:working-copy-of</code></li>
-          </ul>
-          <p class="issue">
-            Unlike the Dublin Core terms, link relations are an ever-expanding list and there may eventually be clashes between link relation terms and those defined above. That's why the above list uses QNames for all link relations, so that they look like <code>link:<var>relation</var></code> rather than plain <code><var>relation</var></code>.
-          </p>
           <p class="issue">
             Any other lists of properties we should crib off?
           </p>
         </section>
       </section>
+
       <section>
         <h3>Columns</h3>
         <p class="note">
@@ -997,6 +1120,15 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         <h3>Registration of <code>application/csvm+json</code></h3>
         <p class="issue">TODO</p>
       </section>
+    </section>
+    <section class="appendix">
+      <h2>JSON-LD Context</h2>
+      <p>
+        The following JSON document is the JSON-LD context document that can be used to interpret metadata documents as RDF.
+      </p>
+      <p class="issue">
+        See <a href="csvm-context.json">csvm-context.json</a>.
+      </p>
     </section>
   </body>
 </html>
