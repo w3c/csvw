@@ -90,6 +90,10 @@ This could be provided by the user doing the conversion CSV to RDF or in
 the metadata file (by link or directly). When provided by the publisher,
 this can be a starting point or used as-is.
 
+A template can be applied by taking each row, applying it to the template by text substitution
+and emitting the text. A processor may choose to perform additional checking (e.g. RDF syntax)
+but this is not required for conformance.
+
 Notes:
 * uses `{sample-time}` twice for different purposes: primary key and triple object.
 
