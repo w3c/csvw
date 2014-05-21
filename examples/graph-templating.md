@@ -82,3 +82,9 @@ together with a way to insert the prefixes (a prologue block of text would be en
     @prefix qudt:       <http://qudt.org/1.1/schema/qudt#> .
     @prefix def-op:     <http://data.example.org/wow/def/observed-property#> .
 
+We don't have to define two separate mechanisms for the cases of when a template is given and when it is not.
+A graph fragment tempate can be generated from the matadate alone:
+
+    <site/22580943/date-time/{sample-time}>
+       def-op:airTemperature_C 11.2e0 "{air-temp}"^^xsd:double ;
+       def-op:dewPointTemperatureCel "{dew-temp}"^^xsd:double .
