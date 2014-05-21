@@ -66,12 +66,13 @@ Some of the rdf:type information could be by ever increasing complexity in the m
         ssn:observationSamplingTime [ time:inXSDDateTime "{sample-time}"^^xsd:dateTime ] ;
         ssn:observationResult [
             a ssn:SensorOutput ;
-            def-op:airTemperature_C [ qudt:numericValue "{Air temperature (Cel)}"^^xsd:double ] ;
-            def-op:dewPointTemperature_C [ qudt:numericValue "{Dew-point temperature (Cel)}"^^xsd:double ] ] .
+            def-op:airTemperature_C [ qudt:numericValue "{air-temp}"^^xsd:double ] ;
+            def-op:dewPointTemperature_C [ qudt:numericValue "{dew-point}"^^xsd:double ] ] .
 
 Notes:
 * uses full column names and short names.
 * uses `{sample-time}` twice for different purposes: primary key and triple object.
+* Writing {Air temperature (Cel)}, using the column given name, is much the same as {air-temp}.
 
 together with a way to insert the prefixes (a prologue block of text would be enough).
 
