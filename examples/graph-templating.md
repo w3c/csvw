@@ -3,7 +3,14 @@ Graph Templating
 
 Using the example in https://github.com/w3c/csvw/blob/gh-pages/examples/simple-weather-observation.md
 
-The CSV file is:
+The data:
+<table>
+  <tr><th>Date-time</th><th>Air temperature (Cel)</th><th>Dew-point temperature (Cel)</th></tr>
+  <tr><td>2013-12-13T08:00:00Z</td><td>11.2</td><td>10.2</td></tr>                
+  <tr><td>2013-12-13T09:00:00Z</td><td>12.0</td><td>10.2</td></tr>
+</table>
+
+in a CSV file is:
 
     "Date-time", "Air temperature (Cel)", "Dew-point temperature (Cel)" 
     "2013-12-13T08:00:00Z",11.2,10.2
@@ -37,7 +44,7 @@ and just from that a conversion might generate some RDF:
 
 Notes:
 * Uses datatypes and given predicate names.
-* A fudge in generating the primary key.  The output string needs converting."2013-12-13T08:00:00Z" to "20131213T0800Z".  This is a separate topic.
+* A fudge in generating the primary key.  The output string needs converting."2013-12-13T08:00:00Z" to "20131213T0800Z".  This is a separate topic.  The whole functions-on-fields-string is orthogonal and important.
 
 That's quite basic. The example paints a different picture:
 (small fragment -- see link for full example)
@@ -64,7 +71,7 @@ Some of the rdf:type information could be by ever increasing complexity in the m
 
 Notes:
 * uses full column names and short names.
-* uses `{sample-time} twice for two purposes: primary key and triple object.
+* uses `{sample-time}` twice for different purposes: primary key and triple object.
 
 together with a way to insert the prefixes (a prologue block of text would be enough).
 
