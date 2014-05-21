@@ -10,7 +10,7 @@ The data:
   <tr><td>2013-12-13T09:00:00Z</td><td>12.0</td><td>10.2</td></tr>
 </table>
 
-in a CSV file is with some quotes (not necessary but things safe):
+in a CSV file is, with some quotes (not necessary but makes things safe):
 
     "Date-time", "Air temperature (Cel)", "Dew-point temperature (Cel)" 
     "2013-12-13T08:00:00Z",11.2,10.2
