@@ -104,14 +104,41 @@ var respecConfig = {
       <section>
         <h3>Core Tabular Data Model</h3>
         <p>
-          Data is held in a <dfn>table</dfn>.
+          The core tabular data model can be used to describe a table that lacks any annotations, whether those annotations are embedded within a CSV file or arise from a separate metadata document.
         </p>
         <p>
-          Each table has one or more <dfn title="column">columns</dfn>. The order of the columns is significant and must be preserved by applications.
+          Data is held in a <dfn>table</dfn>. The properties of a table are:
         </p>
+        <ul>
+          <li><dfn title="table columns">columns</dfn> &mdash; the list of <a title="column">columns</a> in the table. A table MUST have one or more columns and the order of the columns within the list is significant and MUST be preserved by applications</li>
+          <li><dfn title="table rows">rows</dfn> &mdash; the list of rows in the table</li>
+        </ul>
         <p>
-          Each table has one or more <dfn title="row">rows</dfn>. The order of the rows is significant and must be preserved by applications. Each row contains a <dfn>field</dfn> for each column in the table. Some of these fields may be <dfn title="empty field">empty fields</dfn> (fields which have no value). There is no distinction between empty fields and fields whose value is an empty string.
+          A <dfn>column</dfn> represents a vertical arrangement of <a title="field">fields</a> within a <a>table</a>. The properties of a column are:
         </p>
+        <ul>
+          <li><dfn title="column table">table</dfn> &mdash; the <a>table</a> that the column appears in</li>
+          <li><dfn title="column number">number</dfn> &mdash; the position of the column amongst the <a title="table columns">columns</a> for the associated <a title="column table">table</a>, starting from 1</li>
+          <li><dfn title="column fields">fields</dfn> &mdash; the list of <a title="field">fields</a> in the column. A column MUST contain one field from each <a>row</a> in the table. The order of the fields in the list MUST match the order of the rows in which they appear within the <a title="table rows">rows</a> for the associated <a title="column table">table</a>.</li>
+        </ul>
+        <p>
+          A <dfn>row</dfn> represents a horizontal arrangement of <a title="field">fields</a> within a <a>table</a>. The properties of a row are:
+        </p>
+        <ul>
+          <li><dfn title="row table">table</dfn> &mdash; the <a>table</a> that the row appears in</li>
+          <li><dfn title="row number">number</dfn> &mdash; the position of the row amongst the <a title="table rows">rows</a> for the <a title="row table">table</a>, starting from 1</li>
+          <li><dfn title="row fields">fields</dfn> &mdash; the list of <a title="field">fields</a> in the row. A row MUST contain one field from each <a>column</a> in the table. The order of the fields in the list MUST match the order of the columns in which they appear within the <a>table columns</a> for the row's table.</li>
+        </ul>
+        <p>
+          A <dfn>field</dfn> represents a cell at the intersection of a <a>row</a> and a <a>column</a> within a <a>table</a>. The properties of a field are:
+        </p>
+        <ul>
+          <li><dfn title="field table">table</dfn> &mdash; the <a>table</a> that the field appears in</li>
+          <li><dfn title="field column">column</dfn> &mdash; the <a>column</a> that the field appears in; the field MUST be in the <a title="column fields">fields</a> for that column</li>
+          <li><dfn title="field row">row</dfn> &mdash; the <a>row</a> that the field appears in; the field MUST be in the <a title="row fields">fields</a> for that row</li>
+          <li><dfn>string value</dfn> &mdash; a string that is the original syntactic representation of the value of the field, ie how the field appears within a CSV file; this may be an empty string</li>
+          <li><dfn title="field value">value</dfn> &mdash; the semantic value of the field; within the core tabular data model this is either a string which is the same as the <a>string value</a> of the field, or <code>null</code>, if the <a>string value</a> is an empty string</li>
+        </ul>
         <p class="issue">
           Should there be a distinction made (in the core tabular data model) between empty fields and fields whose value is an empty string? With a lack of other metadata, the only way to make the distinction would be to say there was a difference between a missing value in a CSV file (eg the second value in <code>a,,z</code>) and a quoted value (eg the second value in <code>a,"",z</code>). This seems dangerous as I don't think many clients will make a distinction between the two, so the semantics will be lost on round-tripping.
         </p>
@@ -119,7 +146,7 @@ var respecConfig = {
       <section>
         <h3>Annotated Tabular Data Model</h3>
         <p>
-          An <dfn>annotated table</dfn> is a <a>table</a> that is annotated with additional metadata. The table MAY have any number of <dfn title="property">properties</dfn> which provide additional information about the table as a whole. The <dfn title="value">values</dfn> of these properties may be lists, structured objects, or atomic values. Annotations on a table may include:
+          An <dfn>annotated table</dfn> is a <a>table</a> that is annotated with additional metadata. The table MAY have any number of <dfn title="property">properties</dfn> in addition to those provided in the core tabular data model described in <a href="#core-tabular-data-model" class="sectionRef"></a> which provide information about the table as a whole. The <dfn title="value">values</dfn> of these properties may be lists, structured objects, or atomic values. Annotations on a table may include:
         </p>
         <ul>
           <li>titles or descriptions of the table</li>
@@ -127,7 +154,7 @@ var respecConfig = {
           <li>links to other tables (eg to indicate tables that include related information)</li>
         </ul>
         <p>
-          The <a title="column">columns</a> within an <a>annotated table</a> are all <dfn title="annotated column">annotated columns</dfn>: columns which MAY have any number of <a title="property">properties</a>. The annotations on a column provide information about how to interpret the <a title="field">fields</a> in the column. Examples of annotations might be:
+          The <a title="column">columns</a> within an <a>annotated table</a> are all <dfn title="annotated column">annotated columns</dfn>: columns which MAY have any number of <a title="property">properties</a> in addition to those provided in the core tabular data model described in <a href="#core-tabular-data-model" class="sectionRef"></a>. The annotations on a column might provide information about how to interpret the <a title="field">fields</a> in the column or information about the column as a whole. Examples of annotations might be:
         </p>
         <ul>
           <li>a name or label for the column</li>
@@ -135,20 +162,26 @@ var respecConfig = {
           <li>an indication of whether the column contains unique values</li>
         </ul>
         <p>
-          The <a title="row">rows</a> within an <a>annotated table</a> are all <dfn title="annotated row">annotated rows</dfn>: rows which MAY have any number of <a title="property">properties</a>. The annotations on a row provide additional metadata about the information held in the row, such as:
+          The <a title="row">rows</a> within an <a>annotated table</a> are all <dfn title="annotated row">annotated rows</dfn>: rows which MAY have any number of <a title="property">properties</a> in addition to those provided in the core tabular data model described in <a href="#core-tabular-data-model" class="sectionRef"></a>. The annotations on a row provide additional metadata about the information held in the row, such as:
         </p>
         <ul>
           <li>the certainty of the information in that row</li>
           <li>information about the source or provenance of the data in that row</li>
         </ul>
         <p>
-          The <a title="field">fields</a> within an <a>annotated row</a> are all <dfn title="annotated field">annotated fields</dfn>: fields which MAY have any number of <a title="property">properties</a>. The annotations on a field provide metadata about the value held in the field, particularly when this overrides the information provided for the <a>annotated column</a> and <a>annotated row</a> that the field falls within. Annotations on a field might be:
+          The <a title="field">fields</a> within an <a>annotated row</a> are all <dfn title="annotated field">annotated fields</dfn>: fields which MAY have any number of <a title="property">properties</a> in addition to those provided in the core tabular data model described in <a href="#core-tabular-data-model" class="sectionRef"></a>. The annotations on a field provide metadata about the value held in the field, particularly when this overrides the information provided for the <a>annotated column</a> and <a>annotated row</a> that the field falls within. Annotations on a field might be:
         </p>
         <ul>
           <li>notes to aid the interpretation of the value</li>
           <li>type annotations for the value</li>
           <li>a flag that indicates the value is a null value</li>
         </ul>
+        <p>
+          The <a title="field value">value</a> of an <a>annotated field</a> MAY be of a datatype other than a string. For example, annotations might enable a processor to understand the <a>string value</a> of the field as representing a number or a date.
+        </p>
+        <p class="issue">
+          The permitted types of names and values of annotations need to be spelled out here.
+        </p>
         <div class="issue">
           <p>
             It might be useful to define annotated regions as follows:
@@ -200,10 +233,10 @@ var respecConfig = {
       <section>
         <h3>Embedded Metadata</h3>
         <p>
-          The first line of a CSV+ file MUST be processed as a header line unless the CSV+ file is served with a <code>header=absent</code> parameter on the media type. Each non-<a>empty field</a> in the header line provides a <strong>name</strong> annotation on the column in which it appears.
+          The first line of a CSV+ file MUST be processed as a header line unless the CSV+ file is served with a <code>header=absent</code> parameter on the media type. Each non-<a>empty field</a> in the header line provides a <strong>title</strong> annotation on the column in which it appears.
         </p>
         <p class="issue">
-          The <strong>name</strong> annotation needs to be linked to the relevant annotation in the metadata vocabulary.
+          The <strong>title</strong> annotation needs to be linked to the relevant annotation in the metadata vocabulary.
         </p>
       </section>
       <section>
