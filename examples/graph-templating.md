@@ -40,19 +40,22 @@ Suppose we have some basic metadata: (`--` are comments).
        datatype : xsd:double
        -- no predicate given: we'll create one.
 
-No graph fragment templates is provided.
+No graph fragment template is provided.
 
 ## Basic Conversion
 
-Just from that a conversion might generate some RDF:
+Just from that information a conversion might generate some RDF: for one row:
 
     <site/22580943/date-time/20131213T0800Z>
        def-op:airTemperature_C 11.2e0 ;
-       def-op:dewPointTemperatureCel 10.2e0 .
+       :dewPointTemperatureCel 10.2e0 .
+    <site/22580943/date-time/20131213T0900Z>
+       def-op:airTemperature_C 12.0e0 ;
+       :dewPointTemperatureCel 10.2e0 .
 
 Notes:
 * Uses datatypes and given predicate names.
-* Generates a predicate name for one not explicitly supplied.
+* Generates a predicate name `:dewPointTemperatureCel` for the one not explicitly supplied.
 * A fudge in generating the primary key.  The output string needs converting."2013-12-13T08:00:00Z" to "20131213T0800Z".  This is a separate topic.  The whole functions-on-fields-string is orthogonal and important.
 
 ## Shaping the data
