@@ -1,4 +1,7 @@
-From https://github.com/w3c/csvw/blob/gh-pages/examples/simple-weather-observation.md
+Graph Templating
+================
+
+Using the example in https://github.com/w3c/csvw/blob/gh-pages/examples/simple-weather-observation.md
 
 The CSV file is:
 
