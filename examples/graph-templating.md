@@ -72,7 +72,7 @@ Some of the rdf:type information could be by ever increasing complexity in the m
 Notes:
 * uses full column names and short names.
 * uses `{sample-time}` twice for different purposes: primary key and triple object.
-* Writing {Air temperature (Cel)}, using the column given name, is much the same as {air-temp}.
+* Writing `{Air temperature (Cel)}`, using the column given name, is much the same as `{air-temp}`.
 
 together with a way to insert the prefixes (a prologue block of text would be enough).
 
