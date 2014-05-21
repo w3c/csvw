@@ -74,8 +74,7 @@ in the for full example).
             def-op:dewPointTemperature_C [ qudt:numericValue "10.2"^^xsd:double ] ] .
 
 
-This has structure to the output and additional triples not directly due to any column.
-Some of the rdf:type information could be included by ever increasing complexity in the metadata.
+This has adds structure to the output and additional triples not directly due to any column.
 
 The graph fragment template approach is to define a template for the RDF for each row:
 
@@ -86,6 +85,10 @@ The graph fragment template approach is to define a template for the RDF for eac
             a ssn:SensorOutput ;
             def-op:airTemperature_C [ qudt:numericValue "{air-temp}"^^xsd:double ] ;
             def-op:dewPointTemperature_C [ qudt:numericValue "{dew-point}"^^xsd:double ] ] .
+
+This could be provided by the user doing the conversion CSV to RDF or in
+the metadata file (by link or directly). When provided by the publisher,
+this can be a starting point or used as-is.
 
 Notes:
 * uses `{sample-time}` twice for different purposes: primary key and triple object.
@@ -102,7 +105,7 @@ together with a way to insert the prefixes (a prologue block of text would be en
 ## Basic RDF by Template
 
 We don't have to define two separate mechanisms for the two case above.  We can define
-A graph fragment template can be generated from the metadata alone.  It might look like:
+a graph fragment template can be generated from the metadata alone.  It might look like:
 
     <site/22580943/date-time/{sample-time}>
        def-op:airTemperature_C 11.2e0 "{air-temp}"^^xsd:double ;
