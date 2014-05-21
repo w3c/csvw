@@ -70,5 +70,5 @@ together with a way to insert the prefixes (a prologue block of text would be en
     @prefix time:       <http://www.w3.org/2006/time#> .
     @prefix xsd:        <http://www.w3.org/2001/XMLSchema#> . 
     @prefix qudt:       <http://qudt.org/1.1/schema/qudt#> .
-    @prefix def-op:     <http://data.example.org/wow/def/observed-property#> 
+    @prefix def-op:     <http://data.example.org/wow/def/observed-property#> .
 
