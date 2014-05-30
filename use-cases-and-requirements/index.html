@@ -2531,6 +2531,217 @@ MCL TRANSPORT CONSULTANTS LTD,Concessionary Fares Scheme,"£10,476","Economy, Tr
           <a href="#R-LinkFromMetadataToData">LinkFromMetadataToData</a>
         </p>
       </section>
+      
+      
+      <section id="UC-HealthLevelSevenHL7">
+        <h2>Use Case #20 - Health Level Seven (HL7) Messages</h2>
+        <p>
+          <span style="font-size: 10pt">(Contributed James McKinney)</span>
+        </p>
+	<p>HL7 develops international healthcare informatics interoperability standards, which are widely used.  HL7 messages follow a format that is very similar to CSV (and may very well be CSV, depending on how you define it). Briefly, a message is a CSV file. A <i>segment</i> is a CSV line, with carriage returns separating <i>segments</i>. A <i>segment</i> is composed of one or more <i>composites</i> (CSV fields). <i>Composites</i> are delimited by pipe characters, instead of the CSV comma. A <i>composite</i> is composed of one or more <i>subcomposites</i>, delimited by <b>^</b> caret characters. The <b>&</b> ampersand is for sub-sub-composites. This system gets around some of the limitations of the CSV file format. A HL7 message (CSV file) can indicate that it is using different delimiters [2].
+
+HL7 has ways of describing the structure of <a href="https://wiki.nci.nih.gov/display/caCORE/CSV+Specification+v4.0">CSV files.</a> 
+
+</p>
+
+        <pre class="example">
+MSH|^~\&amp;|EPIC|EPICADT|SMS|SMSADT|199912271408|CHARRIS|ADT^A04|1817457|D|2.5|
+PID||0493575^^^2^ID 1|454721||DOE^JOHN^^^^|DOE^JOHN^^^^|19480203|M||B|254 MYSTREET AVE^^MYTOWN^OH^44123^USA||(216)123-4567|||M|NON|||
+NK1||ROE^MARIE^^^^|SPO||(216)123-4567||EC|||||||||||||||||||||||||||
+PV1||O|168 ~219~C~PMA^^^^^^^^^||||277^ALLEN MYLASTNAME^BONNIE^^^^|||||||||| ||2688684|||||||||||||||||||||||||199912271408||||||002376853
+        </pre>
+
+	<p>
+          <strong>Requires:</strong> 
+        </p>
+
+      </section>
+      
+      <section id="UC-CollatingHumanitarianResponseInformation">
+        <h2>Use Case #23 - Collating humanitarian information for crisis response</h2>
+        <p>
+          <span style="font-size: 10pt">(Contributed by Tim Davies)</span>
+        </p>
+        
+        <p>During a crisis response, information managers within the humanitarian community face 
+        a significant challenge in trying to collate data regarding humanitarian needs and response 
+        activities conducted by a large number of humanitarian actors. The schemas for these data 
+        sets are generally not standardized across different actors nor are the mechanisms for 
+        sharing the data. In the best case, this results in a significant delay between the collection 
+        of data and the formulation of that data into a common operational picture. In the worst case, 
+        information is simply not shared at all, leaving gaps in the understanding of the field situation.
+        </p>
+        
+        <p>The <a href="https://sites.google.com/site/hxlproject/home">Humanitarian eXchange Language</a> 
+        (HXL) project seeks to address this concern; enabling information from diverse parties to be
+        collated into a single "Humanitarian Data Registry". Supporting tools are provided to assist
+        participants in a given response initiative in finding information within this registry to 
+        meet their needs.</p>
+        
+        <p>The HXL standard is designed to be a common publishing format for humanitarian data using RDF. It defines 
+        an authoritative vocabulary of terms relating to humanitarian needs and crisis response. The
+        vocabulary is implemented in RDF/OWL and published in a number of RDF syntaxes alongside a 
+        <a href="http://hxl.humanitarianresponse.info/ns/index.html">human readable version</a>.</p>
+        
+        <div class="issue">
+          <p>The <a href="http://hxl.humanitarianresponse.info/">HXL proof of concept project</a>
+          (from 2012-2013) was clearly predicated on RDF and Linked Data. However, the 
+          <a href="https://docs.google.com/document/d/1srkEdEQiMEYDmk0Jo2rWpsFStYcgp5XaqYJQON6lfvU/edit?pli=1">more recent material</a>
+          asserts that "<em>HXL builds on a tabular data model familiar from spreadsheets and 
+          relational databases, rather than [...] a graph data model (e.g. RDF, the World 
+          Wide Web)</em>".</p>
+          <p>This use case still assumes that the tabular data is converted to RDF for
+          incorporation into the <em>Humanitarian Data Register</em>. Is this still the case? 
+          Is this use case accurate?</p>
+        </div>
+        
+        <p>Once the RDF-encoded content is published to the Humanitarian Data Registry, this information 
+        can be supplemented to, say, provide additional information or draw links between data sets.</p>
+        
+        <p>A key design principle of the HXL project is that the data publishers are able to continue
+        publication of their data using their existing systems. As such, the project provides a 
+        number of tools to generate HXL from other formats.</p> 
+        
+        <p>Unsurprisingly, data publishers often provide their data in tabular formats such as CSV,
+        having exported the content from spreadsheet applications. This tabular data must be converted
+        from CSV to tabular data.</p>
+        
+        <p><strong>Requires:</strong>
+          <a href="#R-CsvToRdfTransformation">CsvToRdfTransformation</a>.</p>
+                
+        <p>During their engagement with the humanitarian response community, the HXL project team 
+        have identified two major concerns when working with tabular data:
+        <ul>
+          <li>Tabular data needs to be created, read by and exchanged between people speaking 
+            different languages. Many of these are basic spreadsheet users who find it 
+            far easier to use data with natural and clear language in the column headings. 
+            Having the column headings in their own language makes creating and interpreting 
+            the data a lot easier.</li>
+          <li>Tabular data needs to be created that contains literal values in multiple languages. 
+            For example, the name of a town in English, French and Arabic. The total number of 
+            languages that the data might be expressed in cannot be easily determined in advance, 
+            and it should be possible for a data manager to introduce a new language variant of 
+            a column easily.</li>
+        </ul>
+        </p>
+        
+        <p>To address these issues, the HXL project have developed a number of conventions for 
+        publishing tabular data in CSV format.</p>
+        
+        <p>Instead of relying on matching text strings, a 
+        <a href="https://docs.google.com/spreadsheets/d/1aq2ojDnceIcTNdLWVKP856AuFPItJP1TWwMaPrKPXXw/edit?pli=1#gid=0">data dictionary</a>
+        provides a set of short (3-character) identifier for each field type. These field 
+        codes are provided on the first row of the CSV file. The second row of the CSV file
+        provides a textual column name - as determined in the natural language of the data
+        publisher. The field code is normative, whilst the textual column name is merely
+        informative.</p>
+        
+        <pre class="example">
+.         100,          101,            A00
+Location name,Location code,People affected
+       Town A,     01000001,           2000
+       Town B,     01000002,            750
+       Town C,     01000003,           1920
+        </pre>
+        
+        <p>(whitespace included for clarity)</p>
+               
+        <p><strong>Requires:</strong>
+        <a href="#R-MultipleHeadingRows">MultipleHeadingRows</a>.</p>
+        
+        <div class="note">
+          <p>The <a href="https://docs.google.com/document/d/1srkEdEQiMEYDmk0Jo2rWpsFStYcgp5XaqYJQON6lfvU/edit?pli=1">HXL tabular data conventions</a>
+            also propose an alternate where the 3-character field code is pre-pended to the textual 
+            column name; e.g. <code>100 Location name</code>.</p>
+        </div>
+        
+        <p>The data dictionary provides both a semantic meaning for the column and the data
+        type for values, as illustrated in the snippet below:</p>
+        
+        <pre class="example">
+Code,                Title,Data type,                                                             Description,   Example
+ 000,        Date reported,     Date,                            The date that this data record was released.,2014-06-23
+ 001,Start date applicable,     Date,             The date when the data in this report was first applicable.,2014-05-01
+ 002,  End date applicable,     Date,              The date when the data in this report was last applicable.,2014-05-31
+ 010,   Source description,     Text,A free-text description of the source organisation for this data record.,  OXFAM GB
+ 011,            Source id,     Code,   A unique identifier for the source organisation for this data record.,      5120          
+ {snip}
+        </pre>
+        
+        <p>(whitespace included for clarity)</p>
+        
+        <p><strong>Requires:</strong> 
+          <a href="#R-SyntacticTypeDefinition">SyntacticTypeDefinition</a> and
+          <a href="#R-SemanticTypeDefinition">SemanticTypeDefinition</a>.</p>       
+        
+        <div class="note">
+          <p>At time of writing, the 
+          <a href="https://docs.google.com/spreadsheets/d/1aq2ojDnceIcTNdLWVKP856AuFPItJP1TWwMaPrKPXXw/edit?pli=1#gid=0">data dictionary</a>
+            does not provide an explicit mapping to the 
+            <a href="http://hxl.humanitarianresponse.info/ns/index.html">HXL data vocabulary</a> 
+            from the earlier proof of concept work.</p>
+        </div>
+        
+        <p>For multilingual content, this document proposes that the field-identifiers allow 
+        an optional "/" followed by an ISO 639 language code. The language code applies to the 
+        content contained within that column and may also apply to the column label.</p>
+        
+        <pre class="example">
+.           B00/en,                      B00/fr
+     Project title,             Titre du projet
+Malaria treatments,     Traitement du paludisme
+  Teacher training,Formation des enseignant(e)s
+
+        </pre>
+        
+        <p>(whitespace included for clarity)</p>
+        
+        <p><strong>Requires:</strong>
+        <a href="#R-MultilingualContent">MultilingualContent</a>.</p>
+        
+        <p>Finally, where multiple data-values for a given field code are provided in a single
+        row, the field code is repeated - as illustrated in the example below that provides
+        geocodes for multiple locations pertaining to the subject of the record.</p>
+        
+        <pre class="example">        
+.     101,      101,      101
+P-code #1,P-code #2,P-code #3
+   020503,         ,
+   060107,   060108,
+   173219,         ,
+   530012,   530013,   530015
+   279333,         ,
+        </pre>
+        
+        <p>(whitespace included for clarity)</p>
+        
+        <p><strong>Requires:</strong>
+        <a href="#R-ListsAsRepeatedFields">ListsAsRepeatedFields</a>.</p>
+        
+        <p>A snippet of an example of a tabular HXL data file is provided below. A local copy
+        of the HXL data file is also available: 
+        <a href="HXL_3W_samples_draft_Multilingual.csv">HXL_3W_samples_draft_Multilingual.csv</a>.</p>
+        
+        <pre class="example">
+.             000,         010,               B30,             B41,               B40/es,           B40/en,   B50/en,   105/es,                126,   125/en,120/en,                 131,      130/en
+Fecha del informe,      Fuente,     Implementador,Código de sector,       Sector / grupo,   Sector / group,Subsector,     País,Código de provincia, Province,Region,Código del municipio,Municipality
+       2013-11-19,Mapaction OP,      World VISION,             S01,Refugio de emergencia,Emergency Shelter,         ,Filipinas,           60400000,    Aklan,    VI,                    ,
+       2013-11-19,   DHNetwork,DFID Medical Teams,             S02,                Salud,           Health,         ,         ,           60400000,    Aklan,    VI,                    ,
+       2013-11-19,   DHNetwork,               MSF,             S02,                Salud,           Health,         ,         ,           60400000,    Aklan,    VI,                    ,
+       2013-11-19,  Cluster 3W,     LDS Charities,             S03,                 WASH,             WASH,  Hygiene,Filipinas,           60400000,    Aklan,    VI,                    ,
+{snip}
+        </pre>
+        
+        <p>(whitespace included for clarity)</p>
+
+        <p>Finally, note that the humanitarian data often includes codes to reference some authoritative 
+        term, definition or other resource; e.g. the <em>Province code</em> <code>60400000</code>. In order
+        to establish links between data sets, these codes must be reconciled with their official definitions.</p>
+        
+        <p><strong>Requires:</strong>
+        <a href="#R-AssociationOfCodeValuesWithExternalDefinitions">AssociationOfCodeValuesWithExternalDefinitions</a>.</p>
+
+      </section>
 
     </section>
 
@@ -2662,8 +2873,9 @@ MCL TRANSPORT CONSULTANTS LTD,Concessionary Fares Scheme,"£10,476","Economy, Tr
                 <a href="#UC-OrganogramData">OrganogramData</a>,
                 <a href="#UC-PublicationOfPropertyTransactionData">PublicationOfPropertyTransactionData</a>,
                 <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>,
-                <a href="#UC-CanonicalMappingOfCSV">CanonicalMappingOfCSV</a> and
-                <a href="#UC-PublicationOfBiodiversityInformation">PublicationOfBiodiversityInformation</a>.
+                <a href="#UC-CanonicalMappingOfCSV">CanonicalMappingOfCSV</a>,
+                <a href="#UC-PublicationOfBiodiversityInformation">PublicationOfBiodiversityInformation</a> and
+                <a href="#UC-CollatingHumanitarianResponseInformation">CollatingHumanitarianResponseInformation</a>.
               </p>
             </dd>
             <dt id="R-CsvToJsonTransformation">R-CsvToJsonTransformation</dt>
@@ -3015,8 +3227,9 @@ PhysicalObject,ANSP,PH,124,"Buxbaumia piperi",2,urn:lsid:tim.lsid.tdwg.org:colle
                 <a href="#UC-PublicationOfPropertyTransactionData">PublicationOfPropertyTransactionData</a>,
                 <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>,
                 <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>,
-		            <a href="#UC-SupportingSemantic-basedRecommendations">SupportingSemantic-basedRecommendations</a> and
-                <a href="#UC-PublicationOfBiodiversityInformation">PublicationOfBiodiversityInformation</a>.
+		            <a href="#UC-SupportingSemantic-basedRecommendations">SupportingSemantic-basedRecommendations</a>
+                <a href="#UC-PublicationOfBiodiversityInformation">PublicationOfBiodiversityInformation</a> and
+                <a href="#UC-CollatingHumanitarianResponseInformation">CollatingHumanitarianResponseInformation</a>.
               </p>
             </dd>
             <dt id="R-CsvAsSubsetOfLargerDataset">R-CsvAsSubsetOfLargerDataset</dt>
@@ -3069,8 +3282,9 @@ PhysicalObject,ANSP,PH,124,"Buxbaumia piperi",2,urn:lsid:tim.lsid.tdwg.org:colle
                 <a href="#UC-DisplayingLocationsOfCareHomesOnAMap">DisplayingLocationsOfCareHomesOnAMap</a>,
                 <a href="#UC-IntelligentlyPreviewingCSVFiles">IntelligentlyPreviewingCSVFiles</a>,
                 <a href="#UC-CanonicalMappingOfCSV">CanonicalMappingOfCSV</a>,
-		            <a href="#UC-SupportingSemantic-basedRecommendations">SupportingSemantic-basedRecommendations</a> and
-                <a href="#UC-PublicationOfBiodiversityInformation">PublicationOfBiodiversityInformation</a>.
+		            <a href="#UC-SupportingSemantic-basedRecommendations">SupportingSemantic-basedRecommendations</a>,
+                <a href="#UC-PublicationOfBiodiversityInformation">PublicationOfBiodiversityInformation</a> and
+                <a href="#UC-CollatingHumanitarianResponseInformation">CollatingHumanitarianResponseInformation</a>.
               </p>
             </dd>
             <dt id="R-SemanticTypeDefinition">R-SemanticTypeDefinition</dt>
@@ -3108,8 +3322,9 @@ PhysicalObject,ANSP,PH,124,"Buxbaumia piperi",2,urn:lsid:tim.lsid.tdwg.org:colle
                 <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>,
                 <a href="#UC-IntelligentlyPreviewingCSVFiles">IntelligentlyPreviewingCSVFiles</a>,
             		<a href="#UC-SupportingSemantic-basedRecommendations">SupportingSemantic-basedRecommendations</a>,
-                <a href="#UC-MakingSenseOfOtherPeoplesData">MakingSenseOfOtherPeoplesData</a> and
-                <a href="#UC-PublicationOfBiodiversityInformation">PublicationOfBiodiversityInformation</a>.
+                <a href="#UC-MakingSenseOfOtherPeoplesData">MakingSenseOfOtherPeoplesData</a>,
+                <a href="#UC-PublicationOfBiodiversityInformation">PublicationOfBiodiversityInformation</a> and
+                <a href="#UC-CollatingHumanitarianResponseInformation">CollatingHumanitarianResponseInformation</a>.
               </p>
             </dd>
             <dt id="R-MissingValueDefinition">R-MissingValueDefinition</dt>
@@ -3209,6 +3424,51 @@ PhysicalObject,ANSP,PH,124,"Buxbaumia piperi",2,urn:lsid:tim.lsid.tdwg.org:colle
                 <a href="#UC-PublicationOfBiodiversityInformation">PublicationOfBiodiversityInformation</a>.
               </p>
             </dd>
+            
+            <dt id="R-MultilingualContent">R-MultilingualContent</dt>
+            <dd>
+              <em id="_R-MultilingualContent">
+                <strong>Ability to declare a locale / language for content in a specified column</strong>
+              </em>
+              <p>Tabular data may contain literal values for a given property in multiple languages. For example, 
+              the name of a town in English, French and Arabic. It shall be possible to:
+              <ul>
+                <li>specify the property for which the literal values are supplied; and</li>
+                <li>specify the language / locale relevant to each field.</li>
+              </ul>
+              </p>
+              <p>Additionally, it should be possible to provide supplementary labels for column headings in multiple
+              languages.</p>
+              <p>
+                <strong>Motivation:</strong>
+                <a href="#UC-CollatingHumanitarianResponseInformation">CollatingHumanitarianResponseInformation</a>.
+              </p>
+            </dd>
+            
+            <dt id="R-ListsAsRepeatedFields">R-ListsAsRepeatedFields</dt>
+            <dd>
+              <em id="_R-ListsAsRepeatedFields">
+                <strong>Ability to provide multiple values for a given property within a single row using repeated columns</strong>
+              </em>
+              <p>Often, a single row within a tabular data set may contain multiple values for a given property.
+                For example, multiple locations for a humanitarian crisis. 
+                <a href="#R-CellValueMicroSyntax">Cell value microsyntax</a> provides one method of expressing multiple
+                values; e.g. using a delimited list within a single field value. Another method is to declare a
+                column for each of the anticipated property values. It is essential to declare that each of the
+                columns refer to the same property.</p>
+              <pre class="example">        
+geocode #1,geocode #2,geocode #3
+    020503,          ,
+    060107,    060108,
+    173219,          ,
+    530012,    530013,    530015
+    279333,          ,
+        </pre>
+              <p>
+                <strong>Motivation:</strong>
+                <a href="#UC-CollatingHumanitarianResponseInformation">CollatingHumanitarianResponseInformation</a>.
+              </p>
+            </dd>
 	  </dl>
       </section>
       </section>
@@ -3226,7 +3486,8 @@ PhysicalObject,ANSP,PH,124,"Buxbaumia piperi",2,urn:lsid:tim.lsid.tdwg.org:colle
                 <strong>Motivation:</strong>
                 <a href="#UC-PublicationOfNationalStatistics">PublicationOfNationalStatistics</a>,
                 <a href="#UC-AnalyzingScientificSpreadsheets">AnalyzingScientificSpreadsheets</a>,
-                <a href="#UC-IntelligentlyPreviewingCSVFiles">IntelligentlyPreviewingCSVFiles</a>
+                <a href="#UC-IntelligentlyPreviewingCSVFiles">IntelligentlyPreviewingCSVFiles</a> and
+                <a href="#UC-CollatingHumanitarianResponseInformation">CollatingHumanitarianResponseInformation</a>.
               </p>
             </dd>
             <dt id="R-RandomAccess">R-RandomAccess</dt>
