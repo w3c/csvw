@@ -3219,10 +3219,17 @@ PhysicalObject,ANSP,PH,124,"Buxbaumia piperi",2,urn:lsid:tim.lsid.tdwg.org:colle
             <dt id="R-SyntacticTypeDefinition">R-SyntacticTypeDefinition</dt>
             <dd>
               <em id="_R-SyntacticTypeDefinition">
-                <strong>Ability to declare syntactic type for data values</strong>
+                <strong>Ability to declare syntactic type for fields within a specified column.</strong>
               </em>
-              <p>supporting automated recognition syntactic type e.g. date, number etc. ... further
-                description to be added</p>
+              <p>Whilst it is possible to automatically detect the type of data (e.g. date, number) in a 
+                given field, this can be error prone. For example, the date <em>April 1st</em> if written
+                as <code>1/4</code> may be interpreted as a decimal fraction.</p>
+              <p>It shall be possible to declare the data type for the fields in a given column of a 
+                tabular data file. Only one data type can be declared for a given column.</p>
+              <div class="note">
+                <p>An application may still attempt to automatically detect the data type for a given
+                field. However, the explicit declaration shall always take precedent.</p>
+              </div>
               <p>
                 <strong>Motivation:</strong>
                 <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>, 
@@ -3241,10 +3248,41 @@ PhysicalObject,ANSP,PH,124,"Buxbaumia piperi",2,urn:lsid:tim.lsid.tdwg.org:colle
             <dt id="R-SemanticTypeDefinition">R-SemanticTypeDefinition</dt>
             <dd>
               <em id="_R-SemanticTypeDefinition">
-                <strong>Ability to declare semantic type for data values</strong>
+                <strong>Ability to declare semantic type for fields within a specified column.</strong>
               </em>
-              <p>supporting automated recognition of semantic type, typically expressed for each
-                column ... further description to be added</p>
+              <p>Each row in a tabular data set describes a given resource or entity. The properties 
+              for that entity are described in the fields of that row. All the fields in a given column
+              are anticipated to provide the same property.</p>
+              <p>It shall be possible to declare the semantic relationship between the entity that a 
+              given row describes and a field in a given column.</p>
+              <p>The following example of an <a href="http://www.onetcenter.org/taxonomy/2010/list.html?d=1">occupational listing</a>
+              illustrates how a row of tabular data can be mapped to equivalent content expressed in RDF (Turtle).</p>
+              <p> The mappings are:
+                <ul>
+                  <li><code>O*NET-SOC 2010 Code</code> is mapped to <a href="http://www.w3.org/2004/02/skos/core#notation">SKOS notation</a> (<code>skos:notation</code>)</li>
+                  <li><code>O*NET-SOC 2010 Title</code> is mapped to <a href="http://www.w3.org/2000/01/rdf-schema#">RDFS label</a> (<code>rdfs:label</code>)</li>
+                  <li><code>O*NET-SOC 2010 Description</code> is mapped to <a href="http://purl.org/dc/elements/1.1/">DC description</a> (<code>dc:description</code>)</li>
+                </ul>
+              </p>
+              <pre class="example">
+CSV
+---
+
+O*NET-SOC 2010 Code,O*NET-SOC 2010 Title,O*NET-SOC 2010 Description
+         11-1011.00,    Chief Executives,"Determine and formulate policies and provide overall direction of companies [...]."
+{snip}                
+
+RDF (Turtle)
+------------
+
+ex:11-1011.00
+    skos:notation "11-1011.00" ;
+    rdfs:label "Chief Executives" ;
+    dc:description "Determine and formulate policies and provide overall direction of companies [...]." .
+              </pre>
+              
+              <p>A copy of the occupational listing CSV is available <a href="2010_Occupations.csv">locally</a>.</p>
+              
               <div class="note">
                 <p>To express semantics in a machine readable form, RDF seems the appropriate choice.
                   Furthermore, best practice indicates that one should adopt common and widely adopted
