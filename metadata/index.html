@@ -222,7 +222,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         <li><strong>Data Aggregators</strong> can use the indicated metadata, such as descriptions, titles, modification dates and licences, to enable more intelligent retrieval of relevant data on the web.</li>
       </ul>
       <p>
-        The <a href="http://www.w3.org/TR/tabular-data-model/">Model for Tabular Data and Metadata on the Web</a> specification defines an <a href="http://www.w3.org/TR/tabular-data-model/#annotated-model">Annotated Tabular Data Model</a> in which tables, columns, rows and fields can be annotated with properties and values, and a <a href="http://www.w3.org/TR/tabular-data-model/#grouped-model">Grouped Tabular Data Model</a> in which a group of tables is annotated. That specification also describes <a href="http://www.w3.org/TR/tabular-data-model/#metadata">how to locate metadata</a> about a given CSV file.
+        The <a href="http://www.w3.org/TR/tabular-data-model/">Model for Tabular Data and Metadata on the Web</a> specification defines an <a href="http://www.w3.org/TR/tabular-data-model/#annotated-model">Annotated Tabular Data Model</a> in which tables, columns, rows and cells can be annotated with properties and values, and a <a href="http://www.w3.org/TR/tabular-data-model/#grouped-model">Grouped Tabular Data Model</a> in which a group of tables is annotated. That specification also describes <a href="http://www.w3.org/TR/tabular-data-model/#metadata">how to locate metadata</a> about a given CSV file.
       </p>
       <p>
         This document defines the format and structure of metadata documents, and how these are interpreted to create an Annotated Tabular Data Model. It also defines how to validate tabular data based on some of these annotations. This metadata can be expressed as an RDF graph. However, all applications that conform to this specification (including validators and applications that read or convert tabular data) MUST read the JSON-based format described in <a href="#metadata-in-json" class="sectionRef"></a>.
@@ -242,29 +242,29 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           The metadata defined in this specification is used to annotate an existing <a href="http://w3c.github.io/csvw/syntax/#dfn-annotated-table">annotated table</a> as defined in [[!CSV-MODEL]]. Annotated tables form the basis for all further processing, such as validating or displaying the table. All compliant applications MUST create annotated tables based on the algorithm defined here.
         </p>
         <p>
-          Metadata documents contain descriptions of tables, columns, rows and fields which are used to create annotations. There are three classes of properties on description objects:
+          Metadata documents contain descriptions of tables, columns, rows and cells which are used to create annotations. There are three classes of properties on description objects:
         </p>
         <ul>
-          <li>properties that are used to identify the table, column, row or field that the annotations should appear on; these match up to properties on those objects in the core tabular data model defined in [[!CSV-MODEL]] and do not form additional annotations</li>
-          <li>properties that map directly to annotations that appear directly on the table, column, row or field whose description they appear on, such as the <code>name</code> of a column or the <code>provenance</code> of a table</li>
-          <li>properties that are specified on the description of a table, column or row to provide a default value for the equivalent annotation on each of the fields that appear in that table, column or row</li>
+          <li>properties that are used to identify the table, column, row or cell that the annotations should appear on; these match up to properties on those objects in the core tabular data model defined in [[!CSV-MODEL]] and do not form additional annotations</li>
+          <li>properties that map directly to annotations that appear directly on the table, column, row or cell whose description they appear on, such as the <code>name</code> of a column or the <code>provenance</code> of a table</li>
+          <li>properties that are specified on the description of a table, column or row to provide a default value for the equivalent annotation on each of the cells that appear in that table, column or row</li>
         </ul>
         <section>
           <h4>Direct Annotations</h4>
           <p>
-            <dfn title="direct annotation">Direct annotations</dfn> are properties on the description object for a given table, column, row or field which map directly to properties on the described table, column, row or field. The name of the annotation is the same as the name of the property on the annotation. The value of the annotation is the same as the value of the property on the description object.
+            <dfn title="direct annotation">Direct annotations</dfn> are properties on the description object for a given table, column, row or cell which map directly to properties on the described table, column, row or cell. The name of the annotation is the same as the name of the property on the annotation. The value of the annotation is the same as the value of the property on the description object.
           </p>
         </section>
         <section>
           <h4>Inherited Properties</h4>
           <p>
-            A field may be assigned annotations based on properties on the description objects for the table, column or row that it appears in. These properties are known as <dfn title="inherited property">inherited properties</dfn> and are listed in <a href="#fields" class="sectionRef"></a>. To ascertain a value for these annotations, an application MUST identify the relevant property in the descriptions of the table, column and row.
+            A cell may be assigned annotations based on properties on the description objects for the table, column or row that it appears in. These properties are known as <dfn title="inherited property">inherited properties</dfn> and are listed in <a href="#cells" class="sectionRef"></a>. To ascertain a value for these annotations, an application MUST identify the relevant property in the descriptions of the table, column and row.
           </p>
           <p>
-            Applications MUST raise an error if the value of a property in a column or row description is not <a>compatible with</a> the value of that property on the table. Applications MUST raise an error if the value of a property on a row is not <a>compatible with</a> the values of that property on all the columns in the table. Application MUST raise an error if the value of a property on a field is not <a>compatible with</a> the values of that property on both the column and the row that the field is associated with.
+            Applications MUST raise an error if the value of a property in a column or row description is not <a>compatible with</a> the value of that property on the table. Applications MUST raise an error if the value of a property on a row is not <a>compatible with</a> the values of that property on all the columns in the table. Application MUST raise an error if the value of a property on a cell is not <a>compatible with</a> the values of that property on both the column and the row that the cell is associated with.
           </p>
           <p>
-            A value for a field, column or row is <dfn>compatible with</dfn> with a value on a row, column or table if they are the same value or if the first value is a sub-value of the second value. The definitions of individual inherited properties indicate what values count as sub-values of others.
+            A value for a cell, column or row is <dfn>compatible with</dfn> with a value on a row, column or table if they are the same value or if the first value is a sub-value of the second value. The definitions of individual inherited properties indicate what values count as sub-values of others.
           </p>
         </section>
       </section>
@@ -277,7 +277,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         <section>
           <h4>Bidirectional Tables</h4>
           <p>
-            There are two levels of bidirectionality to consider when displaying tables: the directionality of the table (ie whether the columns should be arranged left-to-right or right-to-left) and the directionality of the content of individual fields.
+            There are two levels of bidirectionality to consider when displaying tables: the directionality of the table (ie whether the columns should be arranged left-to-right or right-to-left) and the directionality of the content of individual cells.
           </p>
           <p>
             The <a href="#table-direction"><code>table-direction</code> property</a> provides information about the desired display of the table. If <code>table-direction=ltr</code> then the first column SHOULD be displayed on the left and the last column on the right. If <code>table-direction=rtl</code> then the first column SHOULD be displayed on the right and the last column on the left.
@@ -289,10 +289,10 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             Implementations SHOULD enable user preferences to override the indicated metadata about the directionality of the table.
           </p>
           <p>
-            Once the directionality of the table has been determined, each field within the table should be considered as a separate <a href="http://unicode.org/reports/tr9/#The_Paragraph_Level">paragraph</a>, as defined by the <acronym title="Unicode Bidirectional Algorithm">UBA</acronym> in [[!UNICODE-BIDI]]. The default directionality for the field is determined by looking at the <a href="#field-text-direction"><code>text-direction</code> property</a>, which is an <a>inherited property</a>.
+            Once the directionality of the table has been determined, each cell within the table should be considered as a separate <a href="http://unicode.org/reports/tr9/#The_Paragraph_Level">paragraph</a>, as defined by the <acronym title="Unicode Bidirectional Algorithm">UBA</acronym> in [[!UNICODE-BIDI]]. The default directionality for the cell is determined by looking at the <a href="#cell-text-direction"><code>text-direction</code> property</a>, which is an <a>inherited property</a>.
           </p>
           <p>
-            Thus, as defined by the <acronym title="Unicode Bidirectional Algorithm">UBA</acronym>, if a field contains no characters with a strong type (if it's a number or date for example) then the way the field is displayed should be determined by the <a href="#field-text-direction"><code>text-direction</code> property</a> of the field. However, when the field contains characters with a strong type (such as letters) then they MUST be displayed according to the Unicode Bidirectional Algorithm as described in [[!UNICODE-BIDI]].
+            Thus, as defined by the <acronym title="Unicode Bidirectional Algorithm">UBA</acronym>, if a cell contains no characters with a strong type (if it's a number or date for example) then the way the cell is displayed should be determined by the <a href="#cell-text-direction"><code>text-direction</code> property</a> of the cell. However, when the cell contains characters with a strong type (such as letters) then they MUST be displayed according to the Unicode Bidirectional Algorithm as described in [[!UNICODE-BIDI]].
           </p>
         </section>
         <section>
@@ -300,7 +300,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           <p class="issue">TODO: stuff about using labels etc</p>
         </section>
         <section>
-          <h4>Displaying Fields</h4>
+          <h4>Displaying cells</h4>
           <p class="issue">TODO: stuff about formatting values, having access to notes &amp; annotations etc</p>
         </section>
       </section>
@@ -350,7 +350,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       <section>
         <h3>Syntax</h3>
         <p>
-          A metadata document is a JSON document which holds an object at the top level. This object is a <a>description object</a> of a table. A <dfn>description object</dfn> is a JSON object that describes a component of a table (a table, a column, a row or a field) and has one or more properties are mapped into properties on that component. There are different types of properties on description objects:
+          A metadata document is a JSON document which holds an object at the top level. This object is a <a>description object</a> of a table. A <dfn>description object</dfn> is a JSON object that describes a component of a table (a table, a column, a row or a cell) and has one or more properties are mapped into properties on that component. There are different types of properties on description objects:
         </p>
         <dl>
           <dt><dfn title="link property">link properties</dfn></dt>
@@ -437,7 +437,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       <section>
         <h3>Common Properties</h3>
         <p>
-          The properties listed here may be applied to any structure within the tabular data model: tables, columns, rows or fields.
+          The properties listed here may be applied to any structure within the tabular data model: tables, columns, rows or cells.
         </p>
         <p class="issue">
           Any other lists of properties we should crib off?
@@ -508,7 +508,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <tr><th><code>valid</code></th><td><a>atomic property</a></td><td>dates in the format <code>YYYY-MM-DD</code></td></tr>
           </table>
           <p class="issue">
-            The adoption of <code>type</code> from DC-TERMS means that the datatype of fields is indicated through <code>datatype</code> instead.
+            The adoption of <code>type</code> from DC-TERMS means that the datatype of cells is indicated through <code>datatype</code> instead.
           </p>
         </section>
         <section>
@@ -750,7 +750,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           Metadata data associated with tables describes either the table itself or all the data in the table, depending on the property.
         </p>
         <section>
-          <h4>Required Fields</h4>
+          <h4>Required Properties</h4>
           <dl>
             <dt id="table-id"><code>@id</code></dt>
             <dd>
@@ -767,7 +767,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           </p>
         </section>
         <section>
-          <h4>Optional Fields</h4>
+          <h4>Optional Properties</h4>
           <p>
             The description of a table MAY also contain:
           </p>
@@ -803,10 +803,10 @@ GID,On Street,Species,Trim Cycle,Inventory Date
                 An array of row descriptions as described in <a href="#rows" class="sectionRef"></a>. These are matched to row by the value of the <code>row</code> in the row description. The values of the <code>row</code> properties MUST be unique within a given table description (ie no row can have more than one description).
               </p>
             </dd>
-            <dt id="table-fields"><code>fields</code></dt>
+            <dt id="table-cells"><code>cells</code></dt>
             <dd>
               <p>
-                An array of field descriptions as described in <a href="#fields" class="sectionRef"></a>. These are matched to field by the value of the <code>row</code> and <code>column</code> properties in the field description. The combination of values of the <code>row</code> and <code>column</code> properties MUST be unique within a given table description (ie no field can have more than one description).
+                An array of cell descriptions as described in <a href="#cells" class="sectionRef"></a>. These are matched to cell by the value of the <code>row</code> and <code>column</code> properties in the cell description. The combination of values of the <code>row</code> and <code>column</code> properties MUST be unique within a given table description (ie no cell can have more than one description).
               </p>
             </dd>
             <dt id="table-primaryKey"><code>primaryKey</code></dt>
@@ -815,7 +815,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
                 An <a>internal reference property</a> that holds either a single references to a column description object or an array of references.
               </p>
               <p>
-                Validators MUST check that each row has a unique combination of fields in the indicated columns. For example, if <code>primaryKey</code> is set to <code>["_:familyName", "_:givenName"]</code> then every row must have a unique value for the combination of the <code>familyName</code> and <code>givenName</code> columns.
+                Validators MUST check that each row has a unique combination of cells in the indicated columns. For example, if <code>primaryKey</code> is set to <code>["_:familyName", "_:givenName"]</code> then every row must have a unique value for the combination of the <code>familyName</code> and <code>givenName</code> columns.
               </p>
               <p class="issue">
                 When referencing columns for a primary key, it is a lot clearer to reference them by name rather than by number. For JSON-LD compatibility, we have to assign a blank node identifier to each column even though they each have a <code>name</code> property that could be used instead. It would be great to avoid having the extra <code>_:</code> syntax which will just seem weird to people who don't care about RDF.
@@ -849,7 +849,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <li><code>title</code></li>
           </ul>
           <p>
-            The description MAY contain any of the <a title="inherited property">inherited properties</a> defined for fields in <a href="#inherited-properties" class="sectionRef"></a>.
+            The description MAY contain any of the <a title="inherited property">inherited properties</a> defined for cells in <a href="#inherited-properties" class="sectionRef"></a>.
           </p>
         </section>
         <!--
@@ -914,7 +914,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       <section>
         <h3>Columns</h3>
         <p>
-          A column description is a simple JSON object that describes a single column. The description provides additional human-readable documentation for a field, as well as additional information that may be used to validate the field, create a user interface for data entry, or inform conversion into other formats.
+          A column description is a simple JSON object that describes a single column. The description provides additional human-readable documentation for a column, as well as additional information that may be used to validate the cells within the column, create a user interface for data entry, or inform conversion into other formats.
         </p>
         <p>
           There are no required properties for column descriptors.
@@ -969,13 +969,13 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               </p>
             </dd>
             <dt id="column-required"><code>required</code></dt>
-            <dd>A boolean value which indicates whether every field within the column must have a non-null value.</dd>
+            <dd>A boolean value which indicates whether every cell within the column must have a non-null value.</dd>
           </dl>
           <p>
             The description MAY contain any of the properties defined in <a href="#common-properties" class="sectionRef"></a> to describe the column.
           </p>
           <p>
-            The description MAY contain any of the <a title="inherited property">inherited properties</a> defined for fields in <a href="#inherited-properties" class="sectionRef"></a>.
+            The description MAY contain any of the <a title="inherited property">inherited properties</a> defined for cells in <a href="#inherited-properties" class="sectionRef"></a>.
           </p>
         </section>
       </section>
@@ -1006,7 +1006,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 ...
             </pre>
             <p>
-              The table (as defined in [[CSV-MODEL]]) begins in the fourth row and second column of the CSV file. The initial column is padding, and the initial columns provide metadata about the table and the columns it contains. The first row in the table contains fields with the values <code>Department of Health</code>,<code>The Royal Wolverhampton Hospitals NHS Trust RL4</code>,<code>31/01/2014</code>,<code>Capital Project</code>,<code>Capital</code>,<code>STRYKER UK LTD</code>,<code>0001337928</code>,<code>31896.06</code>,<code>null</code>. This is equivalent to the row identified by the fragment identifier <code>#row=4</code>.
+              The table (as defined in [[CSV-MODEL]]) begins in the fourth row and second column of the CSV file. The initial column is padding, and the initial columns provide metadata about the table and the columns it contains. The first row in the table contains cells with the values <code>Department of Health</code>,<code>The Royal Wolverhampton Hospitals NHS Trust RL4</code>,<code>31/01/2014</code>,<code>Capital Project</code>,<code>Capital</code>,<code>STRYKER UK LTD</code>,<code>0001337928</code>,<code>31896.06</code>,<code>null</code>. This is equivalent to the row identified by the fragment identifier <code>#row=4</code>.
             </p>
           </div>
         </section>
@@ -1024,29 +1024,29 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             The description MAY contain any of the properties defined in <a href="#common-properties" class="sectionRef"></a> to describe the row.
           </p>
           <p>
-            The description MAY contain any of the <a title="inherited property">inherited properties</a> defined for fields in <a href="#inherited-properties" class="sectionRef"></a>.
+            The description MAY contain any of the <a title="inherited property">inherited properties</a> defined for cells in <a href="#inherited-properties" class="sectionRef"></a>.
           </p>
         </section>
       </section>
       <section>
-        <h3>Fields</h3>
+        <h3>Cells</h3>
         <p>
-          Fields can be described using field <a title="description object">description objects</a>. A field description object is a JSON object within a metadata file that includes properties that describe an individual field.
+          Cells can be described using cell <a title="description object">description objects</a>. A cell description object is a JSON object within a metadata file that includes properties that describe an individual cell.
         </p>
         <section>
           <h4>Required Properties</h4>
           <p>
-            The following properties MUST appear on a field description:
+            The following properties MUST appear on a cell description:
           </p>
           <dl>
             <dt><code>row</code></dt>
-            <dd>an integer; the number of the row on which the field appears</dd>
+            <dd>an integer; the number of the row on which the cell appears</dd>
             <dt><code>column</code></dt>
-            <dd>an integer; the number of the column on which the field appears</dd>
+            <dd>an integer; the number of the column on which the cell appears</dd>
           </dl>
           <div class="note">
             <p>
-              The values of the <code>row</code> and <code>column</code> properties indicate the position of the field within the table rather than the position of the field within the original CSV file. For example, a CSV file might contain padding columns and skipped headers, as in:
+              The values of the <code>row</code> and <code>column</code> properties indicate the position of the cell within the table rather than the position of the cell within the original CSV file. For example, a CSV file might contain padding columns and skipped headers, as in:
             </p>
             <pre>
 ,"Expenditure over £25,000- Payment made in January 2014",,,,,,,,
@@ -1057,7 +1057,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 ...
             </pre>
             <p>
-              The table (as defined in [[CSV-MODEL]]) begins in the fourth row and second column of the CSV file. The initial column is padding, and the initial columns provide metadata about the table and the columns it contains. The field in the first column of the first row has the value "Department of Health". This is equivalent to the field identified by the fragment identifier <code>#cell=4,2</code>.
+              The table (as defined in [[CSV-MODEL]]) begins in the fourth row and second column of the CSV file. The initial column is padding, and the initial columns provide metadata about the table and the columns it contains. The cell in the first column of the first row has the value "Department of Health". This is equivalent to the cell identified by the fragment identifier <code>#cell=4,2</code>.
             </p>
           </div>
         </section>
@@ -1067,7 +1067,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <dt id="column-ld-type"><code>@type</code></dt>
             <dd>
               <p>
-                If included, <code>@type</code> MUST be set to <code>"Field"</code>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.
+                If included, <code>@type</code> MUST be set to <code>"Cell"</code>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.
               </p>
             </dd>
           </dl>
@@ -1075,100 +1075,100 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             The description MAY contain any of the properties defined in <a href="#common-properties" class="sectionRef"></a> to describe the column.
           </p>
           <p>
-            The description MAY contain any of the <a title="inherited property">inherited properties</a> defined for fields in <a href="#inherited-properties" class="sectionRef"></a>.
+            The description MAY contain any of the <a title="inherited property">inherited properties</a> defined for cells in <a href="#inherited-properties" class="sectionRef"></a>.
           </p>
         </section>
         <section>
           <h4>Inherited Properties</h4>
           <p>
-            Field descriptions may override <a title="inherited property">inherited properties</a>, as described in <a href="#created-annotated-tables" class="sectionRef"></a>. It is good practice to define these properties on columns, so that all fields within a given column are handled in the same way. These properties are:
+            Cell descriptions may override <a title="inherited property">inherited properties</a>, as described in <a href="#created-annotated-tables" class="sectionRef"></a>. It is good practice to define these properties on columns, so that all cells within a given column are handled in the same way. These properties are:
           </p>
           <dl>
-            <dt id="field-empty-value"><code>null</code></dt>
+            <dt id="cell-empty-value"><code>null</code></dt>
             <dd>
               <p>
                 The string used for null values. If not specified, the default for this is the empty string.
               </p>
             </dd>
-            <dt id="field-separator"><code>separator</code></dt>
+            <dt id="cell-separator"><code>separator</code></dt>
             <dd>
               <p>
-                The character used to separate items in the string value of the field. If <code>null</code>, the field does not contain a list. Otherwise, application MUST split the string value of the field on the specified separator character and parse each of the resulting strings separately. The field's value will then be a list. Conversion specifications MUST use the separator to determine the conversion of a field into the target format. See <a href="#parsing-fields"></a> for more details.
+                The character used to separate items in the string value of the cell. If <code>null</code>, the cell does not contain a list. Otherwise, application MUST split the string value of the cell on the specified separator character and parse each of the resulting strings separately. The cell's value will then be a list. Conversion specifications MUST use the separator to determine the conversion of a cell into the target format. See <a href="#parsing-cells"></a> for more details.
               </p>
             </dd>
-            <dt id="field-format"><code>format</code></dt>
+            <dt id="cell-format"><code>format</code></dt>
             <dd>
               <p>
-                A definition of the format of the field, used when parsing the field as described in <a href="#parsing-fields"></a>.
+                A definition of the format of the cell, used when parsing the cell as described in <a href="#parsing-cells"></a>.
               </p>
             </dd>
-            <dt id="field-datatype"><code>datatype</code></dt>
+            <dt id="cell-datatype"><code>datatype</code></dt>
             <dd>
               <p>
-                The main datatype of the values of the field. If the field contains a list (ie <code>separator</code> is not <code>null</code>) then this is the datatype of each value within the list. Conversion specifications MUST use the datatype of the value to determine the conversion of a field into the target format. See <a href="#datatypes"></a> for more details.
+                The main datatype of the values of the cell. If the cell contains a list (ie <code>separator</code> is not <code>null</code>) then this is the datatype of each value within the list. Conversion specifications MUST use the datatype of the value to determine the conversion of a cell into the target format. See <a href="#datatypes"></a> for more details.
               </p>
               <p class="issue">
                 Using the term <code>datatype</code> rather than <code>type</code> because DCTERMS defines <code>type</code>, and because <code>type</code> is confusing with <code>@type</code>.
               </p>
             </dd>
-            <dt id="field-length"><code>length</code></dt>
+            <dt id="cell-length"><code>length</code></dt>
             <dd>
               <p>
-                The exact length of the value of the field. See <a href="#length-constraints" class="sectionRef"></a> for details.
+                The exact length of the value of the cell. See <a href="#length-constraints" class="sectionRef"></a> for details.
               </p>
             </dd>
-            <dt id="field-minLength"><code>minLength</code></dt>
+            <dt id="cell-minLength"><code>minLength</code></dt>
             <dd>
               <p>
-                The minimum length of the value of the field. See <a href="#length-constraints" class="sectionRef"></a> for details.
+                The minimum length of the value of the cell. See <a href="#length-constraints" class="sectionRef"></a> for details.
               </p>
             </dd>
-            <dt id="field-maxLength"><code>maxLength</code></dt>
+            <dt id="cell-maxLength"><code>maxLength</code></dt>
             <dd>
               <p>
-                The maximum length of the value of the field. See <a href="#length-constraints" class="sectionRef"></a> for details.
+                The maximum length of the value of the cell. See <a href="#length-constraints" class="sectionRef"></a> for details.
               </p>
             </dd>
-            <dt id="field-minimum"><code>minimum</code></dt>
+            <dt id="cell-minimum"><code>minimum</code></dt>
             <dd>
               <p>
-                The minimum value for the field (inclusive); equivalent to <code>minInclusive</code>. See <a href="#value-constraints" class="sectionRef"></a> for details.
+                The minimum value for the cell (inclusive); equivalent to <code>minInclusive</code>. See <a href="#value-constraints" class="sectionRef"></a> for details.
               </p>
             </dd>
-            <dt id="field-maximum"><code>maximum</code></dt>
+            <dt id="cell-maximum"><code>maximum</code></dt>
             <dd>
               <p>
-                The maximum value for the field (inclusive); equivalent to <code>maxInclusive</code>. See <a href="#value-constraints" class="sectionRef"></a> for details.
+                The maximum value for the cell (inclusive); equivalent to <code>maxInclusive</code>. See <a href="#value-constraints" class="sectionRef"></a> for details.
               </p>
             </dd>
-            <dt id="field-minInclusive"><code>minInclusive</code></dt>
+            <dt id="cell-minInclusive"><code>minInclusive</code></dt>
             <dd>
               <p>
-                The minimum value for the field (inclusive). See <a href="#value-constraints" class="sectionRef"></a> for details.
+                The minimum value for the cell (inclusive). See <a href="#value-constraints" class="sectionRef"></a> for details.
               </p>
             </dd>
-            <dt id="field-maxInclusive"><code>maxInclusive</code></dt>
+            <dt id="cell-maxInclusive"><code>maxInclusive</code></dt>
             <dd>
               <p>
-                The maximum value for the field (inclusive). See <a href="#value-constraints" class="sectionRef"></a> for details.
+                The maximum value for the cell (inclusive). See <a href="#value-constraints" class="sectionRef"></a> for details.
               </p>
             </dd>
-            <dt id="field-minExclusive"><code>minExclusive</code></dt>
+            <dt id="cell-minExclusive"><code>minExclusive</code></dt>
             <dd>
               <p>
-                The minimum value for the field (exclusive). See <a href="#value-constraints" class="sectionRef"></a> for details.
+                The minimum value for the cell (exclusive). See <a href="#value-constraints" class="sectionRef"></a> for details.
               </p>
             </dd>
-            <dt id="field-maxExclusive"><code>maxExclusive</code></dt>
+            <dt id="cell-maxExclusive"><code>maxExclusive</code></dt>
             <dd>
               <p>
-                The maximum value for the field (exclusive). See <a href="#value-constraints" class="sectionRef"></a> for details.
+                The maximum value for the cell (exclusive). See <a href="#value-constraints" class="sectionRef"></a> for details.
               </p>
             </dd>
-            <dt id="field-text-direction"><code>text-direction</code></dt>
+            <dt id="cell-text-direction"><code>text-direction</code></dt>
             <dd>
               <p>
-                One of <code>"rtl"</code> or <code>"ltr"</code> (the default). Indicates whether the text within the field should be displayed by default as left-to-right or right-to-left text. See <a href="#bidirectional-tables" class="sectionRef"></a> for more details.
+                One of <code>"rtl"</code> or <code>"ltr"</code> (the default). Indicates whether the text within the cell should be displayed by default as left-to-right or right-to-left text. See <a href="#bidirectional-tables" class="sectionRef"></a> for more details.
               </p>
             </dd>
           </dl>
@@ -1176,7 +1176,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         <section>
           <h3>Datatypes</h3>
           <p>
-            Fields within tables may be annotated with a <code>datatype</code> which indicates the type of the value obtained by parsing the value of the field. The format expected in the field is determined by the <code>format</code> annotation, if there is one, or uses a default format determined by the type.
+            Cells within tables may be annotated with a <code>datatype</code> which indicates the type of the value obtained by parsing the value of the cell. The format expected in the cell is determined by the <code>format</code> annotation, if there is one, or uses a default format determined by the type.
           </p>
           <p>
             The possible datatypes are:
@@ -1248,16 +1248,16 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           <section>
             <h4>Length Constraints</h4>
             <p>
-              The <code>length</code>, <code>minLength</code> and <code>maxLength</code> properties indicate the exact, minimum and maximum lengths of the values of fields.
+              The <code>length</code>, <code>minLength</code> and <code>maxLength</code> properties indicate the exact, minimum and maximum lengths of the values of cells.
             </p>
             <p>
-              Applications MUST raise an error if both <code>length</code> and <code>minLength</code> are specified and they do not have the same value. Similarly, applications MUST raise an error if both <code>length</code> and <code>maxLength</code> are specified and they do not have the same value. Applications MUST raise an error if <code>length</code>, <code>maxLength</code> or <code>minLength</code> are specified and the field value is not a list (ie <code>separator</code> is not specified), a string or one of its subtypes, or a binary value.
+              Applications MUST raise an error if both <code>length</code> and <code>minLength</code> are specified and they do not have the same value. Similarly, applications MUST raise an error if both <code>length</code> and <code>maxLength</code> are specified and they do not have the same value. Applications MUST raise an error if <code>length</code>, <code>maxLength</code> or <code>minLength</code> are specified and the cell value is not a list (ie <code>separator</code> is not specified), a string or one of its subtypes, or a binary value.
             </p>
             <p>
-              The length of a value of a field is determined as follows:
+              The length of a value of a cell is determined as follows:
             </p>
             <ul>
-              <li>if the field is <code>null</code> its length is zero</li>
+              <li>if the cell is <code>null</code> its length is zero</li>
               <li>if the value is a list, its length is the number of items in the list</li>
               <li>if the value is a string or one of its subtypes, its length is the number of characters in the value</li>
               <li>if the value is of a binary type, its length is the number of bytes in the binary value</li>
@@ -1266,7 +1266,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           <section>
             <h4>Value Constraints</h4>
             <p>
-              The <code>minimum</code>, <code>maximum</code>, <code>minInclusive</code>, <code>maxInclusive</code>, <code>minExclusive</code> and <code>maxExclusive</code> properties indicate limits on the values of fields. These apply to numeric and date/time types. The <code>minimum</code> property is equivalent to the <code>minInclusive</code> property and the <code>maximum</code> property is equivalent to the <code>maxInclusive</code> property.
+              The <code>minimum</code>, <code>maximum</code>, <code>minInclusive</code>, <code>maxInclusive</code>, <code>minExclusive</code> and <code>maxExclusive</code> properties indicate limits on the values of cells. These apply to numeric and date/time types. The <code>minimum</code> property is equivalent to the <code>minInclusive</code> property and the <code>maximum</code> property is equivalent to the <code>maxInclusive</code> property.
             </p>
             <p>
               Validation against these properties is as defined in [[!xmlschema-2]].
@@ -1274,7 +1274,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           </section>
         </section>
         <section>
-          <h3>Parsing Fields</h3>
+          <h3>Parsing cells</h3>
           <p>
             Unlike many other data formats, tabular data is designed to be read by humans. For that reason, it's common for data to be represented within tabular data in a human-readable way. The <code>separator</code> and <code>format</code> properties indicates the format used to represent data within the table. This is used:
           </p>
@@ -1285,7 +1285,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <li>when <strong>inputting</strong> data, to turn entered values into representations in a consistent format</li>
           </ul>
           <p>
-            The process of parsing the string value of a field into a single value or a list of values is as follows:
+            The process of parsing the string value of a cell into a single value or a list of values is as follows:
           </p>
           <ol>
             <li>unless the <code>datatype</code> is <code>string</code> or <code>anySimpleType</code> or <code>any</code>, strip leading and trailing whitespace from the value</li>
@@ -1324,7 +1324,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               Boolean values may be represented in many ways aside from the standard <code>1</code> and <code>0</code> or <code>true</code> and <code>false</code>.
             </p>
             <p>
-              If the <code>datatype</code> is <code>boolean</code>, the <code>format</code> property provides the true and false values expected, separated by <code>|</code>. For example if <code>format</code> is <code>Y|N</code> then fields must hold either <code>Y</code> or <code>N</code> with <code>Y</code> meaning <code>true</code> and <code>N</code> meaning <code>false</code>.
+              If the <code>datatype</code> is <code>boolean</code>, the <code>format</code> property provides the true and false values expected, separated by <code>|</code>. For example if <code>format</code> is <code>Y|N</code> then cells must hold either <code>Y</code> or <code>N</code> with <code>Y</code> meaning <code>true</code> and <code>N</code> meaning <code>false</code>.
             </p>
           </section>
           <section>
@@ -1352,7 +1352,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         <section>
           <h3>Additional Constraints</h3>
 
-          <p>A set of constraints can be associated with a field. These constraints can be used 
+          <p>A set of constraints can be associated with a cell. These constraints can be used 
           to validate data against a JSON Table Schema. The constraints might be used by consumers 
           to validate, for example, the contents of a data package, or as a means to validate 
           data being collected or updated via a data entry interface.</p>
@@ -1363,26 +1363,26 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           <ul>
             <li><code>minLength</code> – An integer that specifies the minimum number of characters for a value</li>
             <li><code>maxLength</code> – An integer that specifies the maximum number of characters for a value</li>
-            <li><code>unique</code> – A boolean. If <code>true</code>, then all values for that field MUST be unique within the 
+            <li><code>unique</code> – A boolean. If <code>true</code>, then all values for that cell MUST be unique within the 
           data file in which it is found. This defines a unique key for a row although a row could 
           potentially have several such keys.</li>
-            <li><code>pattern</code> – A regular expression that can be used to test field values. If the regular 
+            <li><code>pattern</code> – A regular expression that can be used to test cell values. If the regular 
           expression matches then the value is valid. Values will be treated as a string of characters. 
-          It is recommended that values of this field conform to the standard 
+          It is recommended that values of this cell conform to the standard 
           <a href="http://www.w3.org/TR/xmlschema-2/#regexs">XML Schema regular expression syntax</a>. See also 
           <a href="http://www.regular-expressions.info/xml.html">this reference</a>.</li>
-            <li><code>minimum</code> – specifies a minimum value for a field. This is different to <code>minLength</code> which 
-          checks number of characters. A <code>minimum</code> value constraint checks whether a field value is greater than 
-          or equal to the specified value. The range checking depends on the <code>type</code> of the field. E.g. an 
-          integer field may have a minimum value of 100; a date field might have a minimum date. If a 
-          <code>minimum</code> value constraint is specified then the field descriptor <code>MUST</code> contain a <code>type</code> key</li>
-            <li><code>maximum</code> – as above, but specifies a maximum value for a field.</li>
+            <li><code>minimum</code> – specifies a minimum value for a cell. This is different to <code>minLength</code> which 
+          checks number of characters. A <code>minimum</code> value constraint checks whether a cell value is greater than 
+          or equal to the specified value. The range checking depends on the <code>type</code> of the cell. E.g. an 
+          integer cell may have a minimum value of 100; a date cell might have a minimum date. If a 
+          <code>minimum</code> value constraint is specified then the cell descriptor <code>MUST</code> contain a <code>type</code> key</li>
+            <li><code>maximum</code> – as above, but specifies a maximum value for a cell.</li>
           </ul>
 
           <p>A constraints descriptor may contain multiple constraints, in which case a consumer <code>MUST</code> apply 
-          all the constraints when determining if a field value is valid.</p>
+          all the constraints when determining if a cell value is valid.</p>
 
-          <p>A data file, e.g. an entry in a data package, is considered to be valid if all of its fields are valid 
+          <p>A data file, e.g. an entry in a data package, is considered to be valid if all of its cells are valid 
           according to their declared <code>type</code> and <code>constraints</code>.</p>
 
         </section>
