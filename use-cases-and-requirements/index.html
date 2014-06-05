@@ -2719,6 +2719,326 @@ Fecha del informe,      Fuente,     Implementador,Código de sector,       Secto
           <a href="#R-CsvToRdfTransformation">CsvToRdfTransformation</a>.</p>
 
       </section>
+      <section id="UC-ExpressingHierarchyWithinOccupationalListings">
+        <h2>Use Case #24 - Expressing a hierarchy within occupational listings</h2>
+        <p>
+          <span style="font-size: 10pt">(Contributed by Dan Brickley)</span>
+        </p>
+       
+        <p>Our user intends to analyze the current state of the job market using information gleaned
+        from job postings that are published using <a href="http://schema.org">schema.org</a> markup.</p>
+
+        <p class="note"><a href="http://schema.org">schema.org</a> defines a schema for a listing that describes a 
+          job opening within an organization: <code><a href="http://schema.org/JobPosting">JobPosting</a></code>.</p>
+
+        <p>One of the things our user wants to do is to organise the job postings into categories 
+          based on the <code><a href="http://schema.org/occupationalCategory">occupationalCategory</a></code> 
+          property of each <code>JobPosting</code>.</p>
+
+        <p>The <code>occupationalCategory</code> property is used to categorize the described job. The 
+          <a href="http://www.onetcenter.org/taxonomy.html">O*NET-SOC Taxonomy</a> is schema.org's recommended
+          controlled vocabulary for the occupational categories.</p>
+
+        <p>The schema.org documentation notes that value of the <code>occupationalCategory</code> property 
+          should include both the textual label and the formal code from the O*NET-SOC Taxonomy, as 
+          illustrated below in the following <a href="http://www.w3.org/TR/rdfa-primer/">RDFa</a> snippet:</p>
+
+        <pre class="example">
+&lt;br&gt;&lt;strong&gt;Occupational Category:&lt;/strong&gt; &lt;span property="occupationalCategory"&gt;15-1199.03 Web Administrators&lt;/span&gt;
+        </pre>
+
+        <p>The O*NET-SEC Taxonomy is republished every few years; the 
+          <a href="http://www.onetcenter.org/taxonomy/2010/list.html">occupational listing for 2010</a> 
+          is the most recent version available. This 
+          <a href="http://www.onetcenter.org/taxonomy/2010/list.html/2010_Occupations.csv?fmt=csv">listing is also available in CSV format</a>.
+          An extract from this file is provided below. A local copy of this CSV file is also available: 
+          file = <a href="2010_Occupations.csv">2010_Occupations.csv</a>.</p>
+
+<pre class="example">
+O*NET-SOC 2010 Code,O*NET-SOC 2010 Title,O*NET-SOC 2010 Description
+{snip}
+15-1199.00,"Computer Occupations, All Other",All computer occupations not listed separately.
+15-1199.01,Software Quality Assurance Engineers and Testers,Develop and execute software test plans in order to identify software problems and their causes.
+15-1199.02,Computer Systems Engineers/Architects,"Design and develop solutions to complex applications problems, system administration issues, or network concerns. Perform systems management and integration functions."
+15-1199.03,Web Administrators,"Manage web environment design, deployment, development and maintenance activities. Perform testing and quality assurance of web sites and web applications."
+15-1199.04,Geospatial Information Scientists and Technologists,"Research or develop geospatial technologies. May produce databases, perform applications programming, or coordinate projects. May specialize in areas such as agriculture, mining, health care, retail trade, urban planning, or military intelligence."
+15-1199.05,Geographic Information Systems Technicians,"Assist scientists, technologists, or related professionals in building, maintaining, modifying, or using geographic information systems (GIS) databases. May also perform some custom application development or provide user support."
+15-1199.06,Database Architects,"Design strategies for enterprise database systems and set standards for operations, programming, and security. Design and construct large relational databases. Integrate new systems with existing warehouse structure and refine system performance and functionality."
+15-1199.07,Data Warehousing Specialists,"Design, model, or implement corporate data warehousing activities. Program and configure warehouses of database information and provide support to warehouse users."
+15-1199.08,Business Intelligence Analysts,Produce financial and market intelligence by querying data repositories and generating periodic reports. Devise methods for identifying data patterns and trends in available information sources.
+15-1199.09,Information Technology Project Managers,"Plan, initiate, and manage information technology (IT) projects. Lead and guide the work of technical staff. Serve as liaison between business and technical aspects of projects. Plan project stages and assess business implications for each stage. Monitor progress to assure deadlines, standards, and cost targets are met."
+15-1199.10,Search Marketing Strategists,"Employ search marketing tactics to increase visibility and engagement with content, products, or services in Internet-enabled devices or interfaces. Examine search query behaviors on general or specialty search engines or other Internet-based content. Analyze research, data, or technology to understand user intent and measure outcomes for ongoing optimization."
+15-1199.11,Video Game Designers,"Design core features of video games. Specify innovative game and role-play mechanics, story lines, and character biographies. Create and maintain design documentation. Guide and collaborate with production staff to produce games as designed."
+15-1199.12,Document Management Specialists,"Implement and administer enterprise-wide document management systems and related procedures that allow organizations to capture, store, retrieve, share, and destroy electronic records and documents."
+{snip}
+</pre>
+
+        <p>The CSV file follows the specification outlined in [[RFC4180]] - including the use of 
+        pairs of double quotes (<code>""</code>) to escape cells that themselves contain commas.</p>
+
+        <p>Also note that each row provides a unique identifier for the occupation it describes. This
+        unique identifier is given in the <code>O*NET-SOC 2010 Code</code> column. This code can be considered
+        as the primary key for each occupation record in the listing.</p>
+
+        <p><strong>Requires:</strong> 
+        <a href="#R-PrimaryKey">PrimaryKey</a>.</p>  
+
+        <p>Closer inspection of the O*NET-SOC 2010 code illustrates the hierarchical classification
+        within the taxonomy. The first six digits are based on the 
+        <a href="http://www.bls.gov/soc/">Standard Occupational Classification</a> (SOC) 
+        code from the US Bureau of Labor Statistics, with further subcategorization thereafter where necessary. 
+        The first and second digits represent the major group; the third digit represents the minor group; 
+        the fourth and fifth digits represent the broad occupation; and the sixth digit represents the 
+        detailed occupation.</p>
+
+        <p>The <a href="http://www.bls.gov/soc/soc_structure_2010.xls">SOC structure (2010) is available in Microsoft Excel 97-2003 Workbook format</a>.
+        An extract of this structure, in CSV format (exported from Microsoft Excel 2007), is provided below. 
+        A local copy of the SOC structure in CSV is also available: file = <a href="soc_structure_2010.csv">soc_structure_2010.csv</a>.</p>
+
+        <pre class="example">
+Bureau of Labor Statistics,,,,,,,,,
+On behalf of the Standard Occupational Classification Policy Committee (SOCPC),,,,,,,,,
+,,,,,,,,,
+January 2009,,,,,,,,,
+*** This is the final structure for the 2010 SOC.   Questions should be emailed to soc@bls.gov***,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,2010 Standard Occupational Classification,,,,,,,,
+,,,,,,,,,
+Major Group,Minor Group,Broad Group,Detailed Occupation,,,,,,
+,,,,,,,,,
+11-0000,,,,Management Occupations,,,,,
+,11-1000,,,Top Executives,,,,,
+,,11-1010,,Chief Executives,,,,,
+,,,11-1011,Chief Executives,,,,,
+{snip}
+,,,13-2099,"Financial Specialists, All Other",,,,,
+15-0000,,,,Computer and Mathematical Occupations,,,,,
+,15-1100,,,Computer Occupations,,,,,
+,,15-1110,,Computer and Information Research Scientists,,,,,
+,,,15-1111,Computer and Information Research Scientists,,,,,
+,,15-1120,,Computer and Information Analysts,,,,,
+,,,15-1121,Computer Systems Analysts,,,,,
+,,,15-1122,Information Security Analysts,,,,,
+,,15-1130,,Software Developers and Programmers,,,,,
+,,,15-1131,Computer Programmers,,,,,
+,,,15-1132,"Software Developers, Applications",,,,,
+,,,15-1133,"Software Developers, Systems Software",,,,,
+,,,15-1134,Web Developers,,,,,
+,,15-1140,,Database and Systems Administrators and Network Architects,,,,,
+,,,15-1141,Database Administrators,,,,,
+,,,15-1142,Network and Computer Systems Administrators,,,,,
+,,,15-1143,Computer Network Architects,,,,,
+,,15-1150,,Computer Support Specialists,,,,,
+,,,15-1151,Computer User Support Specialists,,,,,
+,,,15-1152,Computer Network Support Specialists,,,,,
+,,15-1190,,Miscellaneous Computer Occupations,,,,,
+,,,15-1199,"Computer Occupations, All Other",,,,,
+,15-2000,,,Mathematical Science Occupations,,,,,
+{snip}
+        </pre>
+
+        <p>The header line here comes below an empty row and is separated from the data by another empty row. 
+        There is metadata about the table in the rows above the header line.</p>
+
+        <p><strong>Requires:</strong>
+          <a href="#R-MultipleHeadingRows">MultipleHeadingRows</a> and
+          <a href="#R-AnnotationAndSupplementaryInfo">AnnotationAndSupplementaryInfo</a>.</p>	
+
+        <p>Being familiar with <a href="http://www.w3.org/TR/skos-reference/">SKOS</a>, our user decides 
+        to map both the O*NET-SOC and SOC taxonomies into a single hierarchy expressed using RDF/OWL and the 
+        SKOS vocabulary.</p>
+
+        <p>Each of the five levels used across the occupation classification schemes are assigned
+        to a particular OWL class - each of which is a sub-class of 
+        <a href="http://www.w3.org/2004/02/skos/core#Concept">skos:Concept</a>:
+          <ul>
+            <li>From SOC -
+              <ul>
+                <li>Major Group: <code>ex:SOC-MajorGroup</code></li>
+                <li>Minor Group: <code>ex:SOC-MinorGroup</code></li>
+                <li>Broad Group: <code>ex:SOC-BroadGroup</code></li>
+                <li>Detailed Occupation: <code>ex:SOC-DetailedOccupation</code></li>
+              </ul>
+            </li>
+            <li>From O*NET-SOC -
+              <ul>
+                <li><code>ex:ONETSOC-Occupation</code></li>
+              </ul>
+            </li>
+          </ul>
+        </p>
+
+        <p>The SOC taxonomy contains four different types of entities, and so requires several different
+        passes to extract each of those from the CSV file. Depending on which kind of entity is being 
+        extracted, a different column is defined as the primary key.</p>
+        
+        <div class="note">
+          <p>Where the value in the designated primary key column is blank, the row is ignored.</p>
+        </div>
+
+        <p><strong>Requires:</strong>
+          <a href="#R-PrimaryKey">PrimaryKey</a>.</p>
+
+        <p>The hierarchy in the SOC structure is implied by <em>inheritance</em> from
+        the preceeding row(s). For example, the row describing SOC minor group "Computer Occupations" 
+        (<code>Minor Group</code> = <code>15-1100</code> (above) has an empty cell value for column <code>Major Group</code>.
+        The value for SOC major group is provided by the preceeding row. In the case of SOC detailed 
+        occupation "Computer Occupations, All Other" (<code>Detailed Occupation</code> = <code>15-1199</code>), 
+        the value of value for column <code>Major Group</code> is provided 20 lines previously when a value
+        in that column was most recently provided. The example snippet below illustrates what the CSV would
+        look like if the <em>inherited</em> cell values were present:</p>
+
+
+        <pre class="example">
+{snip}
+Major Group,Minor Group,Broad Group,Detailed Occupation,                                            ,,,,,
+           ,           ,           ,                   ,                                            ,,,,,
+{snip}
+    13-0000,    13-2000,    13-2090,            13-2099,          "Financial Specialists, All Other",,,,,
+    15-0000,           ,           ,                   ,       Computer and Mathematical Occupations,,,,,
+    15-0000,    15-1100,           ,                   ,                        Computer Occupations,,,,,
+    15-0000,    15-1100,    15-1110,                   ,Computer and Information Research Scientists,,,,,
+    15-0000,    15-1100,    15-1110,            15-1111,Computer and Information Research Scientists,,,,,
+{snip}
+    15-0000,    15-1100,    15-1190,                   ,          Miscellaneous Computer Occupations,,,,,
+    15-0000,    15-1100,    15-1190,            15-1199,           "Computer Occupations, All Other",,,,,
+    15-0000,    15-2000,           ,                   ,            Mathematical Science Occupations,,,,,
+{snip}
+        </pre>
+
+        <p>(whitespace added for clarity)</p>
+
+        <p>It is difficult to programatically describe how the inherited values should be implemented.
+        It is not as simple as infering the value for a blank cell from the most recent preceeding row 
+        when a non-blank value was provided for that column. For example, the last row in the example 
+        above describing "Mathematical Science Occupations" does not inherit the values from columns 
+        <code>Broad Group</code> and <code>Detailed Occupation</code> in the preceeding row because 
+          it describes a new level in the hierarchy.</p>
+
+        <p>However, given that the SOC code is a string value with regular structure that reflects
+        the position of a given concept within the hierarchy, it is possible to determine the
+        identifier of each of the broader concepts by parsing the identifier string. For example, 
+        the regular expression <code>/^(\d{2})-(\d{2})(\d)\d$/</code> could be used to split the
+        identifier for a detailed occupation code into its constituent parts from which the 
+        identifiers for the associated broader concepts could be constructed.</p>
+
+        <div class="issue">
+          <p>The REGEXP needs to be verified as correct.</p>
+        </div>
+
+        <p><strong>Requires:</strong>
+          <a href="#R-CellMicrosyntax">CellMicrosyntax</a>.</p>
+
+        <p>The same kind of processing applies to the O*NET-SOC taxonomy; in this case also extracting
+        a description for the occupation. There is also an additional complication: where a 
+        O*NET-SOC code ends in "<code>.00</code>", that occupation is a direct mapping to the 
+        occupation defined in the SOC taxonomy. For example, the O*NET-SOC code <code>15-1199.00</code> 
+        refers to the same occupation category as the SOC code <code>15-1199</code>: 
+        "Computer Occupations, All Other"</p>
+
+        <p>To implement this complication, we need to use conditional processing.</p> 
+        <p>If the final two digits of the O*NET-SOC code are "<code>00</code>", then: 
+          <ul>
+            <li>the entity is of type <code>ex:SOC-DetailedOccupation</code>;</li>
+            <li>the unique identifier and notation for the concept comprises only the six numerical 
+              digits of the <code>O*NET-SOC 2010 Code</code> cell value (e.g. in the form 
+              <code>nn-nnnn</code>); and</li>
+            <li>no <a href="http://www.w3.org/2004/02/skos/core#broader">skos:broader</a>
+              relationship need be defined.</li> 
+          </ul>
+        </p>
+        <p>else: 
+          <ul>
+            <li>the entity is of type <code>ex:ONETSOC-Occupation</code>;</li>
+            <li>the unique identifier and notation for the concept comprises the eight numerical 
+              digits of the <code>O*NET-SOC 2010 Code</code> cell value (e.g. in the form 
+              <code>nn-nnnn.nn</code>); and</li>
+            <li>a <a href="http://www.w3.org/2004/02/skos/core#broader">skos:broader</a>
+              relationship is defined with the broader concept from the SOC taxonomy identified 
+              by the first six numerical digits of the <code>O*NET-SOC 2010 Code</code>cell value.</li> 
+          </ul>
+        </p>
+        <p>The example below illustrates the conditional behaviour:</p>
+
+        <pre class="example">
+row:
+----
+
+15-1199.00,"Computer Occupations, All Other",All computer occupations not listed separately.
+
+resulting RDF (in Turtle syntax):
+---------------------------------
+
+ex:15-1199 a ex:SOC-DetailedOccupation ;
+    skos:notation "15-1199" ;
+    skos:prefLabel "Computer Occupations, All Other" ;
+    dct:description "All computer occupations not listed separately." .
+
+row:
+----
+
+15-1199.03,Web Administrators,"Manage web environment design, deployment, development and maintenance activities. Perform testing and quality assurance of web sites and web applications."
+
+resulting RDF (in Turtle syntax):
+---------------------------------
+
+ex:15-1199.03 a ex:ONETSOC-Occupation ;
+    skos:notation "15-1199.03" ;
+    skos:prefLabel "Web Administrators" ;
+    dct:description "Manage web environment design, deployment, development and maintenance activities. Perform testing and quality assurance of web sites and web applications." ;
+    skos:broader ex:15-1199 .
+        </pre>
+
+        <p><strong>Requires:</strong>
+          <a href="#R-ConditionalProcessingBasedOnCellValues">ConditionalProcessingBasedOnCellValues</a>.</p>
+
+        <p>A snippet of the final SKOS concept scheme, expressed in RDF using Turtle syntax, resulting 
+        from transformation of the O*NET-SOC and SOC taxonomies into RDF is provided below. Ideally, all
+        duplicate triples will be removed - such as the <a href="http://www.w3.org/2004/02/skos/core#prefLabel">skos:prefLabel</a>
+        property for concept <code>ex:15-1190</code> which would be provided by both the O*NET-SOC and SOC CSV files.</p>
+
+        <pre class="example">
+ex:15-0000 a ex:SOC-MajorGroup ;
+    skos:notation "15-0000" ;
+    skos:prefLabel "Computer and Mathematical Occupations" .
+ex:15-1100 a ex:SOC-MinorGroup ;
+    skos:notation "15-1100" ;
+    skos:prefLabel "Computer Occupations" ;
+    skos:broader ex:15-0000 .
+ex:15-1190 a ex:SOC-BroadGroup ;
+    skos:notation "15-1190" ;
+    skos:prefLabel "Miscellaneous Computer Occupations" ;
+    skos:broader ex:15-0000, ex:15-1100 .
+ex:15-1199 a ex:SOC-DetailedOccupation ;
+    skos:notation "15-1199" ;
+    skos:prefLabel "Computer Occupations, All Other" ;
+    dct:description "All computer occupations not listed separately." ;
+    skos:broader ex:15-0000, ex:15-1100, ex:15-1190 .
+ex:15-1199.03 a ex:ONETSOC-Occupation ;
+    skos:notation "15-1199.03" ;
+    skos:prefLabel "Web Administrators" ;
+    dct:description "Manage web environment design, deployment, development and maintenance activities. Perform testing and quality assurance of web sites and web applications." ;
+    skos:broader ex:15-0000, ex:15-1100, ex:15-1190, ex:15-1199 .
+        </pre>
+
+        <p>Once the SKOS concept scheme has been defined, it is possible for our user to group 
+        job postings by SOC Major Group, SOC Minor Group, SOC Broad Group, SOC Detailed Occupation
+        and O*NET-SOC Occupation to provide summary statistics about the job market.</p>	
+
+        <p>For example, we can use the SKOS concept scheme to group job postings for "Web 
+        Administrators" (code <code>15-1199.03</code>) as follows:
+          <ul>
+            <li><code>15-0000</code> "Computer and Mathematical Occupations" (SOC major group)</li>
+            <li><code>15-1100</code> "Computer Occupations" (SOC minor group)</li>
+            <li><code>15-1190</code> "Miscellaneous Computer Occupations" (SOC broad occupation)</li>
+            <li><code>15-1199</code> "Computer Occupations, All Other" (SOC detailed occupation)</li>
+            <li><code>15-1199.03</code> "Web Administrators"</li>
+          </ul>
+        </p>
+      </section>
 
     </section>
 
@@ -2864,8 +3184,9 @@ Fecha del informe,      Fuente,     Implementador,Código de sector,       Secto
                 <a href="#UC-PublicationOfPropertyTransactionData">PublicationOfPropertyTransactionData</a>,
                 <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>,
                 <a href="#UC-CanonicalMappingOfCSV">CanonicalMappingOfCSV</a>,
-                <a href="#UC-PublicationOfBiodiversityInformation">PublicationOfBiodiversityInformation</a> and
-                <a href="#UC-CollatingHumanitarianResponseInformation">CollatingHumanitarianResponseInformation</a>.
+                <a href="#UC-PublicationOfBiodiversityInformation">PublicationOfBiodiversityInformation</a>,
+                <a href="#UC-CollatingHumanitarianResponseInformation">CollatingHumanitarianResponseInformation</a> and
+                <a href="#UC-ExpressingHierarchyWithinOccupationalListings">ExpressingHierarchyWithinOccupationalListings</a>.
               </p>
             </dd>
             <dt id="R-CsvToJsonTransformation">R-CsvToJsonTransformation</dt>
@@ -2985,6 +3306,22 @@ catalogNumber,scientificName,individualCount,datasetID
                 <a href="#UC-PublicationOfBiodiversityInformation">PublicationOfBiodiversityInformation</a>.
               </p>
             </dd>
+            
+            <dt id="R-ConditionalProcessingBasedOnCellValues">R-ConditionalProcessingBasedOnCellValues</dt>
+            <dd>
+              <em id="_R-ConditionalProcessingBasedOnCellValues">
+                <strong>Ability to apply conditional processing based on the value of a specific cell</strong>
+              </em>
+              <p>When transforming CSV content into XML, JSON or RDF it shall be possible to vary the transformation
+                of the information in a particular row based on the values within a cell, or element within a cell, 
+                contained within that row.</p>
+              <p>To vary the transformation based on an element within a cell, the value of that cell must be 
+                well structured. See <a href="#CellMicrosyntax">CellMicrosyntax</a> for more information.</p>
+              <p>
+                <strong>Motivation:</strong>
+                <a href="#UC-ExpressingHierarchyWithinOccupationalListings">ExpressingHierarchyWithinOccupationalListings</a>.
+              </p>
+            </dd>
           </dl>
         </section>
         <section id="can-req-non-func">
@@ -3097,9 +3434,10 @@ catalogNumber,scientificName,individualCount,datasetID
               </div>
                         
               <p><strong>Motivation:</strong>
-              <a href="#UC-JournalArticleSearch">JournalArticleSearch</a>,
-              <a href="#UC-PaloAltoTreeData">PaloAltoTreeData</a> and
-	            <a href="#UC-SupportingSemantic-basedRecommendations">SupportingSemantic-basedRecommendations</a>.
+                <a href="#UC-JournalArticleSearch">JournalArticleSearch</a>,
+                <a href="#UC-PaloAltoTreeData">PaloAltoTreeData</a>, 
+	              <a href="#UC-SupportingSemantic-basedRecommendations">SupportingSemantic-basedRecommendations</a> and
+                <a href="#UC-ExpressingHierarchyWithinOccupationalListings">ExpressingHierarchyWithinOccupationalListings</a>.
               </p>
             </dd>
 	          <dt id="R-NonStandardCellDelimiter">R-NonStandardCellDelimiter</dt>
@@ -3138,6 +3476,7 @@ catalogNumber,scientificName,individualCount,datasetID
                 <li>where the primary key is defined as a local identfier, declare how to
                   convert the local identifier to a URI.</li>
               </ul>
+              <p>Where a row contains a primary key cell that is blank or empty, that row shall be ignored.</p>
               <p class="note">Assumption that a row within a CSV file describes a <em>single</em>
                 entity for which a primary key can be assigned.</p>
               <p>
@@ -3557,26 +3896,6 @@ Equivalent JSON:
   "name": [ "Afghanistan", "Islamic Republic of Afghanistan" ]
 }]
               </pre>
-              
-              <div class="issue">
-                <p>It is not uncommon for tabular data expressing repeated property values across multiple rows
-                (as illustrated above) to use a <em>blank</em> primary key identifier to indicate that the
-                subject of the row is the same as the preceeding row; e.g.</p>
-                
-                <pre>
-country,name
-AD,Andorra
-,Principality of Andorra
-AF,Afghanistan
-,Islamic Republic of Afghanistan    
-{snip}                  
-                </pre>
-                
-                <p>Given that no use cases are (yet) provided exhibiting this behaviour, should we include this
-                  as a requirement? They complexity arises in that this affects the "row by row" parsing of the data, 
-                  meaning that the parser would need to retain state from a previous row to <em>remember</em> the
-                  identifier of the entity.</p>
-              </div>
 
               <p>Second, a single row within a tabular data set may contain multiple values for a given property
                 by declaring that multiple columns map to the same property. For example, multiple locations:</p>
@@ -3675,8 +3994,9 @@ Equivalent JSON:
                 <strong>Motivation:</strong>
                 <a href="#UC-PublicationOfNationalStatistics">PublicationOfNationalStatistics</a>,
                 <a href="#UC-AnalyzingScientificSpreadsheets">AnalyzingScientificSpreadsheets</a>,
-                <a href="#UC-IntelligentlyPreviewingCSVFiles">IntelligentlyPreviewingCSVFiles</a> and
-                <a href="#UC-CollatingHumanitarianResponseInformation">CollatingHumanitarianResponseInformation</a>.
+                <a href="#UC-IntelligentlyPreviewingCSVFiles">IntelligentlyPreviewingCSVFiles</a>,
+                <a href="#UC-CollatingHumanitarianResponseInformation">CollatingHumanitarianResponseInformation</a> and
+                <a href="#UC-ExpressingHierarchyWithinOccupationalListings">ExpressingHierarchyWithinOccupationalListings</a>.
               </p>
             </dd>
             <dt id="R-RandomAccess">R-RandomAccess</dt>
