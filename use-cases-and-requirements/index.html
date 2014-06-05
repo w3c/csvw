@@ -916,30 +916,48 @@ Department for Business Innovation and Skills,Higher Education Funding Council f
                whole).
           </li>
           </ul>
-
+    
+       <p> The PLOS website features a <a href="https://lucene.apache.org/solr/">Solr</a> index search 
+           engine (Live Search) which can return query results in  
+         <a href="http://api.plos.org/search/?q=doc_type:full+AND+cross_published_journal_key:PLoSONE&fl=id,doi,publication_date,title_display,author&sort=publication_date+desc&rows=5">XML</a>,
+         <a href="http://api.plos.org/search/?q=doc_type:full+AND+cross_published_journal_key:PLoSONE&fl=id,doi,publication_date,title_display,author&sort=publication_date+desc&wt=json&rows=5">JSON</a>
+         or in a more concise <a href="http://api.plos.org/search/?q=doc_type:full+AND+cross_published_journal_key:PLoSONE&fl=id,doi,publication_date,title_display,author&sort=publication_date+desc&wt=csv&rows=5">CSV </a> format.
+         The output from the CSV Live Search is illustrated below: 
+       </p> 
+       <pre class="example">
+id,doi,publication_date,title_display,author
+10.1371/journal.pone.0095131,10.1371/journal.pone.0095131,2014-06-05T00:00:00Z,"Genotyping of French &lt;i&gt;Bacillus anthracis&lt;/i&gt; Strains Based on 31-Loci Multi Locus VNTR Analysis: Epidemiology, Marker Evaluation, and Update of the Internet Genotype Database","Simon Thierry,Christophe Tourterel,Philippe Le Flèche,Sylviane Derzelle,Neira Dekhil,Christiane Mendy,Cécile Colaneri,Gilles Vergnaud,Nora Madani"
+10.1371/journal.pone.0095156,10.1371/journal.pone.0095156,2014-06-05T00:00:00Z,Pathways Mediating the Interaction between Endothelial Progenitor Cells (EPCs) and Platelets,"Oshrat Raz,Dorit L Lev,Alexander Battler,Eli I Lev"
+10.1371/journal.pone.0095275,10.1371/journal.pone.0095275,2014-06-05T00:00:00Z,Identification of Divergent Protein Domains by Combining HMM-HMM Comparisons and Co-Occurrence Detection,"Amel Ghouila,Isabelle Florent,Fatma Zahra Guerfali,Nicolas Terrapon,Dhafer Laouini,Sadok Ben Yahia,Olivier Gascuel,Laurent Bréhélin"
+10.1371/journal.pone.0096098,10.1371/journal.pone.0096098,2014-06-05T00:00:00Z,Baseline CD4 Cell Counts of Newly Diagnosed HIV Cases in China: 2006–2012,"Houlin Tang,Yurong Mao,Cynthia X Shi,Jing Han,Liyan Wang,Juan Xu,Qianqian Qin,Roger Detels,Zunyou Wu"
+10.1371/journal.pone.0097475,10.1371/journal.pone.0097475,2014-06-05T00:00:00Z,Crystal Structure of the Open State of the &lt;i&gt;Neisseria gonorrhoeae&lt;/i&gt; MtrE Outer Membrane Channel,"Hsiang-Ting Lei,Tsung-Han Chou,Chih-Chia Su,Jani Reddy Bolla,Nitin Kumar,Abhijith Radhakrishnan,Feng Long,Jared A Delmar,Sylvia V Do,Kanagalaghatta R Rajashankar,William M Shafer,Edward W Yu"
+       </pre>
+       <p>Versions of the search results provided at time of writing are available locally in
+         <a href="PLOSone-search-results.xml">XML</a>, 
+         <a href="PLOSone-search-results.json">JSON</a> and 
+         <a href="PLOSone-search-results.csv">CSV</a> formats for reference.</p> 
+        
+       <p>A significant difference between the CSV formatted results and those of JSON
+         and XML is the absence of information about how the set of results provided in the HTTP response fit within 
+         the complete set of results that match the Live Search request. The information provided
+         in the JSON and XML search results states both the total number of "hits" for the Live 
+         Search request and the start index within the complete set (zero for the example provided
+         here as the <code>?start={offset}</code> query parameter is absent from the request).</p>
+        
+        <div class="note">
+          <p>Other common methods of splitting up large datasets into manageable chunks include
+          partitioning by time (e.g. all the records added to a dataset in a given day may be
+          exported in a CSV file). Such partitioning allows regular updates to be shared. However, 
+          in order to recombine those time-based partitions into the complete set, one needs to know
+          the datetime range for which that dataset partition is valid. Such information should be
+          available within a CSV metadata description.</p>
+        </div>
+        
         <p>
           <strong>Requires:</strong> 
           <a href="#R-CsvAsSubsetOfLargerDataset">CsvAsSubsetOfLargerDataset</a>.
         </p>
-    
-       <p> The PLOS website features a <a href="https://lucene.apache.org/solr/">Solr</a> index search 
-           engine which can return query results in 
-           <a href="http://api.plos.org/search/?q=doc_type:full+AND+cross_published_journal_key:PLoSONE&fl=id,doi,publication_date,title_display,author&sort=publication_date+desc&wt=json&rows=5">JSON Live Search</a>
-           <a type="image/png" href="plosone-json-search-results.png">(JSON Screen dump)</a>, 
-           <a href="http://api.plos.org/search/?q=doc_type:full+AND+cross_published_journal_key:PLoSONE&fl=id,doi,publication_date,title_display,author&sort=publication_date+desc&rows=5">XML Live Search </a>
-           <a type="image/png" href="plosone-xml-search-results.png">(XML Screen dump)</a>  
-           or in a more concise format 
-           <a href="http://api.plos.org/search/?q=doc_type:full+AND+cross_published_journal_key:PLoSONE&fl=id,doi,publication_date,title_display,author&sort=publication_date+desc&wt=csv&rows=5">CSV Live Search </a>
-           <a type="image/png" href="plosone-csv-search-results.png">(CSV Screen dump)</a> : 
-       </p> 
-       <pre class="example">
-id,publication_date,title_display,author
-10.1371/journal.pone.0087584,2014-02-14T00:00:00Z,Healthcare Worker Perceived Barriers to Early Initiation of Antiretroviral and Tuberculosis Therapy among Tanzanian Inpatients,&quot;Bahati M K Wajanga,Robert N Peck,Samuel Kalluvya,Daniel W Fitzgerald,Luke R Smart,Jennifer A Downs&quot;
-10.1371/journal.pone.0087286,2014-02-14T00:00:00Z,&quot;Subditine, a New Monoterpenoid Indole Alkaloid from Bark of &lt;i&gt;Nauclea subdita&lt;/i&gt; (Korth.) Steud. Induces Apoptosis in Human Prostate Cancer Cells&quot;,&quot;Sook Yee Liew,Chung Yeng Looi,Mohammadjavad Paydar,Foo Kit Cheah,Kok Hoong Leong,Won Fen Wong,Mohd Rais Mustafa,Marc Litaudon,Khalijah Awang&quot;
-10.1371/journal.pone.0087630,2014-02-14T00:00:00Z,Spatiotemporal Characterizations of Dengue Virus in Mainland China: Insights into the Whole Genome from 1978 to 2011,&quot;Hao Zhang,Yanru Zhang,Rifat Hamoudi,Guiyun Yan,Xiaoguang Chen,Yuanping Zhou&quot;
-10.1371/journal.pone.0086587,2014-02-14T00:00:00Z,&lt;i&gt;optGpSampler&lt;/i&gt;: An Improved Tool for Uniformly Sampling the Solution-Space of Genome-Scale Metabolic Networks,&quot;Wout Megchelenbrink,Martijn Huynen,Elena Marchiori&quot;
-10.1371/journal.pone.0082694,2014-02-14T00:00:00Z,Prophylactic Antibiotics to Prevent Cellulitis of the Leg: Economic Analysis of the PATCH I &amp; II Trials,&quot;James M Mason,Kim S Thomas,Angela M Crook,Katharine A Foster,Joanne R Chalmers,Andrew J Nunn,Hywel C Williams&quot;
-       </pre>
+       
        <p> 
         To be useful to a user maintaining a PLOS One search results need to be returned in an organized and
         consistent tabular format.  This includes:</p>
@@ -974,32 +992,7 @@ id,publication_date,title_display,author
           <a href="#R-CellMicrosyntax">CellMicrosyntax</a> and
           <a href="#R-RepeatedProperties">RepeatedProperties</a>. 
         </p>
-
-       <div class="issue">
-       <p> 
-        Is this information in scope? How can it be incorporated better into the use case? The following 
-        additional observations were made while interacting with the search engine:   
-       </p>
-       <ul>
-          <li>As the "rows" parameter is set to "5", the first 5 rows are returned. To paginate through the 
-              collection, add "&start={offset}" (e.g. "&start=5") to the query.
-          </li> 
-          <li> It would be useful to receive, at the start of the response, an indication of the total number of
-               results (as is present in the JSON version of the response, as OpenSearch fields). </li>
-          <li> It would also be useful to be able to continue fetching rows using the last known identifier
-               with "&before={id}" or "&since={id}", to avoid issues of pagination if the result set is altered 
-               while while it is being fetched. 
-          </li>
-          <li> To allow incremental updates to the local collection, it would again be useful to support "&since={id}"
-               (or an If-Modified-Since header), to fetch all the items since the query was last update. </li>
-          <li> For archiving, it might also be desirable to break the data up into separate CSV files - one per day - 
-               that can easily be synchronized between machines and recombined when needed.
-          </li>
-          <li> For converting to linked data, it would be useful to be able to specify the data type of each cell, 
-               and to map the column headers and values to URLs. 
-          </li>
-       </ul>
-       <div>
+        
       </section>
       
       <section id="UC-ReliabilityAnalyzesOfPoliceOpenData">
