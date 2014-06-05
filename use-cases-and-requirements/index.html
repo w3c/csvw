@@ -2162,11 +2162,18 @@ data:
         <p>
           <span style="font-size: 10pt">(Contributed James McKinney)</span>
         </p>
-	<p>HL7 develops international healthcare informatics interoperability standards, which are widely used.  HL7 messages follow a format that is very similar to CSV (and may very well be CSV, depending on how you define it). Briefly, a message is a CSV file. A <i>segment</i> is a CSV line, with carriage returns separating <i>segments</i>. A <i>segment</i> is composed of one or more <i>composites</i> (CSV cells). <i>Composites</i> are delimited by pipe characters, instead of the CSV comma. A <i>composite</i> is composed of one or more <i>subcomposites</i>, delimited by <b>^</b> caret characters. The <b>&</b> ampersand is for sub-sub-composites. This system gets around some of the limitations of the CSV file format. A HL7 message (CSV file) can indicate that it is using different delimiters [2].
+	      <p>HL7 develops international healthcare informatics interoperability standards, which are 
+	        widely used.  HL7 messages follow a format that is very similar to CSV (and may very well 
+	        be CSV, depending on how you define it). Briefly, a message is a CSV file. A <i>segment</i> 
+	        is a CSV line, with carriage returns separating <i>segments</i>. A <i>segment</i> is 
+	        composed of one or more <i>composites</i> (CSV cells). <i>Composites</i> are delimited by 
+	        pipe characters, instead of the CSV comma. A <i>composite</i> is composed of one or more 
+	        <i>subcomposites</i>, delimited by <b>^</b> caret characters. The <b>&amp;</b> ampersand 
+	        is for sub-sub-composites. This system gets around some of the limitations of the CSV 
+	        file format. A HL7 message (CSV file) can indicate that it is using different delimiters.</p>
 
-HL7 has ways of describing the structure of <a href="https://wiki.nci.nih.gov/display/caCORE/CSV+Specification+v4.0">CSV files.</a> 
-
-</p>
+        <p>HL7 has ways of describing the structure of 
+          <a href="https://wiki.nci.nih.gov/display/caCORE/CSV+Specification+v4.0">CSV files</a>.</p>
 
         <pre class="example">
 MSH|^~\&amp;|EPIC|EPICADT|SMS|SMSADT|199912271408|CHARRIS|ADT^A04|1817457|D|2.5|
@@ -2175,9 +2182,51 @@ NK1||ROE^MARIE^^^^|SPO||(216)123-4567||EC|||||||||||||||||||||||||||
 PV1||O|168 ~219~C~PMA^^^^^^^^^||||277^ALLEN MYLASTNAME^BONNIE^^^^|||||||||| ||2688684|||||||||||||||||||||||||199912271408||||||002376853
         </pre>
 
-	<p>
+	      <p>
           <strong>Requires:</strong> 
         </p>
+        
+        <div class="issue">
+          <p>This use case is currently incomplete and does not (yet) follow the narrative style
+          displayed elsewhere in this document.</p>
+          <p>A suitable narrative might be:</p>
+          <p>"<em>John Doe is being transferred from a one clinic to another to recieve specialied 
+            care. The machine-readable transfer documentation includes his name, patient ID, his 
+            visit to the first clinic, and some information about his next of kin. The visit info 
+            (and many other fields) require microparsing on the '^' separator to extract further 
+            structured information about, for example, the referring physician.</em>"</p>
+          <p>However, further information from Eric Prud'hommeaux indicates that HL7 might be 
+            more than we can (or want to) cope with. HL7 messages <strong>do not</strong> appear to be regular 
+            tabular data. OK, so the "microsyntax" in each field is complicated (making the data
+            3- or 4-dimensional, with "^~\&amp;" being the declared separators for the "fields 
+            within fields" in the example below) but it can be worked 
+            out, but the real issue is that the rows are not uniform - they have different 
+            numbers of fields ...</p> 
+          <pre>
+MSH|^~\&amp;|EPIC|EPICADT|SMS|SMSADT|199912271408|CHARRIS|ADT^A04|1817457|
+MSH|D|2.5|
+PID||0493575^^^2^ID 
+PID||1|454721||DOE^JOHN^^^^|DOE^JOHN^^^^|19480203|M||B|254 MYSTREET 
+PID||AVE^^MYTOWN^OH^44123^USA||(216)123-4567|||M|NON|||
+NK1||ROE^MARIE^^^^|SPO||(216)123-4567||EC|||||||||||||||||||||||||||
+PV1||O|168 ~219~C~PMA^^^^^^^^^||||277^ALLEN 
+PV1||O|MYLASTNAME^BONNIE^^^^|||||||||| 
+PV1||O|||2688684|||||||||||||||||||||||||199912271408||||||002376853
+          </pre>
+          <p>Furthermore, it appears that the data is parsed according to a specific set of rules 
+            defined in a "table" and without this table there's no way to label the parsed 
+            attributes. The first line in the example above says that the message conforms to 
+            version 2.5 tables (versions from 2.2 to 2.6 are visible in the wild). The version 2.5
+            table indicates how the message should be parsed, e.g. the PID field, which happens to 
+            include subfields like lastname and firstname ("DOE" and "JOHN" respectively). Without 
+            that table, there's no way to know how to label the parsed attributes.</p>
+          <p>So whilst HL7 is row oriented, it does not appear to be CSV: line lengths are irregular, 
+            and one needs to refer to tables to effectively parse the content.</p>
+          <p><strong>Do we still want to include this use case?</strong> If so, we will need
+            assistance in completing it, including illustrative examples that fit the narrative and
+            a good understanding of how those examples actually work so that they can be adequately
+            described.</p>
+        </div>
 
       </section>
       
