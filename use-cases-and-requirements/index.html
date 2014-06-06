@@ -2191,11 +2191,100 @@ data:
       </section>
 
 
-      <section id="UC-BLANK">
-        <h2>Use Case #20 - [placeholder for Yakov's Spotfire use case]</h2>
+      <section id="UC-PlatformIntegrationUsingSTDF">
+        <h2>Use Case #20 - Integrating components with the TIBCO Spotfire platform using tabular data</h2>
         <p>
           <span style="font-size: 10pt">(Contributed Yakov Shafranovich)</span>
         </p>
+        <p>A systems integrator seeks to integrate a new component into the 
+          <a href="http://spotfire.tibco.com/">TIBCO Spotfire analytics platform</a>. 
+          Reviewing the documentation that describes how to extend the platform indicates 
+          that Spotfire employs a common tabular file format for all products: the 
+          <a href="http://stn.spotfire.com/stn/Extend/STDF.aspx">Spotfire Text Data Format</a>
+          (STDF).</p>
+        <p>The example from the STDF documentation (below) illustrates a number of the key 
+          differences with the standard CSV format defined in [[RFC4180]].</p>
+        <pre class="example">
+<bom>\! filetype=Spotfire.DataFormat.Text; version=1.0;
+\* ich bin ein berliner 
+Column A;Column #14B;Kolonn Ö;The n:th column; 
+Real;String;Blob;Date;
+-123.45;i think there\r\nshall never be;\#aaXzD;2004-06-18;
+1.0E-14;a poem\r\nlovely as a tree;\#ADB12=;\?lost in time;
+222.2;\?invalid text;\?;2004-06-19;
+\?error11;\\förstår ej\\;\#aXzCV==;\?1979;
+3.14;hej å hå\seller?;\?NIL;\?#ERROR;
+        </pre>
+        
+        <p>
+          <ul>
+            <li>
+              <p>The first line of the STDF file, following a 
+                <a href="http://en.wikipedia.org/wiki/Byte_order_mark ">byte order mark</a> (BOM),
+                provides metadata about the file type and version to inform consuming applications.</p>
+              <p><strong>Requires:</strong> 
+                <a href="#R-AnnotationAndSupplementaryInfo">AnnotationAndSupplementaryInfo</a>.</p>
+            </li>
+            <li>
+              <p>The second line is a <em>comment line</em> which is ignored during processing.
+              The comment is recognised from teh initial sequence of characters within the line:
+              "<code>\*</code>".</p>
+              <p><strong>Requires:</strong> 
+                <a href="#R-CommentLines">CommentLines</a>.</p>
+            </li>
+            <li>
+              <p>Lines three and four provide metadata: column heading names and the data types 
+              (including integer, real, string, date, time, datetime and blob)for each column 
+              respectively.</p>
+              <p><strong>Requires:</strong> 
+                <a href="#R-MultipleHeadingRows">MultipleHeadingRows</a> and
+                <a href="#R-SyntacticTypeDefinition">SyntacticTypeDefinition</a>.</p>
+            </li>
+            <li>
+              <p>Cells are delimited using the semi-colon "<code>;</code>" character.</p>
+              <p><strong>Requires:</strong> 
+                <a href="#R-NonStandardCellDelimiter">NonStandardCellDelimiter</a>.</p>
+            </li>
+            <li>
+              <p>Date and time values are strictly formatted; <code>YYYY-MM-DD</code>and
+                <code>HH:MM:SS</code> respectively.</p>
+              <p><strong>Requires:</strong> 
+                <a href="#R-CellMicrosyntax">CellMicrosyntax</a>.</p>
+            </li>
+            <li>
+              <p>Base64-encoded binary values may be included. These are designated by setting
+                the initial cell value to "<code>\#</code>".</p>
+            </li>
+            <li>
+              <p>A number of escape sequences for special characters are supported; e.g. 
+                "<code>\\</code>" (backslash within a string), 
+                "<code>\s</code>" (semicolon within a string - <em>not a cell or list item delimiter</em>),
+                "<code>\n</code>" (newline within a string) and
+                "<code>\\</code>" (tab within a string) etc.</p>
+              <p>These special characters don't affect the parsing of the data but are further
+                examples of the use of microsyntax within cells.</p>
+              <p><strong>Requires:</strong>
+                <a href="#R-CellMicrosyntax">CellMicrosyntax</a>.</p>
+            </li>
+            <li>
+              <p>Null and invalid values are indicated by setting the initial character 
+                sequence of a cell to "<code>\?</code>". Optionally, an error code or other
+                informative statement may follow.</p>
+              <p><strong>Requires:</strong> 
+                <a href="#R-MissingValueDefinition">MissingValueDefinition</a> and
+                <a href="#R-CellMicrosyntax">CellMicrosyntax</a>.</p>
+            </li>
+          </ul>
+        </p>
+        <p>Although not shown in this example, STDF also supports <em>list types</em>: 
+          <ul>
+            <li>A valid list value must begin with "<code>\[</code>" and end with 
+              "<code>\]</code>" followed by a terminating semicolon.</li>
+            <li>All list items are terminated by a semicolon, including the last item in a list.</li>
+          </ul>
+        </p>
+        <p><strong>Requires:</strong>
+          <a href="#R-CellMicrosyntax">CellMicrosyntax</a>.</p>
       </section>
       
       <section id="UC-PublicationOfBiodiversityInformation">
@@ -3361,6 +3450,22 @@ catalogNumber,scientificName,individualCount,datasetID
                 <strong>Motivation:</strong>
                 <a href="#UC-ExpressingHierarchyWithinOccupationalListings">ExpressingHierarchyWithinOccupationalListings</a>.
               </p>
+            </dd>            
+            <dt id="R-CommentLines">R-CommentLines</dt>
+            <dd>
+              <em id="_R-CommentLines">
+                <strong>Ability to identify comment lines within a CSV file and skip over them during parsing, format conversion or other processing</strong>
+              </em>
+              <p>A tabular datafile may include comment lines. It shall be possible to declare how to recognize 
+              a comment line within the data (e.g. by specifying a sequence of characters that are found
+              at the beginning of every comment line).</p>
+              <p>Comment lines shall not be treated as data when parsing, converting or processing the
+              CSV file. During format conversion, the application may try to include the comment in the
+              conversion.</p>
+              <p>
+                <strong>Motivation:</strong>
+                <a href="#UC-PlatformIntegrationUsingSTDF">PlatformIntegrationUsingSTDF</a>.
+              </p>
             </dd>
           </dl>
         </section>
@@ -3476,8 +3581,9 @@ catalogNumber,scientificName,individualCount,datasetID
               <p><strong>Motivation:</strong>
                 <a href="#UC-JournalArticleSearch">JournalArticleSearch</a>,
                 <a href="#UC-PaloAltoTreeData">PaloAltoTreeData</a>, 
-	              <a href="#UC-SupportingSemantic-basedRecommendations">SupportingSemantic-basedRecommendations</a> and
-                <a href="#UC-ExpressingHierarchyWithinOccupationalListings">ExpressingHierarchyWithinOccupationalListings</a>.
+	              <a href="#UC-SupportingSemantic-basedRecommendations">SupportingSemantic-basedRecommendations</a>, 
+                <a href="#UC-ExpressingHierarchyWithinOccupationalListings">ExpressingHierarchyWithinOccupationalListings</a> and
+                <a href="#UC-PlatformIntegrationUsingSTDF">PlatformIntegrationUsingSTDF</a>.
               </p>
             </dd>
 	          <dt id="R-NonStandardCellDelimiter">R-NonStandardCellDelimiter</dt>
@@ -3493,8 +3599,9 @@ catalogNumber,scientificName,individualCount,datasetID
                 <strong>Motivation:</strong>
                 <a href="#UC-DisplayingLocationsOfCareHomesOnAMap">DisplayingLocationsOfCareHomesOnAMap</a>,
                 <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>,
-		            <a href="#UC-SupportingSemantic-basedRecommendations">SupportingSemantic-basedRecommendations</a> and
-                <a href="#UC-PublicationOfBiodiversityInformation">PublicationOfBiodiversityInformation</a>.
+		            <a href="#UC-SupportingSemantic-basedRecommendations">SupportingSemantic-basedRecommendations</a>, 
+                <a href="#UC-PublicationOfBiodiversityInformation">PublicationOfBiodiversityInformation</a> and
+                <a href="#UC-PlatformIntegrationUsingSTDF">PlatformIntegrationUsingSTDF</a>.
               </p>
             </dd>
 	    <dt id="R-PrimaryKey">R-PrimaryKey</dt>
@@ -3594,8 +3701,9 @@ catalogNumber,scientificName,individualCount,datasetID
                 <a href="#UC-CanonicalMappingOfCSV">CanonicalMappingOfCSV</a>,
 	             	<a href="#UC-SupportingSemantic-basedRecommendations">SupportingSemantic-basedRecommendations</a>,
                 <a href="#UC-MakingSenseOfOtherPeoplesData">MakingSenseOfOtherPeoplesData</a>, 
-                <a href="#UC-PublicationOfBiodiversityInformation">PublicationOfBiodiversityInformation</a> and
-                <a href="#UC-ExpressingHierarchyWithinOccupationalListings">ExpressingHierarchyWithinOccupationalListings</a>.
+                <a href="#UC-PublicationOfBiodiversityInformation">PublicationOfBiodiversityInformation</a>,
+                <a href="#UC-ExpressingHierarchyWithinOccupationalListings">ExpressingHierarchyWithinOccupationalListings</a> and
+                <a href="#UC-PlatformIntegrationUsingSTDF">PlatformIntegrationUsingSTDF</a>.
               </p>
             </dd>
             <dt id="R-AssociationOfCodeValuesWithExternalDefinitions">R-AssociationOfCodeValuesWithExternalDefinitions</dt>
@@ -3688,8 +3796,9 @@ catalogNumber,scientificName,individualCount,datasetID
                 <a href="#UC-IntelligentlyPreviewingCSVFiles">IntelligentlyPreviewingCSVFiles</a>,
                 <a href="#UC-CanonicalMappingOfCSV">CanonicalMappingOfCSV</a>,
 		            <a href="#UC-SupportingSemantic-basedRecommendations">SupportingSemantic-basedRecommendations</a>,
-                <a href="#UC-PublicationOfBiodiversityInformation">PublicationOfBiodiversityInformation</a> and
-                <a href="#UC-CollatingHumanitarianResponseInformation">CollatingHumanitarianResponseInformation</a>.
+                <a href="#UC-PublicationOfBiodiversityInformation">PublicationOfBiodiversityInformation</a>,
+                <a href="#UC-CollatingHumanitarianResponseInformation">CollatingHumanitarianResponseInformation</a> and
+                <a href="#UC-PlatformIntegrationUsingSTDF">PlatformIntegrationUsingSTDF</a>.
               </p>
             </dd>
             <dt id="R-SemanticTypeDefinition">R-SemanticTypeDefinition</dt>
@@ -3780,8 +3889,9 @@ ex:11-1011.00
                 <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>,
                 <a href="#UC-OrganogramData">OrganogramData</a>,
                 <a href="#UC-OpenSpendingData">OpenSpendingData</a>,
-                <a href="#UC-NetCdFcDl">NetCdFcDl</a> and
-                <a href="#UC-PaloAltoTreeData">PaloAltoTreeData</a>.
+                <a href="#UC-NetCdFcDl">NetCdFcDl</a>, 
+                <a href="#UC-PaloAltoTreeData">PaloAltoTreeData</a> and
+                <a href="#UC-PlatformIntegrationUsingSTDF">PlatformIntegrationUsingSTDF</a>.
               </p>
             </dd>
             <dt id="R-URIMapping">R-URIMapping</dt>
@@ -4030,8 +4140,9 @@ Equivalent JSON:
                 <a href="#UC-PublicationOfNationalStatistics">PublicationOfNationalStatistics</a>,
                 <a href="#UC-AnalyzingScientificSpreadsheets">AnalyzingScientificSpreadsheets</a>,
                 <a href="#UC-IntelligentlyPreviewingCSVFiles">IntelligentlyPreviewingCSVFiles</a>,
-                <a href="#UC-CollatingHumanitarianResponseInformation">CollatingHumanitarianResponseInformation</a> and
-                <a href="#UC-ExpressingHierarchyWithinOccupationalListings">ExpressingHierarchyWithinOccupationalListings</a>.
+                <a href="#UC-CollatingHumanitarianResponseInformation">CollatingHumanitarianResponseInformation</a>,
+                <a href="#UC-ExpressingHierarchyWithinOccupationalListings">ExpressingHierarchyWithinOccupationalListings</a> and
+                <a href="#UC-PlatformIntegrationUsingSTDF">PlatformIntegrationUsingSTDF</a>.
               </p>
             </dd>
             <dt id="R-RandomAccess">R-RandomAccess</dt>
