@@ -177,11 +177,14 @@ var respecConfig = {
         <p>Each row within a CSV file relates to a particular Record and is allocated a unique
           identifier. This unique identifier behaves as a primary key for the Record within the
           scope of the CSV file and is used when referencing that Record from within other Record
-          transcriptions.</p>
+          transcriptions. The unique identifier is unique within the scope of the datafile; in 
+          order for the Record to be referenced from outside this datafile, the local identifier
+          must be mapped to a globally unique identifier such as a URI.</p>
 
         <p>
           <strong>Requires:</strong>
-          <a href="#R-PrimaryKey">PrimaryKey</a> and 
+          <a href="#R-PrimaryKey">PrimaryKey</a>,
+          <a href="#R-URIMapping">URIMapping</a> and 
           <a href="#R-ForeignKeyReferences">ForeignKeyReferences</a>.
         </p>
 
@@ -728,14 +731,18 @@ Department for Business Innovation and Skills,Higher Education Funding Council f
         </ul>
         
         <p>Within the senior role CSV the cell <code>Post Unique Reference</code> provides 
-          a primary key for the entity described within a given row.</p>
+          a primary key within the data file for each row. In addition, it provides a 
+          unique identifier for the entity described within a given row. In order for the 
+          entity to be referenced from outside this datafile, the local identifier
+          must be mapped to a globally unique identifier such as a URI.</p>
         
         <p>
           <strong>Requires:</strong>
-          <a href="#R-PrimaryKey">PrimaryKey</a>.
+          <a href="#R-PrimaryKey">PrimaryKey</a> and 
+          <a href="#R-URIMapping">URIMapping</a>.
         </p>
         
-        <p>This primary key is referenced both from within the senior post dataset, <code>
+        <p>This unique identifier is referenced both from within the senior post dataset, <code>
           Reports to Senior Post</code>, and within the junior post dataset, <code>Reporting 
             Senior Post</code> in order to determine the relationships within the organisational
           structure.</p>
@@ -851,11 +858,16 @@ Department for Business Innovation and Skills,Higher Education Funding Council f
         </p>
         
         <p>Each row, or record, within the tabular dataset describes a property transaction. The 
-          <code>Transaction unique identifier</code> column provides the primary key for each record.</p>
+          <code>Transaction unique identifier</code> column provides a unique identifier for that
+          property transaction. Given that transactions may be amended, this identifier cannot
+          be treated as a primary key for rows within the dataset as the identifier may occur
+          more than once. the primary key for each record. In order for the 
+          property transaction to be referenced from outside this dataset, the local identifier
+          must be mapped to a globally unique identifier such as a URI.</p>
         
         <p>
           <strong>Requires:</strong>
-          <a href="#R-PrimaryKey">PrimaryKey</a>.
+          <a href="#R-URIMapping">URIMapping</a>.
         </p>
         
         <p>Each transaction record makes use of predefined category codes as outlined above; e.g. 
@@ -1130,15 +1142,17 @@ NM_178185	Hist1h2ao	7,13	16,52		7,82		7,79		16,99	75,04		290,72		21,99		164,93	.
 	      treatment with two concentrations of two cytokines, measured after two periods of time, presented as both actual values and fold
 	      change. This can be represented in a table, but needs 3 levels of headings and several merged cells. In fact, the first row is the title of the table,
 	      the second to fourth rows are the table headers.</p>
-        <p>We also see that the first column <code>gene_name</code> provides an identifier for 
-        the data provided in each row, with the second column <code>symbol</code> providing a
+        <p>We also see that the first column <code>gene_name</code> provides a unique identifier for 
+        the gene described in each row, with the second column <code>symbol</code> providing a
         human readable notation for each gene - albeit a scientific human! It is necessary to 
         determine which column, if any, provides the unique identifier for the entity which 
-        each row describes.</p>
+        each row describes. In order for the gene to be referenced from outside the datafile, 
+        e.g. to reconcile the information in this table with other information about the gene,
+        the local identifier must be mapped to a globally unique identifier such as a URI.</p>
 	<p>
     <strong>Requires:</strong>
     <a href="#R-MultipleHeadingRows">MultipleHeadingRows</a> and 
-	  <a href="#R-PrimaryKey">PrimaryKey</a>.
+	  <a href="#R-URIMapping">URIMapping</a>.
 	</p>
 	
 	
@@ -1366,12 +1380,16 @@ GID,Private,Tree ID,Admin Area,Side of Street,On Street,From Street,To Street,St
         </li>
         <li> ordering the CSV columns to match the order of the spreadsheet columns.
         </li> 
-        <li> The CSV file provides a primary key for each row, accounts for missing data, and lists characteristics
+        <li> The CSV file provides a primary key for each row (column <code>GID</code>), a unique identifier 
+             for each tree (column <code>Tree ID</code>), accounts for missing data, and lists characteristics
              describing the condition of the tree in the comments cell using a micro syntax to delimit the
              characteristics list.  The spreadsheet also provides geo coordinate information pinpointing each
              inventoried tree.
         </li>
         </ul>
+        <p>In order for information about a given tree to be reconciled with information about the same 
+          tree originating from other sources, the local identifier for that tree must be mapped to a 
+          globally unique identifier such as a URI.</p>
         <p>Also note that in row 6, a series of statements describing the condition of the tree and other 
           important information are provided in the <code>comments</code> cell. These statements are
           delimited using the semi-colon "<code>;</code>" character.</p>
@@ -1379,6 +1397,8 @@ GID,Private,Tree ID,Admin Area,Side of Street,On Street,From Street,To Street,St
           <strong>Requires:</strong>
           <a href="#R-WellFormedCsvCheck">WellFormedCsvCheck</a>,
           <a href="#R-CsvValidation">CsvValidation</a>,
+          <a href="#R-PrimaryKey">PrimaryKey</a>,
+          <a href="#R-URIMapping">URIMapping</a>,
           <a href="#R-MissingValueDefinition">MissingValueDefinition</a>,  
           <a href="#R-UnitMeasureDefinition">UnitMeasureDefinition</a>,
           <a href="#R-CellMicrosyntax">CellMicrosyntax</a> and
@@ -1422,19 +1442,15 @@ GID,Private,Tree ID,Admin Area,Side of Street,On Street,From Street,To Street,St
         The key characteristics of the XYZ format are:  
         <ul>
         <li> CSV contains two header rows, the first row containing the number of atoms in molecule (number of rows in data block).
-             The second is a comment line.
-        </li>
-        <li> Each row in the data block used a fix number of cells (atom name followed by x, y, z coordinates).
-        </li>
-        <li> All values are delimited by spaces.
-        </li>
+             The second is a comment line.</li>
+        <li> Each row in the data block used a fix number of cells (atom name followed by x, y, z coordinates).</li>
+        <li> All values are delimited by spaces.</li>
         </ul>
         <p>
           <strong>Requires:</strong>
           <a href="#R-WellFormedCsvCheck">WellFormedCsvCheck</a>,
           <a href="#R-CsvValidation">CsvValidation</a>, 
-          <a href="#R-MultipleHeadingRows">MultipleHeadingRows</a>, 
-          <a href="#R-PrimaryKey">PrimaryKey</a> and
+          <a href="#R-MultipleHeadingRows">MultipleHeadingRows</a> and
           <a href="#R-UnitMeasureDefinition">UnitMeasureDefinition</a>.
         </p>
        </p> 
@@ -1543,11 +1559,13 @@ HETATM  132  OXT ACY   401       4.306  23.101  12.291  1.00 21.19           O
 	has a document ID and three offset pairs.
 	</p>
 	<p>The file format exemplified above opens up for a number of issues described as follows.</p>
-	Each row is intended to describe an entity (“:e4”) that thus represents a primary key and needs
-	to be identified as such.</p>
+	Each row is intended to describe an entity (e.g. the subject of the triple, “:e4”). The unique identifier for that 
+	entity is provided in the first column. In order for information about this entity to be reconcilled with 
+	information from other sources about the same entity, the local identifier needs to be mapped to a globally 
+	unique identifier such as a URI.</p>
 	<p>
 	<strong>Requires:</strong>
-	<a href="#R-PrimaryKey">PrimaryKey</a>.
+	<a href="#R-URIMapping">URIMapping</a>.
 	</p>
 	<p>After each triple, there is a variable number of annotations representing the provenance of the triple and, occasionally,
 	its certainty. This information has to be properly identified and managed.</p>
@@ -2290,13 +2308,12 @@ OBSNEV:SINFONEVADA:SINFON-100-008211-20040930	2013-06-20T11:18:18	OBSNEV	SINFONE
             <li>the number of rows to skip at the beginning of the file before the data section (e.g. the length of the header section)</li>
             <li>the type of entity that each row in the tabular dataset describes</li>
             <li>the name of the tabular data file <code>occurence.txt</code></li>
-            <li>the column which provides the primary identifier for the entity described by each row</li>
+            <li>the column which provides the unique identifier for the entity described by each row</li>
             <li>the property type associated with each column based on the column number index</li>
           </ul>
         </p>
         
         <p><strong>Requires:</strong> 
-          <a href="#R-PrimaryKey">PrimaryKey</a>,
           <a href="#R-NonStandardCellDelimiter">NonStandardCellDelimiter</a>,
           <a href="#R-ZeroEditAdditionOfSupplementaryMetadata">ZeroEditAdditionOfSupplementaryMetadata</a> and
           <a href="#R-AnnotationAndSupplementaryInfo">AnnotationAndSupplementaryInfo</a>.</p>
@@ -2437,14 +2454,16 @@ OBSNEV:SINFONEVADA:SINFON-100-008211-20040930	2013-06-20T11:18:18	OBSNEV	SINFONE
         
         <p>The complete JSON object may be retrieved <a href="sinfonevada-example.json">here</a>.</p>
 
+        <p>The unique identifier for each "occurence" record has been mapped to
+          a URI by appending the local identifier (from column <code>id</code>) 
+          to the URI of the dataset within which the recond occurs.</p>
+
         <p><strong>Requires:</strong>
+          <a href="#R-URIMapping">URIMapping</a>
           <a href="#R-SemanticTypeDefinition">SemanticTypeDefinition</a> and
           <a href="#R-CsvToRdfTransformation">CsvToRdfTransformation</a>.</p>
 
-        <div class="note">
-          <p>The primary identifier is converted to a URI by appending the value of the <code>id</code>
-          column for a given row to the URL of the dataset.</p>
-          
+        <div class="note">          
           <p>The <code>@type</code> of the entity is taken from the <code>rowType</code> attribute
           within the metadata file.</p>
         </div>
@@ -2770,7 +2789,8 @@ O*NET-SOC 2010 Code,O*NET-SOC 2010 Title,O*NET-SOC 2010 Description
 
         <p>Also note that each row provides a unique identifier for the occupation it describes. This
         unique identifier is given in the <code>O*NET-SOC 2010 Code</code> column. This code can be considered
-        as the primary key for each occupation record in the listing.</p>
+        as the primary key for each row in the listing as it is unique for every row. Furthermore, the value 
+        of the <code>O*NET-SOC 2010 Code</code> column serves as the unique identifier for the occupation.</p>
 
         <p><strong>Requires:</strong> 
         <a href="#R-PrimaryKey">PrimaryKey</a>.</p>  
@@ -2842,7 +2862,13 @@ Major Group,Minor Group,Broad Group,Detailed Occupation,,,,,,
         <p>Being familiar with <a href="http://www.w3.org/TR/skos-reference/">SKOS</a>, our user decides 
         to map both the O*NET-SOC and SOC taxonomies into a single hierarchy expressed using RDF/OWL and the 
         SKOS vocabulary.</p>
-
+        
+        <p>Note that in order to express the two taxonomies in SKOS, the local identifiers used in
+        the CSV files (e.g. <code>15-1199.03</code>) must be mapped to URIs.</p>
+        
+        <p><strong>Requires:</strong>
+          <a href="#R-URIMapping">URIMapping</a>.</p>
+        
         <p>Each of the five levels used across the occupation classification schemes are assigned
         to a particular OWL class - each of which is a sub-class of 
         <a href="http://www.w3.org/2004/02/skos/core#Concept">skos:Concept</a>:
@@ -2865,14 +2891,35 @@ Major Group,Minor Group,Broad Group,Detailed Occupation,,,,,,
 
         <p>The SOC taxonomy contains four different types of entities, and so requires several different
         passes to extract each of those from the CSV file. Depending on which kind of entity is being 
-        extracted, a different column is defined as the primary key.</p>
+        extracted, a different column provides the unique identifier for the entity. Data in a given
+        row is only processed if the value for the cell designated as the unique identifier is not blank.
+        For example, if the <code>Detailed Occupation</code> column is designated as providing the 
+        unique identifier (e.g. to extract entities of type <code>ex:SOC-DetailedOccupation</code>), 
+        then the only rows to be processed in the snippet below would be "Financial Specialists, All Other",
+        "Computer and Information Research Scientists" and "Computer Occupations, All Other". All other rows
+        would be ignored.</p>
         
-        <div class="note">
-          <p>Where the value in the designated primary key column is blank, the row is ignored.</p>
-        </div>
-
+        <pre class="example">
+{snip}
+Major Group,Minor Group,Broad Group,Detailed Occupation,                                            ,,,,,
+           ,           ,           ,                   ,                                            ,,,,,
+{snip}
+           ,           ,           ,            13-2099,          "Financial Specialists, All Other",,,,,
+    15-0000,           ,           ,                   ,       Computer and Mathematical Occupations,,,,,
+           ,    15-1100,           ,                   ,                        Computer Occupations,,,,,
+           ,           ,    15-1110,                   ,Computer and Information Research Scientists,,,,,
+           ,           ,           ,            15-1111,Computer and Information Research Scientists,,,,,
+{snip}
+           ,           ,    15-1190,                   ,          Miscellaneous Computer Occupations,,,,,
+           ,           ,           ,            15-1199,           "Computer Occupations, All Other",,,,,
+           ,    15-2000,           ,                   ,            Mathematical Science Occupations,,,,,
+{snip}
+        </pre>
+        
+        <p>(whitespace added for clarity)</p>
+        
         <p><strong>Requires:</strong>
-          <a href="#R-PrimaryKey">PrimaryKey</a>.</p>
+          <a href="#R-ConditionalProcessingBasedOnCellValues">ConditionalProcessingBasedOnCellValues</a>.</p>
 
         <p>The hierarchy in the SOC structure is implied by <em>inheritance</em> from
         the preceeding row(s). For example, the row describing SOC minor group "Computer Occupations" 
@@ -2908,7 +2955,7 @@ Major Group,Minor Group,Broad Group,Detailed Occupation,                        
         when a non-blank value was provided for that column. For example, the last row in the example 
         above describing "Mathematical Science Occupations" does not inherit the values from columns 
         <code>Broad Group</code> and <code>Detailed Occupation</code> in the preceeding row because 
-          it describes a new level in the hierarchy.</p>
+        it describes a new level in the hierarchy.</p>
 
         <p>However, given that the SOC code is a string value with regular structure that reflects
         the position of a given concept within the hierarchy, it is possible to determine the
@@ -3152,11 +3199,12 @@ ex:15-1199.03 a ex:ONETSOC-Occupation ;
               </em>
               <p>Standardised CSV to RDF transformation mechanisms mitigate the need for bespoke
                 transformation software to be developed by CSV data consumers, thus simplifying the
-                exploitation of CSV data. Identifiers used as primary and foreign keys within a CSV
-                file need to be converted to URIs. RDF properties (or <em>property paths</em>) need to
-                be determined to relate the entity described within a given row to the corresponding
-                data values for that row. Where available, the type of a data value should be
-                incorporated in the resulting RDF. Built-in types defined in [[rdf11-concepts]] (e.g.
+                exploitation of CSV data. Local identifiers for the entity described in a given row or 
+                used to reference some other entity need to be converted to URIs. RDF properties 
+                (or <em>property paths</em>) need to be determined to relate the entity described 
+                within a given row to the corresponding data values for that row. Where available, 
+                the type of a data value should be incorporated in the resulting RDF. Built-in types 
+                defined in [[rdf11-concepts]] (e.g.
                 <code><a href="http://www.w3.org/TR/xmlschema11-2/#dateTime">xsd:dateTime</a></code>,
                 <code><a href="http://www.w3.org/TR/xmlschema11-2/#integer">xsd:integer</a></code>
                 etc.) and types defined in other RDF vocabularies / OWL ontologies (e.g. <code><a
@@ -3165,9 +3213,9 @@ ex:15-1199.03 a ex:ONETSOC-Occupation ;
                 be supported.</p>
               <p>
                 <strong>Dependency:</strong>
-                <a href="#R-SemanticTypeDefinition">R-SemanticTypeDefinition</a>, <a
-                  href="#R-SyntacticTypeDefinition">R-SyntacticTypeDefinition</a>, <a
-                    href="#R-PrimaryKey">R-PrimaryKey</a>
+                <a href="#R-SemanticTypeDefinition">R-SemanticTypeDefinition</a>, 
+                <a href="#R-SyntacticTypeDefinition">R-SyntacticTypeDefinition</a> and 
+                <a href="#R-URIMapping">R-URIMapping</a>.
               </p>
               <p>
                 <strong>Motivation:</strong>
@@ -3452,37 +3500,28 @@ catalogNumber,scientificName,individualCount,datasetID
 	    <dt id="R-PrimaryKey">R-PrimaryKey</dt>
             <dd>
               <em id="_R-PrimaryKey">
-                <strong>Ability to determine the primary key for entities described within a CSV
-                  file</strong>
+                <strong>Ability to determine the primary key for rows within a tabular data file</strong>
               </em>
-              <p>Each row within a CSV file typically relates to a single entity. In many cases that
-                entity is the object of references from other entities described within the CSV file -
-                or perhaps even from entities described in other CSV files or data resources.</p>
-              <p>Typically within a CSV file, primary key identifiers are only unique within the scope
-                of the CSV file within which they are stated (e.g. a local identifier). In order for
-                the entity to be unambiguously identified, the local identifier needs to be converted
-                to a URI (as defined in [[RFC3986]]).</p>
-              <p>It shall be possible to:</p>
+              <p>It shall be possible to uniquely identify every row within a tabular data file. The
+              default behaviour for uniquely identifying rows is to use the row number. However, some
+              datasets already include a unique identifier for each row in the dataset. In such
+              cases, it shall be possible to:</p>
               <ul>
                 <li>declare which column provides the primary key; and</li>
                 <li>where the primary key is defined as a local identfier, declare how to
                   convert the local identifier to a URI.</li>
               </ul>
-              <p>Where a row contains a primary key cell that is blank or empty, that row shall be ignored.</p>
-              <p class="note">Assumption that a row within a CSV file describes a <em>single</em>
-                entity for which a primary key can be assigned.</p>
+              <p>
+                <strong>Dependency:</strong>
+                <a href="#R-URIMapping">R-URIMapping</a>.
+              </p>
               <p>
                 <strong>Motivation:</strong>
                 <a href="#UC-DigitalPreservationOfGovernmentRecords">DigitalPreservationOfGovernmentRecords</a>,
                 <a href="#UC-OrganogramData">OrganogramData</a>, 
-                <a href="#UC-PublicationOfPropertyTransactionData">PublicationOfPropertyTransactionData</a>,
-                <a href="#UC-AnalyzingScientificSpreadsheets">AnalyzingScientificSpreadsheets</a>,
-                <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>, 
-                <a href="#UC-ChemicalImaging">ChemicalImaging</a>, 
-                <a href="#UC-ChemicalStructures">ChemicalStructures</a>,
-                <a href="#UC-PublicationOfBiodiversityInformation">PublicationOfBiodiversityInformation</a> and
+                <a href="#UC-ChemicalImaging">ChemicalImaging</a>,
+                <a href="#UC-PaloAltoTreeData">PaloAltoTreeData</a> and
                 <a href="#UC-ExpressingHierarchyWithinOccupationalListings">ExpressingHierarchyWithinOccupationalListings</a>.
-                
               </p>
             </dd>
             <dt id="R-ForeignKeyReferences">R-ForeignKeyReferences</dt>
@@ -3759,21 +3798,31 @@ ex:11-1011.00
               <em id="_R-URIMapping">
                 <strong>Ability to map cell values within a given column into corresponding URI</strong>
               </em>
-              <p>Tabular data often makes use of local identifiers for reference data. The local identifier will often be unique 
-              within the scope of a particular code list, but cannot be guaranteed to be globally unique. In order to establish 
-              links between the tabular data and the related reference data it is necessary to map those local identifiers
+              <p>Tabular data often makes use of local identifiers to uniquely identify an entity described within a tabular data file
+              or to reference an entity described in the same data file or elsewhere (e.g. reference data, code lists, etc.). 
+              The local identifier will often be unique within a particular scope (e.g. a code list or data set), but cannot 
+              be guaranteed to be globally unique. In order to make these local identifiers globally unique (e.g. so that
+              the entity described by a row in a tabular data file can be referred to from an external source, or to establish 
+              links between the tabular data and the related reference data) it is necessary to map those local identifiers
               to URIs.</p>
               <p>It shall be possible to declare how local identifiers used within a column of a particular dataset
               can be mapped to their respective URI. Typically, this may be achieved by concatenating the local identifier with 
-              a prefix - although more complex mappings are anticipated.</p>
+              a prefix - although more complex mappings are anticipated such as removal of "special characters" that are not 
+              permitted in URIs (as defined in [[RFC3986]]) or <a href="http://www.w3.org/TR/curie/">CURIEs</a>.</p>
               <p>Furthermore, where the local identifier is part of a controlled vocabulary, code list or thesaurus, it should
-              be possible to specify the idenfier for the controlled vocabulary within which the local identfier is defined.</p>
+              be possible to specify the URI for the controlled vocabulary within which the local identfier is defined.</p>
               <p class="note">Also see the related requirement <a href="#R-ForeignKeyReferences">R-ForeignKeyReferences</a>.</p>
               <p>
                 <strong>Motivation:</strong>
+                <a href="#UC-DigitalPreservationOfGovernmentRecords">DigitalPreservationOfGovernmentRecords</a>,
+                <a href="#UC-OrganogramData">OrganogramData</a>, 
+                <a href="#UC-PublicationOfPropertyTransactionData">PublicationOfPropertyTransactionData</a>,
                 <a href="#UC-AnalyzingScientificSpreadsheets">AnalyzingScientificSpreadsheets</a>,
-                <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a> and
-                <a href="#UC-MakingSenseOfOtherPeoplesData">MakingSenseOfOtherPeoplesData</a>.
+                <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>, 
+                <a href="#UC-PaloAltoTreeData">PaloAltoTreeData</a>,
+                <a href="#UC-PublicationOfBiodiversityInformation">PublicationOfBiodiversityInformation</a>,
+                <a href="#UC-MakingSenseOfOtherPeoplesData">MakingSenseOfOtherPeoplesData</a> and
+                <a href="#UC-ExpressingHierarchyWithinOccupationalListings">ExpressingHierarchyWithinOccupationalListings</a>.
               </p>
             </dd>
             <dt id="R-UnitMeasureDefinition">R-UnitMeasureDefinition</dt>
@@ -3866,8 +3915,9 @@ ex:11-1011.00
               <p>It is commonplace for a tabular data file to provide multiple values of a given property
               for a single entity. This may be achieved in a number of ways.</p>
               <p>First, the multiple rows may be used to describe the same entity; each such row using the same 
-                primary key (please refer to <a href="#R-PrimaryKey">R-PrimaryKey</a> for more information on how
-                primary keys are identified). For example, a country may have more than one name:</p>
+                unique identifier for the entity. For example, a country, identified using its 
+                <a href="http://en.wikipedia.org/wiki/ISO_3166-1_alpha-2">two-letter country code</a>, 
+                may have more than one name:</p>
               <pre class="example">
 CSV:
 ----
