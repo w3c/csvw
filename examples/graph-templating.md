@@ -113,4 +113,4 @@ a graph fragment template can be generated from the metadata alone.  It might lo
 
     <site/22580943/date-time/{sample-time}>
        def-op:airTemperature_C 11.2e0 "{air-temp}"^^xsd:double ;
-       def-op:dewPointTemperatureCel "{dew-temp}"^^xsd:double .
+       :dewPointTemperatureCel "{dew-point}"^^xsd:double .
