@@ -208,28 +208,27 @@ A regular expression can be defined that captures multiple values from a matchin
 These values could be placed into an array, allowing each value to be addressed individually.
 
 For example:
-regexp: `/^(\s+);(\s+);(\s+);(\s+)$/`
-string: `one;two;three;four`
-captured array of values: `("one", "two", "three", "four")`
+* regexp: `/^(\s+);(\s+);(\s+);(\s+)$/`
+* string: `one;two;three;four`
+* captured array of values: `("one", "two", "three", "four")`
 
 One problem here is that [RFC 6570][4] does not appear to provide a mechanism to address
 specific values in list variable; e.g.
-
-variable: `count := ("one", "two", "three", "four")`
-template 1: `{/count*}`
-expansion 1: `/one/two/three/four`
-template 2: `{?count*}`
-expansion 2: `?count=one&count=two&count=three&count=four`
+* variable: `count := ("one", "two", "three", "four")`
+* template 1: `{/count*}`
+* expansion 1: `/one/two/three/four`
+* template 2: `{?count*}`
+* expansion 2: `?count=one&count=two&count=three&count=four`
 
 As a work around, one might use an array-like syntax such as illustrated below:
 
-variable: `count := ("one", "two", "three", "four")`
-template 3: `{/count[0]}`
-expansion 3: `/one`
-template 4: `{/count[0,1]}`
-expansion 4: `/one,two`
-template 5: `{/count[0,2]*}`
-expansion 5: `/one/two/three`
+* variable: `count := ("one", "two", "three", "four")`
+* template 3: `{/count[0]}`
+* expansion 3: `/one`
+* template 4: `{/count[0,1]}`
+* expansion 4: `/one,two`
+* template 5: `{/count[0,2]*}`
+* expansion 5: `/one/two/three`
 
 However, this deviated from [RFC 6570][4] ... that said, let's proceed.
 
