@@ -19,12 +19,12 @@ A snippet of the the CSV data is provided below:
 
 ... or in plain CSV format:
 
-<code>
-Date-time,Air temperature (Cel),Dew-point temperature (Cel)
-2013-12-13T08:00:00Z,11.2,10.2                
-2013-12-13T09:00:00Z,12.0,10.2
-{snip}
-</code>
+
+    Date-time,Air temperature (Cel),Dew-point temperature (Cel)
+    2013-12-13T08:00:00Z,11.2,10.2                
+    2013-12-13T09:00:00Z,12.0,10.2
+    {snip}
+
 
 <h2>The CSV metadata</h2>
 
@@ -39,63 +39,63 @@ The template definition in the CSV metadata should specify the Content-Type crea
  
 File: `wx-obs-dec2013-site22580943.csvm`:
  
-<code>
-{
-   "name": "wx-obs-dec2013-site22580943",
-   "title": "Weather observations for site 22580943 (Exeter Airport, UK)",
-   "keyworda": [
-       "Air temperature",
-       "Dew-point temperature",
-       "Exeter"
-   ],
-   "publisher": [{
-       "name": "Met Office",
-       "web": "http://www.metoffice.gov.uk"
-   }],
-   "license": "ogl",
-   "resources": [{
+
+    {
        "name": "wx-obs-dec2013-site22580943",
-       "path": "site22580943-2013-dec.csv",
-       "modified": "2013-12-31",
-       "schema": {"fields": [
-           {
-               "name": "Date-time",
-               "short-name": "datetime",
-               "title": "Date-time",
-               "description": "Date-time that the observation occurred.",
-               "type": "dateTime",
-               "format": "YYYY-MM-DDThh:mm:ssZ",
-               "constraints": {
-                   "required": true
+       "title": "Weather observations for site 22580943 (Exeter Airport, UK)",
+       "keyworda": [
+           "Air temperature",
+           "Dew-point temperature",
+           "Exeter"
+       ],
+       "publisher": [{
+           "name": "Met Office",
+           "web": "http://www.metoffice.gov.uk"
+       }],
+       "license": "ogl",
+       "resources": [{
+           "name": "wx-obs-dec2013-site22580943",
+           "path": "site22580943-2013-dec.csv",
+           "modified": "2013-12-31",
+           "schema": {"fields": [
+               {
+                   "name": "Date-time",
+                   "short-name": "datetime",
+                   "title": "Date-time",
+                   "description": "Date-time that the observation occurred.",
+                   "type": "dateTime",
+                   "format": "YYYY-MM-DDThh:mm:ssZ",
+                   "constraints": {
+                       "required": true
+                   }
+               },
+               {
+                   "name", "Air temperature (Cel)",
+                   "short-name": "air-temp",
+                   "title": "Air temperature (Celsius)",
+                   "description": "Air temperature quantity value expressed in Celsius.",
+                   "type": "double",
+                   "constraints": {"required": true}
+               },
+               {
+                   "name": "Dew-point temperature (Cel)",
+                   "short-name": "dew-point-temp",
+                   "title": "Dew-point temperature (Celsius)",
+                   "description": "Dew-point temperature quantity value expressed in Celsius.",
+                   "type": "double",
+                   "constraints": {"required": true}
                }
-           },
-           {
-               "name", "Air temperature (Cel)",
-               "short-name": "air-temp",
-               "title": "Air temperature (Celsius)",
-               "description": "Air temperature quantity value expressed in Celsius.",
-               "type": "double",
-               "constraints": {"required": true}
-           },
-           {
-               "name": "Dew-point temperature (Cel)",
-               "short-name": "dew-point-temp",
-               "title": "Dew-point temperature (Celsius)",
-               "description": "Dew-point temperature quantity value expressed in Celsius.",
-               "type": "double",
-               "constraints": {"required": true}
+           ]},
+           "template": {
+               "name": "wx-obs-csv-to-ttl",
+               "description": "Template converting CSV content to RDF (expressed in Turtle syntax). Uses Semantic Sensor Network (SSN) and QUDT ontologies.",
+               "type": "template",
+               "path": "wx-obs-csv-to-ttl.ttl",
+               "hasFormat": "text/turtle"
            }
-       ]},
-       "template": {
-           "name": "wx-obs-csv-to-ttl",
-           "description": "Template converting CSV content to RDF (expressed in Turtle syntax). Uses Semantic Sensor Network (SSN) and QUDT ontologies.",
-           "type": "template",
-           "path": "wx-obs-csv-to-ttl.ttl",
-           "hasFormat": "text/turtle"
-       }
-   }]
-}
-</code>
+       }]
+    }
+
 
 [2]: http://w3c.github.io/csvw/metadata/index.html
 
@@ -122,22 +122,22 @@ in the RDF resulting from the conversion.
 
 File: `wx-obs-csv-to-ttl.ttl`:
 
-<code>
-@base               <http://data.example.org/wow/data/weather-observations/> .
-@prefix ssn:        <http://purl.oclc.org/NET/ssnx/ssn#> .
-@prefix time:       <http://www.w3.org/2006/time#> .
-@prefix xsd:        <http://www.w3.org/2001/XMLSchema#> . 
-@prefix qudt:       <http://qudt.org/1.1/schema/qudt#> .
-@prefix def-op:     <http://data.example.org/wow/def/observed-property#> .
 
-<site/22580943/date-time/{datetime:/^(\d{2})-(\d{2})-(\d{2}T\d{2}):(\d{2}):(\d{2}Z)$/}>
-    a ssn:Observation ;
-    ssn:observationSamplingTime [ time:inXSDDateTime "{datetime}"^^xsd:dateTime ] ;
-    ssn:observationResult [
-        a ssn:SensorOutput ;
-        def-op:airTemperature_C [ qudt:numericValue "{air-temp}"^^xsd:double ] ;
-        def-op:dewPointTemperature_C [ qudt:numericValue "{dew-point-temp}"^^xsd:double ] ] .
-</code>
+    @base               <http://data.example.org/wow/data/weather-observations/> .
+    @prefix ssn:        <http://purl.oclc.org/NET/ssnx/ssn#> .
+    @prefix time:       <http://www.w3.org/2006/time#> .
+    @prefix xsd:        <http://www.w3.org/2001/XMLSchema#> . 
+    @prefix qudt:       <http://qudt.org/1.1/schema/qudt#> .
+    @prefix def-op:     <http://data.example.org/wow/def/observed-property#> .
+    
+    <site/22580943/date-time/{datetime:/^(\d{2})-(\d{2})-(\d{2}T\d{2}):(\d{2}):(\d{2}Z)$/}>
+        a ssn:Observation ;
+        ssn:observationSamplingTime [ time:inXSDDateTime "{datetime}"^^xsd:dateTime ] ;
+        ssn:observationResult [
+            a ssn:SensorOutput ;
+            def-op:airTemperature_C [ qudt:numericValue "{air-temp}"^^xsd:double ] ;
+            def-op:dewPointTemperature_C [ qudt:numericValue "{dew-point-temp}"^^xsd:double ] ] .
+
 
 [3]: http://w3c.github.io/csvw/csv2rdf/
 [4]: http://tools.ietf.org/html/rfc6570
@@ -146,27 +146,26 @@ File: `wx-obs-csv-to-ttl.ttl`:
 
 (expressed in Turtle syntax)
 
-<code>
-    @base               <http://data.example.org/wow/data/weather-observations/> .
-    @prefix ssn:        <http://purl.oclc.org/NET/ssnx/ssn#> .
-    @prefix time:       <http://www.w3.org/2006/time#> .
-    @prefix xsd:        <http://www.w3.org/2001/XMLSchema#> . 
-    @prefix qudt:       <http://qudt.org/1.1/schema/qudt#> .
-    @prefix def-op:     <http://data.example.org/wow/def/observed-property#> .
-     
-    <site/22580943/date-time/20131213T0800Z>
-        a ssn:Observation ;
-        ssn:observationSamplingTime [ time:inXSDDateTime "2013-12-13T08:00:00Z"^^xsd:dateTime ] ;
-        ssn:observationResult [
-            a ssn:SensorOutput ;
-            def-op:airTemperature_C [ qudt:numericValue "11.2"^^xsd:double ] ;
-            def-op:dewPointTemperature_C [ qudt:numericValue "10.2"^^xsd:double ] ] .
-     
-    <site/22580943/date-time/20131213T0900Z>
-        a ssn:Observation ;
-        ssn:observationSamplingTime [ time:inXSDDateTime "2013-12-13T09:00:00Z"^^xsd:dateTime ] ;
-        ssn:observationResult [
-            a ssn:SensorOutput ;
-            def-op:airTemperature_C [ qudt:numericValue "12.0"^^xsd:double ] ;
-            def-op:dewPointTemperature_C [ qudt:numericValue "10.2"^^xsd:double ] ] .
-</code>
+
+        @base               <http://data.example.org/wow/data/weather-observations/> .
+        @prefix ssn:        <http://purl.oclc.org/NET/ssnx/ssn#> .
+        @prefix time:       <http://www.w3.org/2006/time#> .
+        @prefix xsd:        <http://www.w3.org/2001/XMLSchema#> . 
+        @prefix qudt:       <http://qudt.org/1.1/schema/qudt#> .
+        @prefix def-op:     <http://data.example.org/wow/def/observed-property#> .
+         
+        <site/22580943/date-time/20131213T0800Z>
+            a ssn:Observation ;
+            ssn:observationSamplingTime [ time:inXSDDateTime "2013-12-13T08:00:00Z"^^xsd:dateTime ] ;
+            ssn:observationResult [
+                a ssn:SensorOutput ;
+                def-op:airTemperature_C [ qudt:numericValue "11.2"^^xsd:double ] ;
+                def-op:dewPointTemperature_C [ qudt:numericValue "10.2"^^xsd:double ] ] .
+         
+        <site/22580943/date-time/20131213T0900Z>
+            a ssn:Observation ;
+            ssn:observationSamplingTime [ time:inXSDDateTime "2013-12-13T09:00:00Z"^^xsd:dateTime ] ;
+            ssn:observationResult [
+                a ssn:SensorOutput ;
+                def-op:airTemperature_C [ qudt:numericValue "12.0"^^xsd:double ] ;
+                def-op:dewPointTemperature_C [ qudt:numericValue "10.2"^^xsd:double ] ] .
