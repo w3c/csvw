@@ -191,6 +191,7 @@ simplified so that it can be incorporated in the unique identifier of the observ
 entity.
 
 ISO 8601 syntax (no timezone offset): `YYYY-MM-DDThh:mm:ssZ`
+
 Simplified syntax: `YYYYMMDDThhmmssZ`
 
 Thus the following individual elements need to be extracted from the microsyntax:
