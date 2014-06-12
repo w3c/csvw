@@ -30,7 +30,8 @@ A snippet of the the CSV data is provided below:
 
 The metadata document below is based on the [Metadata Vocabulary for Tabular Data][2] - although a few errors
 are anticipated. Also, I've introduced a few new terms to the vocabulary which seem to be missing:
-* `short-name`: used to map column heading from CSV to a more useful form; and
+* `short-name`: used to map column heading from CSV to a more useful form - must be unique within 
+the scope of a single metadata description; and
 * `template`: used to describe the CSV transformation template.
 
 The template definition in the CSV metadata should also specify the Content-Type created by a target 
@@ -112,10 +113,13 @@ standard ISO 8601 syntax.
 * To convert the ISO 8601 syntax into the simplified form required for the identifier, a REGEXP (probably with errors!)
 is used to capture the bits of the ISO 8601 syntax that are necessary. Embedding a REGEXP in a URI Template appears to be 
 beyond what is permitted in [RFC 6570][4] - but it's included anyway to illustrate the idea.
-* Alternatively, one may want to pre-process the CSV to parse the ISO 8601 syntax into a delimited list from which 
-values can be easily extracted; e.g. `2013-12-13T08:00:00Z` could be separated into the individual `YYYY`, `MM`, 
-`DD`, `hh`, `mm` and `ss` elements, using a semi-colon `;` as the list delimiter: `2013;12;13;08;00;00`. Further 
-consideration of pre-processing steps is not provided here.
+* Alternatives include:
+** pre-processing the CSV to parse the ISO 8601 syntax into a delimited list from which values can be easily extracted; 
+e.g. `2013-12-13T08:00:00Z` could be separated into the individual `YYYY`, `MM`, `DD`, `hh`, `mm` and `ss` elements, 
+using a semi-colon `;` as the list delimiter: `2013;12;13;08;00;00`. Further consideration of pre-processing steps is 
+not provided here.
+** defining a standard mechanism in the CSV+ specification for parsing cell microsyntax 
+(see [R-CellMicrosyntax requirement][5]). See [below][6] for an expansion of this idea.
 * The template processing is assumed to follow a row-by-row processing model; the entire Template is applied for each
 row. For simplicity, I am just "assuming" that the `base` and `prefix` statements in the Template are also included 
 in the RDF resulting from the conversion. 
@@ -130,7 +134,7 @@ File: `wx-obs-csv-to-ttl.ttl`:
     @prefix qudt:       <http://qudt.org/1.1/schema/qudt#> .
     @prefix def-op:     <http://data.example.org/wow/def/observed-property#> .
     
-    <site/22580943/date-time/{datetime:/^(\d{2})-(\d{2})-(\d{2}T\d{2}):(\d{2}):(\d{2}Z)$/}>
+    <site/22580943/date-time/{datetime:/^(\d{4})-(\d{2})-(\d{2}T\d{2}):(\d{2}):(\d{2}Z)$/}>
         a ssn:Observation ;
         ssn:observationSamplingTime [ time:inXSDDateTime "{datetime}"^^xsd:dateTime ] ;
         ssn:observationResult [
@@ -141,6 +145,8 @@ File: `wx-obs-csv-to-ttl.ttl`:
 
 [3]: http://w3c.github.io/csvw/csv2rdf/
 [4]: http://tools.ietf.org/html/rfc6570
+[5]: http://w3c.github.io/csvw/use-cases-and-requirements/index.html#R-CellMicrosyntax
+[6]: #parsing-cell-microsyntax
 
 <h2>The resulting RDF</h2>
 
@@ -169,3 +175,199 @@ File: `wx-obs-csv-to-ttl.ttl`:
             a ssn:SensorOutput ;
             def-op:airTemperature_C [ qudt:numericValue "12.0"^^xsd:double ] ;
             def-op:dewPointTemperature_C [ qudt:numericValue "10.2"^^xsd:double ] ] .
+            
+            
+<h2>Parsing cell microsyntax</h2>
+
+The [R-CellMicrosyntax requirement][6] states:
+
+<em>Microsyntax, therefore, requires manipulation of the text if processed. Typically, 
+this will relate to conversion of lists into multiple-valued entries, but may also include 
+reformatting of text to convert between formats (e.g. to convert a datetime value to a date, 
+or locale dates to ISO 8601 compliant syntax).</em> 
+
+In this "simple weather observation" example, the ISO 8601 date-time value needs to be 
+simplified so that it can be incorporated in the unique identifier of the observation 
+entity.
+
+ISO 8601 syntax (no timezone offset): `YYYY-MM-DDThh:mm:ssZ`
+Simplified syntax: `YYYYMMDDThhmmssZ`
+
+Thus the following individual elements need to be extracted from the microsyntax:
+* `YYYY`: four-digit year
+* `MM`: two-digit month
+* `DD`: two-digit day
+* `hh`: two-digit hour
+* `mm`: two-digit minute
+* `ss`: two-digit second
+
+<h3>Single REGEXP extracting array of values</h3>
+
+A regular expression can be defined that captures multiple values from a matching string. 
+These values could be placed into an array, allowing each value to be addressed individually.
+
+For example:
+regexp: `/^(\s+);(\s+);(\s+);(\s+)$/`
+string: `one;two;three;four`
+captured array of values: `("one", "two", "three", "four")`
+
+One problem here is that [RFC 6570][4] does not appear to provide a mechanism to address
+specific values in list variable; e.g.
+
+variable: `count := ("one", "two", "three", "four")`
+template 1: `{/count*}`
+expansion 1: `/one/two/three/four`
+template 2: `{?count*}`
+expansion 2: `?count=one&count=two&count=three&count=four`
+
+As a work around, one might use an array-like syntax such as illustrated below:
+
+variable: `count := ("one", "two", "three", "four")`
+template 3: `{/count[0]}`
+expansion 3: `/one`
+template 4: `{/count[0,1]}`
+expansion 4: `/one,two`
+template 5: `{/count[0,2]*}`
+expansion 5: `/one/two/three`
+
+However, this deviated from [RFC 6570][4] ... that said, let's proceed.
+
+The following regular expression extracts six values from a matching ISO 8601 formatted string:
+
+`/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z$/`
+
+So we might define in the `fields` section of the metadata document a `microsyntax` object:
+
+           "fields": [
+               {
+                   "name": "Date-time",
+                   "short-name": "datetime",
+                   "title": "Date-time",
+                   "description": "Date-time that the observation occurred.",
+                   "type": "dateTime",
+                   "format": "YYYY-MM-DDThh:mm:ssZ",
+                   "constraints": {
+                       "required": true
+                   }
+                   "microsyntax": {
+                       "var": "dtelements",
+                       "regexp": "/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z$/"
+                   }
+               }
+           ]
+
+(the names used here are just for illustration; not concrete proposals)
+
+So `date-time-element[0]` would be the `YYYY` element etc.
+
+We might use these in the Template as follows:
+
+    @base               <http://data.example.org/wow/data/weather-observations/> .
+    @prefix ssn:        <http://purl.oclc.org/NET/ssnx/ssn#> .
+    @prefix time:       <http://www.w3.org/2006/time#> .
+    @prefix xsd:        <http://www.w3.org/2001/XMLSchema#> . 
+    @prefix qudt:       <http://qudt.org/1.1/schema/qudt#> .
+    @prefix def-op:     <http://data.example.org/wow/def/observed-property#> .
+    
+    <site/22580943/date-time/{dtelements[0]}{dtelements[1]}{dtelements[2]}T{dtelements[3]}{dtelements[4]}{dtelements[5]}Z>
+        a ssn:Observation ;
+        ssn:observationSamplingTime [ time:inXSDDateTime "{datetime}"^^xsd:dateTime ] ;
+        ssn:observationResult [
+            a ssn:SensorOutput ;
+            def-op:airTemperature_C [ qudt:numericValue "{air-temp}"^^xsd:double ] ;
+            def-op:dewPointTemperature_C [ qudt:numericValue "{dew-point-temp}"^^xsd:double ] ] .
+
+Note that the unmodified `date-time` cell-reference is still used to access the 
+ISO 8601 formatted date for use in the `ssn:observationSamplingTime/time:inXSDDateTime`
+property.
+
+Note: one might deal with simple delimited lists using this mechanism ...
+
+If the cell had the value `one;two;three;four` then the microsyntax block below could parse the string
+such that `count[3]` equates to `four`.
+
+    "microsyntax": {
+        "var": "count",
+        "list-delimiter": ";"
+    }
+
+<h3>Multiple REGEXP each extracting single value</h3>
+
+An alternative method would be to define multiple microsyntax blocks in the metadata document; each
+with their own unique variable name; e.g.
+
+           "fields": [
+               {
+                   "name": "Date-time",
+                   "short-name": "datetime",
+                   "title": "Date-time",
+                   "description": "Date-time that the observation occurred.",
+                   "type": "dateTime",
+                   "format": "YYYY-MM-DDThh:mm:ssZ",
+                   "constraints": {
+                       "required": true
+                   }
+                   "microsyntax": [{
+                           "var": "YYYY",
+                           "regexp": "/^(\d{4})-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/"
+                       },{
+                           "var": "MM",
+                           "regexp": "/^\d{4}-(\d{2})-\d{2}T\d{2}:\d{2}:\d{2}Z$/"
+                       },{
+                           "var": "DD",
+                           "regexp": "/^\d{4}-\d{2}-(\d{2})T\d{2}:\d{2}:\d{2}Z$/"
+                       },{
+                           "var": "hh",
+                           "regexp": "/^\d{4}-\d{2}-\d{2}T(\d{2}):\d{2}:\d{2}Z$/"
+                       },{
+                           "var": "mm",
+                           "regexp": "/^\d{4}-\d{2}-\d{2}T\d{2}:(\d{2}):\d{2}Z$/"
+                       },{
+                           "var": "ss",
+                           "regexp": "/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:(\d{2})Z$/"
+                       }
+                   ]
+               }
+           ]
+
+In this case, there is no need to use array syntax in the URI Template, but the 
+microsyntax definition is a little more complex.
+
+The Template would then be expressed as:
+
+    @base               <http://data.example.org/wow/data/weather-observations/> .
+    @prefix ssn:        <http://purl.oclc.org/NET/ssnx/ssn#> .
+    @prefix time:       <http://www.w3.org/2006/time#> .
+    @prefix xsd:        <http://www.w3.org/2001/XMLSchema#> . 
+    @prefix qudt:       <http://qudt.org/1.1/schema/qudt#> .
+    @prefix def-op:     <http://data.example.org/wow/def/observed-property#> .
+    
+    <site/22580943/date-time/{YYYY}{MM}{DD}T{hh}{mm}{ss}Z>
+        a ssn:Observation ;
+        ssn:observationSamplingTime [ time:inXSDDateTime "{datetime}"^^xsd:dateTime ] ;
+        ssn:observationResult [
+            a ssn:SensorOutput ;
+            def-op:airTemperature_C [ qudt:numericValue "{air-temp}"^^xsd:double ] ;
+            def-op:dewPointTemperature_C [ qudt:numericValue "{dew-point-temp}"^^xsd:double ] ] .
+
+Note: dealing with simple delimited lists would be almost identical to parsing a more complex string; 
+each sub-element would need to be picked out individually. Fortunately, the number of sub-elements
+in a given column should be regular for every row.
+
+If the cell had the value `one;two;three;four` then the microsyntax block below could parse the string
+such that `c4` equates to `four`.
+
+    "microsyntax": [{
+            "var": "c1",
+            "regexp": "/^(\s+);\s+;\s+;\s+$/"
+        },{
+            "var": "c2",
+            "regexp": "/^\s+;(\s+);\s+;\s+$/"
+        },{
+            "var": "c3",
+            "regexp": "/^\s+;\s+;(\s+);\s+$/"
+        },{
+            "var": "c4",
+            "regexp": "/^\s+;\s+;\s+;(\s+)$/"
+        }
+    ]
