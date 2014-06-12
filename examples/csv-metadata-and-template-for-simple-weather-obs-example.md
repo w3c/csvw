@@ -202,6 +202,11 @@ Thus the following individual elements need to be extracted from the microsyntax
 * `mm`: two-digit minute
 * `ss`: two-digit second
 
+Note: at this point, no thought has been given to how one would register a _callback function_,
+_promise_ or other external processing agent (e.g. XSLT, SPARQL Construct, Javascript) for 
+dealing with complex parsing issues that are beyond the scope of the CSV+ specification; when 
+you need to, as @JeniT says, "_bug out_".
+
 <h3>Single REGEXP extracting array of values</h3>
 
 A regular expression can be defined that captures multiple values from a matching string. 
