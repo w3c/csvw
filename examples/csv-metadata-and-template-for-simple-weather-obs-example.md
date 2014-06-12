@@ -28,14 +28,14 @@ A snippet of the the CSV data is provided below:
 
 <h2>The CSV metadata</h2>
 
-The metadata document below is based on the [Metadata Vocabulary for Tabular Data][2] - although I expect
-that there are a few errors. Also, I've introduced a few new terms to the vocabulary which seem to be missing:
+The metadata document below is based on the [Metadata Vocabulary for Tabular Data][2] - although a few errors
+are anticipated. Also, I've introduced a few new terms to the vocabulary which seem to be missing:
 * `short-name`: used to map column heading from CSV to a more useful form; and
 * `template`: used to describe the CSV transformation template.
 
-The template definition in the CSV metadata should specify the Content-Type created by a target transformation
- - a given CSV metadata doc might include references to multiple transformation templates; and users should be 
- able to ask for _one_ of those by name. I've used "hasFormat" to specify this.
+The template definition in the CSV metadata should also specify the Content-Type created by a target 
+transformation - a given CSV metadata doc might include references to multiple transformation templates; and 
+users should be able to ask for _one_ of those by name. I've used `hasFormat` to specify this.
  
 File: `wx-obs-dec2013-site22580943.csvm`:
  
@@ -43,7 +43,7 @@ File: `wx-obs-dec2013-site22580943.csvm`:
     {
        "name": "wx-obs-dec2013-site22580943",
        "title": "Weather observations for site 22580943 (Exeter Airport, UK)",
-       "keyworda": [
+       "keywords": [
            "Air temperature",
            "Dew-point temperature",
            "Exeter"
@@ -99,7 +99,7 @@ File: `wx-obs-dec2013-site22580943.csvm`:
 
 [2]: http://w3c.github.io/csvw/metadata/index.html
 
-<h2>The CSV to RDF/TTL template</h2>
+<h2>The CSV to RDF(TTL) template</h2>
 
 This is based on my understanding of the [Generating RDF from Tabular Data on the Web][3] document.
 
@@ -147,25 +147,25 @@ File: `wx-obs-csv-to-ttl.ttl`:
 (expressed in Turtle syntax)
 
 
-        @base               <http://data.example.org/wow/data/weather-observations/> .
-        @prefix ssn:        <http://purl.oclc.org/NET/ssnx/ssn#> .
-        @prefix time:       <http://www.w3.org/2006/time#> .
-        @prefix xsd:        <http://www.w3.org/2001/XMLSchema#> . 
-        @prefix qudt:       <http://qudt.org/1.1/schema/qudt#> .
-        @prefix def-op:     <http://data.example.org/wow/def/observed-property#> .
-         
-        <site/22580943/date-time/20131213T0800Z>
-            a ssn:Observation ;
-            ssn:observationSamplingTime [ time:inXSDDateTime "2013-12-13T08:00:00Z"^^xsd:dateTime ] ;
-            ssn:observationResult [
-                a ssn:SensorOutput ;
-                def-op:airTemperature_C [ qudt:numericValue "11.2"^^xsd:double ] ;
-                def-op:dewPointTemperature_C [ qudt:numericValue "10.2"^^xsd:double ] ] .
-         
-        <site/22580943/date-time/20131213T0900Z>
-            a ssn:Observation ;
-            ssn:observationSamplingTime [ time:inXSDDateTime "2013-12-13T09:00:00Z"^^xsd:dateTime ] ;
-            ssn:observationResult [
-                a ssn:SensorOutput ;
-                def-op:airTemperature_C [ qudt:numericValue "12.0"^^xsd:double ] ;
-                def-op:dewPointTemperature_C [ qudt:numericValue "10.2"^^xsd:double ] ] .
+    @base               <http://data.example.org/wow/data/weather-observations/> .
+    @prefix ssn:        <http://purl.oclc.org/NET/ssnx/ssn#> .
+    @prefix time:       <http://www.w3.org/2006/time#> .
+    @prefix xsd:        <http://www.w3.org/2001/XMLSchema#> . 
+    @prefix qudt:       <http://qudt.org/1.1/schema/qudt#> .
+    @prefix def-op:     <http://data.example.org/wow/def/observed-property#> .
+     
+    <site/22580943/date-time/20131213T0800Z>
+        a ssn:Observation ;
+        ssn:observationSamplingTime [ time:inXSDDateTime "2013-12-13T08:00:00Z"^^xsd:dateTime ] ;
+        ssn:observationResult [
+            a ssn:SensorOutput ;
+            def-op:airTemperature_C [ qudt:numericValue "11.2"^^xsd:double ] ;
+            def-op:dewPointTemperature_C [ qudt:numericValue "10.2"^^xsd:double ] ] .
+     
+    <site/22580943/date-time/20131213T0900Z>
+        a ssn:Observation ;
+        ssn:observationSamplingTime [ time:inXSDDateTime "2013-12-13T09:00:00Z"^^xsd:dateTime ] ;
+        ssn:observationResult [
+            a ssn:SensorOutput ;
+            def-op:airTemperature_C [ qudt:numericValue "12.0"^^xsd:double ] ;
+            def-op:dewPointTemperature_C [ qudt:numericValue "10.2"^^xsd:double ] ] .
