@@ -106,6 +106,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
   "modified": "2010-12-31",
   "schema": {
     "columns": [{
+      "@id": "_:GID",
       "name": "GID",
       "title": [
         "GID",
@@ -137,7 +138,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       "datatype": "date",
       "format": "M/D/YYYY"
     }]
-    "primaryKey": "GID"  
+    "primaryKey": "_:GID"  
   }
 }
       </pre>
@@ -312,6 +313,25 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               <li><strong>strings</strong> &mdash; resolved as URLs against the <a>base URL</a></li>
               <li><strong>arrays</strong> &mdash; lists of strings which are resolved as URLs against the <a>base URL</a></li>
             </ul>
+            <p>
+              For example, the <code>hasVersion</code> property is a link property. A <a>table description</a> might contain:
+            </p>
+            <pre class="example highlight">
+"hasVersion": "example-2014-01-03.csv"
+            </pre>
+            <p>
+              in which case the <code>hasVersion</code> property on the table would have a single value, a link to <code>example-2014-01-03.csv</code>, or it might contain:
+            </p>
+            <pre class="example highlight">
+"hasVersion": [
+  "example-2014-01-03.csv",
+  "example-2014-01-17.csv",
+  "example-2014-01-25.csv"
+]
+            </pre>
+            <p>
+              in which case the <code>hasVersion</code> property on the table would have three values, links to other versions of the table.
+            </p>
           </dd>
           <dt><dfn title="internal reference property">internal reference properties</dfn></dt>
           <dd>
@@ -320,6 +340,33 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               <li><strong>strings</strong> &mdash; in the format <code>_:<var>name</var></code> which MUST match the <code>@id</code> on another description object within the metadata document</li>
               <li><strong>arrays</strong> &mdash; lists of strings as above</li>
             </ul>
+            <p>
+              For example, the <code>primaryKey</code> property is an internal reference property on the schema. It has to hold references to columns defined elsewhere in the schema, and the descriptions of those columns must have <code>@id</code> properties. It can hold a single reference, like this:
+            </p>
+            <pre class="example highlight">
+"schema": {
+  "columns": [{
+    "@id": "_:GID",
+    "name": "GID"
+  }, ... ],
+  "primaryKey": "_:GID"
+}
+            </pre>
+            <p>
+              or it can contain an array of references, like this:
+            </p>
+            <pre class="example highlight">
+"schema": {
+  "columns": [{
+    "@id": "_:givenName",
+    "name": "givenName"
+  }, {
+    "@id": "_:familyName",
+    "name": "familyName"
+  }, ... ],
+  "primaryKey": [ "_:givenName", "_:familyName" ]
+}
+            </pre>
           </dd>
           <dt><dfn title="object property">object properties</dfn></dt>
           <dd>
@@ -330,11 +377,21 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               <li><strong>arrays</strong> &mdash; lists of strings and/or objects</li>
             </ul>
             <p>
-              Object properties are often used when the values can be or should be values within controlled vocabularies.
+              Object properties are often used when the values can be or should be values within controlled vocabularies, or structured information which may be held elsewhere. For example, the <code>creator</code> of a table is an object property. It could be provided as a URL that indicates the creator, like this:
             </p>
-            <p class="issue">
-              Add an example using frequency, which has a controlled vocabulary from DCT.
+            <pre class="example highlight">
+"creator": "http://ons.gov.uk"
+            </pre>
+            <p>
+              or a structured object, like this:
             </p>
+            <pre class="example highlight">
+"creator": {
+  "name": "Office of National Statistics",
+  "url": "http://ons.gov.uk",
+  "email": "info@ons.gsi.gov.uk"
+}
+            </pre>
           </dd>
           <dt><dfn title="natural language property">natural language properties</dfn></dt>
           <dd>
@@ -344,19 +401,46 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               <li><strong>arrays</strong> &mdash; interpreted as alternative natural language strings in the <a>default language</a></li>
               <li><strong>objects</strong> whose properties MUST be language codes as defined by [[!RFC3066]] and whose values are either strings or arrays, providing natural language strings in that language</li>
             </ul>
+            <p>
+              Natural language properties are used for things like descriptions and titles. For example, the <code>title</code> property provides a natural language label for a column. If it's a plain string like this:
+            </p>
+            <pre class="example highlight">
+"title": "Project title"
+            </pre>
+            <p>
+              then that string is assumed to be in the language provided through the <code>@language</code> property of the nearest <code>@context</code> (or have no assumed language, if there is no such property). Multiple alternative values can be given in an array:
+            </p>
+            <pre class="example highlight">
+"title": [
+  "Project title",
+  "Project"
+]
+            </pre>
+            <p>
+              It's also possible to provide multiple values in different languages, using an object structure. For example:
+            </p>
+            <pre class="example highlight">
+"title": {
+  "en": "Project title",
+  "fr": "Titre du projet"
+}
+            </pre>
             <p class="issue">
               It would be nice to enable some markup in natural language strings, for example by stating that they are interpreted as HTML or Markdown.
             </p>
           </dd>
           <dt><dfn title="atomic property">atomic properties</dfn></dt>
           <dd>
-            <p>These hold atomic values such as dates, numbers or strings. Their values may be:</p>
+            <p>These hold atomic values. Their values may be:</p>
             <ul>
               <li><strong>numbers</strong> &mdash; interpreted as integers or doubles</li>
-              <li><strong>booleans</strong> &mdash; interpreted as booleans</li>
+              <li><strong>booleans</strong> &mdash; interpreted as booleans (<code>true</code> or <code>false</code>)</li>
               <li><strong>strings</strong> &mdash; interpreted as defined by the property</li>
               <li><strong>arrays</strong> &mdash; lists of numbers, booleans or strings</li>
             </ul>
+            <p class="note">
+              JSON does not have date or time types. Where a property takes a date as a value, this MUST be a string in the format <code>YYYY-MM-DD</code>.
+            </p>
           </dd>
         </dl>
       </section>
