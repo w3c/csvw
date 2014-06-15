@@ -61,6 +61,10 @@ var respecConfig = {
     };
     </script>
   </head>
+  <style>
+    td, th { padding-left: 1em; padding-right: 1em; }
+    tbody tr th { text-align: left; }
+  </style>
   <body>
     <section id="abstract">
       <p>
@@ -88,59 +92,10 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       </p>
       <pre class="example highlight">
 {
-  "name": "tree-ops",
-  "title": "Tree Operations",
-  "keywords": ["tree", "street", "maintenance"],
-  "publisher": [{
-    "name": "Example Municipality",
-    "web": "http://example.org"
-  }],
-  "license": "cc-by",
-  "resources": [{
-    "name": "tree-ops",
-    "path": "tree-ops.csv",
-    "modified": "2010-12-31",
-    "schema": {
-      "fields": [{
-        "name": "GID",
-        "title": "Generic Identifier",
-        "description": "An identifier for the operation on a tree.",
-        "type": "string",
-        "constraints": {
-          "required": true,
-          "unique": true
-        }
-      }, {
-        "name": "On Street",
-        "description": "The street that the tree is on.",
-        "type": "string"
-      }, {
-        "name": "Species",
-        "description": "The species of the tree.",
-        "type": "string"
-      }, {
-        "name": "Trim Cycle",
-        "description": "The operation performed on the tree.",
-        "type": "string"
-      }, {
-        "name": "Inventory Date",
-        "description": "The date of the operation that was performed.",
-        "type": "date",
-        "format": "M/D/YYYY"
-      }]
-    },
-    "primaryKey": "GID"  
-  }]
-}
-      </pre>
-      <div class="issue">
-        <p>
-          Above is unaltered datapackage JSON. If we focus on just single file metadata, try to throw in some JSON-LD naming conventions and use terminology from the model document, we get something more like:
-        </p>
-        <pre class="highlight">
-[{
   "@id": "tree-ops.csv",
-  "@type": "Table",
+  "@context": {
+    "@language": "en"
+  }
   "title": "Tree Operations",
   "keywords": ["tree", "street", "maintenance"],
   "publisher": [{
@@ -149,68 +104,43 @@ GID,On Street,Species,Trim Cycle,Inventory Date
   }],
   "license": "http://opendefinition.org/licenses/cc-by/",
   "modified": "2010-12-31",
-  "columns": [{
-    "@id": "_:GID",
-    "name": "GID",
-    "title": "Generic Identifier",
-    "description": "An identifier for the operation on a tree.",
-    "type": "string",
-    "required": true,
-    "unique": true
-  }, {
-    "name": "On Street",
-    "description": "The street that the tree is on.",
-    "type": "string"
-  }, {
-    "name": "Species",
-    "description": "The species of the tree.",
-    "type": "string"
-  }, {
-    "name": "Trim Cycle",
-    "description": "The operation performed on the tree.",
-    "type": "string"
-  }, {
-    "name": "Inventory Date",
-    "description": "The date of the operation that was performed.",
-    "type": "date",
-    "format": "M/D/YYYY"
-  }]
-  "primaryKey": "_:GID"  
-}]
-        </pre>
-        <p>
-          The JSON-LD context would roughly look like:
-        </p>
-        <pre class="highlight">
-{
-  "@vocab": "http://w3.org/ns/table#",
-  "dc": "http://purl.org/dc/terms/",
-  "xsd": "http://www.w3.org/2001/XMLSchema#",
-  "title": "dc:title",
-  "keywords": "dc:keywords",
-  "publisher": {
-    "@id": "dc:publisher",
-    "@type": "@id"
-    // something here that maps the publisher onto an appropriate schema.org type?    
-  }
-  "license": {
-    "@id": "dc:license",
-    "@type": "@id"
-  },
-  "modified": {
-    "@id": "dc:modified",
-    "@type": "xsd:date"
-  },
-  "columns": {
-    "@type": "@id",
-    "@container": "@list"
-  },
-  "primaryKey": {
-    "@type": "@id"
+  "schema": {
+    "columns": [{
+      "name": "GID",
+      "title": [
+        "GID",
+        "Generic Identifier"
+      ],
+      "description": "An identifier for the operation on a tree.",
+      "type": "string",
+      "required": true,
+      "unique": true
+    }, {
+      "name": "on-street",
+      "title": "On Street",
+      "description": "The street that the tree is on.",
+      "type": "string"
+    }, {
+      "name": "species",
+      "title": "Species",
+      "description": "The species of the tree.",
+      "type": "string"
+    }, {
+      "name": "trim-cycle",
+      "title": "Trim Cycle",
+      "description": "The operation performed on the tree.",
+      "type": "string"
+    }, {
+      "name": "inventory-date",
+      "title": "Inventory Date",
+      "description": "The date of the operation that was performed.",
+      "type": "date",
+      "format": "M/D/YYYY"
+    }]
+    "primaryKey": "GID"  
   }
 }
-        </pre>
-      </div>
+      </pre>
       <p>
         Given the location of the CSV file, this metadata file can be located by appending <code>.csvm</code> to the URL (as described in <a href="http://www.w3.org/TR/tabular-data-model/#standard-path">Model for Tabular Data and Metadata on the Web</a>). It provides information for different types of applications:
       </p>
@@ -242,7 +172,14 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           The metadata defined in this specification is used to annotate an existing <a href="http://w3c.github.io/csvw/syntax/#dfn-annotated-table">annotated table</a> as defined in [[!CSV-MODEL]]. Annotated tables form the basis for all further processing, such as validating or displaying the table. All compliant applications MUST create annotated tables based on the algorithm defined here.
         </p>
         <p>
-          Metadata documents contain descriptions of tables, columns, rows and cells which are used to create annotations. There are three classes of properties on description objects:
+          Metadata documents contain descriptions of tables, columns, rows, cells and regions which are used to create annotations. There are two types of description objects:
+        </p>
+        <ul>
+          <li>descriptions that appear within a schema, and that may apply across multiple CSV files</li>
+          <li>descriptions of particular tables, columns, rows, cells and regions within a single CSV file</li>
+        </ul>
+        <p>
+          The description objects themselves contain a number of properties. These are:
         </p>
         <ul>
           <li>properties that are used to identify the table, column, row or cell that the annotations should appear on; these match up to properties on those objects in the core tabular data model defined in [[!CSV-MODEL]] and do not form additional annotations</li>
@@ -345,7 +282,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         This section defines a set of properties and permitted values for annotating tabular data, and how these annotations should be interpreted by applications.
       </p>
       <p class="issue">
-        We intend to support metadata for packages, and to support externally-sourced schemas for tabular data. For now, we are scoping to single metadata files defining single CSV files.
+        We intend to support metadata for packages. For now, we are scoping to single metadata files defining single CSV files.
       </p>
       <section>
         <h3>Syntax</h3>
@@ -547,6 +484,17 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             Unlike the Dublin Core terms, link relations are an ever-expanding list and there may eventually be clashes between link relation terms and those defined above. That's why the above list uses QNames for all link relations, so that they look like <code>link:<var>relation</var></code> rather than plain <code><var>relation</var></code>.
           </p>
         </section>
+        <section>
+          <h4>Other Properties</h4>
+          <dl>
+            <dt id="cell-text-direction"><code>text-direction</code></dt>
+            <dd>
+              <p>
+                One of <code>"rtl"</code> or <code>"ltr"</code> (the default). Indicates whether the text within cells should be displayed by default as left-to-right or right-to-left text. See <a href="#bidirectional-tables" class="sectionRef"></a> for more details.
+              </p>
+            </dd>
+          </dl>
+        </section>
       </section>
       <!--
       <section>
@@ -747,7 +695,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       <section>
         <h3>Tables</h3>
         <p>
-          Metadata data associated with tables describes either the table itself or all the data in the table, depending on the property.
+          A <dfn>table description</dfn> is a JSON object that describes a table within a CSV file.
         </p>
         <section>
           <h4>Required Properties</h4>
@@ -785,41 +733,13 @@ GID,On Street,Species,Trim Cycle,Inventory Date
                 This should really be a controlled vocabulary in JSON-LD, but I think that would mean saying <code>bidi:rtl</code> and <code>bidi:ltr</code> were the possible values for the property, rather than simply <code>rtl</code> and <code>ltr</code>. Have I missed something?
               </p>
             </dd>
-            <dt id="table-columns"><code>columns</code></dt>
+            <dt id="table-schema"><code>schema</code></dt>
             <dd>
-              <p>
-                An array of column descriptions as described in <a href="#columns" class="sectionRef"></a>. These are matched to columns by position: the first column description in the array applies to the first column in the table, the second to the second and so on.
-              </p>
-              <p>
-                The <a href="#column-name"><code>name</code></a> properties of the column descriptions MUST be unique within a given table description.
-              </p>
-              <p class="issue">
-                We will need a mechanism for pointing to a schema in a separate document (for reusability).
-              </p>
+              An <a>object property</a> that provides a <a>schema description</a> as described in <a href="#schemas" class="sectionRef"></a>. This may be provided as an embedded object within the JSON metadata or as a URL reference to a separate JSON schema document.
             </dd>
-            <dt id="table-rows"><code>rows</code></dt>
+            <dt id="table-notes"><code>notes</code></dt>
             <dd>
-              <p>
-                An array of row descriptions as described in <a href="#rows" class="sectionRef"></a>. These are matched to row by the value of the <code>row</code> in the row description. The values of the <code>row</code> properties MUST be unique within a given table description (ie no row can have more than one description).
-              </p>
-            </dd>
-            <dt id="table-cells"><code>cells</code></dt>
-            <dd>
-              <p>
-                An array of cell descriptions as described in <a href="#cells" class="sectionRef"></a>. These are matched to cell by the value of the <code>row</code> and <code>column</code> properties in the cell description. The combination of values of the <code>row</code> and <code>column</code> properties MUST be unique within a given table description (ie no cell can have more than one description).
-              </p>
-            </dd>
-            <dt id="table-primaryKey"><code>primaryKey</code></dt>
-            <dd>
-              <p>
-                An <a>internal reference property</a> that holds either a single references to a column description object or an array of references.
-              </p>
-              <p>
-                Validators MUST check that each row has a unique combination of cells in the indicated columns. For example, if <code>primaryKey</code> is set to <code>["_:familyName", "_:givenName"]</code> then every row must have a unique value for the combination of the <code>familyName</code> and <code>givenName</code> columns.
-              </p>
-              <p class="issue">
-                When referencing columns for a primary key, it is a lot clearer to reference them by name rather than by number. For JSON-LD compatibility, we have to assign a blank node identifier to each column even though they each have a <code>name</code> property that could be used instead. It would be great to avoid having the extra <code>_:</code> syntax which will just seem weird to people who don't care about RDF.
-              </p>
+              An <a>object property</a>, usually an array, of annotation objects. An <dfn>annotation object</dfn> is an object that holds general annotations about a particular column, row, cell or region of the table. Each annotation object MUST have an <code>@id</code> property that references the relevant column, row, cell or region of the table using a fragment identifier. It MAY have any other common properties as described in <a href="#common-properties" class="sectionRef"></a>.
             </dd>
           </dl>
           <p class="issue">
@@ -848,9 +768,6 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <li><code>temporal</code></li>
             <li><code>title</code></li>
           </ul>
-          <p>
-            The description MAY contain any of the <a title="inherited property">inherited properties</a> defined for cells in <a href="#inherited-properties" class="sectionRef"></a>.
-          </p>
         </section>
         <!--
         <section>
@@ -910,14 +827,76 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         </section>
       -->
       </section>
-
+      <section>
+        <h3>Schemas</h3>
+        <p>
+          A <dfn>schema</dfn> is a definition of a tabular format that may be common to multiple tables. For example, multiple tables from different sources may have the same columns and be designed such that they can be aggregated together.
+        </p>
+        <p>
+          A <dfn>schema description</dfn> is a JSON object that encodes the information about a schema. All the properties of a schema description are optional.
+        </p>
+        <dl>
+          <dt id="schema-ld-type"><code>@type</code></dt>
+          <dd>
+            If included, <code>@type</code> MUST be set to <code>"Schema"</code>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.
+          </dd>
+          <dt id="schema-columns"><code>columns</code></dt>
+          <dd>
+            <p>
+              An array of column descriptions as described in <a href="#columns" class="sectionRef"></a>. These are matched to columns in table that use the schema by position: the first column description in the array applies to the first column in the table, the second to the second and so on.
+            </p>
+            <p>
+              The <a href="#column-name"><code>name</code></a> properties of the column descriptions MUST be unique within a given table description.
+            </p>
+          </dd>
+          <dt id="table-rows"><code>rows</code></dt>
+          <dd>
+            <p>
+              An array of row descriptions as described in <a href="#rows" class="sectionRef"></a>. These are matched to row by the value of the <code>row</code> in the row description. The values of the <code>row</code> properties MUST be unique within a given table description (ie no row can have more than one description).
+            </p>
+          </dd>
+          <dt id="table-cells"><code>cells</code></dt>
+          <dd>
+            <p>
+              An array of cell descriptions as described in <a href="#cells" class="sectionRef"></a>. These are matched to cell by the value of the <code>row</code> and <code>column</code> properties in the cell description. The combination of values of the <code>row</code> and <code>column</code> properties MUST be unique within a given table description (ie no cell can have more than one description).
+            </p>
+          </dd>
+          <dt id="table-primaryKey"><code>primaryKey</code></dt>
+          <dd>
+            <p>
+              An <a>internal reference property</a> that holds either a single references to a column description object or an array of references.
+            </p>
+            <p>
+              Validators MUST check that each row has a unique combination of cells in the indicated columns. For example, if <code>primaryKey</code> is set to <code>["_:familyName", "_:givenName"]</code> then every row must have a unique value for the combination of the <code>familyName</code> and <code>givenName</code> columns.
+            </p>
+            <p class="issue">
+              When referencing columns for a primary key, it is a lot clearer to reference them by name rather than by number. For JSON-LD compatibility, we have to assign a blank node identifier to each column even though they each have a <code>name</code> property that could be used instead. It would be great to avoid having the extra <code>_:</code> syntax which will just seem weird to people who don't care about RDF.
+            </p>
+          </dd>
+        </dl>
+        <p>
+          The description MAY contain any of the properties defined in <a href="#common-properties" class="sectionRef"></a> to describe the schema. As well as links to other related schemas, the following common properties are particularly suitable for schemas:
+        </p>
+        <ul>
+          <li><code>created</code></li>
+          <li><code>creator</code></li>
+          <li><code>description</code></li>
+          <li><code>license</code></li>
+          <li><code>modified</code></li>
+          <li><code>publisher</code></li>
+          <li><code>rights</code></li>
+          <li><code>rightsHolder</code></li>
+          <li><code>subject</code></li>
+          <li><code>title</code></li>
+        </ul>
+        <p>
+          The description MAY contain any of the <a title="inherited property">inherited properties</a> defined for cells in <a href="#inherited-properties" class="sectionRef"></a>.
+        </p>
+      </section>
       <section>
         <h3>Columns</h3>
         <p>
           A column description is a simple JSON object that describes a single column. The description provides additional human-readable documentation for a column, as well as additional information that may be used to validate the cells within the column, create a user interface for data entry, or inform conversion into other formats.
-        </p>
-        <p>
-          There are no required properties for column descriptors.
         </p>
         <section>
           <h4>Required Properties</h4>
@@ -972,9 +951,6 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <dd>A boolean value which indicates whether every cell within the column must have a non-null value.</dd>
           </dl>
           <p>
-            The description MAY contain any of the properties defined in <a href="#common-properties" class="sectionRef"></a> to describe the column.
-          </p>
-          <p>
             The description MAY contain any of the <a title="inherited property">inherited properties</a> defined for cells in <a href="#inherited-properties" class="sectionRef"></a>.
           </p>
         </section>
@@ -993,22 +969,6 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <dt><code>row</code></dt>
             <dd>an integer; the number of the row the description object describes</dd>
           </dl>
-          <div class="note">
-            <p>
-              The value of the <code>row</code> property indicates the position of the row within the table rather than the position of the row within the original CSV file. For example, a CSV file might contain padding columns and skipped headers, as in:
-            </p>
-            <pre>
-,"Expenditure over £25,000- Payment made in January 2014",,,,,,,,
-,,,,,,,,,
-,Department Family,Entity,Date,Expense Type,Expense Area,Supplier,Transaction Number,Amount in Sterling,
-,Department of Health,The Royal Wolverhampton Hospitals NHS Trust RL4,31/01/2014,Capital Project,Capital,STRYKER UK LTD,0001337928,31896.06,
-,Department of Health,The Royal Wolverhampton Hospitals NHS Trust RL4,17/01/2014,SERVICE AGREEMENTS,Pathology,ABBOTT LABORATORIES LTD,0001335058,77775.13,
-...
-            </pre>
-            <p>
-              The table (as defined in [[CSV-MODEL]]) begins in the fourth row and second column of the CSV file. The initial column is padding, and the initial columns provide metadata about the table and the columns it contains. The first row in the table contains cells with the values <code>Department of Health</code>,<code>The Royal Wolverhampton Hospitals NHS Trust RL4</code>,<code>31/01/2014</code>,<code>Capital Project</code>,<code>Capital</code>,<code>STRYKER UK LTD</code>,<code>0001337928</code>,<code>31896.06</code>,<code>null</code>. This is equivalent to the row identified by the fragment identifier <code>#row=4</code>.
-            </p>
-          </div>
         </section>
         <section>
           <h4>Optional Properties</h4>
@@ -1020,9 +980,6 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               </p>
             </dd>
           </dl>
-          <p>
-            The description MAY contain any of the properties defined in <a href="#common-properties" class="sectionRef"></a> to describe the row.
-          </p>
           <p>
             The description MAY contain any of the <a title="inherited property">inherited properties</a> defined for cells in <a href="#inherited-properties" class="sectionRef"></a>.
           </p>
@@ -1044,23 +1001,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <dt><code>column</code></dt>
             <dd>an integer; the number of the column on which the cell appears</dd>
           </dl>
-          <div class="note">
-            <p>
-              The values of the <code>row</code> and <code>column</code> properties indicate the position of the cell within the table rather than the position of the cell within the original CSV file. For example, a CSV file might contain padding columns and skipped headers, as in:
-            </p>
-            <pre>
-,"Expenditure over £25,000- Payment made in January 2014",,,,,,,,
-,,,,,,,,,
-,Department Family,Entity,Date,Expense Type,Expense Area,Supplier,Transaction Number,Amount in Sterling,
-,Department of Health,The Royal Wolverhampton Hospitals NHS Trust RL4,31/01/2014,Capital Project,Capital,STRYKER UK LTD,0001337928,31896.06,
-,Department of Health,The Royal Wolverhampton Hospitals NHS Trust RL4,17/01/2014,SERVICE AGREEMENTS,Pathology,ABBOTT LABORATORIES LTD,0001335058,77775.13,
-...
-            </pre>
-            <p>
-              The table (as defined in [[CSV-MODEL]]) begins in the fourth row and second column of the CSV file. The initial column is padding, and the initial columns provide metadata about the table and the columns it contains. The cell in the first column of the first row has the value "Department of Health". This is equivalent to the cell identified by the fragment identifier <code>#cell=4,2</code>.
-            </p>
-          </div>
-        </section>
+       </section>
         <section>
           <h4>Optional Properties</h4>
           <dl>
@@ -1071,9 +1012,6 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               </p>
             </dd>
           </dl>
-          <p>
-            The description MAY contain any of the properties defined in <a href="#common-properties" class="sectionRef"></a> to describe the column.
-          </p>
           <p>
             The description MAY contain any of the <a title="inherited property">inherited properties</a> defined for cells in <a href="#inherited-properties" class="sectionRef"></a>.
           </p>
@@ -1163,12 +1101,6 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <dd>
               <p>
                 The maximum value for the cell (exclusive). See <a href="#value-constraints" class="sectionRef"></a> for details.
-              </p>
-            </dd>
-            <dt id="cell-text-direction"><code>text-direction</code></dt>
-            <dd>
-              <p>
-                One of <code>"rtl"</code> or <code>"ltr"</code> (the default). Indicates whether the text within the cell should be displayed by default as left-to-right or right-to-left text. See <a href="#bidirectional-tables" class="sectionRef"></a> for more details.
               </p>
             </dd>
           </dl>
