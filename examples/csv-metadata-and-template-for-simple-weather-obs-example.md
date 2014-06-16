@@ -62,8 +62,8 @@ File: `wx-obs-dec2013-site22580943.json`:
                {
                    "name": "datetime",
                    "title": [
-                       ("@value": "Date-time", "@language": "en"},
-                       ("@value": "Date et l'heure", "@language": "fr"}
+                       {"@value": "Date-time", "@language": "en"},
+                       {"@value": "Date et l'heure", "@language": "fr"}
                    ],
                    "description": "Date-time that the observation occurred.",
                    "type": "dateTime",
@@ -75,8 +75,8 @@ File: `wx-obs-dec2013-site22580943.json`:
                {
                    "name": "air-temp",
                    "title": [
-                       ("@value": "Air temperature (Cel)", "@language": "en"},
-                       ("@value": "La température d'air (C)", "@language": "fr"}
+                       {"@value": "Air temperature (Cel)", "@language": "en"},
+                       {"@value": "La température d'air (C)", "@language": "fr"}
                    ],
                    "description": "Air temperature quantity value expressed in Celsius.",
                    "type": "double",
@@ -85,8 +85,8 @@ File: `wx-obs-dec2013-site22580943.json`:
                {
                    "name": "dew-point-temp",
                    "title": [
-                       ("@value": "Dew-point temperature (Cel)", "@language": "en"},
-                       ("@value": "Température du point de rosée (C)", "@language": "fr"}
+                       {"@value": "Dew-point temperature (Cel)", "@language": "en"},
+                       {"@value": "Température du point de rosée (C)", "@language": "fr"}
                    ],
                    "description": "Dew-point temperature quantity value expressed in Celsius.",
                    "type": "double",
