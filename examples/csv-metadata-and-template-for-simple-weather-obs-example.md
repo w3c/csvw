@@ -38,7 +38,7 @@ The template definition in the CSV metadata should also specify the Content-Type
 transformation - a given CSV metadata doc might include references to multiple transformation templates; and 
 users should be able to ask for _one_ of those by name. I've used `hasFormat` to specify this.
  
-File: `wx-obs-dec2013-site22580943.csvm`:
+File: `wx-obs-dec2013-site22580943.json`:
  
 
     {
@@ -60,9 +60,11 @@ File: `wx-obs-dec2013-site22580943.csvm`:
            "modified": "2013-12-31",
            "schema": {"fields": [
                {
-                   "name": "Date-time",
-                   "short-name": "datetime",
-                   "title": "Date-time",
+                   "name": "datetime",
+                   "title": [
+                       ("@value": "Date-time", "@language": "en"},
+                       ("@value": "Date et l'heure", "@language": "fr"}
+                   ],
                    "description": "Date-time that the observation occurred.",
                    "type": "dateTime",
                    "format": "YYYY-MM-DDThh:mm:ssZ",
@@ -71,17 +73,21 @@ File: `wx-obs-dec2013-site22580943.csvm`:
                    }
                },
                {
-                   "name", "Air temperature (Cel)",
-                   "short-name": "air-temp",
-                   "title": "Air temperature (Celsius)",
+                   "name": "air-temp",
+                   "title": [
+                       ("@value": "Air temperature (Cel)", "@language": "en"},
+                       ("@value": "La température d'air (C)", "@language": "fr"}
+                   ],
                    "description": "Air temperature quantity value expressed in Celsius.",
                    "type": "double",
                    "constraints": {"required": true}
                },
                {
-                   "name": "Dew-point temperature (Cel)",
-                   "short-name": "dew-point-temp",
-                   "title": "Dew-point temperature (Celsius)",
+                   "name": "dew-point-temp",
+                   "title": [
+                       ("@value": "Dew-point temperature (Cel)", "@language": "en"},
+                       ("@value": "Température du point de rosée (C)", "@language": "fr"}
+                   ],
                    "description": "Dew-point temperature quantity value expressed in Celsius.",
                    "type": "double",
                    "constraints": {"required": true}
