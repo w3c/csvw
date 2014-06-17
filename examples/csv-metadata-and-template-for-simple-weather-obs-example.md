@@ -58,13 +58,13 @@ File: `wx-obs-dec2013-site22580943.json`:
            "name": "wx-obs-dec2013-site22580943",
            "path": "site22580943-2013-dec.csv",
            "modified": "2013-12-31",
-           "schema": {"fields": [
+           "schema": {"columns": [
                {
                    "name": "datetime",
-                   "title": [
-                       {"@value": "Date-time", "@language": "en"},
-                       {"@value": "Date et l'heure", "@language": "fr"}
-                   ],
+                   "title": {
+                       "en": "Date-time",
+                       "fr": "Date et l'heure"
+                   },
                    "description": "Date-time that the observation occurred.",
                    "type": "dateTime",
                    "format": "YYYY-MM-DDThh:mm:ssZ",
@@ -74,20 +74,20 @@ File: `wx-obs-dec2013-site22580943.json`:
                },
                {
                    "name": "air-temp",
-                   "title": [
-                       {"@value": "Air temperature (Cel)", "@language": "en"},
-                       {"@value": "La température d'air (C)", "@language": "fr"}
-                   ],
+                   "title": {
+                       "en": "Air temperature (Cel)",
+                       "fr": "La température d'air (C)"
+                   },
                    "description": "Air temperature quantity value expressed in Celsius.",
                    "type": "double",
                    "constraints": {"required": true}
                },
                {
                    "name": "dew-point-temp",
-                   "title": [
-                       {"@value": "Dew-point temperature (Cel)", "@language": "en"},
-                       {"@value": "Température du point de rosée (C)", "@language": "fr"}
-                   ],
+                   "title": {
+                       "en": "Dew-point temperature (Cel)",
+                       "fr": "Température du point de rosée (C)"
+                   },
                    "description": "Dew-point temperature quantity value expressed in Celsius.",
                    "type": "double",
                    "constraints": {"required": true}
@@ -111,7 +111,7 @@ File: `wx-obs-dec2013-site22580943.json`:
 This is based on my understanding of the [Generating RDF from Tabular Data on the Web][3] document.
 
 A few notes:
-* `short-name` is used in the template rather than the real column name to avoid pesky embedded whitespace.
+* `name` is used in the template rather than the column `title` to avoid pesky embedded whitespace.
 * The values in the `date-time` column are used for two purposes: firstly to create part of the unique identifier
 for the observation entity, and secondly to provide the date-time value for the `ssn:observationSamplingTime/time:inXSDDateTime`
 property. The former usage needs a simplified version of the date-time syntax, whilst the latter uses the 
@@ -247,13 +247,15 @@ The following regular expression extracts six values from a matching ISO 8601 fo
 
 `/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z$/`
 
-So we might define in the `fields` section of the metadata document a `microsyntax` object:
+So we might define in the `columns` section of the metadata document a `microsyntax` object:
 
-           "fields": [
+           "columns": [
                {
-                   "name": "Date-time",
-                   "short-name": "datetime",
-                   "title": "Date-time",
+                   "name": "datetime",
+                   "title": {
+                       "en": "Date-time",
+                       "fr": "Date et l'heure"
+                   },
                    "description": "Date-time that the observation occurred.",
                    "type": "dateTime",
                    "format": "YYYY-MM-DDThh:mm:ssZ",
@@ -307,11 +309,13 @@ such that `count[3]` equates to `four`.
 An alternative method would be to define multiple microsyntax blocks in the metadata document; each
 with their own unique variable name; e.g.
 
-           "fields": [
+           "columns": [
                {
-                   "name": "Date-time",
-                   "short-name": "datetime",
-                   "title": "Date-time",
+                   "name": "datetime",
+                   "title": {
+                       "en": "Date-time",
+                       "fr": "Date et l'heure"
+                   },
                    "description": "Date-time that the observation occurred.",
                    "type": "dateTime",
                    "format": "YYYY-MM-DDThh:mm:ssZ",
