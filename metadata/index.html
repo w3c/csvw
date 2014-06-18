@@ -159,7 +159,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         This document defines the format and structure of metadata documents, and how these are interpreted to create an Annotated Tabular Data Model. It also defines how to validate tabular data based on some of these annotations. This metadata can be expressed as an RDF graph. However, all applications that conform to this specification (including validators and applications that read or convert tabular data) MUST read the JSON-based format described in <a href="#metadata-in-json" class="sectionRef"></a>.
       </p>
       <p class="issue">
-        We should aim, if we can, for the JSON format to be equivalent to a JSON-LD version of the RDF vocabulary, but without any requirement to include context within the JSON itself (to save people from having to do boilerplate).
+        We are aiming for the JSON format to be interpretable as JSON-LD, but without any requirement to include context within the JSON itself (to save people from having to do boilerplate). We invite comments on the utility of this approach: is it useful for CSV metadata to be interpretable as JSON-LD? Is it helpful to be able to map it to RDF? Would it be better to rename some of the JSON-LD keywords, such as <code>@id</code> and <code>@type</code>?
       </p>
     </section>
     <section>
@@ -223,10 +223,19 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       </section>
       <section>
         <h3>Displaying Tables</h3>
-        <section>
-          <h4>Displaying Metadata</h4>
-          <p class="issue">TODO: Stuff about providing metadata about the table</p>
-        </section>
+        <div class="issue">
+          <p>
+            We intend to include other sections here about:
+          </p>
+          <ul>
+            <li>displaying metadata about tables, columns, rows, cells and regions</li>
+            <li>what headings to use for columns when displaying tabular content</li>
+            <li>how to format values in cells</li>
+          </ul>
+          <p>
+            Much of this is likely to be non-normative. We invite comment on whether it's useful to provide this kind of guidance.
+          </p>
+        </div>
         <section>
           <h4>Bidirectional Tables</h4>
           <p>
@@ -248,18 +257,12 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             Thus, as defined by the <acronym title="Unicode Bidirectional Algorithm">UBA</acronym>, if a cell contains no characters with a strong type (if it's a number or date for example) then the way the cell is displayed should be determined by the <a href="#cell-text-direction"><code>text-direction</code> property</a> of the cell. However, when the cell contains characters with a strong type (such as letters) then they MUST be displayed according to the Unicode Bidirectional Algorithm as described in [[!UNICODE-BIDI]].
           </p>
         </section>
-        <section>
-          <h4>Column and Row Headings</h4>
-          <p class="issue">TODO: stuff about using labels etc</p>
-        </section>
-        <section>
-          <h4>Displaying cells</h4>
-          <p class="issue">TODO: stuff about formatting values, having access to notes &amp; annotations etc</p>
-        </section>
       </section>
       <section>
         <h3>Validating Tables</h3>
-        <p class="issue">TODO</p>
+        <p class="issue">
+          We intend to detail how to validate a CSV file against metadata. This would be normative: compliant validators would have to report the errors and warnings that we define. We invite comment on whether this is a useful thing to specify.
+        </p>
       </section>
       <section>
         <h3>Converting Tables</h3>
@@ -270,7 +273,10 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           Conversion specifications MUST define a default mapping from an annotated table that lacks any annotations (ie that is equivalent to an un-annotated table).
         </p>
         <p>
-          Conversion specifications MAY use any of the properties defined in this specification to adjust the mapping of an annotated table into another format. For example, the <a href="#column-name"><code>name</code> of a column</a> may become the name of the equivalent element in XML or property in JSON or be used to construct a property URI in RDF.
+          Conversion specifications MUST use the <a href="#column-name"><code>name</code> of a column</a> as the basis for naming machine-readable fields in the target format, such as the name of the equivalent element or attribute in XML, property in JSON or property URI in RDF.
+        </p>
+        <p>
+          Conversion specifications MAY use any of the properties defined in this specification to adjust the mapping of an annotated table into another format.
         </p>
         <p>
           Conversion specifications MAY define additional properties, not defined in this specification, which are specifically used when converting to the target format of the conversion. For example, a conversion to XML might specify a <code>element-or-attribute</code> property on columns that determines whether a particular column is represented through an element or an attribute in the data.
@@ -283,13 +289,6 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           <li>a string containing a SPARQL CONSTRUCT pattern that is executed on RDF after it is generated</li>
           <li>properties that contain definitions of Javascript callback functions that are used when processing particular columns or individual rows</li>
         </ul>
-        <p class="issue">
-          There might be some properties that should be used in particular ways within conversion specifications in order to give some consistency. For example, using the names of columns as the source of property names. So there might be other constraints on conversion specifications that get listed here.
-        </p>
-      </section>
-      <section>
-        <h3>Aggregating Tables</h3>
-        <p class="issue">TODO</p>
       </section>
     </section>
     <section>
@@ -298,7 +297,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         This section defines a set of properties and permitted values for annotating tabular data, and how these annotations should be interpreted by applications.
       </p>
       <p class="issue">
-        We intend to support metadata for packages. For now, we are scoping to single metadata files defining single CSV files.
+        We intend to support metadata for packages. In this version of this specification, we are scoping to single metadata files defining single CSV files.
       </p>
       <section>
         <h3>Syntax</h3>
@@ -426,7 +425,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 }
             </pre>
             <p class="issue">
-              It would be nice to enable some markup in natural language strings, for example by stating that they are interpreted as HTML or Markdown.
+              We invite comment on whether it would be useful to enable some markup in natural language strings, for example by stating that they are interpreted as HTML or Markdown.
             </p>
           </dd>
           <dt><dfn title="atomic property">atomic properties</dfn></dt>
@@ -476,7 +475,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           The properties listed here may be applied to any structure within the tabular data model: tables, columns, rows or cells.
         </p>
         <p class="issue">
-          Any other lists of properties we should crib off?
+          We invite comment on whether there are other standard metadata vocabularies that should be reused within this specification.
         </p>
         <section>
           <h4>Dublin Core Terms</h4>
@@ -543,9 +542,6 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <tr><th><code>type</code></th><td><a>object property</a></td><td></td></tr>
             <tr><th><code>valid</code></th><td><a>atomic property</a></td><td>dates in the format <code>YYYY-MM-DD</code></td></tr>
           </table>
-          <p class="issue">
-            The adoption of <code>type</code> from DC-TERMS means that the datatype of cells is indicated through <code>datatype</code> instead.
-          </p>
         </section>
         <section>
           <h4>Links</h4>
@@ -579,7 +575,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <li><code>link:working-copy</code></li>
             <li><code>link:working-copy-of</code></li>
           </ul>
-          <p class="issue">
+          <p class="note">
             Unlike the Dublin Core terms, link relations are an ever-expanding list and there may eventually be clashes between link relation terms and those defined above. That's why the above list uses QNames for all link relations, so that they look like <code>link:<var>relation</var></code> rather than plain <code><var>relation</var></code>.
           </p>
         </section>
@@ -796,6 +792,9 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         <p>
           A <dfn>table description</dfn> is a JSON object that describes a table within a CSV file.
         </p>
+        <p class="issue">
+          A CSV file might not be the same as the table that it contains. For example, a given CSV file might contain two tables (in different regions of the CSV file), or might contain a table that isn't positioned at the top left of the CSV file. We invite comment about whether we should assume that pre-processing is used to extract tables where there isn't a 1:1 correspondence between CSV file and table, or not.
+        </p>
         <section>
           <h4>Required Properties</h4>
           <dl>
@@ -804,14 +803,8 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               <p>
                 This gives the URL of the CSV file that the table is held in, relative to the location of the metadata document.
               </p>
-              <p class="issue">
-                Technically, the CSV file might not be the same as the table that it contains. For example, a given CSV file might contain two tables (in different regions of the CSV file), or might contain a table that isn't positioned at the top left of the CSV file. Given this, should we use a different property than <code>@id</code> to indicate the CSV file that the table comes from?
-              </p>
             </dd>
           </dl>
-          <p class="issue">
-            It's possible to alias all the JSON-LD keywords, for example to use <code>url</code> instead of <code>@id</code>, but would that be useful?
-          </p>
         </section>
         <section>
           <h4>Optional Properties</h4>
@@ -829,7 +822,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
                 One of <code>"rtl"</code>, <code>"ltr"</code> or <code>"default"</code>. Indicates whether the table should be displayed with the first column on the right, on the left, or based on the first character in the table that has a specific direction. See <a href="#bidirectional-tables" class="sectionRef"></a> for more details.
               </p>
               <p class="issue">
-                This should really be a controlled vocabulary in JSON-LD, but I think that would mean saying <code>bidi:rtl</code> and <code>bidi:ltr</code> were the possible values for the property, rather than simply <code>rtl</code> and <code>ltr</code>. Have I missed something?
+                This should be a defined controlled vocabulary in JSON-LD, so that the values map on to URIs in the RDF version rather than strings. We invite comment on how to configure the JSON-LD context to enable these values to be interpreted in this way.
               </p>
             </dd>
             <dt id="table-schema"><code>schema</code></dt>
@@ -841,11 +834,21 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               An <a>object property</a>, usually an array, of annotation objects. An <dfn>annotation object</dfn> is an object that holds general annotations about a particular column, row, cell or region of the table. Each annotation object MUST have an <code>@id</code> property that references the relevant column, row, cell or region of the table using a fragment identifier. It MAY have any other common properties as described in <a href="#common-properties" class="sectionRef"></a>.
             </dd>
           </dl>
+          <div class="issue">
+            <p>
+              We intend to add a small subset of properties that indicate how a CSV file should be parsed, specifically those that mirror the existing distinction between the media types for <code>text/csv</code> and <code>text/tab-separated-values</code>, and the media type parameters that they allow, namely:
+            </p>
+            <ul>
+              <li><code>separator</code> to give the character used as the separator in the tabular data file</li>
+              <li><code>encoding</code> to specify the encoding used in the file</li>
+              <li><code>header</code> to specify whether or not a header line is present</li>
+            </ul>
+            <p>
+              We invite comment about whether these are the right properties to specify.
+            </p>
+          </div>
           <p class="issue">
-            Should we include any properties that help in the parsing of the file, eg data package includes <code>encoding</code>?
-          </p>
-          <p class="issue">
-            Should we include any properties that help in checking the integrity of the file, eg data package includes <code>bytes</code> and <code>hash</code>? We could possibly reuse the <a href="http://www.w3.org/TR/SRI/">Subresource Integrity</a> work here.
+            We invite comment on whether we should include properties that help in checking the integrity of the file: datapackage includes <code>bytes</code> and <code>hash</code>. We could reuse the <a href="http://www.w3.org/TR/SRI/">Subresource Integrity</a> work here.
           </p>
           <p>
             The description MAY contain any of the properties defined in <a href="#common-properties" class="sectionRef"></a> to describe the table. As well as links to other related tables, the following common properties are particularly suitable for tables:
@@ -969,7 +972,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               Validators MUST check that each row has a unique combination of cells in the indicated columns. For example, if <code>primaryKey</code> is set to <code>["_:familyName", "_:givenName"]</code> then every row must have a unique value for the combination of the <code>familyName</code> and <code>givenName</code> columns.
             </p>
             <p class="issue">
-              When referencing columns for a primary key, it is a lot clearer to reference them by name rather than by number. For JSON-LD compatibility, we have to assign a blank node identifier to each column even though they each have a <code>name</code> property that could be used instead. It would be great to avoid having the extra <code>_:</code> syntax which will just seem weird to people who don't care about RDF.
+              When referencing columns for a primary key, it is a lot clearer to reference them by name rather than by number. For JSON-LD compatibility, we have to assign a blank node identifier to each column even though they each have a <code>name</code> property that could be used instead. We invite comment on how to make this easier for people to use while maintaining JSON-LD compatibility.
             </p>
           </dd>
         </dl>
@@ -1006,7 +1009,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
                 An <a>atomic property</a> that gives a canonical name for the column. This MUST be a string. Conversion specifications MUST use this property as the basis for the names of properties/elements/attributes in the results of conversions.
               </p>
               <p class="issue">
-                Suggest we have some syntactic limitations on names, to make it easy to use them as the basis of JSON properties, XML elements and so on. For example, not containing spaces would be good.
+                We invite comment on what the syntactic limitations should be on column names to make them most useful when used as the basis of conversion into other formats, bearing in mind that different target languages such as JSON, RDF and XML have different syntactic limitations and common naming conventions.
               </p>
               <p>
                 During validation, if there is no <code>title</code> property and the column already has a <code>title</code> annotation then a validator MUST issue a warning if the existing <code>title</code> annotation does not match the <code>name</code> specified in the column description.
@@ -1041,9 +1044,6 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <dd>
               <p>
                 If included, <code>@type</code> MUST be set to <code>"Column"</code>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.
-              </p>
-              <p class="issue">
-                Having both a <code>@type</code> property and a <code>type</code> property is confusing. Should we rename <code>@type</code> in the JSON-LD context? What to?
               </p>
             </dd>
             <dt id="column-required"><code>required</code></dt>
@@ -1143,9 +1143,6 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <dd>
               <p>
                 The main datatype of the values of the cell. If the cell contains a list (ie <code>separator</code> is not <code>null</code>) then this is the datatype of each value within the list. Conversion specifications MUST use the datatype of the value to determine the conversion of a cell into the target format. See <a href="#datatypes"></a> for more details.
-              </p>
-              <p class="issue">
-                Using the term <code>datatype</code> rather than <code>type</code> because DCTERMS defines <code>type</code>, and because <code>type</code> is confusing with <code>@type</code>.
               </p>
             </dd>
             <dt id="cell-length"><code>length</code></dt>
@@ -1262,19 +1259,19 @@ GID,On Street,Species,Trim Cycle,Inventory Date
                 the datatype <code>geopoint</code> which indicates a comma-separated longitude and latitude (ie values that after stripping leading and trailing whitespace are in the format <code><var>longitude</var>\s*,\s*<var>latitude</var></code>); a sub-value of <code>anySimpleType</code>
               </p>
               <p class="issue">
-                In JSON Table Schema, <code>geopoint</code> permits values in JSON representations of points, namely <code>{ lon: <var>longitude</var>, lat: <code>latitude</code>}</code> and <code>[<var>longitude</var>, <var>latitude</var>]</code>. Suggest that these additional formats are supported through the <code>format</code> property.
+                In JSON Table Schema, <code>geopoint</code> permits values in JSON representations of points, namely <code>{ lon: <var>longitude</var>, lat: <code>latitude</code>}</code> and <code>[<var>longitude</var>, <var>latitude</var>]</code>. We invite comment about whether these types are suitable for CSV files. If they are, we suggest that these additional formats for <code>geopoint</code> are supported through the <code>format</code> property.
               </p>
             </li>
             <li>the datatype <code>any</code> which is exactly equivalent to <code>anySimpleType</code></li>
           </ul>
           <p class="issue">
-            The JSON Table Schema also includes <code>object</code>, <code>array</code> and <code>geojson</code>. Should we be supporting the inclusion of JSON-based structures within CSV files?
+            The JSON Table Schema also includes <code>object</code>, <code>array</code> and <code>geojson</code>. We invite comment on whether we should we support the inclusion of JSON-based structures within CSV files.
           </p>
           <p class="issue">
-            Is the <code>any</code> type useful?
+            We invite comment on whether the <code>any</code> type is useful.
           </p>
           <p class="issue">
-            Should there be types for formats like XML, HTML and markdown?
+            We invite comment on whether there should be types for formats like XML, HTML and markdown which may appear within CSV cells.
           </p>
           <section>
             <h4>Length Constraints</h4>
@@ -1331,7 +1328,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               If the <code>datatype</code> is a string type, the <code>format</code> property provides a regular expression for the string values, in the syntax defined by [[!ECMASCRIPT]].
             </p>
             <p class="issue">
-              Is this the right reference to use for regular expressions? Could use XML Schema ones or XPath ones instead?
+              We invite comment about which reference to use for regular expression syntax. Other possibilities are to use that defined by XML Schema or XPath.
             </p>
           </section>
           <section>
@@ -1346,7 +1343,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               When the <code>datatype</code> is a numeric type, the <code>format</code> property's value MUST be a number format as specified in [[!xslt-21]].
             </p>
             <p class="issue">
-              Is this the right reference to use for parsing numbers? Would a printf syntax be better?
+              We invite comment on the best format to specify how to parse numbers.
             </p>
           </section>
           <section>
@@ -1370,13 +1367,13 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               When the <code>datatype</code> is a date or time type, the <code>format</code> property's value MUST be a date/time format as specified in [[!xslt-21]].
             </p>
             <p class="issue">
-              Is this the right reference to use for parsing dates and times? Would a printf syntax be better?
+              We invite comment on which format to use when parsing dates and times.
             </p>
           </section>
           <section>
             <h4>Formats for durations</h4>
             <p class="issue">
-              Are there standard formats for describing how to parse durations that we can crib from?
+              We invite comment on whether there are standard formats to use when parsing durations.
             </p>
           </section>
         </section>
@@ -1419,24 +1416,6 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         </section>
       </section>
     </section>
-    <section>
-      <h2>Metadata in JSON</h2>
-      <p class="issue">
-        Add example of what it looks like.
-      </p>
-      <section>
-        <h3>JSON-LD Context</h3>
-        <p class="issue">
-          Provide the context file for JSON-LD-based processing of metadata files.
-        </p>
-      </section>
-      <section>
-        <h3><code>application/csvm+json</code> Media Type</h3>
-        <p class="issue">
-          Provide definition of the media type here.
-        </p>
-      </section>
-    </section>
     <section class="appendix">
       <h2>Acknowledgements</h2>
       <p>
@@ -1447,7 +1426,9 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       <h2>IANA Considerations</h2>
       <section>
         <h3>Registration of <code>application/csvm+json</code></h3>
-        <p class="issue">TODO</p>
+        <p class="issue">
+          We intend to include a registration for a new datatype, namely <code>application/csvm+json</code>. We invite comment about how to indicate that this is consistent with <code>application/ld+json</code>, or whether we should just use <code>application/json</code> or <code>application/ld+json</code> and not create a specific media type for the metadata files defined in this document.
+        </p>
       </section>
     </section>
     <section class="appendix">
