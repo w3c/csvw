@@ -29,10 +29,7 @@ A snippet of the the CSV data is provided below:
 <h2>The CSV metadata</h2>
 
 The metadata document below is based on the [Metadata Vocabulary for Tabular Data][2] - although a few errors
-are anticipated. Also, I've introduced a few new terms to the vocabulary which seem to be missing:
-* `short-name`: used to map column heading from CSV to a more useful form - must be unique within 
-the scope of a single metadata description; and
-* `template`: used to describe the CSV transformation template.
+are anticipated. Also, I've introduced a new term `template` to the metadata vocabulary to provide an object that describes the CSV transformation template.
 
 The template definition in the CSV metadata should also specify the Content-Type created by a target 
 transformation - a given CSV metadata doc might include references to multiple transformation templates; and 
