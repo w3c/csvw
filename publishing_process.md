@@ -22,7 +22,7 @@ the ``/publishing-snapshot`` directory contains specific milestone publications,
 	1. Check whether ``respec`` signals a possible problem (a red or orange button should appear on the upper right hand corner for errors or warnings, respectively).
 	1. Push the button called ``respec`` on the upper right hand corner, choose ``Save Snapshot``, then ``Save as HTML``. You should either see the HTML source in your screen (e.g., in Safari or IE) or asked to download the HTML file on your disk.
 	1. Create/update a file called ``Overview.html`` file in the snapshot directory, and commit it to github
-	1. ``http://w3c.github.io/csvw/publishing-snapshots/WD-syntax=2014-12-12/Overview.html`` is a local copy of the publication-to-be in pure HTML
+	1. ``http://w3c.github.io/csvw/publishing-snapshots/WD-syntax-2014-12-12/Overview.html`` is a local copy of the publication-to-be in pure HTML
 	1. Use the [W3C pub rules checker](http://www.w3.org/2005/07/pubrules) with this URI to check the validity of the document. If there are problems, go back to the first step.
 1. Generate diff from previous version:
 	1. Push the button called ``respec`` on the upper right hand corner, choose ``Diff``,
