@@ -256,7 +256,7 @@ So we might define in the `columns` section of the metadata document a `microsyn
                    "format": "YYYY-MM-DDThh:mm:ssZ",
                    "required": true,
                    "microsyntax": {
-                       "var": "dtelements",
+                       "name": "dtelements",
                        "regexp": "/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z$/"
                    }
                }
@@ -293,7 +293,7 @@ If the cell had the value `one;two;three;four` then the microsyntax block below 
 such that `count[3]` equates to `four`.
 
     "microsyntax": {
-        "var": "count",
+        "name": "count",
         "list-delimiter": ";"
     }
 
@@ -314,22 +314,22 @@ with their own unique variable name; e.g.
                    "format": "YYYY-MM-DDThh:mm:ssZ",
                    "required": true,
                    "microsyntax": [{
-                           "var": "YYYY",
+                           "name": "YYYY",
                            "regexp": "/^(\d{4})-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/"
                        },{
-                           "var": "MM",
+                           "name": "MM",
                            "regexp": "/^\d{4}-(\d{2})-\d{2}T\d{2}:\d{2}:\d{2}Z$/"
                        },{
-                           "var": "DD",
+                           "name": "DD",
                            "regexp": "/^\d{4}-\d{2}-(\d{2})T\d{2}:\d{2}:\d{2}Z$/"
                        },{
-                           "var": "hh",
+                           "name": "hh",
                            "regexp": "/^\d{4}-\d{2}-\d{2}T(\d{2}):\d{2}:\d{2}Z$/"
                        },{
-                           "var": "mm",
+                           "name": "mm",
                            "regexp": "/^\d{4}-\d{2}-\d{2}T\d{2}:(\d{2}):\d{2}Z$/"
                        },{
-                           "var": "ss",
+                           "name": "ss",
                            "regexp": "/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:(\d{2})Z$/"
                        }
                    ]
@@ -364,16 +364,16 @@ If the cell had the value `one;two;three;four` then the microsyntax block below 
 such that `c4` equates to `four`.
 
     "microsyntax": [{
-            "var": "c1",
+            "name": "c1",
             "regexp": "/^(\s+);\s+;\s+;\s+$/"
         },{
-            "var": "c2",
+            "name": "c2",
             "regexp": "/^\s+;(\s+);\s+;\s+$/"
         },{
-            "var": "c3",
+            "name": "c3",
             "regexp": "/^\s+;\s+;(\s+);\s+$/"
         },{
-            "var": "c4",
+            "name": "c4",
             "regexp": "/^\s+;\s+;\s+;(\s+)$/"
         }
     ]
