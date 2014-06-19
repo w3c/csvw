@@ -65,9 +65,7 @@ File: `wx-obs-dec2013-site22580943.json`:
                    "description": "Date-time that the observation occurred.",
                    "type": "dateTime",
                    "format": "YYYY-MM-DDThh:mm:ssZ",
-                   "constraints": {
-                       "required": true
-                   }
+                   "required": true
                },
                {
                    "name": "air-temp",
@@ -77,7 +75,7 @@ File: `wx-obs-dec2013-site22580943.json`:
                    },
                    "description": "Air temperature quantity value expressed in Celsius.",
                    "type": "double",
-                   "constraints": {"required": true}
+                   "required": true
                },
                {
                    "name": "dew-point-temp",
@@ -87,7 +85,7 @@ File: `wx-obs-dec2013-site22580943.json`:
                    },
                    "description": "Dew-point temperature quantity value expressed in Celsius.",
                    "type": "double",
-                   "constraints": {"required": true}
+                   "required": true
                }
            ]},
            "template": {
@@ -256,9 +254,7 @@ So we might define in the `columns` section of the metadata document a `microsyn
                    "description": "Date-time that the observation occurred.",
                    "type": "dateTime",
                    "format": "YYYY-MM-DDThh:mm:ssZ",
-                   "constraints": {
-                       "required": true
-                   }
+                   "required": true,
                    "microsyntax": {
                        "var": "dtelements",
                        "regexp": "/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z$/"
@@ -316,9 +312,7 @@ with their own unique variable name; e.g.
                    "description": "Date-time that the observation occurred.",
                    "type": "dateTime",
                    "format": "YYYY-MM-DDThh:mm:ssZ",
-                   "constraints": {
-                       "required": true
-                   }
+                   "required": true,
                    "microsyntax": [{
                            "var": "YYYY",
                            "regexp": "/^(\d{4})-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/"
