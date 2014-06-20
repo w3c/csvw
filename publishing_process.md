@@ -25,7 +25,7 @@ the ``/publishing-snapshot`` directory contains specific milestone publications,
 	1. ``http://w3c.github.io/csvw/publishing-snapshots/WD-syntax-2014-12-12/Overview.html`` is a local copy of the publication-to-be in pure HTML ... note that if you're working in an alternative branch, the content will not be available at ``http://w3c.github.io/[...]``. Instead, use the service at https://rawgit.com/ - paste the URL of the raw file into the RawGit page, e.g. the raw URL ``https://raw.githubusercontent.com/w3c/csvw/my-branch/publishing-snapshots/WD-syntax-2014-12-12/Overview.html`` will publish content at the "development" URL ``https://rawgit.com/w3c/csvw/my-branch/publishing-snapshots/WD-syntax-2014-12-12/Overview.html``.
 	1. Use the [W3C pub rules checker](http://www.w3.org/2005/07/pubrules) with this URI to check the validity of the document. If there are problems, go back to the first step.
 1. Generate diff from previous version:
-	1. Push the button called ``respec`` on the upper right hand corner, choose ``Diff``,
+	1. Push the button called ``respec`` on the upper right hand corner, choose ``Save Snapshot`` then ``Diff``,
  	1. Save diff to publication directory using path set in ``otherLinks/Changes/Diff to previous version/href``.
 1. Update working version of file:
 	1. Set ``otherLinks/Changes/Diff to previous version/href`` based on last publication date.
