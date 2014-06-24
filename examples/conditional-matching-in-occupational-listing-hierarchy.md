@@ -180,5 +180,159 @@ ex:15-1199 a ex:SOC-DetailedOccupation ;
                  ex:15-1190 .
 ```
 
+<h2>Triggering a template given a specific value within a microsyntax element</h2>
 
-<h2>Next</h2>
+data snippet (from [2010_Occupations.csv][3]):
+```
+O*NET-SOC 2010 Code,O*NET-SOC 2010 Title,O*NET-SOC 2010 Description
+{snip}
+15-1199.00,"Computer Occupations, All Other",All computer occupations not listed separately.
+{snip}
+15-1199.03,Web Administrators,"Manage web environment design, deployment, development and maintenance activities.[...]"
+{snip}
+```
+
+[3]: http://w3c.github.io/csvw/use-cases-and-requirements/2010_Occupations.csv  
+
+This time I want to trigger a one template if the Occupation is a main category (e.g. Code = "15-1199.00"), else I want to trigger a different category.
+
+*(Aside 3: of course, as these two files are likely to be packaged together, I could have had just a single metadata description describing BOTH resources!)*
+
+*(Aside 4: I've assumed that the conditional match is assessed against the entire row; whilst it's not impossible to deal with, I note that the need to potentially escape fields to count the columns is an added complexity!)*
+
+Here's the metadata description for the resource:
+
+```json
+{
+    "name": "2010_Occupations",
+    "title": "O*NET-SOC Occupational listing for 2010",
+    "publisher": [{
+        "name": "O*Net Resource Center",
+        "web": " http://www.onetcenter.org/ "
+    }],
+    "resources": [{
+        "name": "2010_Occupations-csv",
+        "path": "2010_Occupations.csv",
+        "schema": {"columns": [
+            {
+                "name": "onet-soc-2010-code",
+                "title": "O*NET-SOC 2010 Code",
+                "description": "O*NET Standard Occupational Classification Code (2010).",
+                "type": "string",
+                "required": true,
+                "unique": true,
+                "microsyntax": [
+                    {
+                        "name": "soc-major-group",
+                        "regexp": "^(\\d{2})-\\d{4}.\\d{2}$"
+                    },
+                    {
+                        "name": "soc-minor-group",
+                        "regexp": "^\\d{2}-(\\d{2})\\d{2}.\\d{2}$"
+                    },
+                    {
+                        "name": "soc-broad-group",
+                        "regexp": "^\\d{2}-\\d{2}(\\d)\\d.\\d{2}$"
+                    },
+                    {
+                        "name": "soc-detailed-occupation",
+                        "regexp": "^\\d{2}-\\d{3}(\\d).\\d{2}$"
+                    }
+                ]
+            },
+            {
+                "name": "title",
+                "title": "O*NET-SOC 2010 Title",
+                "description": "Title of occupational classification.",
+                "type": "string",
+                "required": true
+            },
+            {
+                "name": "description",
+                "title": "O*NET-SOC 2010 Description",
+                "description": "Description of occupational classification.",
+                "type": "string",
+                "required": true
+            }
+        ]},
+        "template": [
+            {
+                "conditional-match": "^\\d{2}-\\d{4}.00,\\.*",
+                "name": "soc-occupation-category-template-ttl",
+                "description": "Template converting SOC occupation category CSV content to SKOS/RDF (expressed in Turtle syntax).",
+                "type": "template",
+                "path": "soc-occupation-category-csv-to-ttl-template.ttl",
+                "hasFormat": "text/turtle"
+            },
+            {
+                "conditional-match": "^\\d{2}-\\d{4}.(?!00),\\.*",
+                "name": "onet-soc-occupation-subcategory-template-ttl",
+                "description": "Template converting O*NET SOC occupation sub-category CSV content to SKOS/RDF (expressed in Turtle syntax).",
+                "type": "template",
+                "path": "onet-soc-occupation-subcategory-csv-to-ttl-template.ttl",
+                "hasFormat": "text/turtle"
+            }
+        ]
+    }]
+}
+```
+
+My TTL templates would be ...
+
+`soc-occupation-category-csv-to-ttl-template.ttl`:
+```
+ex:{onet-soc-2010-code} a ex:SOC-DetailedOccupation ;
+    skos:notation "{soc-major-group}-{soc-minor-group}{soc-broad-group}{soc-detailed-occupation}" ;
+    skos:prefLabel "{title}" ;
+    dct:description "{description}" ;
+    skos:exactMatch ex:{soc-major-group}-{soc-minor-group}{soc-broad-group}{soc-detailed-occupation} ;
+    skos:broader ex:{soc-major-group}-0000, 
+                 ex:{soc-major-group}-{soc-minor-group}00, 
+                 ex:{soc-major-group}-{soc-minor-group}{soc-broad-group}0 .
+```
+
+and `onet-soc-occupation-subcategory-csv-to-ttl-template.ttl`:
+```
+ex:{onet-soc-2010-code} a ex:ONETSOC-Occupation ;
+    skos:notation "{onet-soc-2010-code}" ;
+    skos:prefLabel "{title}" ;
+    dct:description "{description}" ;
+    skos:broader ex:{soc-major-group}-0000, 
+                 ex:{soc-major-group}-{soc-minor-group}00, 
+                 ex:{soc-major-group}-{soc-minor-group}{soc-broad-group}0,
+                 ex:{soc-major-group}-{soc-minor-group}{soc-broad-group}{soc-detailed-occupation} .
+```
+
+Thus, the input row below:
+```
+15-1199.00,"Computer Occupations, All Other",All computer occupations not listed separately.
+```
+
+... would generate the following TTL snippet:
+```
+ex:15-1199.00 a ex:SOC-DetailedOccupation ;
+    skos:notation "15-1199.00" ;
+    skos:prefLabel "Computer Occupations, All Other" ;
+    dct:description "All computer occupations not listed separately." ;
+    skos:exactMatch ex:15-1199 ;
+    skos:broader ex:15-0000, 
+                 ex:15-1100, 
+                 ex:15-1190 .
+```
+
+And this row:
+```
+15-1199.03,Web Administrators,"Manage web environment design, deployment, development and maintenance activities.[...]"
+```
+
+... would generate this TTL snippet:
+```
+ex:15-1199.03 a ex:ONETSOC-Occupation ;
+    skos:notation "15-1199.03" ;
+    skos:prefLabel "Web Administrators" ;
+    dct:description "Manage web environment design, deployment, development and maintenance activities.[...]" ;
+    skos:broader ex:15-0000, 
+                 ex:15-1100, 
+                 ex:15-1190,
+                 ex:15-1199 .
+```
