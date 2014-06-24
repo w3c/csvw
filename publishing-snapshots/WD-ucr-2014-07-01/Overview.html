@@ -2315,20 +2315,15 @@ data:
         <p>
           <span style="font-size: 10pt">(Contributed by Yakov Shafranovich)</span>
         </p>
-	      <p>Writing systems are relied upon for providing a standardized means to convey information.  
-           These writing systems rely not only upon symbols, but the order which the symbols (e.g. characters)
-           are organized.  Latin based languages use on left to write (LTR) representations, while languages 
-           such as Arabic and Hebrew employ <a href="http://dotancohen.com/howto/rtl_right_to_left.html">
-           right to left (RTL)</a> representations.</p>
-        <p>Irrespective of the LTR or RTL representation employed by a given language, data is serialised
-           such that the bytes are ordered in sequential order. That sequential order is, of course, 
-           dependent on the representation:
-           </p><ul>
-             <li>in LTR, the sequence will begin in with the left-most byte on the first line; whilst</li>
-             <li>in RTL, the sequence will begin on the right, progressing right to left.</li>
-           </ul>
-        <p></p>
-        <p>Content published in Hebrew and Arabic provide examples of this behaviour.</p>
+	      <p>Writing systems affect the way in which information is displayed. In some cases, these writing 
+          systems affect the order in which characters are displayed. Latin based languages display text 
+          left-to-right across a page (LTR). Languages such as Arabic and Hebrew are written in scripts 
+          whose dominant direction is right to left (RTL) when displayed, however when it involves 
+          non-native text or numbers it is actually bidirectional.</p>
+        <p>Irrespective of the LTR or RTL display of characters in a given language, data is serialised 
+          such that the bytes are ordered in one sequential order.</p>
+        
+        <p>Content published in Hebrew and Arabic provide examples of RTL display behaviour.</p>
         
         <div class="note"><div id="h_note_4" role="heading" aria-level="3" class="note-title"><span>Note</span></div><p class="">Tabular data from originating from countries where vertical writing is the norm 
           (e.g. China, Japan) appear to be published with rows and columns as defined in [<cite><a href="#bib-RFC4180" class="bibref">RFC4180</a></cite>] (e.g.
@@ -2336,11 +2331,11 @@ data:
           providing a header with column names). Rows are published in the left to right topology.</p></div>
         
         <p>The <a href="http://referendum2012.elections.eg/results/referendum-results">results from the Egyptian Referendum of 2012</a>  
-          illustrate the problem, as can be seen in <a class="fig-ref" href="#egypt-referendum-2012-result-web-page-figure">Fig. <span class="figno">1</span> <span class="fig-title">Snippet of web page displaying Egyptian Referendum results (2012).</span></a>.</p>
+          illustrate the problem, as can be seen in <a class="fig-ref" href="#egypt-referendum-2012-result-web-page-figure">Fig. <span class="figno">1</span> <span class="fig-title">Snippet of web page displaying Egyptian Referendum results (2012)</span></a>.</p>
         
         <figure id="egypt-referendum-2012-result-web-page-figure">
           <img src="egypt-referendum-2012-result-web-page-snip.PNG" alt="egypt-referendum-2012-result-web-page-snip.PNG">
-          <figcaption>Fig. <span class="figno">1</span> <span class="fig-title">Snippet of web page displaying Egyptian Referendum results (2012).</span></figcaption>
+          <figcaption>Fig. <span class="figno">1</span> <span class="fig-title">Snippet of web page displaying Egyptian Referendum results (2012)</span></figcaption>
         </figure>
         
         <p>The content in the 
@@ -2364,30 +2359,52 @@ data:
           sequential left-to-right order.
         </p></div>
         
-        <p>The directionality of the content does not affect the <em>logical</em> structure of the tabular data;
+        <p>The directionality of the content as displayed does not affect the <em>logical</em> structure of the tabular data;
         i.e. the cell at index zero is followed by the cell at index 1, and then index 2 etc.</p>
         
         <p>However, without awareness of the directionality of the content, an application may display data in 
         a way that is unintuitive for the a RTL reader. For example, viewing the CSV file using 
         <a href="http://www.libreoffice.org/">Libre Office</a> Calc (tested 
-        using version 3) demonstrates the challenge in rendering the content correctly.
-          <a class="fig-ref" href="#egypt-referendum-2012-result-libre-office-calc-figure">Fig. <span class="figno">2</span> <span class="fig-title">CSV data file containing Egyptian Referendum results (2012) displayed in Libre Office Calc.</span></a> shows how the 
+        using version 3 configured with <code>English (UK)</code> locale) demonstrates the challenge in rendering the content correctly.
+          <a class="fig-ref" href="#egypt-referendum-2012-result-libre-office-calc-figure">Fig. <span class="figno">2</span> <span class="fig-title">CSV data file containing Egyptian Referendum results (2012) displayed in Libre Office Calc</span></a> shows how the 
           <a href="https://egelections-2011.appspot.com/Referendum2012/results/csv/EG.csv">content</a> is 
-        incorrectly rendered in LTR mode. Similar behaviour is observed in Microsoft Office Excel 2007.</p>
+        incorrectly rendered; cells progress from left-to-right yet, on the positive side, the Arabic text 
+        within a given field runs from right-to-left. Similar behaviour is observed in Microsoft Office Excel 2007.</p>
         
         <figure id="egypt-referendum-2012-result-libre-office-calc-figure">
           <img src="egypt-referendum-2012-result-csv-in-libre-office-3.png" alt="egypt-referendum-2012-result-csv-in-libre-office-3.png">
-          <figcaption>Fig. <span class="figno">2</span> <span class="fig-title">CSV data file containing Egyptian Referendum results (2012) displayed in Libre Office Calc.</span></figcaption>
+          <figcaption>Fig. <span class="figno">2</span> <span class="fig-title">CSV data file containing Egyptian Referendum results (2012) displayed in Libre Office Calc</span></figcaption>
         </figure>
         
-        <p>From this example, we can see that automatic prediction of the direction in which to 
-        display content is not uniformly implemented. Such automatic prediction is complicated further given the 
-        prevalence of mixed LTR and RTL content in a single row. As a result, a 
-        mechanism needs to be provided such that one can explicitly declare the directionality which applies when
-        parsing and rendering the content of CSV files.</p>
+        <p>By contrast, we can see <a class="fig-ref" href="#egypt-referendum-2012-result-textwrangler-figure">Fig. <span class="figno">3</span> <span class="fig-title">CSV data file containing Egyptian Referendum results (2012) displayed in TextWrangler</span></a>. The simple
+          <a href="http://www.barebones.com/products/textwrangler/">TextWrangler</a> text editor is not aware that the overall
+          direction is right-to-left, but does apply the Unicode bidirectional algorithm such that lines starting with an
+          Arabic character have a direction base of right-to-left. However, as a result, the numeric digits are also displayed
+          right to left, which is incorrect.</p>
         
-        <div class="issue"><div id="h_issue_3" role="heading" aria-level="3" class="issue-title"><span>Issue 3</span></div><div class="">
-          <p>From internationalization perspective how is the proper language encoding is determined?</p>
+        <figure id="egypt-referendum-2012-result-textwrangler-figure">
+          <img src="egypt-referendum-2012-result-csv-in-textwrangler.png" alt="egypt-referendum-2012-result-csv-in-textwrangler.png">
+          <figcaption>Fig. <span class="figno">3</span> <span class="fig-title">CSV data file containing Egyptian Referendum results (2012) displayed in TextWrangler</span></figcaption>
+        </figure>
+        
+        <p>It is clear that a mechanism needs to be provided such that one can explicitly declare the directionality 
+          which applies when parsing and rendering the content of CSV files.</p>
+        
+        <div class="note"><div id="h_note_6" role="heading" aria-level="3" class="note-title"><span>Note</span></div><div class="">
+          <p>From Unicode version 6.3 onwards, the Unicode Standard contains new control codes (RLI, LRI, FSI, PDI) 
+            to enable authors to express isolation at the same time as direction in inline bidirectional text. The 
+            Unicode Consortium recommends that isolation be used as the default for all future inline bidirectional 
+            text embeddings. To use these new control codes, however, it will be necessary to wait until the browsers 
+            support them. The new control codes are:
+            </p><ul>
+              <li>RLI (RIGHT-TO-LEFT ISOLATE) <code>U+2067</code> to set direction right-to-left</li>
+              <li>LRI (LEFT-TO-RIGHT ISOLATE) <code>U+2066</code> to set direction left-to-right</li>
+              <li>FSI (FIRST STRONG ISOLATE) <code>U+2068</code> to set direction according to the first strong character</li>
+              <li>PDI (POP DIRECTIONAL ISOLATE) <code>U+2069</code> to terminate the range set by RLI, LRI or FSI</li>
+            </ul>
+          <p></p>
+          <p>More information on setting the directionality of text without markup can be found 
+            <a href="http://www.w3.org/International/articles/inline-bidi-markup/Overview#nomarkup">here</a></p>
         </div></div>
         
         <p><strong>Requires:</strong> 
@@ -2682,7 +2699,7 @@ OBSNEV:SINFONEVADA:SINFON-100-008211-20040930	2013-06-20T11:18:18	OBSNEV	SINFONE
     }
 }</pre></div>
         
-        <div class="note"><div id="h_note_6" role="heading" aria-level="3" class="note-title"><span>Note</span></div><p class="">
+        <div class="note"><div id="h_note_7" role="heading" aria-level="3" class="note-title"><span>Note</span></div><p class="">
           GeoJSON coordinates are specified in order of longitude, latitude and, optionally, altitude.
         </p></div>
         
@@ -2748,21 +2765,21 @@ OBSNEV:SINFONEVADA:SINFON-100-008211-20040930	2013-06-20T11:18:18	OBSNEV	SINFONE
           <a href="#R-SemanticTypeDefinition">SemanticTypeDefinition</a> and
           <a href="#R-CsvToRdfTransformation">CsvToRdfTransformation</a>.</p>
 
-        <div class="note"><div id="h_note_7" role="heading" aria-level="3" class="note-title"><span>Note</span></div><div class="">          
+        <div class="note"><div id="h_note_8" role="heading" aria-level="3" class="note-title"><span>Note</span></div><div class="">          
           <p>The <code>@type</code> of the entity is taken from the <code>rowType</code> attribute
           within the metadata file.</p>
         </div></div>
         
-        <div class="note"><div id="h_note_8" role="heading" aria-level="3" class="note-title"><span>Note</span></div><div class="">
+        <div class="note"><div id="h_note_9" role="heading" aria-level="3" class="note-title"><span>Note</span></div><div class="">
           <p>The amendment of the GeoJSON specification to include JSON-LD is a work in progress at the time
           of writing. Details can be found on the <a href="https://github.com/geojson/geojson-ld">GeoJSON GitHub</a>.</p>
         </div></div>
         
-        <div class="issue"><div id="h_issue_4" role="heading" aria-level="3" class="issue-title"><span>Issue 4</span></div><div class="">
+        <div class="issue"><div id="h_issue_3" role="heading" aria-level="3" class="issue-title"><span>Issue 3</span></div><div class="">
           <p>The example "GeoJSON-LD" needs to be verified as correct.</p>
         </div></div>
         
-        <div class="note"><div id="h_note_9" role="heading" aria-level="3" class="note-title"><span>Note</span></div><div class="">
+        <div class="note"><div id="h_note_10" role="heading" aria-level="3" class="note-title"><span>Note</span></div><div class="">
           <p>It is the hope of the DwC-A format specification authors that the availability
           of general metadata vocabulary for describing CSV files, or indeed any tabular text
           datasets, will mean that DwC-A can be deprecated. This would allow the biodiversity
@@ -2799,19 +2816,19 @@ MCL TRANSPORT CONSULTANTS LTD,        Passenger Services, "£7,134","Economy, Tr
 MCL TRANSPORT CONSULTANTS LTD,Concessionary Fares Scheme,"£10,476","Economy, Transport &amp; Environment",  4500529102,     BN25          
 {snip}          </pre></div>
         <p>This data is augmented by spendnetwork.com and presented in a <a href="https://spendnetwork.com/entity_spend/E1421_ESCC_gov">Web page</a>.
-          The web page for East Sussex County Council is illustrated in <a class="fig-ref" href="#e1421-escc-spendnetwork-web-page-figure">Fig. <span class="figno">3</span> <span class="fig-title">Payments over £500 for East Sussex County Council July-Sept 2011, illustrated by spendnetwork</span></a></p>
+          The web page for East Sussex County Council is illustrated in <a class="fig-ref" href="#e1421-escc-spendnetwork-web-page-figure">Fig. <span class="figno">4</span> <span class="fig-title">Payments over £500 for East Sussex County Council July-Sept 2011, illustrated by spendnetwork</span></a></p>
         <figure id="e1421-escc-spendnetwork-web-page-figure">
           <img src="spendnetwork1.png" alt="spendnetwork1.png">
-          <figcaption>Fig. <span class="figno">3</span> <span class="fig-title">Payments over £500 for East Sussex County Council July-Sept 2011, illustrated by spendnetwork</span></figcaption>
+          <figcaption>Fig. <span class="figno">4</span> <span class="fig-title">Payments over £500 for East Sussex County Council July-Sept 2011, illustrated by spendnetwork</span></figcaption>
         </figure>
         <p>Notice the Linked Data column that links to 
           <a href="https://opencorporates.com/companies/gb/03690326">OpenCorporates data on MCL Transport Consultants Ltd</a>. 
           If we follow the 'more' link we see many more cells that spendnetwork would <strong>like</strong> to include (see 
-          <a class="fig-ref" href="#mcl-transport-consultants-payment-transaction-jul-2011-web-page-figure">Fig. <span class="figno">4</span> <span class="fig-title">Payment transaction details, illustrated by spendnetwork</span></a>). Where data is available 
+          <a class="fig-ref" href="#mcl-transport-consultants-payment-transaction-jul-2011-web-page-figure">Fig. <span class="figno">5</span> <span class="fig-title">Payment transaction details, illustrated by spendnetwork</span></a>). Where data is available 
           from the original spreadsheet it has been included.</p>
         <figure id="mcl-transport-consultants-payment-transaction-jul-2011-web-page-figure">
           <img src="spendnetwork2.png" alt="spendnetwork2.png">
-          <figcaption>Fig. <span class="figno">4</span> <span class="fig-title">Payment transaction details, illustrated by spendnetwork</span></figcaption>
+          <figcaption>Fig. <span class="figno">5</span> <span class="fig-title">Payment transaction details, illustrated by spendnetwork</span></figcaption>
         </figure>
         <p>The schema here is defined by a third party (spendnetwork.com) to <strong>make sense</strong> of the original data within their own model 
           (only some of which is shown here, spendnetwork.com also tries to categorize transactions and more). This model exists independently of 
@@ -2907,7 +2924,7 @@ Location name,Location code,People affected
         <p><strong>Requires:</strong>
         <a href="#R-MultipleHeadingRows">MultipleHeadingRows</a>.</p>
         
-        <div class="note"><div id="h_note_10" role="heading" aria-level="3" class="note-title"><span>Note</span></div><div class="">
+        <div class="note"><div id="h_note_11" role="heading" aria-level="3" class="note-title"><span>Note</span></div><div class="">
           <p>The <a href="https://docs.google.com/document/d/1srkEdEQiMEYDmk0Jo2rWpsFStYcgp5XaqYJQON6lfvU/edit?pli=1">HXL tabular data conventions</a>
             also propose an alternate where the 3-character field code is pre-pended to the textual 
             column name; e.g. <code>100 Location name</code>.</p>
@@ -2930,7 +2947,7 @@ Location name,Location code,People affected
           <a href="#R-SyntacticTypeDefinition">SyntacticTypeDefinition</a> and
           <a href="#R-SemanticTypeDefinition">SemanticTypeDefinition</a>.</p>       
         
-        <div class="note"><div id="h_note_11" role="heading" aria-level="3" class="note-title"><span>Note</span></div><div class="">
+        <div class="note"><div id="h_note_12" role="heading" aria-level="3" class="note-title"><span>Note</span></div><div class="">
           <p>At time of writing, the 
           <a href="https://docs.google.com/spreadsheets/d/1aq2ojDnceIcTNdLWVKP856AuFPItJP1TWwMaPrKPXXw/edit?pli=1#gid=0">data dictionary</a>
             does not provide an explicit mapping to the 
@@ -3011,7 +3028,7 @@ Fecha del informe,      Fuente,     Implementador,Código de sector,       Secto
         <p>Our user intends to analyze the current state of the job market using information gleaned
         from job postings that are published using <a href="http://schema.org">schema.org</a> markup.</p>
 
-        <div class="note"><div id="h_note_12" role="heading" aria-level="3" class="note-title"><span>Note</span></div><p class=""><a href="http://schema.org">schema.org</a> defines a schema for a listing that describes a 
+        <div class="note"><div id="h_note_13" role="heading" aria-level="3" class="note-title"><span>Note</span></div><p class=""><a href="http://schema.org">schema.org</a> defines a schema for a listing that describes a 
           job opening within an organization: <code><a href="http://schema.org/JobPosting">JobPosting</a></code>.</p></div>
 
         <p>One of the things our user wants to do is to organise the job postings into categories 
@@ -3226,7 +3243,7 @@ Major Group,Minor Group,Broad Group,Detailed Occupation,                        
         identifier for a detailed occupation code into its constituent parts from which the 
         identifiers for the associated broader concepts could be constructed.</p>
 
-        <div class="issue"><div id="h_issue_5" role="heading" aria-level="3" class="issue-title"><span>Issue 5</span></div><div class="">
+        <div class="issue"><div id="h_issue_4" role="heading" aria-level="3" class="issue-title"><span>Issue 4</span></div><div class="">
           <p>The REGEXP needs to be verified as correct.</p>
         </div></div>
 
@@ -3381,7 +3398,7 @@ ex:15-1199.03 a ex:ONETSOC-Occupation ;
               <p>A "RTL aware" application should use the RTL declaration to determine how to display the 
               a given data file. Left-to-Right (LTR) rendering shall be the default behaviour (in absence of 
               any such declaration).</p>
-              <div class="note"><div id="h_note_13" role="heading" aria-level="4" class="note-title"><span>Note</span></div><div class="">
+              <div class="note"><div id="h_note_14" role="heading" aria-level="4" class="note-title"><span>Note</span></div><div class="">
                 <p>The directionality of the content does not affect the logical structure of the tabular data; 
                   i.e. the cell at index zero is followed by the cell at index 1, and then index 2 etc. As
                   a result, parsing of RTL tabular data is anticipated to be identical to LTR content.</p>
@@ -3422,7 +3439,7 @@ ex:15-1199.03 a ex:ONETSOC-Occupation ;
                 <a href="#UC-NetCdFcDl">NetCdFcDl</a> and
                 <a href="#UC-PaloAltoTreeData">PaloAltoTreeData</a>.
               <p></p>
-              <div class="issue"><div id="h_issue_6" role="heading" aria-level="4" class="issue-title"><span>Issue 6</span></div><div class="">
+              <div class="issue"><div id="h_issue_5" role="heading" aria-level="4" class="issue-title"><span>Issue 5</span></div><div class="">
                 <p>David Booth <a href="http://lists.w3.org/Archives/Public/public-csv-wg/2014Apr/0045.html">suggests</a>:</p>
                 <p>"<em>It sounds like the R-CsvValidation requirement may need to be split into 
                   two separate validation requirements:</em></p>
@@ -3650,7 +3667,7 @@ meta.xml
                 <a href="#UC-PublicationOfBiodiversityInformation">PublicationOfBiodiversityInformation</a>.
               </p>
               
-              <div class="note"><div id="h_note_14" role="heading" aria-level="4" class="note-title"><span>Note</span></div><div class="">
+              <div class="note"><div id="h_note_15" role="heading" aria-level="4" class="note-title"><span>Note</span></div><div class="">
                 <p>Please refer to <a href="#R-CanonicalMappingInLieuOfAnnotation">R-CanonicalMappingInLieuOfAnnotation</a>
                   for details of the requirement to transform a tabular data lacking any supplementary metadata.</p>
               </div></div>
@@ -3708,12 +3725,12 @@ meta.xml
               text to convert between formats (e.g. to convert a datetime value to a date, or locale dates to
               ISO 8601 compliant syntax).</p>
               
-              <div class="note"><div id="h_note_15" role="heading" aria-level="4" class="note-title"><span>Note</span></div><div class="">
+              <div class="note"><div id="h_note_16" role="heading" aria-level="4" class="note-title"><span>Note</span></div><div class="">
                 <p>We assume that lists of values within a given cell all refer to items of the same type - 
                   such as a list of authors for a journal article.</p>
               </div></div>     
               
-              <div class="note"><div id="h_note_16" role="heading" aria-level="4" class="note-title"><span>Note</span></div><div class="">
+              <div class="note"><div id="h_note_17" role="heading" aria-level="4" class="note-title"><span>Note</span></div><div class="">
                 <p>At this time, there is no expectation for CSV parsers to be able to take cells with embedded 
                   structure (e.g. XML, JSON, WKT etc.) or arbitrarily semi-structured text and convert them into 
                   JSON/XML/RDF.</p>
@@ -3724,7 +3741,7 @@ meta.xml
                   of data types.</p>
               </div></div>
 
-              <div class="issue"><div id="h_issue_7" role="heading" aria-level="4" class="issue-title"><span>Issue 7</span></div><div class="">
+              <div class="issue"><div id="h_issue_6" role="heading" aria-level="4" class="issue-title"><span>Issue 6</span></div><div class="">
                 <p>Do we want to provide a mechanism to hook user-defined call-back functions 
                 (or <a href="http://heycam.github.io/webidl/#idl-promise">Promises</a>) into the CSV parser
                 to validate and process / convert embedded structured or semi-structured content?</p>
@@ -3784,7 +3801,7 @@ meta.xml
                 e.g. using a foreign key type reference. The cross-referenced CSV files may, or may
                 not, be packaged together.</p>
               <p>
-              </p><div class="issue"><div id="h_issue_8" role="heading" aria-level="4" class="issue-title"><span>Issue 8</span></div><div class="">
+              </p><div class="issue"><div id="h_issue_7" role="heading" aria-level="4" class="issue-title"><span>Issue 7</span></div><div class="">
                 <p>AndyS <a href="http://lists.w3.org/Archives/Public/public-csv-wg/2014May/0102.html">suggests</a> 
                 that: "<em>The cross reference between files should be limited to files
                 from one publisher - else they are just web links with no guarantee of whether the target
@@ -3818,7 +3835,7 @@ meta.xml
                 adversely impact parsing of the tabular data (e.g. the annotations and supplementary
                 information must be logically separate).</p>
               
-              <div class="note"><div id="h_note_17" role="heading" aria-level="4" class="note-title"><span>Note</span></div><div class="">
+              <div class="note"><div id="h_note_18" role="heading" aria-level="4" class="note-title"><span>Note</span></div><div class="">
                 <p>This requirement refers to provision of human-readable annotation providing
                 additional context to a group of tables, table, column, row, cell or other region
                 within a table. For example, the 
@@ -3907,7 +3924,7 @@ meta.xml
                 <a href="#UC-ChemicalImaging">ChemicalImaging</a> and
                 <a href="#UC-NetCdFcDl">NetCdFcDl</a>.
               </p>
-              <div class="issue"><div id="h_issue_9" role="heading" aria-level="4" class="issue-title"><span>Issue 9</span></div><div class="">
+              <div class="issue"><div id="h_issue_8" role="heading" aria-level="4" class="issue-title"><span>Issue 8</span></div><div class="">
                 <p>Ivan <a href="http://lists.w3.org/Archives/Public/public-csv-wg/2014May/0103.html">says</a>:</p>
                 <p>"<em>Hm. Do we define CSV packaging in this Working Group? Is this in scope? We could decide it is, though we should check this with the charter.</em>"</p>
               </div></div>
@@ -3922,11 +3939,11 @@ meta.xml
                 as <code>1/4</code> may be interpreted as a decimal fraction.</p>
               <p>It shall be possible to declare the data type for the cells in a given column of a 
                 tabular data file. Only one data type can be declared for a given column.</p>
-              <div class="note"><div id="h_note_18" role="heading" aria-level="4" class="note-title"><span>Note</span></div><div class="">
+              <div class="note"><div id="h_note_19" role="heading" aria-level="4" class="note-title"><span>Note</span></div><div class="">
                 <p>An application may still attempt to automatically detect the data type for a given
                 cell. However, the explicit declaration shall always take precedent.</p>
               </div></div>
-              <div class="note"><div id="h_note_19" role="heading" aria-level="4" class="note-title"><span>Note</span></div><div class="">
+              <div class="note"><div id="h_note_20" role="heading" aria-level="4" class="note-title"><span>Note</span></div><div class="">
                 <p>The data type declaration will typically be used to declare that a column contains
                 integers, floating point numbers or text. However, it may be used to assert that a cell 
                 contains, say, embedded 
@@ -3934,7 +3951,7 @@ meta.xml
                 datetime values (<code><a href="http://www.w3.org/2001/XMLSchema#datetime">xsd:datetime</a></code>) or 
                 geometry expressed as well-known-text (<code><a href="http://www.opengis.net/ont/geosparql#wktLiteral">geo:wktLiteral</a></code>).</p>
               </div></div>
-              <div class="issue"><div id="h_issue_10" role="heading" aria-level="4" class="issue-title"><span>Issue 10</span></div><div class="">
+              <div class="issue"><div id="h_issue_9" role="heading" aria-level="4" class="issue-title"><span>Issue 9</span></div><div class="">
                 <p>Is there any intent for the CSV parser to validate that a given cell conforms to the type declaration?</p>
               </div></div>
               <p>
@@ -3989,7 +4006,7 @@ ex:11-1011.00
               
               <p>A copy of the occupational listing CSV is available <a href="2010_Occupations.csv">locally</a>.</p>
               
-              <div class="note"><div id="h_note_20" role="heading" aria-level="4" class="note-title"><span>Note</span></div><div class="">
+              <div class="note"><div id="h_note_21" role="heading" aria-level="4" class="note-title"><span>Note</span></div><div class="">
                 <p>To express semantics in a machine readable form, RDF seems the appropriate choice.
                   Furthermore, best practice indicates that one should adopt common and widely adopted
                   patterns (e.g. RDF vocabularies, OWL ontologies) when publishing data to enable a
@@ -4061,7 +4078,7 @@ ex:11-1011.00
               permitted in URIs (as defined in [<cite><a href="#bib-RFC3986" class="bibref">RFC3986</a></cite>]) or CURIEs [<cite><a href="#bib-curie" class="bibref">curie</a></cite>]).</p>
               <p>Furthermore, where the local identifier is part of a controlled vocabulary, code list or thesaurus, it should
               be possible to specify the URI for the controlled vocabulary within which the local identfier is defined.</p>
-              <div class="note"><div id="h_note_21" role="heading" aria-level="4" class="note-title"><span>Note</span></div><p class="">Also see the related requirement <a href="#R-ForeignKeyReferences">R-ForeignKeyReferences</a>.</p></div>
+              <div class="note"><div id="h_note_22" role="heading" aria-level="4" class="note-title"><span>Note</span></div><p class="">Also see the related requirement <a href="#R-ForeignKeyReferences">R-ForeignKeyReferences</a>.</p></div>
               <p>
                 <strong>Motivation:</strong>
                 <a href="#UC-DigitalPreservationOfGovernmentRecords">DigitalPreservationOfGovernmentRecords</a>,
@@ -4212,7 +4229,7 @@ row:3 admingeo:gssCode ex:173219 .
 row:4 admingeo:gssCode ex:530012, ex:530013, ex:530015 .
 row:5 admingeo:gssCode ex:279333 .</pre></div>
               
-              <div class="note"><div id="h_note_22" role="heading" aria-level="4" class="note-title"><span>Note</span></div><div class="">
+              <div class="note"><div id="h_note_23" role="heading" aria-level="4" class="note-title"><span>Note</span></div><div class="">
                 <p>In this case, it is essential to declare that each of the columns refer to the same property. In the 
                   example above, all the <code>geocode</code> columns in the example above map to 
                   <code><a href="http://data.ordnancesurvey.co.uk/ontology/admingeo/gssCode">admin:gssCode</a></code>.</p>
@@ -4252,7 +4269,7 @@ Equivalent JSON:
                 <a href="#UC-CollatingHumanitarianResponseInformation">CollatingHumanitarianResponseInformation</a>.
               </p>
               
-              <div class="note"><div id="h_note_23" role="heading" aria-level="4" class="note-title"><span>Note</span></div><div class="">
+              <div class="note"><div id="h_note_24" role="heading" aria-level="4" class="note-title"><span>Note</span></div><div class="">
                 <p>In writing this requirement, no assumption has been made regarding how the 
                 repeated values should be implemented in RDF, JSON or XML.</p>
                 <p>In RDF, it may be more appropriate to use 
@@ -4309,7 +4326,7 @@ Equivalent JSON:
                 reducing the number of lines in the data file. As a result, such a <em>normalized</em> data file will
                 no longer be regular as additional informtion is included in each row (e.g. the number of columns will vary 
                 because more cells are provided for some rows).</p>
-              <div class="note"><div id="h_note_24" role="heading" aria-level="3" class="note-title"><span>Note</span></div><div class="">
+              <div class="note"><div id="h_note_25" role="heading" aria-level="3" class="note-title"><span>Note</span></div><div class="">
                 <p>Use of the term <em>normalized</em> is meant in a general sense, rather than the 
                   <a href="http://en.wikipedia.org/wiki/Database_normalization#Normal_forms">specific meaning relavant to relational databases</a>.</p>
               </div></div>
@@ -4319,7 +4336,7 @@ Equivalent JSON:
               <strong>Motivation:</strong>
               <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>.
               <p></p>
-              <div class="note"><div id="h_note_25" role="heading" aria-level="3" class="note-title"><span>Note</span></div><div class="">
+              <div class="note"><div id="h_note_26" role="heading" aria-level="3" class="note-title"><span>Note</span></div><div class="">
                 <p>The <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">motivating use case</a> is an example
                 where we have a CSV file that is not <em>well-formed</em> - in this particular case, the number of 
                 columns varies row by row amd there fore does not conform to the 
