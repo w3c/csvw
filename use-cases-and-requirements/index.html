@@ -2134,20 +2134,15 @@ data:
         <p>
           <span style="font-size: 10pt">(Contributed by Yakov Shafranovich)</span>
         </p>
-	      <p>Writing systems are relied upon for providing a standardized means to convey information.  
-           These writing systems rely not only upon symbols, but the order which the symbols (e.g. characters)
-           are organized.  Latin based languages use on left to write (LTR) representations, while languages 
-           such as Arabic and Hebrew employ <a href="http://dotancohen.com/howto/rtl_right_to_left.html">
-           right to left (RTL)</a> representations.</p>
-        <p>Irrespective of the LTR or RTL representation employed by a given language, data is serialised
-           such that the bytes are ordered in sequential order. That sequential order is, of course, 
-           dependent on the representation:
-           <ul>
-             <li>in LTR, the sequence will begin in with the left-most byte on the first line; whilst</li>
-             <li>in RTL, the sequence will begin on the right, progressing right to left.</li>
-           </ul>
-        </p>
-        <p>Content published in Hebrew and Arabic provide examples of this behaviour.</p>
+	      <p>Writing systems affect the way in which information is displayed. In some cases, these writing 
+          systems affect the order in which characters are displayed. Latin based languages display text 
+          left-to-right across a page (LTR). Languages such as Arabic and Hebrew are written in scripts 
+          whose dominant direction is right to left (RTL) when displayed, however when it involves 
+          non-native text or numbers it is actually bidirectional.</p>
+        <p>Irrespective of the LTR or RTL display of characters in a given language, data is serialised 
+          such that the bytes are ordered in one sequential order.</p>
+        
+        <p>Content published in Hebrew and Arabic provide examples of RTL display behaviour.</p>
         
         <p class="note">Tabular data from originating from countries where vertical writing is the norm 
           (e.g. China, Japan) appear to be published with rows and columns as defined in [[RFC4180]] (e.g.
@@ -2159,7 +2154,7 @@ data:
         
         <figure id="egypt-referendum-2012-result-web-page-figure">
           <img src="egypt-referendum-2012-result-web-page-snip.PNG" alt="egypt-referendum-2012-result-web-page-snip.PNG" />
-          <figcaption>Snippet of web page displaying Egyptian Referendum results (2012).</figcaption>
+          <figcaption>Snippet of web page displaying Egyptian Referendum results (2012)</figcaption>
         </figure>
         
         <p>The content in the 
@@ -2185,30 +2180,52 @@ data:
           sequential left-to-right order.
         </p>
         
-        <p>The directionality of the content does not affect the <em>logical</em> structure of the tabular data;
+        <p>The directionality of the content as displayed does not affect the <em>logical</em> structure of the tabular data;
         i.e. the cell at index zero is followed by the cell at index 1, and then index 2 etc.</p>
         
         <p>However, without awareness of the directionality of the content, an application may display data in 
         a way that is unintuitive for the a RTL reader. For example, viewing the CSV file using 
         <a href="http://www.libreoffice.org/">Libre Office</a> Calc (tested 
-        using version 3) demonstrates the challenge in rendering the content correctly.
+        using version 3 configured with <code>English (UK)</code> locale) demonstrates the challenge in rendering the content correctly.
           <a href="#egypt-referendum-2012-result-libre-office-calc-figure"></a> shows how the 
           <a href="https://egelections-2011.appspot.com/Referendum2012/results/csv/EG.csv">content</a> is 
-        incorrectly rendered in LTR mode. Similar behaviour is observed in Microsoft Office Excel 2007.</p>
+        incorrectly rendered; cells progress from left-to-right yet, on the positive side, the Arabic text 
+        within a given field runs from right-to-left. Similar behaviour is observed in Microsoft Office Excel 2007.</p>
         
         <figure id="egypt-referendum-2012-result-libre-office-calc-figure">
           <img src="egypt-referendum-2012-result-csv-in-libre-office-3.png" alt="egypt-referendum-2012-result-csv-in-libre-office-3.png" />
-          <figcaption>CSV data file containing Egyptian Referendum results (2012) displayed in Libre Office Calc.</figcaption>
+          <figcaption>CSV data file containing Egyptian Referendum results (2012) displayed in Libre Office Calc</figcaption>
         </figure>
         
-        <p>From this example, we can see that automatic prediction of the direction in which to 
-        display content is not uniformly implemented. Such automatic prediction is complicated further given the 
-        prevalence of mixed LTR and RTL content in a single row. As a result, a 
-        mechanism needs to be provided such that one can explicitly declare the directionality which applies when
-        parsing and rendering the content of CSV files.</p>
+        <p>By contrast, we can see <a href="#egypt-referendum-2012-result-textwrangler-figure"></a>. The simple
+          <a href="http://www.barebones.com/products/textwrangler/">TextWrangler</a> text editor is not aware that the overall
+          direction is right-to-left, but does apply the Unicode bidirectional algorithm such that lines starting with an
+          Arabic character have a direction base of right-to-left. However, as a result, the numeric digits are also displayed
+          right to left, which is incorrect.</p>
         
-        <div class="issue">
-          <p>From internationalization perspective how is the proper language encoding is determined?</p>
+        <figure id="egypt-referendum-2012-result-textwrangler-figure">
+          <img src="egypt-referendum-2012-result-csv-in-textwrangler.png" alt="egypt-referendum-2012-result-csv-in-textwrangler.png"/>
+          <figcaption>CSV data file containing Egyptian Referendum results (2012) displayed in TextWrangler</figcaption>
+        </figure>
+        
+        <p>It is clear that a mechanism needs to be provided such that one can explicitly declare the directionality 
+          which applies when parsing and rendering the content of CSV files.</p>
+        
+        <div class="note">
+          <p>From Unicode version 6.3 onwards, the Unicode Standard contains new control codes (RLI, LRI, FSI, PDI) 
+            to enable authors to express isolation at the same time as direction in inline bidirectional text. The 
+            Unicode Consortium recommends that isolation be used as the default for all future inline bidirectional 
+            text embeddings. To use these new control codes, however, it will be necessary to wait until the browsers 
+            support them. The new control codes are:
+            <ul>
+              <li>RLI (RIGHT-TO-LEFT ISOLATE) <code>U+2067</code> to set direction right-to-left</li>
+              <li>LRI (LEFT-TO-RIGHT ISOLATE) <code>U+2066</code> to set direction left-to-right</li>
+              <li>FSI (FIRST STRONG ISOLATE) <code>U+2068</code> to set direction according to the first strong character</li>
+              <li>PDI (POP DIRECTIONAL ISOLATE) <code>U+2069</code> to terminate the range set by RLI, LRI or FSI</li>
+            </ul>
+          </p>
+          <p>More information on setting the directionality of text without markup can be found 
+            <a href="http://www.w3.org/International/articles/inline-bidi-markup/Overview#nomarkup">here</a></p>
         </div>
         
         <p><strong>Requires:</strong> 
