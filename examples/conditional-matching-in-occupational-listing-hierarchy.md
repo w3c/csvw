@@ -170,7 +170,7 @@ Thus, given the input row below:
 ,,,15-1199,"Computer Occupations, All Other",,,,,
 ```
 
-... the "detailed-occupation-template-ttl" should be triggered, based on the conditional match REGEXP, and provide the following TTL snippet:
+... the `detailed-occupation-template-ttl` should be triggered, based on the conditional match REGEXP, and provide the following TTL snippet:
 ```
 ex:15-1199 a ex:SOC-DetailedOccupation ;
     skos:notation "15-1199" ;
