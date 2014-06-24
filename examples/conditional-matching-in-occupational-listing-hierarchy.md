@@ -194,7 +194,7 @@ O*NET-SOC 2010 Code,O*NET-SOC 2010 Title,O*NET-SOC 2010 Description
 
 [3]: http://w3c.github.io/csvw/use-cases-and-requirements/2010_Occupations.csv  
 
-This time I want to trigger a one template if the Occupation is a main category (e.g. Code = "15-1199.00"), else I want to trigger a different category.
+This time I want to trigger a one template if the Occupation is a main category (e.g. Code = "15-1199.00"), else I want to trigger a different category. A main category is denoted with the final two digits of the code being `00`. 
 
 *(Aside 3: of course, as these two files are likely to be packaged together, I could have had just a single metadata description describing BOTH resources!)*
 
