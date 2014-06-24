@@ -180,6 +180,60 @@ ex:15-1199 a ex:SOC-DetailedOccupation ;
                  ex:15-1190 .
 ```
 
+<h3>Alternative: conditional matching based on name rather than entire row<h3>
+
+In this example, I've assumed that the conditional match is assessed against the entire row; whilst it's not impossible to deal with, I note that the need to potentially escape fields to count the columns is an added complexity! As an alternative, we might just match on `name` from a column or microsyntax element. See snippet below:
+
+```json
+
+        "template": [
+            {
+                "conditional-match": {
+                    "target": "soc-major-group-code",
+                    "regexp": "^\\d{2}-0{4}$"
+                    },
+                "name": "major-group-template-ttl",
+                "description": "Template converting Major Group content from SOC structure CSV content to SKOS/RDF (expressed in Turtle syntax).",
+                "type": "template",
+                "path": "major-group-csv-to-ttl-template.ttl",
+                "hasFormat": "text/turtle"
+            },
+            {
+                "conditional-match": {
+                    "target": "soc-minor-group-code",
+                    "regexp": "^\\d{2}-\\d{2}0{2}$"
+                    },
+                "name": "minor-group-template-ttl",
+                "description": "Template converting Minor Group content from SOC structure CSV content to SKOS/RDF (expressed in Turtle syntax).",
+                "type": "template",
+                "path": "minor-group-csv-to-ttl-template.ttl",
+                "hasFormat": "text/turtle"
+            },
+            {
+                "conditional-match": {
+                    "target": "soc-broad-group-code",
+                    "regexp": "^\\d{2}-\\d{3}0$"
+                    },
+                "name": "broad-group-template-ttl",
+                "description": "Template converting Broad Group content from SOC structure CSV content to SKOS/RDF (expressed in Turtle syntax).",
+                "type": "template",
+                "path": "broad-group-csv-to-ttl-template.ttl",
+                "hasFormat": "text/turtle"
+            },
+            {
+                "conditional-match": {
+                    "target": "soc-detailed-occupation-code",
+                    "regexp": "^\\d{2}-\\d{4}$"
+                    },
+                "name": "detailed-occupation-template-ttl",
+                "description": "Template converting Detailed Occupation content from SOC structure CSV content to SKOS/RDF (expressed in Turtle syntax).",
+                "type": "template",
+                "path": "detailed-occupation-csv-to-ttl-template.ttl",
+                "hasFormat": "text/turtle"
+            }
+        ]
+```
+
 <h2>Triggering a template given a specific value within a microsyntax element</h2>
 
 data snippet (from [2010_Occupations.csv][3]):
@@ -197,8 +251,6 @@ O*NET-SOC 2010 Code,O*NET-SOC 2010 Title,O*NET-SOC 2010 Description
 This time I want to trigger a one template if the Occupation is a main category (e.g. Code = `15-1199.00`), else I want to trigger a different category. A main category is denoted with the final two digits of the code being `00`. 
 
 *(Aside 3: of course, as these two files are likely to be packaged together, I could have had just a single metadata description describing BOTH resources!)*
-
-*(Aside 4: I've assumed that the conditional match is assessed against the entire row; whilst it's not impossible to deal with, I note that the need to potentially escape fields to count the columns is an added complexity!)*
 
 Here's the metadata description for the resource:
 
