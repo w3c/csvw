@@ -282,7 +282,7 @@ My TTL templates would be ...
 `soc-occupation-category-csv-to-ttl-template.ttl`:
 ```
 ex:{onet-soc-2010-code} a ex:SOC-DetailedOccupation ;
-    skos:notation "{soc-major-group}-{soc-minor-group}{soc-broad-group}{soc-detailed-occupation}" ;
+    skos:notation "{onet-soc-2010-code}" ;
     skos:prefLabel "{title}" ;
     dct:description "{description}" ;
     skos:exactMatch ex:{soc-major-group}-{soc-minor-group}{soc-broad-group}{soc-detailed-occupation} ;
