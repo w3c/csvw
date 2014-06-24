@@ -388,3 +388,34 @@ ex:15-1199.03 a ex:ONETSOC-Occupation ;
                  ex:15-1190,
                  ex:15-1199 .
 ```
+<h3>Alternative: conditional matching based on name rather than entire row<h3>
+
+As before, here is an alternative way to express the conditional match - assessing against a `name` from a microsyntax definition rather than the entire row:
+
+```json
+
+        "template": [
+            {
+                "conditional-match": {
+                    "target": "soc-detailed-occupation",
+                    "regexp": "^00$"
+                    },
+                "name": "soc-occupation-category-template-ttl",
+                "description": "Template converting SOC occupation category CSV content to SKOS/RDF (expressed in Turtle syntax).",
+                "type": "template",
+                "path": "soc-occupation-category-csv-to-ttl-template.ttl",
+                "hasFormat": "text/turtle"
+            },
+            {
+                "conditional-match": {
+                    "target": "soc-detailed-occupation",
+                    "regexp": "^(?!00)$"
+                    },
+                "name": "onet-soc-occupation-subcategory-template-ttl",
+                "description": "Template converting O*NET SOC occupation sub-category CSV content to SKOS/RDF (expressed in Turtle syntax).",
+                "type": "template",
+                "path": "onet-soc-occupation-subcategory-csv-to-ttl-template.ttl",
+                "hasFormat": "text/turtle"
+            }
+        ]
+```
