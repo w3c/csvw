@@ -185,7 +185,7 @@ ex:15-1199 a ex:SOC-DetailedOccupation ;
 In this example, I've assumed that the conditional match is assessed against the entire row; whilst it's not impossible to deal with, I note that the need to potentially escape fields to count the columns is an added complexity! As an alternative, we might just match on `name` from a column or microsyntax element. See snippet below:
 
 ```json
-
+    {
         "template": [
             {
                 "conditional-match": {
@@ -232,6 +232,7 @@ In this example, I've assumed that the conditional match is assessed against the
                 "hasFormat": "text/turtle"
             }
         ]
+    }    
 ```
 
 <h2>Triggering a template given a specific value within a microsyntax element</h2>
@@ -393,7 +394,7 @@ ex:15-1199.03 a ex:ONETSOC-Occupation ;
 As before, here is an alternative way to express the conditional match - assessing against a `name` from a microsyntax definition rather than the entire row:
 
 ```json
-
+    {
         "template": [
             {
                 "conditional-match": {
@@ -418,4 +419,5 @@ As before, here is an alternative way to express the conditional match - assessi
                 "hasFormat": "text/turtle"
             }
         ]
+    }
 ```
