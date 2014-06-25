@@ -6,6 +6,12 @@ tested.
 
 It is not currently integrated with https://github.com/w3c/csvw/tree/gh-pages/tests and lives in a Git branch.
 
+Nearby: .csv examples from the User Cases + Requirements doc are in
+https://github.com/w3c/csvw/tree/gh-pages/use-cases-and-requirements
+
+Note - this filetree isn't intended for implementations/scripts, but if you want to check in simple scripts, use a script/
+subdirectory.
+
 The goal is to balance pluralism against chaos. It should be possible to collect actual CSV files, associated with
 (hopefully documented) practical use cases, and then apply different templating approaches to these. This should
 let us compare e.g. how Django and XSLT might be applied to some problem.
