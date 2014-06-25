@@ -24,11 +24,21 @@ Usage
 
 There are two kinds of thing here: "scenarios" and "attempts", each managed as a directory.
 
-tests/
-tests/scenarios/
-tests/scenarios/look-inside-art/
-tests/scenarios/look-inside-art/README.md # this describes the CSV file and goals for the mapping
-tests/scenarios/look-inside-art/source/rembrandt-paintings.csv
+A scenario:
+
+    tests/
+    tests/scenarios/
+    tests/scenarios/look-inside-art/
+    tests/scenarios/look-inside-art/README.md # this describes the CSV file and goals for the mapping
+    tests/scenarios/look-inside-art/source/rembrandt-paintings.csv
+
+An attempt at this scenario:
+
+    ./scenarios/look-inside-art/attempts
+    ./scenarios/look-inside-art/attempts/attempt-1/source/rembrandt-paintings.csv # input file as above
+    ./scenarios/look-inside-art/attempts/attempt-1/map-art.ttlt # a particular template format we're exploring
+    ./scenarios/look-inside-art/attempts/attempt-1/meta.json # attempt-specific version of metadata file
+    ./scenarios/look-inside-art/attempts/attempt-1/README.md # explains this approach to the scenario
 
 
 A 'scenario' is a directory with:
