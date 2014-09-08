@@ -20,25 +20,32 @@ providing an access to various templates for different formats (the "javascript"
 
 The template contains *only two* templating mechanisms:
 
-- `{{name}}` means replace the template with the content of a cell whose column name (as defined by the metadata) is ``name``
-- `{{#rows}}` - `{{\rows}}` (where `rows` is a fixed symbol) at the beginning of a line means that the full templates enclosed between these two lines are to be repeated for all rows of the CSV content
+- `{{#rows}}` - `{{\rows}}` (where `rows` is a fixed symbol) at the beginning of a line means that the full templates enclosed between these two lines are to be repeated for all rows of the CSV content.
+- `{{name}}` has two possible roles:
+	- if used *within* a `{{#rows}}` - `{{\rows}}` context, `{{name}}` refers to a column name, and the template is replaced with the content of the corresponding cell
+	- if used *outside* a `{{#rows}}` - `{{\rows}}` context, `{{name}}` refers to a top-level key in the metadata **if its value is a string**; the template is replaced with the corresponding value
 
 That is it. As an example, the template for turtle may look like:
 
 	@prefix ex: <http://www.example.org> .
+	ex:document
+	  ex:author {{author}} ;
+ 	  ex:institution {{institution}} .
 
 	{{#rows}}
 	[] a ex:csvrow;
-	  ex:first_column : {{First}} ;
-	  ex:second_column : {{Second}} ;
- 	 ex:third_column : {{Third}} .
+	  ex:first_column   {{First}} ;
+	  ex:second_column  {{Second}} ;
+ 	  ex:third_column   {{Third}} .
 
 	{{/rows}}
 
 or for JSON may look like:
 
 	{
-		"@id"    : "test", 
+		"@id"         : "test", 
+		"author"      : "{{author}}",
+		"institution" : "{{institution}}",
  		"@graph" : [
 	{{#rows}} 	
 			{ 
@@ -56,10 +63,9 @@ The [test file](http://w3c.github.io/csvw/experiments/simple-templates-jquery/te
 If no template is found, the function returns a straightforward output: an array of JSON/Javascript objects, each object consisting of the column names as keys and the corresponding cell values as values.
 
 ## Possible extensions ##
-We should think twice before adding *any* extension to the pattern above. I see two possible one (one is simple, the other may be more complex):
+We should think twice before adding *any* extension to the pattern above. I see a possible one:
 
-1. keys outside of the `{{#rows}}` - `{{\rows}}` could be used as global keys, i.e., referring to the top level keys of the CSV metadata (possible complication: what happens if the key refers to an object and not only a string?)
-2. keys to access, somehow, the datatype of a cell, as defined by the metadata spec (a special syntax may be needed to make it palatable to mustache, and the access to that datatype is actually more complex due to the 'cascading' style of the metadata spec.)
+* keys to access, somehow, the datatype of a cell, as defined by the metadata spec (a special syntax may be needed to make it palatable to mustache, and the access to that datatype is actually more complex due to the 'cascading' style of the metadata spec.)
 
 ## The code details ##
 (This section is not really of interest as for the decision the WG has to take on whether to use a template language of not. It is just if you want to look at the details...)

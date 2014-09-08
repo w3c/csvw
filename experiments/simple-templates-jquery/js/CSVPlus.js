@@ -34,8 +34,26 @@ Dependencies:
       return JSON.stringify(retval,null,2);
     } else {
       // Transform the data to make it compatible with mustache
+
+      // Mustache is based on an object it calls "view"
       mview = { rows: [] };
-      // Go through the data, line-by-line
+
+      // Copy the top level key-values from the metadata
+      // Only values with a string are considered at this point
+      meta_keys = Object.keys(meta);
+      for( var i = 0; i < meta_keys.length; i++ ) {
+        var key = meta_keys[i];
+        if( typeof meta[key] === "string" ) {
+          mview[key] = meta[key];
+        }
+      }
+
+      // Copy the row values within the special "rows" key as an array
+      // This structure is understood by the mustach implementation to 
+      // handle "cycles"
+      // This is hopelessly inefficient if the CSV file is very large:-(
+                                                                        
+      // Go through the data, and add the rows to the mustache 'view'
       for( var i = 0; i < data.length; i++ ) {
         // the 'mustache' "view" object has to be created
         row = {}
