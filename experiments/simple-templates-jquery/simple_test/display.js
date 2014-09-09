@@ -1,4 +1,8 @@
 $(document).ready( function() {
+  var massage = function(str) {
+    return str.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;');
+  }
+
   $("div#json").each(function(index) {
     var dataset = $(this).prop('dataset');
     var url     = dataset.url;
@@ -6,12 +10,9 @@ $(document).ready( function() {
     var request = { url: dataset.url, format: "json"};
     $.getCSV(request)
       .done( function(csv_data) {
-        console.log(csv_data);
-        target.append("<pre>" + csv_data.data + "</pre>"); 
+        // console.log(csv_data);
+        target.append("<pre>" + massage(csv_data.data) + "</pre>"); 
         $("div#meta").append("<pre>" + JSON.stringify(csv_data.meta,null,2) + "</pre>")
-
-
-
       })
       .fail( function(status,error) {
           console.log(status + " " + error);
@@ -24,8 +25,8 @@ $(document).ready( function() {
     var request = { url: dataset.url, format: "turtle"};
     $.getCSV(request)
       .done( function(csv_data) {
-        console.log(csv_data);
-        target.append("<pre>" + csv_data.data + "</pre>");       
+        // console.log(csv_data);
+        target.append("<pre>" + massage(csv_data.data) + "</pre>");       
       })
       .fail( function(status,error) {
           console.log(status + " " + error);
