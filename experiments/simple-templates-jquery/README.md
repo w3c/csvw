@@ -1,6 +1,6 @@
 # CSV+ implementation with minimal (mustache-like) templates #
 
-Goal: to illustrate whether a very simple subset of mustache can be implemented easily in Javascript. The implementation is built on jQuery, and also implements the data model's definitions to get to metadata (except for metadata in a package). 
+Goal: to illustrate whether a very simple subset of mustache can be implemented easily in Javascript. The implementation is built on jQuery, and also implements the data model's definitions to get to metadata (except for metadata in a package). Ie, metadata can be provided via a ``link`` in the HTTP response header, in the same directory as the CSV file itself bearing the same name and, finally, a fixed ``metadata.csvm`` file (the three sources are "merged" to produce the final metadata).
 
 The metadata definition is extended with keys for templates. The [test metadata](simple_test/test.csvm) includes the following:
 
