@@ -17,66 +17,6 @@ Dependencies:
   var XML_FORMAT        = "xml";
 
   /* =========================================================================== */
-  /*  The core, ie, converting the CSV data                                      */
-  /*   (the core of the standard implementation...)                              */
-  /* =========================================================================== */  
-  var convertCSV = function(data, meta, template, target_format) {
-    // There is no template: the default is to get the rows and columns in JSON
-    if( template === "" ) {
-      var retval = []
-      for( var i = 0; i < data.length; i++ ) {
-        row = {}
-        for( var j = 0; j < meta.schema.columns.length; j++ ) {
-          row[meta.schema.columns[j].name] = data[i][j];
-        }
-        retval.push(row);
-      }
-      return JSON.stringify(retval,null,2);
-    } else {
-      // Transform the data to make it compatible with mustache
-
-      // Mustache is based on an object it calls "view"
-      mview = { rows: [] };
-
-      // Copy the top level key-values from the metadata
-      // Only values with a string are considered at this point
-      meta_keys = Object.keys(meta);
-      for( var i = 0; i < meta_keys.length; i++ ) {
-        var key = meta_keys[i];
-        if( typeof meta[key] === "string" ) {
-          mview[key] = meta[key];
-        }
-      }
-
-      // Copy the row values within the special "rows" key as an array
-      // This structure is understood by the mustach implementation to 
-      // handle "cycles"
-      // This is hopelessly inefficient if the CSV file is very large:-(
-                                                                        
-      // Go through the data, and add the rows to the mustache 'view'
-      for( var i = 0; i < data.length; i++ ) {
-        // the 'mustache' "view" object has to be created
-        row = {}
-        for( var j = 0; j < meta.schema.columns.length; j++ ) {
-          row[meta.schema.columns[j].name] = data[i][j];
-        }
-        mview.rows.push(row);
-      }
-
-      if( target_format === JSON_FORMAT || target_format === JAVASCRIPT_FORMAT ) {
-        var result = eval( '(' + Mustache.render(template,mview) + ')' );
-        if( target_format === JSON_FORMAT ) {
-          return JSON.stringify(result,null,2);
-        } else {
-          return result;
-        }              
-      } else {
-        return Mustache.render(template,mview);
-      }
-    }
-  }
-
-  /* =========================================================================== */
   /*  Various helper functions                                                   */
   /* =========================================================================== */  
   var mergeMeta = function( m1, m2, m3, m4) {
@@ -130,6 +70,181 @@ Dependencies:
     }
     return retval;
   }
+
+  // The full template has to be cut into a series of templates
+  // - global templates
+  // - per-row templates to be repeated
+  // The result is an array of template texts with a flag on whether it is
+  // global or not.
+  // The objects returned in the array are of the form:
+  // {
+  //    repeat:   [boolean], true means this is a template for rows, ie, to be repeated for all of them)
+  //    template: [string], the Mustache template itself     
+  // }
+  var split_template = function(template) {
+    var set_global = function(t) {
+      retval.push({ repeat:false, template:t })
+    };
+    // console.log(template);
+    var retval       = [];
+    var templ = template;
+    while( templ !== "" ) {
+      // Careful with the regexp: 
+      //   - [\s\S] must be used to allow for a multiline template, ie, to match over new lines
+      //   - '?' must be used in the group to avoid a greedy match, ie, to ensure all 
+      //     row templates are handled properly
+      var a = templ.match( /{{#rows}}([\s\S]*?){{\/rows}}/m );
+      if( a === null ) {
+        set_global(templ);
+        break;
+      } else {
+        // See if there is a global portion:
+        if( a.index > 0 ) {
+          set_global(templ.slice(0,a.index));
+        }
+        // See if there is local portion
+        if( a[1] !== "" ) {
+          retval.push({
+            repeat:  true,
+            template: a[1],
+          })
+        }
+        // get the rest of the string...
+        templ = templ.slice(a.index + a[0].length);     
+      }
+    }
+    return retval;
+  }
+
+  // Collect a row into an object with column names (as specified in the metadata) 
+  //    as keys and cells as values
+  // The row is then processed through a callback
+  var process_row = function(data, meta, callback) {
+    for( var i = 0; i < data.length; i++ ) {
+      row = {}
+      for( var j = 0; j < meta.schema.columns.length; j++ ) {
+        row[meta.schema.columns[j].name] = data[i][j];
+      }
+      callback(row);
+    }    
+  }
+
+  /* =========================================================================== */
+  /*  The core, ie, converting the CSV data                                      */
+  /*   (the core of the standard implementation...)                              */
+  /* =========================================================================== */
+  // This is called when there is no template, ie, this is the default conversion
+  // of a CSV file. At present, all it does is to output the data in JSON or JAVASCRIPT
+  // array of object; each object is a row with column names serving as keys and cells
+  // as values. The exact format is still to be defined by the WG. 
+  var convertCSV_default = function(data, meta, target_format) {
+    var retval = []
+    process_row(data,meta,function(row) {
+      retval.push(row);
+    });
+    return target_format === JSON_FORMAT ? JSON.stringify(retval,null,2) : retval;
+  };
+
+  //
+  // Convert the CSV through the tempating (if any)
+  // @param data: the CSV data itself, an array of array (latter being a row from the file)
+  // @param meta: metadata object, as defined in the spec
+  // @param template: template string. If "" (ie, no template) a default Javascript object is generated
+  // @param target_format: can be JSON, Turtle, Javascript, ... Determines whether the result
+  //   should either be a Javascript object or a JSON string. 
+  //   Note: Turtle has no real meaning here, because the data is simply returned verbatim.
+  //   Maybe it is unnecessary to have it here; to be
+  //   seen if it is used elsewhere explicitly...
+
+  var convertCSV = function(data, meta, template, target_format) {
+    // There is no template: the default is to get the rows and columns in JSON
+    if( template === "" ) {
+      return convertCSV_default(data,meta,target_format);
+    } else {
+      // Cut the template into global/repeat portion
+      // the result is an array of separate templates
+      var templates = split_template(template);
+
+      // The 'global' template is used on a view, in mustache jargon
+      // containing only the top level keys from the metadata. This
+      // can be set once and for all
+      var global_mview = {};
+      Object.keys(meta).forEach( function(key) {
+        if( typeof meta[key] === "string" ) global_mview[key] = meta[key];
+      });
+
+      // The main processing cycle: Go through the templates and perform 
+      // each individually. The results are concatenated into one string to be returned
+      var result = "";
+      templates.forEach( function(tstruct) {
+        // The major switch: is the template to be repeated or not?
+        if( tstruct.repeat === true ) {
+          process_row(data,meta,function(row) {
+            result += Mustache.render(tstruct.template,row);
+          });
+        } else {
+          // Just apply the template against the global view and append the outcome
+          // to the result string
+          result += Mustache.render(tstruct.template,global_mview);
+        }
+      });
+
+      if( target_format === JSON_FORMAT || target_format === JAVASCRIPT_FORMAT ) {
+        var j_result = eval( '(' + result + ')' );
+        return target_format === JSON_FORMAT ? JSON.stringify(j_result,null,2) : j_result;
+      } else {
+        return result;
+      }
+    }
+  }
+
+  // var convertCSV_slow = function(data, meta, template, target_format) {
+  //   // There is no template: the default is to get the rows and columns in JSON
+  //   if( template === "" ) {
+  //     return convertCSV_default(data,meta,target_format);
+  //   } else {
+  //     // Transform the data to make it compatible with mustache
+
+  //     // Mustache is based on an object it calls "view"
+  //     mview = { rows: [] };
+
+  //     // Copy the top level key-values from the metadata
+  //     // Only values with a string are considered at this point
+  //     meta_keys = Object.keys(meta);
+  //     for( var i = 0; i < meta_keys.length; i++ ) {
+  //       var key = meta_keys[i];
+  //       if( typeof meta[key] === "string" ) {
+  //         mview[key] = meta[key];
+  //       }
+  //     }
+
+  //     // Copy the row values within the special "rows" key as an array
+  //     // This structure is understood by the mustach implementation to 
+  //     // handle "cycles"
+  //     // This is hopelessly inefficient if the CSV file is very large:-(                                                                
+  //     // Go through the data, and add the rows to the mustache 'view'
+  //     for( var i = 0; i < data.length; i++ ) {
+  //       // the 'mustache' "view" object has to be created
+  //       row = {}
+  //       for( var j = 0; j < meta.schema.columns.length; j++ ) {
+  //         row[meta.schema.columns[j].name] = data[i][j];
+  //       }
+  //       mview.rows.push(row);
+  //     }
+
+  //     if( target_format === JSON_FORMAT || target_format === JAVASCRIPT_FORMAT ) {
+  //       var result = eval( '(' + Mustache.render(template,mview) + ')' );
+  //       if( target_format === JSON_FORMAT ) {
+  //         return JSON.stringify(result,null,2);
+  //       } else {
+  //         return result;
+  //       }              
+  //     } else {
+  //       return Mustache.render(template,mview);
+  //     }
+  //   }
+  // }
+
 
   /* =========================================================================== */
   /*  Public interface, a.k.a. the jQuery extension                              */
