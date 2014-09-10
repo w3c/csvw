@@ -19,7 +19,7 @@ Dependencies:
   /* =========================================================================== */
   /*  Various helper functions                                                   */
   /* =========================================================================== */  
-  var mergeMeta = function( m1, m2, m3, m4) {
+  var mergeMeta = function(m1, m2, m3, m4) {
     // The metadata can include other objects, ie, extension should be "deep"
     return $.extend(true, {}, m1, m2, m3, m4);
   }
@@ -119,14 +119,14 @@ Dependencies:
   // Collect a row into an object with column names (as specified in the metadata) 
   //    as keys and cells as values
   // The row is then processed through a callback
-  var process_row = function(data, meta, callback) {
-    for( var i = 0; i < data.length; i++ ) {
+  var process_row = function(data_row, meta, callback) {
+    data_row.forEach( function(data_cell) {
       row = {}
-      for( var j = 0; j < meta.schema.columns.length; j++ ) {
-        row[meta.schema.columns[j].name] = data[i][j];
-      }
-      callback(row);
-    }    
+      meta.schema.columns.forEach( function(col) {
+        row[col.name] = data_cell;
+      })
+      callback(row);      
+    })
   }
 
   /* =========================================================================== */
@@ -155,7 +155,6 @@ Dependencies:
   //   Note: Turtle has no real meaning here, because the data is simply returned verbatim.
   //   Maybe it is unnecessary to have it here; to be
   //   seen if it is used elsewhere explicitly...
-
   var convertCSV = function(data, meta, template, target_format) {
     // There is no template: the default is to get the rows and columns in JSON
     if( template === "" ) {
@@ -197,54 +196,6 @@ Dependencies:
       }
     }
   }
-
-  // var convertCSV_slow = function(data, meta, template, target_format) {
-  //   // There is no template: the default is to get the rows and columns in JSON
-  //   if( template === "" ) {
-  //     return convertCSV_default(data,meta,target_format);
-  //   } else {
-  //     // Transform the data to make it compatible with mustache
-
-  //     // Mustache is based on an object it calls "view"
-  //     mview = { rows: [] };
-
-  //     // Copy the top level key-values from the metadata
-  //     // Only values with a string are considered at this point
-  //     meta_keys = Object.keys(meta);
-  //     for( var i = 0; i < meta_keys.length; i++ ) {
-  //       var key = meta_keys[i];
-  //       if( typeof meta[key] === "string" ) {
-  //         mview[key] = meta[key];
-  //       }
-  //     }
-
-  //     // Copy the row values within the special "rows" key as an array
-  //     // This structure is understood by the mustach implementation to 
-  //     // handle "cycles"
-  //     // This is hopelessly inefficient if the CSV file is very large:-(                                                                
-  //     // Go through the data, and add the rows to the mustache 'view'
-  //     for( var i = 0; i < data.length; i++ ) {
-  //       // the 'mustache' "view" object has to be created
-  //       row = {}
-  //       for( var j = 0; j < meta.schema.columns.length; j++ ) {
-  //         row[meta.schema.columns[j].name] = data[i][j];
-  //       }
-  //       mview.rows.push(row);
-  //     }
-
-  //     if( target_format === JSON_FORMAT || target_format === JAVASCRIPT_FORMAT ) {
-  //       var result = eval( '(' + Mustache.render(template,mview) + ')' );
-  //       if( target_format === JSON_FORMAT ) {
-  //         return JSON.stringify(result,null,2);
-  //       } else {
-  //         return result;
-  //       }              
-  //     } else {
-  //       return Mustache.render(template,mview);
-  //     }
-  //   }
-  // }
-
 
   /* =========================================================================== */
   /*  Public interface, a.k.a. the jQuery extension                              */
