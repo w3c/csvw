@@ -136,7 +136,7 @@ Dependencies:
       } else {
         // See if there is a global portion:
         if( a.index > 0 ) {
-          set_global(templ.slice(0,a.index));
+          set_global(templ.slice(0, a.index));
         }
         // See if there is local portion
         if( a[1] !== "" ) {
@@ -175,7 +175,7 @@ Dependencies:
       } else {
         // There are arguments to handle;
         var func     = filters[with_args[0]];
-        var all_args = with_args[1].trim().slice(0,-1).split(',');
+        var all_args = with_args[1].trim().slice(0, -1).split(',');
         // this is subptimal: it relies on the fact that I know how many arguments there may be... a general solution would be nicer
         // T.B.D. later using 'eval'
         switch( all_args.length ) {
@@ -223,7 +223,7 @@ Dependencies:
     process_rows(data, meta, function(row) {
       retval.push(row);
     });
-    return target_format === JSON_FORMAT ? JSON.stringify(retval,null,2) : retval;
+    return target_format === JSON_FORMAT ? JSON.stringify(retval, null, 2) : retval;
   };
 
   //
@@ -239,7 +239,7 @@ Dependencies:
   var convertCSV = function(data, meta, template, target_format) {
     // There is no template: the default is to get the rows and columns in JSON
     if( template === "" ) {
-      return convertCSV_default(data,meta,target_format);
+      return convertCSV_default(data, meta, target_format);
     } else {
       // Cut the template into global/repeat portion
       // the result is an array of separate templates
