@@ -2,7 +2,6 @@
 Dependencies:
 - PapaParse: http://papaparse.com, CSV parser.
 - URI.js: https://medialize.github.io/URI.js/, URI library. The site gives the option of a custom build; this uses just the basic module.
-- mustache.js: https://github.com/janl/mustache.js, a Mustache implementation in Javascript
 */
 
 
@@ -16,14 +15,29 @@ Dependencies:
   var TURTLE_FORMAT     = "turtle";
   var XML_FORMAT        = "xml";
 
+  // Filters that the current implementation recognizes for templates. The 
+  // list has to be defined by the WG, eventually. These are just examples.
+  var filters = {
+    "upper"    : function(val)         { return val.toUpperCase();    },
+    "lower"    : function(val)         { return val.toLowerCase();    },
+    "replace"  : function(val,from,to) { return val.replace(from,to); }
+  }
+
   /* =========================================================================== */
   /*  Various helper functions                                                   */
-  /* =========================================================================== */  
+  /* =========================================================================== */ 
+  //
+  //
+  // Merge the various metadata objects into one 
   var mergeMeta = function(m1, m2, m3, m4) {
     // The metadata can include other objects, ie, extension should be "deep"
     return $.extend(true, {}, m1, m2, m3, m4);
   }
 
+  // Default metadata: to be used when no metadata is specified whatsoever.
+  // It lists the column names, whether from the first row or creating a column name on the fly
+  // (this depends on user setting, ie, whether the first row is indeed column names)
+  // Additional metadatata may be added, this will depend on the WG's final spec.
   var default_meta = function(data, headers) {
     // The default metadata just includes the names of the columns
     var retval = {
@@ -47,10 +61,14 @@ Dependencies:
     return retval;
   } 
 
+  //
+  // Extract the current templates, if any, from the metadata. This depends on the user's option
+  // that determines what the output format should be
+  // Default case is to return no template in Javascript object
   var get_template_data = function(options, meta) {
     // The (user's) option dictates the required output format
     // The metadata contains (possibly) the template for different formats
-    var retval = { url: "", format: JSON_FORMAT };
+    var retval = { url: "", format: JAVASCRIPT_FORMAT };
     // See if there is a template to be extracted. If not, the template will be returned as ""
     if( meta.template !== undefined ) {
       if( $.isArray(meta.template) ) {
@@ -71,6 +89,24 @@ Dependencies:
     return retval;
   }
 
+  // Collect a row into an object with column names (as specified in the metadata) 
+  //    as keys and cells as values
+  // The row is then processed through a callback function
+  var process_rows = function(data, meta, callback) {
+    data.forEach( function(data_row) {
+      row = {}
+      meta.schema.columns.forEach( function(col, index) {
+        row[col.name] = data_row[index];
+      })
+      callback(row);      
+    })
+  }
+
+  /* =========================================================================== */
+  /* Mini mustache implementation                        */
+  /* =========================================================================== */
+  //
+  //
   // The full template has to be cut into a series of templates
   // - global templates
   // - per-row templates to be repeated
@@ -116,18 +152,63 @@ Dependencies:
     return retval;
   }
 
-  // Collect a row into an object with column names (as specified in the metadata) 
-  //    as keys and cells as values
-  // The row is then processed through a callback
-  var process_row = function(data_row, meta, callback) {
-    data_row.forEach( function(data_cell) {
-      row = {}
-      meta.schema.columns.forEach( function(col) {
-        row[col.name] = data_cell;
-      })
-      callback(row);      
-    })
-  }
+  //
+  // Process one mustache tag, ie, something like {{a.b.c.d}} (but without the mustaches)
+  // The first symbol should be used to get a value; all the others are filters.
+  // The implementation does not handle escape characters... :-(
+  // @param tag  : the tag itself
+  // @param view : a mapping object providing a value for a pure symbol (not a filter)                                                             
+  var process_one_tag = function(tag, view) {
+    var tags = tag.split('.');
+
+    // Start by getting the base value
+    var retval  = view[tags[0].trim()];
+
+    // Go through the filters, if any
+    for( i = 1; i < tags.length; i++ ) {
+      var filter = tags[i].trim();
+      // see if there are argumnets attached to the filter
+      var with_args = filter.split('(');
+      if( with_args.length === 1 ) {
+        // There are no arguments, just a simple filter
+        retval = filters[filter](retval)
+      } else {
+        // There are arguments to handle;
+        var func     = filters[with_args[0]];
+        var all_args = with_args[1].trim().slice(0,-1).split(',');
+        // this is subptimal: it relies on the fact that I know how many arguments there may be... a general solution would be nicer
+        // T.B.D. later using 'eval'
+        switch( all_args.length ) {
+          case 1:  retval = func(retval, all_args[0]);
+               break;
+          case 2:  retval = func(retval, new RegExp(all_args[0]), all_args[1]);
+               break;
+          default: /* this is a bit of an error, never mind */
+               retval = func(retval);
+        }
+      }
+    }
+    return retval;
+  };
+
+  //
+  // Process a template, without the {{#rows}}...{{\#rows}} sections. The function goes through the templates recursively,
+  // by taking the templates from left-to-right and concatenating the results.
+  // @param template  : the template itself
+  // @param view      : a mapping object providing a value for a pure symbol (not a filter)                                                             
+  var render_templates = function(template, view) {
+    var matched = template.match(/{{.*?}}/m);
+    if( matched == null ) {
+      // No template given, we are done; this also means the end of the line
+      return template;
+    } else {
+      // There is a match on the left of the string...
+      var begin  = template.slice(0, matched.index);
+      var middle = process_one_tag(matched[0].slice(2, -2), view);
+      var end    = template.slice(matched.index + matched[0].length);
+      return begin + middle + render_templates(end, view);
+    }
+  };
 
   /* =========================================================================== */
   /*  The core, ie, converting the CSV data                                      */
@@ -139,7 +220,7 @@ Dependencies:
   // as values. The exact format is still to be defined by the WG. 
   var convertCSV_default = function(data, meta, target_format) {
     var retval = []
-    process_row(data,meta,function(row) {
+    process_rows(data, meta, function(row) {
       retval.push(row);
     });
     return target_format === JSON_FORMAT ? JSON.stringify(retval,null,2) : retval;
@@ -178,13 +259,15 @@ Dependencies:
       templates.forEach( function(tstruct) {
         // The major switch: is the template to be repeated or not?
         if( tstruct.repeat === true ) {
-          process_row(data,meta,function(row) {
-            result += Mustache.render(tstruct.template,row);
+          process_rows(data, meta, function(row) {
+            // result += Mustache.render(tstruct.template, row);
+            result += render_templates(tstruct.template, row);
           });
         } else {
           // Just apply the template against the global view and append the outcome
           // to the result string
-          result += Mustache.render(tstruct.template,global_mview);
+          // result += Mustache.render(tstruct.template, global_mview);
+          result += render_templates(tstruct.template, global_mview);
         }
       });
 
@@ -374,9 +457,10 @@ Dependencies:
             // These should be merged
             var final_meta = mergeMeta(embedded_meta, linked_meta, local_meta, global_meta);
 
-            var required_template = get_template_data( settings, final_meta);
+            var required_template = get_template_data(settings, final_meta);
             get_template(required_template.url)
               .done( function(template) {
+                // We finally arrived at the core: make the conversion of the CSV content to whatever the user wants...
                 var final_data = convertCSV(pcsv.data, final_meta, template, required_template.format);
                 retval = {
                   data      : final_data,
