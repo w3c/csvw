@@ -18,9 +18,9 @@ Dependencies:
   // Filters that the current implementation recognizes for templates. The 
   // list has to be defined by the WG, eventually. These are just examples.
   var filters = {
-    "upper"    : function(val)         { return val.toUpperCase();    },
-    "lower"    : function(val)         { return val.toLowerCase();    },
-    "replace"  : function(val,from,to) { return val.replace(from,to); }
+    "upper"    : function(val)         { return val.toUpperCase(); },
+    "lower"    : function(val)         { return val.toLowerCase(); },
+    "replace"  : function(val,from,to) { return val.replace(new RegExp(from),to); }
   }
 
   /* =========================================================================== */
@@ -181,7 +181,7 @@ Dependencies:
         switch( all_args.length ) {
           case 1:  retval = func(retval, all_args[0]);
                break;
-          case 2:  retval = func(retval, new RegExp(all_args[0]), all_args[1]);
+          case 2:  retval = func(retval, all_args[0], all_args[1]);
                break;
           default: /* this is a bit of an error, never mind */
                retval = func(retval);
