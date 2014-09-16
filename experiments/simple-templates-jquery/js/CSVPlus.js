@@ -18,9 +18,9 @@ Dependencies:
   // Filters that the current implementation recognizes for templates. The 
   // list has to be defined by the WG, eventually. These are just examples.
   var filters = {
-    "upper"    : function(val)         { return val.toUpperCase(); },
-    "lower"    : function(val)         { return val.toLowerCase(); },
-    "replace"  : function(val,from,to) { return val.replace(new RegExp(from),to); }
+    "upper"    : function(val, meta)           { return val.toUpperCase(); },
+    "lower"    : function(val, meta)           { return val.toLowerCase(); },
+    "replace"  : function(val, meta, from, to) { return val.replace(new RegExp(from), to); }
   }
 
   /* =========================================================================== */
@@ -158,7 +158,8 @@ Dependencies:
   // The implementation does not handle escape characters... :-(
   // @param tag  : the tag itself
   // @param view : a mapping object providing a value for a pure symbol (not a filter)                                                             
-  var process_one_tag = function(tag, view) {
+  // @param meta      : metadata associated to the CSV file                                                            
+  var process_one_tag = function(tag, view, meta) {
     var tags = tag.split('.');
 
     // Start by getting the base value
@@ -179,12 +180,12 @@ Dependencies:
         // this is subptimal: it relies on the fact that I know how many arguments there may be... a general solution would be nicer
         // T.B.D. later using 'eval'
         switch( all_args.length ) {
-          case 1:  retval = func(retval, all_args[0]);
+          case 1:  retval = func(retval, meta, all_args[0]);
                break;
-          case 2:  retval = func(retval, all_args[0], all_args[1]);
+          case 2:  retval = func(retval, meta, all_args[0], all_args[1]);
                break;
           default: /* this is a bit of an error, never mind */
-               retval = func(retval);
+               retval = func(retval, meta);
         }
       }
     }
@@ -195,8 +196,9 @@ Dependencies:
   // Process a template, without the {{#rows}}...{{\#rows}} sections. The function goes through the templates recursively,
   // by taking the templates from left-to-right and concatenating the results.
   // @param template  : the template itself
-  // @param view      : a mapping object providing a value for a pure symbol (not a filter)                                                             
-  var render_templates = function(template, view) {
+  // @param view      : a mapping object providing a value for a pure symbol (not a filter) 
+  // @param meta      : metadata associated to the CSV file                                                            
+  var render_templates = function(template, view, meta) {
     var matched = template.match(/{{.*?}}/m);
     if( matched == null ) {
       // No template given, we are done; this also means the end of the line
@@ -204,7 +206,7 @@ Dependencies:
     } else {
       // There is a match on the left of the string...
       var begin  = template.slice(0, matched.index);
-      var middle = process_one_tag(matched[0].slice(2, -2), view);
+      var middle = process_one_tag(matched[0].slice(2, -2), view, meta);
       var end    = template.slice(matched.index + matched[0].length);
       return begin + middle + render_templates(end, view);
     }
@@ -261,13 +263,13 @@ Dependencies:
         if( tstruct.repeat === true ) {
           process_rows(data, meta, function(row) {
             // result += Mustache.render(tstruct.template, row);
-            result += render_templates(tstruct.template, row);
+            result += render_templates(tstruct.template, row, meta);
           });
         } else {
           // Just apply the template against the global view and append the outcome
           // to the result string
           // result += Mustache.render(tstruct.template, global_mview);
-          result += render_templates(tstruct.template, global_mview);
+          result += render_templates(tstruct.template, global_mview, meta);
         }
       });
 
