@@ -119,11 +119,11 @@ Dependencies:
   // Collect a row into an object with column names (as specified in the metadata) 
   //    as keys and cells as values
   // The row is then processed through a callback
-  var process_row = function(data_row, meta, callback) {
-    data_row.forEach( function(data_cell) {
+  var process_rows = function(data, meta, callback) {
+    data.forEach( function(data_row) {
       row = {}
-      meta.schema.columns.forEach( function(col) {
-        row[col.name] = data_cell;
+      meta.schema.columns.forEach( function(col, index) {
+        row[col.name] = data_row[index];
       })
       callback(row);      
     })
@@ -139,7 +139,7 @@ Dependencies:
   // as values. The exact format is still to be defined by the WG. 
   var convertCSV_default = function(data, meta, target_format) {
     var retval = []
-    process_row(data,meta,function(row) {
+    process_rows(data,meta,function(row) {
       retval.push(row);
     });
     return target_format === JSON_FORMAT ? JSON.stringify(retval,null,2) : retval;
@@ -178,7 +178,7 @@ Dependencies:
       templates.forEach( function(tstruct) {
         // The major switch: is the template to be repeated or not?
         if( tstruct.repeat === true ) {
-          process_row(data,meta,function(row) {
+          process_rows(data,meta,function(row) {
             result += Mustache.render(tstruct.template,row);
           });
         } else {
