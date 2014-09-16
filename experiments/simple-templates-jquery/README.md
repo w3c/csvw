@@ -18,43 +18,58 @@ The metadata definition is extended with keys for templates. The [test metadata]
 
 providing an access to various templates for different formats (the "javascript" format is really for javascript usage: it means that, instead of returning a JSON text, it returns the javascript object version thereof).
 
-The template contains *only two* templating mechanisms:
+The template contains *only two* template tag types:
 
 - `{{#rows}}` - `{{\rows}}` (where `rows` is a fixed symbol) at the beginning of a line means that the full templates enclosed between these two lines are to be repeated for all rows of the CSV content.
 - `{{name}}` has two possible roles:
 	- if used *within* a `{{#rows}}` - `{{\rows}}` context, `{{name}}` refers to a column name, and the template is replaced with the content of the corresponding cell
 	- if used *outside* a `{{#rows}}` - `{{\rows}}` context, `{{name}}` refers to a top-level key in the metadata **if its value is a string**; the template is replaced with the corresponding value
+- `{{name}}` can also have *filters*. The tag can have the format: ``{{name.f1.f2.….fn}}``, where ``f1,…,fn`` are filter functions. A filter function may have argument, i.e., it may look like ``fi("a","b")``; the arguments are strings surrounded by the ``"`` or the ``'`` characters. If there are no arguments, the argument list can be dropped altogether. Filter functions are invoked with: the output of the previous filter or the value corresponding ``{{name}}``; the reference to the metadata object; the list of the arguments (strings) if applicable. The filter function must return a replacement for the template value.
+
+The list of available filter functions will be specified by the WG, and a mechanism to add a user-defined filter will be provided. At present, there are only a few filters, these are ``upper``, ``lower``, ``concat(str)``, ``replace(regexp,str)``.
 
 That is it. As an example, the template for turtle may look like:
 
 	@prefix ex: <http://www.example.org> .
 	ex:document
-	  ex:author {{author}} ;
- 	  ex:institution {{institution}} .
+	  ex:author      "{{author.concat(", W3C")}}" ;
+ 	  ex:institution "{{institution}}" .
 
 	{{#rows}}
 	[] a ex:csvrow;
-	  ex:first_column   {{First}} ;
-	  ex:second_column  {{Second}} ;
- 	  ex:third_column   {{Third}} .
-
+	  ex:first_column   "{{First.upper}}" ;
+	  ex:second_column  "{{Second}}" ;
+ 	  ex:third_column   "{{Third}}" .
 	{{/rows}}
+
+    {{#rows}}
+    [] a ex:csvrow2;
+       ex:key_column "{{First}}" .
+    {{/rows}}
+
+    ex:comment
 
 or for JSON may look like:
 
 	{
 		"@id"         : "test", 
-		"author"      : "{{author}}",
+		"author"      : "{{author.concat(", W3C")}}",
 		"institution" : "{{institution}}",
  		"@graph" : [
 	{{#rows}} 	
 			{ 
 				"@type"         : "csvrow",
-				"first column"  : "{{First}}",
+				"first column"  : "{{First.upper}}",
 				"second column" : "{{Second}}",
 				"third column"  : "{{Third}}",
 			},
 	{{/rows}}
+    {{#rows}}
+            {
+                "@type" :         "csvrow2",
+                "ex:key_column" : "{{First}}"
+            }
+    {{/rows}}
 	 	]
 	}	
 
@@ -94,8 +109,7 @@ The code depends on external modules
 
 - [PapaParse](http://papaparse.com) CSV parser
 - [URI.js](https://medialize.github.io/URI.js/) to manipulate URI-s
-- [mustache.js](https://github.com/janl/mustache.js), a Mustache implementation in Javascript
 
-The code is *very* rough at the edges (e.g., managing errors) and is probably very inefficient for larger CSV files...
+The code is *very* rough at the edges (e.g., managing errors) and is probably not very efficient for larger CSV files...
 
 

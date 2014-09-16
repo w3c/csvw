@@ -20,7 +20,8 @@ Dependencies:
   var filters = {
     "upper"    : function(val, meta)           { return val.toUpperCase(); },
     "lower"    : function(val, meta)           { return val.toLowerCase(); },
-    "replace"  : function(val, meta, from, to) { return val.replace(new RegExp(from), to); }
+    "replace"  : function(val, meta, from, to) { return val.replace(new RegExp(from), to); },
+    "concat"   : function(val, meta, str)      { return val + str; }
   }
 
   /* =========================================================================== */
@@ -102,6 +103,33 @@ Dependencies:
     })
   }
 
+  // Extract the arguments from a tag, ie, if a filter looks like
+  // filter("a","b","c"), then extract an array of the form [a,b,c] from the
+  // '"a","b","c"' string.
+  var get_args = function( args_string, args_array ) {
+    if( args_string.length === 0 ) return false;
+    if( args_string[0] === ",") {
+      args_string = args_string.slice(1).trim();
+    }
+
+    // String must begin with a quote:
+    if( args_string[0] !== "'" && args_string[0] !== '"' ) return false;
+
+    // Try to match...
+    var reg = /(["'])(.*?)\1/;
+    var matched = args_string.trim().match(reg);
+
+    if( matched !== null ) {
+      args_array.push(matched[2]);
+
+      get_args( matched.input.slice(matched[0].length), args_array )
+    } else {
+      return false;
+    }
+    return true;
+  } 
+
+
   /* =========================================================================== */
   /* Mini mustache implementation                        */
   /* =========================================================================== */
@@ -176,17 +204,17 @@ Dependencies:
       } else {
         // There are arguments to handle;
         var func     = filters[with_args[0]];
-        var all_args = with_args[1].trim().slice(0, -1).split(',');
-        // this is subptimal: it relies on the fact that I know how many arguments there may be... a general solution would be nicer
-        // T.B.D. later using 'eval'
-        switch( all_args.length ) {
-          case 1:  retval = func(retval, meta, all_args[0]);
-               break;
-          case 2:  retval = func(retval, meta, all_args[0], all_args[1]);
-               break;
-          default: /* this is a bit of an error, never mind */
-               retval = func(retval, meta);
-        }
+
+        var all_args = [];
+        get_args( with_args[1],all_args );
+
+        // To call the filter, the argument should be preceded with the previous value
+        // in the filter and the meta
+        all_args.unshift(meta);
+        all_args.unshift(retval);
+
+        // The filter can be invoked now:
+        retval = func.apply(this, all_args);
       }
     }
     return retval;
