@@ -1,3 +1,11 @@
+/**
+* Experimental CSV+ extension to jQuery, including location of the CSV+ metadata and a mustache-like simple
+* template to convert the CSV data into a javascript object, JSON, Turtle, XML, or any other text
+* 
+* @author Ivan Herman
+* @license W3C
+*/
+
 /*
 Dependencies:
 - PapaParse: http://papaparse.com, CSV parser.
@@ -311,20 +319,18 @@ Dependencies:
   }
 
   /* =========================================================================== */
-  /*  Public interface, a.k.a. the jQuery extension                              */
-  /* =========================================================================== */  
-  /* Configuration options:
-    @param options: either a string (giving the URL of the CSV file), or an object
-     with options:
+  /**  
+    Public interface, a.k.a. the jQuery extension:
+     @param {string|object} options - identification of the object. If it is a string, it is the URL of the CSV file. If it is an object, it has the following possible fields:
        url:         URL of csv file (required),
        delimiter:   delimiter character 
                     (optional, default is "", ie, auto-detect)
        comments:    specify a comment character (like "#") to skip lines; false if no comment is allowed
                     (optional, default is '#')
        format:      expected output format (can be "json", "javascript", "turtle", etc.; default is "javascript")
-    @param success: fallback to process the result. Function with one result argument
+    @param {function} success - fallback to process the result. Function with one result argument
                     (optional)
-    @param failure: fallback to process in case of HTTP failure. Function two arguments: HTTP Status code and error message.
+    @param {function} failure - fallback to process in case of HTTP failure. Function two arguments: HTTP Status code and error message.
                     (optional)
 
     "result" is an object:

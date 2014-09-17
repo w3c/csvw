@@ -77,10 +77,23 @@ The [test file](http://w3c.github.io/csvw/experiments/simple-templates-jquery/te
 
 If no template is found, the function returns a straightforward output: an array of JSON/Javascript objects, each object consisting of the column names as keys and the corresponding cell values as values.
 
-## Possible extensions ##
-We should think twice before adding *any* extension to the pattern above. I see a possible one:
+## Initial language grammar ##
 
-* keys to access, somehow, the datatype of a cell, as defined by the metadata spec (a special syntax may be needed to make it palatable to mustache, and the access to that datatype is actually more complex due to the 'cascading' style of the metadata spec.)
+    template         ::= statement*
+    statement        ::= rows | text_or_tag
+    rows             ::= '{{#rows}}' text_or_tag* '{{/rows}}'
+    text_or_tag      ::= template | text
+    text             ::= TEXT
+    template         ::= '{{' tag '}}'
+    tag              ::= name ('.' name_or_function)*
+    name_or_function ::= name|function
+    name             ::= NAME
+    function         ::= name '(' QUOTE name QUOTE (, QUOTE name QUOTE)* ')'
+
+    TEXT             ::= Any text except '{{' and '}}' 
+    NAME             ::= Any text except '{{', '}}', or '.' (or these are escaped)
+    QUOTE            ::= '"' | '''
+
 
 ## The code details ##
 (This section is not really of interest as for the decision the WG has to take on whether to use a template language of not. It is just if you want to look at the details...)
