@@ -26,10 +26,10 @@ Dependencies:
   // Filters that the current implementation recognizes for templates. The 
   // list has to be defined by the WG, eventually. These are just examples.
   var filters = {
-    "upper"    : function(val, meta)           { return val.toUpperCase(); },
-    "lower"    : function(val, meta)           { return val.toLowerCase(); },
-    "replace"  : function(val, meta, from, to) { return val.replace(new RegExp(from), to); },
-    "concat"   : function(val, meta, str)      { return val + str; }
+    "upper"    : function(val, context)           { return val.toUpperCase(); },
+    "lower"    : function(val, context)           { return val.toLowerCase(); },
+    "replace"  : function(val, context, from, to) { return val.replace(new RegExp(from), to); },
+    "concat"   : function(val, context, str)      { return val + str; }
   }
 
   /* =========================================================================== */
@@ -102,12 +102,17 @@ Dependencies:
   //    as keys and cells as values
   // The row is then processed through a callback function
   var process_rows = function(data, meta, callback) {
-    data.forEach( function(data_row) {
+    data.forEach( function(data_row, index) {
+      context = {
+        meta  : meta,
+        index : index,
+        row   : data_row
+      };
       row = {}
       meta.schema.columns.forEach( function(col, index) {
         row[col.name] = data_row[index];
       })
-      callback(row);      
+      callback(row, context);      
     })
   }
 
@@ -194,12 +199,20 @@ Dependencies:
   // The implementation does not handle escape characters... :-(
   // @param tag  : the tag itself
   // @param view : a mapping object providing a value for a pure symbol (not a filter)                                                             
-  // @param meta      : metadata associated to the CSV file                                                            
-  var process_one_tag = function(tag, view, meta) {
+  // @param context   : object containing:
+  //                      meta:         metadata associated to the CSV file  
+  //                      index:        index of the row being processed, if applicable, -1 otherwise
+  //                      column_name:  (if applicable, null otherwise
+  //                      row:          full row being processed, if applicable, null otherwise                                                         
+  var process_one_tag = function(tag, view, context) {
     var tags = tag.split('.');
 
     // Start by getting the base value
-    var retval  = view[tags[0].trim()];
+    var col_name        = tags[0].trim();
+    var retval          = view[col_name];
+    var final_context   = $.extend({
+      column_name : col_name
+    },context);
 
     // Go through the filters, if any
     for( i = 1; i < tags.length; i++ ) {
@@ -208,7 +221,7 @@ Dependencies:
       var with_args = filter.split('(');
       if( with_args.length === 1 ) {
         // There are no arguments, just a simple filter
-        retval = filters[filter](retval)
+        retval = filters[filter](retval, final_context)
       } else {
         // There are arguments to handle;
         var func     = filters[with_args[0]];
@@ -218,7 +231,7 @@ Dependencies:
 
         // To call the filter, the argument should be preceded with the previous value
         // in the filter and the meta
-        all_args.unshift(meta);
+        all_args.unshift(final_context);
         all_args.unshift(retval);
 
         // The filter can be invoked now:
@@ -233,8 +246,11 @@ Dependencies:
   // by taking the templates from left-to-right and concatenating the results.
   // @param template  : the template itself
   // @param view      : a mapping object providing a value for a pure symbol (not a filter) 
-  // @param meta      : metadata associated to the CSV file                                                            
-  var render_templates = function(template, view, meta) {
+  // @param context   : object containing:
+  //                      meta:         metadata associated to the CSV file  
+  //                      index:        index of the row being processed, if applicable, -1 otherwise
+  //                      row:          full row being processed, if applicable, null otherwise                                                         
+  var render_templates = function(template, view, context) {
     var matched = template.match(/{{.*?}}/m);
     if( matched == null ) {
       // No template given, we are done; this also means the end of the line
@@ -242,7 +258,7 @@ Dependencies:
     } else {
       // There is a match on the left of the string...
       var begin  = template.slice(0, matched.index);
-      var middle = process_one_tag(matched[0].slice(2, -2), view, meta);
+      var middle = process_one_tag(matched[0].slice(2, -2), view, context);
       var end    = template.slice(matched.index + matched[0].length);
       return begin + middle + render_templates(end, view);
     }
@@ -258,7 +274,7 @@ Dependencies:
   // as values. The exact format is still to be defined by the WG. 
   var convertCSV_default = function(data, meta, target_format) {
     var retval = []
-    process_rows(data, meta, function(row) {
+    process_rows(data, meta, function(row, context) {
       retval.push(row);
     });
     return target_format === JSON_FORMAT ? JSON.stringify(retval, null, 2) : retval;
@@ -297,15 +313,20 @@ Dependencies:
       templates.forEach( function(tstruct) {
         // The major switch: is the template to be repeated or not?
         if( tstruct.repeat === true ) {
-          process_rows(data, meta, function(row) {
+          process_rows(data, meta, function(row, context) {
             // result += Mustache.render(tstruct.template, row);
-            result += render_templates(tstruct.template, row, meta);
+            result += render_templates(tstruct.template, row, context);
           });
         } else {
           // Just apply the template against the global view and append the outcome
           // to the result string
           // result += Mustache.render(tstruct.template, global_mview);
-          result += render_templates(tstruct.template, global_mview, meta);
+          context = {
+            meta        : meta,
+            index       : -1,
+            row         : null
+          };
+          result += render_templates(tstruct.template, global_mview, context);
         }
       });
 
