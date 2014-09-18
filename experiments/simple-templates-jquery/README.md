@@ -98,25 +98,7 @@ If no template is found, the function returns a straightforward output: an array
 ## The code details ##
 (This section is not really of interest as for the decision the WG has to take on whether to use a template language of not. It is just if you want to look at the details...)
 
-The code is provided as an extension to jQuery, all in the [`js/CSVPlus.js`](js/CSVPlus.js) file. The module implements the  `$.getCSV()` function that can be used as follows:
-
-	$.getCSV(options_or_url, success, failure)
-    @param options_or_url: either a string (giving the URL of the CSV file), or an object with options:
-       url:         URL of csv file (required),
-       delimiter:   delimiter character (optional, default is "", ie, auto-detect)
-       comments:    specify a comment character (like "#") to skip lines; false if no comment is allowed (optional, default is '#')
-       format:      expected output format (can be "json", "javascript", "turtle", etc.; default is "javascript")
-       
-    @param success: fallback to process the result. Function with one result argument. (optional)
-    
-    @param failure: fallback to process in case of HTTP failure. Function has two arguments: HTTP Status code and error message. (optional)
-
-    "result" is an object:
-       data:        result of CSV conversion in the format required by the options
-       meta:        the (combined) metadata of the CSV content
-       errors:      array of error and warning messages (including possible CSV parsing errors)
-
-    The function returns a promise, ie, can be used as a deferred object, too.
+The code is provided as an extension to jQuery, all in the [`js/CSVPlus.js`](js/CSVPlus.js) file. See the separate [documentation](doc/classes/CSVPlus.html) for further details.
    
 The code depends on external modules
 
