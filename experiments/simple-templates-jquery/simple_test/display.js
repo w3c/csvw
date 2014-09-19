@@ -7,7 +7,7 @@ $(document).ready( function() {
     var dataset = $(this).prop('dataset');
     var url     = dataset.url;
     var target  = $(this);
-    var request = { url: dataset.url, format: "json"};
+    var request = { url: dataset.url, format: $.CSV_format.JSON };
     $.getCSV(request)
       .done( function(csv_data) {
         // console.log(csv_data);

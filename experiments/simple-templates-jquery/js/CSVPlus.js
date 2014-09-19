@@ -1,6 +1,9 @@
 /**
 * Experimental CSV+ extension to jQuery, including location of the CSV+ metadata and a mustache-like simple
-* template to convert the CSV data into a javascript object, JSON, Turtle, XML, or any other text
+* template to convert the CSV data into a javascript object, JSON, Turtle, XML, or any other text.
+*
+* * Author: Ivan Herman
+* * Licence: © Copyright W3C® SOFTWARE NOTICE AND LICENSE <http://www.w3.org/Consortium/Legal/2002/copyright-software-20021231>, Ivan Herman, 2014
 * 
 * @module CSVPlus
 * @main CSVPlus
@@ -14,58 +17,42 @@ Dependencies:
 - URI.js: https://medialize.github.io/URI.js/, URI library. The site gives the option of a custom build; this uses just the basic module.
 */
 
+/*
+ * @class CSVPlus
+ * @static
+*/
+
 
 /* ======================================================================================= */
 /*              jQuery extension to access CSV data                                        */
 /* ======================================================================================= */  
 
 /**
- * jQuery Extension to handle CSV+ files
+ * Extension jQuery (a.k.a. $)to handle CSV+ files.
  *
- * @class CSVPlus
+ * @class $
  * @static
  */
 (function($) {
 
   /* ======================================================================================= */
   /*              Output format strings                                                      */
-  /* ======================================================================================= */  
+  /* ======================================================================================= */
   /**
-  * Constant used for denoting a JSON output format
   *
-  * @property JSON_FORMAT
-  * @type String
+  * Constants to be used for the output format: ``JSON``, ``JAVASCRIPT``, ``TURTLE``, ``XML``.
+  *
+  * @class $.CSV_format
   * @static
   * @final
+  * @for $
   */
-  var JSON_FORMAT       = "json";
-  /**
-  * Constant used for denoting a Javascript Object output format
-  *
-  * @property JAVASCRIPT_FORMAT
-  * @type String
-  * @static
-  * @final
-  */
-  var JAVASCRIPT_FORMAT = "javascript";
-  /**
-  * Constant used for denoting a Turtle output format
-  *
-  * @property TURTLE_FORMAT
-  * @type String
-  * @static
-  * @final
-  */
-  var TURTLE_FORMAT     = "turtle";
-  /**
-  * Constant used for denoting a XML output format
-  *
-  * @property XML_FORMAT
-  * @type String
-  * @static
-  * @final
-  */
-  var XML_FORMAT        = "xml";
+  $.CSV_format = {
+    JSON : "json",
+    JAVASCRIPT : "javascript",
+    TURTLE : "turtle",
+    XML : "xml"
+  };  
 
   /* ======================================================================================= */  
   // Filters that the current implementation recognizes for templates. The 
@@ -96,6 +83,7 @@ Dependencies:
   * @static
   * @final
   * @private
+  * @for $
   */
   var filters = {
     "upper"    : function(val, context)           { return val.toUpperCase(); },
@@ -184,7 +172,7 @@ Dependencies:
   var get_template_data = function(options, meta) {
     // The (user's) option dictates the required output format
     // The metadata contains (possibly) the template for different formats
-    var retval = { url: "", format: JAVASCRIPT_FORMAT };
+    var retval = { url: "", format: $.CSV_format.JAVASCRIPT };
     // See if there is a template to be extracted. If not, the template will be returned as ""
     if( meta.template !== undefined ) {
       if( $.isArray(meta.template) ) {
@@ -434,7 +422,7 @@ Dependencies:
     process_rows(data, meta, function(row, context) {
       retval.push(row);
     });
-    return target_format === JSON_FORMAT ? JSON.stringify(retval, null, 2) : retval;
+    return target_format === $.CSV_format.JSON ? JSON.stringify(retval, null, 2) : retval;
   };
 
   /**
@@ -494,9 +482,9 @@ Dependencies:
         }
       });
 
-      if( target_format === JSON_FORMAT || target_format === JAVASCRIPT_FORMAT ) {
+      if( target_format === $.CSV_format.JSON || target_format === $.CSV_format.JAVASCRIPT ) {
         var j_result = eval( '(' + result + ')' );
-        return target_format === JSON_FORMAT ? JSON.stringify(j_result,null,2) : j_result;
+        return target_format === $.CSV_format.JSON ? JSON.stringify(j_result,null,2) : j_result;
       } else {
         return result;
       }
@@ -595,7 +583,7 @@ Dependencies:
       dynamicTyping: false,
       comments: '#',
       keepEmptyRows: false,
-      format: JAVASCRIPT_FORMAT,
+      format: $.CSV_format.JAVASCRIPT,
       download: false
     },options);
 
