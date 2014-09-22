@@ -80,6 +80,8 @@ Dependencies:
   * * row_number - return the index of the data row being processed (starting with 1)
   * * replace - replace the regexp (in ``string1``) with the string value in ``string2``
   * * concat - concatenate ``val`` with ``string1``
+  * * preconcat - concatenate ``string1`` with ``val``
+  * * URI_encode - encode the string following RFC3986 (to be used as a URI component)
   *
   * @property builtin_filters
   * @type Array
@@ -94,7 +96,9 @@ Dependencies:
     "number"     : function(val, context)           { return 1*val; },
     "row_number" : function(val, context)           { return context.row_index + 1 },
     "replace"    : function(val, context, from, to) { return val.replace(new RegExp(from), to); },
-    "concat"     : function(val, context, str)      { return val + str; }
+    "concat"     : function(val, context, str)      { return val + str; },
+    "preconcat"  : function(val, context, str)      { return str + val; },
+    "URI_encode" : function(val, context)           { return URI.encode(val); }
   }
   , filters = {}
   ;
