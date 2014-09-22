@@ -60,17 +60,17 @@ Dependencies:
   /**
   * Filters that the current implementation recognizes for templates. The list has to be defined by
   * the WG, eventually. Each of the filters is invoked with the arguments:
-  * * var - String
-  * * context - Template context object containing:
+  * * ``var`` - String
+  * * ``context`` - Template context object containing:
   *   * ``column_name``: name of the column (used in the ``{{name}}`` part of the template tag)
   *   * ``meta``: (cumulative) metadata object
   *   * ``row``: array of the row being processed by the template process
   *   * ``row_index``: index of the row being processed
   *   * ``target_format``: target format of the template (i.e., "json", "turtle", "xml", etc. )
-  * * string1 (optional) - additional string provided in the template
-  * * string2 (optional) - additional string provided in the template
+  * * ``string1`` (optional) - additional string provided in the template
+  * * ``string2`` (optional) - additional string provided in the template
   * * …
-  * * stringn (optional) - additional string provided in the template
+  * * ``stringn`` (optional) - additional string provided in the template
   * The filter returns a string to be used as a replacement.
   *
   * At the moment, the following filters are defined:
@@ -81,14 +81,14 @@ Dependencies:
   * * replace - replace the regexp (in ``string1``) with the string value in ``string2``
   * * concat - concatenate ``val`` with ``string1``
   *
-  * @property filters
+  * @property builtin_filters
   * @type Array
   * @static
   * @final
   * @private
   * @for $
   */
-  var filters = {
+  var builtin_filters = {
     "upper"      : function(val, context)           { return val.toUpperCase(); },
     "lower"      : function(val, context)           { return val.toLowerCase(); },
     "number"     : function(val, context)           { return 1*val; },
@@ -96,6 +96,8 @@ Dependencies:
     "replace"    : function(val, context, from, to) { return val.replace(new RegExp(from), to); },
     "concat"     : function(val, context, str)      { return val + str; }
   }
+  , filters = {}
+  ;
 
   /* =========================================================================== */
   /*  Various helper functions                                                   */
@@ -394,7 +396,6 @@ Dependencies:
       // No template given, we are done; this also means the end of the line
       return template;
     } else {
-      console.log(context);
       // There is a match on the left of the string...
       var begin  = template.slice(0, matched.index);
       var middle = process_one_tag(matched[0].slice(2, -2), view, context);
@@ -544,12 +545,30 @@ Dependencies:
   * @param {String} options.delimiter - CSV delimiter character (optional, default is ``""``, ie, auto-detect)
   * @param {String} options.comments - Specifies a comment character (like ``"#"``) to skip lines; ``false`` if no comment is allowed (optional, default is '#')
   * @param {String} options.format - Expected output format (can be "json", "javascript", "turtle", etc.; default is "javascript")
+  * @param {Object} options.filters - Object providing user-defined filters; each key denotes a (template) filter function. 
+  * A filter is invoked with the arguments:
+  * * ``var`` - String
+  * * ``context`` - Template context object containing:
+  *     * ``column_name``: name of the column (used in the ``{{name}}`` part of the template tag)
+  *     * ``meta``: (cumulative) metadata object
+  *     * ``row``: array of the row being processed by the template process
+  *     * ``row_index``: index of the row being processed
+  *     * ``target_format``: target format of the template (i.e., "json", "turtle", "xml", etc. )
+  * * ``string1`` (optional) - additional string provided in the template
+  * * ``string2`` (optional) - additional string provided in the template
+  * * …
+  * * ``stringn`` (optional) - additional string provided in the template
+  *
+  * The filter returns a string to be used as a replacement.
   * @param {Function} [success] - Callback to process the result, called with an input argument, i.e., result object
   * @param {Function} [failure] - Callback to process in case of HTTP errors. Function two arguments: HTTP Status code and error message
   * @return {Promise Object} - A promise with the result object of the form:
   * * ``data``: result of the CSV conversion in the format required by the options
   * * ``meta``: the (combined) metadata of the CSV content
   * * ``errors``: array of error or warning messages (including possible CSV parsing errors)
+  *
+  * 
+
   */
   $.getCSV = function(options, success, failure) {
     var result = $.Deferred();
@@ -590,8 +609,10 @@ Dependencies:
       comments: '#',
       keepEmptyRows: false,
       format: $.CSV_format.JAVASCRIPT,
-      download: false
+      download: false,
+      filters: {}
     },options);
+    filters = $.extend(settings.filters, builtin_filters);
 
     /* ----------------------- Start CSV processing ----------------------- */
     // Processing is part of a jQuery deferred structure on reading the CSV file

@@ -3,11 +3,16 @@ $(document).ready( function() {
     return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
 
+  var capitalize = function(val, context) {
+    var uval = val.toLowerCase();
+    return uval[0].toUpperCase() + uval.slice(1);
+  }
+
   $("div#json").each(function(index) {
     var dataset = $(this).prop('dataset');
     var url     = dataset.url;
     var target  = $(this);
-    var request = { url: dataset.url, format: $.CSV_format.JSON };
+    var request = { url: dataset.url, format: $.CSV_format.JSON, filters: { capitalize: capitalize } };
     $.getCSV(request)
       .done( function(csv_data) {
         // console.log(csv_data);
@@ -22,7 +27,7 @@ $(document).ready( function() {
     var dataset = $(this).prop('dataset');
     var url     = dataset.url;
     var target  = $(this);
-    var request = { url: dataset.url, format: "turtle"};
+    var request = { url: dataset.url, format: "turtle", filters: { capitalize: capitalize }};
     $.getCSV(request)
       .done( function(csv_data) {
         // console.log(csv_data);

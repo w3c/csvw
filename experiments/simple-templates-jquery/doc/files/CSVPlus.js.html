@@ -154,16 +154,17 @@ Dependencies:
   /**
   * Filters that the current implementation recognizes for templates. The list has to be defined by
   * the WG, eventually. Each of the filters is invoked with the arguments:
-  * * var - String
-  * * context - Template context object containing:
+  * * &#x60;&#x60;var&#x60;&#x60; - String
+  * * &#x60;&#x60;context&#x60;&#x60; - Template context object containing:
   *   * &#x60;&#x60;column_name&#x60;&#x60;: name of the column (used in the &#x60;&#x60;{{name}}&#x60;&#x60; part of the template tag)
   *   * &#x60;&#x60;meta&#x60;&#x60;: (cumulative) metadata object
   *   * &#x60;&#x60;row&#x60;&#x60;: array of the row being processed by the template process
   *   * &#x60;&#x60;row_index&#x60;&#x60;: index of the row being processed
-  * * string1 (optional) - additional string provided in the template
-  * * string2 (optional) - additional string provided in the template
+  *   * &#x60;&#x60;target_format&#x60;&#x60;: target format of the template (i.e., &quot;json&quot;, &quot;turtle&quot;, &quot;xml&quot;, etc. )
+  * * &#x60;&#x60;string1&#x60;&#x60; (optional) - additional string provided in the template
+  * * &#x60;&#x60;string2&#x60;&#x60; (optional) - additional string provided in the template
   * * …
-  * * stringn (optional) - additional string provided in the template
+  * * &#x60;&#x60;stringn&#x60;&#x60; (optional) - additional string provided in the template
   * The filter returns a string to be used as a replacement.
   *
   * At the moment, the following filters are defined:
@@ -174,14 +175,14 @@ Dependencies:
   * * replace - replace the regexp (in &#x60;&#x60;string1&#x60;&#x60;) with the string value in &#x60;&#x60;string2&#x60;&#x60;
   * * concat - concatenate &#x60;&#x60;val&#x60;&#x60; with &#x60;&#x60;string1&#x60;&#x60;
   *
-  * @property filters
+  * @property builtin_filters
   * @type Array
   * @static
   * @final
   * @private
   * @for $
   */
-  var filters = {
+  var builtin_filters = {
     &quot;upper&quot;      : function(val, context)           { return val.toUpperCase(); },
     &quot;lower&quot;      : function(val, context)           { return val.toLowerCase(); },
     &quot;number&quot;     : function(val, context)           { return 1*val; },
@@ -189,6 +190,8 @@ Dependencies:
     &quot;replace&quot;    : function(val, context, from, to) { return val.replace(new RegExp(from), to); },
     &quot;concat&quot;     : function(val, context, str)      { return val + str; }
   }
+  , filters = {}
+  ;
 
   /* =========================================================================== */
   /*  Various helper functions                                                   */
@@ -491,7 +494,7 @@ Dependencies:
       var begin  = template.slice(0, matched.index);
       var middle = process_one_tag(matched[0].slice(2, -2), view, context);
       var end    = template.slice(matched.index + matched[0].length);
-      return begin + middle + render_template(end, view);
+      return begin + middle + render_template(end, view, context);
     }
   };
 
@@ -564,16 +567,17 @@ Dependencies:
         // The major switch: is the template to be repeated or not?
         if( tstruct.repeat === true ) {
           process_rows(data, meta, function(row, context) {
-            result += render_template(tstruct.template, $.extend({}, global_mview, row), context);
+            result += render_template(tstruct.template, $.extend({}, global_mview, row), $.extend({target_format:target_format}, context));
           });
         } else {
           // Just apply the template against the global view and append the outcome
           // to the result string
           context = {
-            meta        : meta,
-            row_index   : null,
-            col_index   : null,
-            row         : null
+            meta          : meta,
+            target_format : target_format,
+            row_index     : null,
+            col_index     : null,
+            row           : null
           };
           result += render_template(tstruct.template, global_mview, context);
         }
@@ -635,12 +639,30 @@ Dependencies:
   * @param {String} options.delimiter - CSV delimiter character (optional, default is &#x60;&#x60;&quot;&quot;&#x60;&#x60;, ie, auto-detect)
   * @param {String} options.comments - Specifies a comment character (like &#x60;&#x60;&quot;#&quot;&#x60;&#x60;) to skip lines; &#x60;&#x60;false&#x60;&#x60; if no comment is allowed (optional, default is &#x27;#&#x27;)
   * @param {String} options.format - Expected output format (can be &quot;json&quot;, &quot;javascript&quot;, &quot;turtle&quot;, etc.; default is &quot;javascript&quot;)
+  * @param {Object} options.filters - Object providing user-defined filters; each key denotes a (template) filter function. 
+  * A filter is invoked with the arguments:
+  * * &#x60;&#x60;var&#x60;&#x60; - String
+  * * &#x60;&#x60;context&#x60;&#x60; - Template context object containing:
+  *     * &#x60;&#x60;column_name&#x60;&#x60;: name of the column (used in the &#x60;&#x60;{{name}}&#x60;&#x60; part of the template tag)
+  *     * &#x60;&#x60;meta&#x60;&#x60;: (cumulative) metadata object
+  *     * &#x60;&#x60;row&#x60;&#x60;: array of the row being processed by the template process
+  *     * &#x60;&#x60;row_index&#x60;&#x60;: index of the row being processed
+  *     * &#x60;&#x60;target_format&#x60;&#x60;: target format of the template (i.e., &quot;json&quot;, &quot;turtle&quot;, &quot;xml&quot;, etc. )
+  * * &#x60;&#x60;string1&#x60;&#x60; (optional) - additional string provided in the template
+  * * &#x60;&#x60;string2&#x60;&#x60; (optional) - additional string provided in the template
+  * * …
+  * * &#x60;&#x60;stringn&#x60;&#x60; (optional) - additional string provided in the template
+  *
+  * The filter returns a string to be used as a replacement.
   * @param {Function} [success] - Callback to process the result, called with an input argument, i.e., result object
   * @param {Function} [failure] - Callback to process in case of HTTP errors. Function two arguments: HTTP Status code and error message
   * @return {Promise Object} - A promise with the result object of the form:
   * * &#x60;&#x60;data&#x60;&#x60;: result of the CSV conversion in the format required by the options
   * * &#x60;&#x60;meta&#x60;&#x60;: the (combined) metadata of the CSV content
   * * &#x60;&#x60;errors&#x60;&#x60;: array of error or warning messages (including possible CSV parsing errors)
+  *
+  * 
+
   */
   $.getCSV = function(options, success, failure) {
     var result = $.Deferred();
@@ -681,8 +703,10 @@ Dependencies:
       comments: &#x27;#&#x27;,
       keepEmptyRows: false,
       format: $.CSV_format.JAVASCRIPT,
-      download: false
+      download: false,
+      filters: {}
     },options);
+    filters = $.extend(settings.filters, builtin_filters);
 
     /* ----------------------- Start CSV processing ----------------------- */
     // Processing is part of a jQuery deferred structure on reading the CSV file
