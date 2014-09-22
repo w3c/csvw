@@ -65,7 +65,7 @@ Dependencies:
   *   * ``column_name``: name of the column (used in the ``{{name}}`` part of the template tag)
   *   * ``meta``: (cumulative) metadata object
   *   * ``row``: array of the row being processed by the template process
-  *   * ``index``: data cell being processed within the row of data
+  *   * ``row_index``: index of the row being processed
   * * string1 (optional) - additional string provided in the template
   * * string2 (optional) - additional string provided in the template
   * * …
@@ -75,6 +75,8 @@ Dependencies:
   * At the moment, the following filters are defined:
   * * upper - convert to upper case
   * * lower - convert to lower case
+  * * number - convert the string into a number
+  * * row_number - return the index of the data row being processed (starting with 1)
   * * replace - replace the regexp (in ``string1``) with the string value in ``string2``
   * * concat - concatenate ``val`` with ``string1``
   *
@@ -86,10 +88,12 @@ Dependencies:
   * @for $
   */
   var filters = {
-    "upper"    : function(val, context)           { return val.toUpperCase(); },
-    "lower"    : function(val, context)           { return val.toLowerCase(); },
-    "replace"  : function(val, context, from, to) { return val.replace(new RegExp(from), to); },
-    "concat"   : function(val, context, str)      { return val + str; }
+    "upper"      : function(val, context)           { return val.toUpperCase(); },
+    "lower"      : function(val, context)           { return val.toLowerCase(); },
+    "number"     : function(val, context)           { return 1*val; },
+    "row_number" : function(val, context)           { return context.row_index + 1 },
+    "replace"    : function(val, context, from, to) { return val.replace(new RegExp(from), to); },
+    "concat"     : function(val, context, str)      { return val + str; }
   }
 
   /* =========================================================================== */
@@ -206,19 +210,19 @@ Dependencies:
   * * row: the data row Array
   * * context: object containing:
   *   * ``meta``: the CSV metadata
-  *   * ``index``: the index of the row within the whole CSV file
+  *   * ``row_index``: the index of the row within the whole CSV file
   *   * ``row``: the current data row Array
   */
   var process_rows = function(data, meta, callback) {
-    data.forEach( function(data_row, index) {
+    data.forEach( function(data_row, rindex) {
       context = {
-        meta  : meta,
-        index : index,
-        row   : data_row
+        meta      : meta,
+        row_index : rindex,
+        row       : data_row
       };
       row = {}
-      meta.schema.columns.forEach( function(col, index) {
-        row[col.name] = data_row[index];
+      meta.schema.columns.forEach( function(col, cindex) {
+        row[col.name] = data_row[cindex];
       })
       callback(row, context);      
     })
@@ -335,10 +339,10 @@ Dependencies:
 
     // Start by getting the base value
     var col_name        = tags[0].trim();
-    var retval          = view[col_name];
+    var retval          = col_name === "" ? "" : view[col_name];
     var final_context   = $.extend({
       column_name : col_name
-    },context);
+    }, context);
 
     // Go through the filters, if any
     for( i = 1; i < tags.length; i++ ) {
@@ -451,7 +455,7 @@ Dependencies:
       // the result is an array of separate templates
       var templates = split_template(template);
 
-      // The 'global' template is used on a view, in mustache jargon
+      // The 'global' template is used on a "view" (in mustache jargon)
       // containing only the top level keys from the metadata. This
       // can be set once and for all
       var global_mview = {};
@@ -466,16 +470,15 @@ Dependencies:
         // The major switch: is the template to be repeated or not?
         if( tstruct.repeat === true ) {
           process_rows(data, meta, function(row, context) {
-            // result += Mustache.render(tstruct.template, row);
-            result += render_template(tstruct.template, row, context);
+            result += render_template(tstruct.template, $.extend({}, global_mview, row), context);
           });
         } else {
           // Just apply the template against the global view and append the outcome
           // to the result string
-          // result += Mustache.render(tstruct.template, global_mview);
           context = {
             meta        : meta,
-            index       : -1,
+            row_index   : null,
+            col_index   : null,
             row         : null
           };
           result += render_template(tstruct.template, global_mview, context);

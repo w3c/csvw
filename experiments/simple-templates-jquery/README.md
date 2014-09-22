@@ -2,16 +2,16 @@
 
 Goal: to illustrate whether a very simple subset of mustache can be implemented easily in Javascript. The implementation is built on jQuery, and also implements the data model's definitions to get to metadata (except for metadata in a package). Ie, metadata can be provided via a ``link`` in the HTTP response header, in the same directory as the CSV file itself bearing the same name and, finally, a fixed ``metadata.csvm`` file (the three sources are "merged" to produce the final metadata).
 
-The metadata definition is extended with keys for templates. The [test metadata](simple_test/test.csvm) includes the following:
+The metadata definition is extended with keys for templates. The [test metadata](tree-ops/tree-ops.csvm) includes the following:
 
 	"template" : [{
-			"url"    : "simple_test/test-json.tmpl",
+			"url"    : "tree-ops/tree-ops-json.tmpl",
 			"format" : "javascript"
 		}, {
-			"url"    : "simple_test/test-json.tmpl",
+			"url"    : "tree-ops/tree-ops-json.tmpl",
 			"format" : "json"
 		}, {
-			"url"    : "simple_test/test-turtle.tmpl",
+			"url"    : "tree-ops/tree-ops-turtle.tmpl",
 			"format" : "turtle"			
 		}
 	]
@@ -22,60 +22,25 @@ The template contains *only two* template tag types:
 
 - `{{#rows}}` - `{{\rows}}` (where `rows` is a fixed symbol) at the beginning of a line means that the full templates enclosed between these two lines are to be repeated for all rows of the CSV content.
 - `{{name}}` has two possible roles:
-	- if used *within* a `{{#rows}}` - `{{\rows}}` context, `{{name}}` refers to a column name, and the template is replaced with the content of the corresponding cell
-	- if used *outside* a `{{#rows}}` - `{{\rows}}` context, `{{name}}` refers to a top-level key in the metadata **if its value is a string**; the template is replaced with the corresponding value
-- `{{name}}` can also have *filters*. The tag can have the format: ``{{name.f1.f2.….fn}}``, where ``f1,…,fn`` are filter functions. A filter function may have argument, i.e., it may look like ``fi("a","b")``; the arguments are strings surrounded by the ``"`` or the ``'`` characters. If there are no arguments, the argument list can be dropped altogether. Filter functions are invoked with: the output of the previous filter or the value corresponding ``{{name}}``; the reference a ``context`` object; the list of the arguments (strings) if applicable. The filter function must return a replacement for the template value. The ``context`` object has a reference to the full metadata of the CSV file, the name of the column (corresponding to the cell tag being processed, ie, the value of ``{{name}}``), the index of the cell within the data row and a reference to the data row itself (as an array).
+    - if used *outside* a `{{#rows}}` - `{{\rows}}` context, `{{name}}` refers to a top-level key in the metadata **if its value is a string**; the template is replaced with the corresponding value.
+	- if used *within* a `{{#rows}}` - `{{\rows}}` context and the `{{name}}` refers to a column name, and the template is replaced with the content of the corresponding cell; if `{{name}}` does not refer to a column name, it is considered to refer to a top-level key in the metadata **if its value is a string**, and the template is repalces with the corresponding value. 
+- `{{name}}` can also have *filters*. The tag can have the format: `{{name.f1.f2.….fn}}`, where `f1,…,fn` are filter functions. A filter function may have argument, i.e., it may look like `fi("a","b")`; the arguments are strings surrounded by the `"` or the `'` characters. If there are no arguments, the argument list can be dropped altogether. Filter functions are invoked with: the output of the previous filter or the value corresponding `{{name}}`; the reference a `context` object; the list of the arguments (strings) if applicable. The filter function must return a replacement for the template value. The `context` object has a reference to the full metadata of the CSV file, the name of the column (corresponding to the cell tag being processed, ie, the value of `{{name}}`), the index of the row within the CSV file and a reference to the data row itself (as an array). When used in a filtered tag, the `name` part may be missing (i.e., the template tag may be `{{.f1.f2.f3}}`) when the `f1` filter returns a value without considering the value of `{{name}}` (an example may be a filter returning the row number).
 
-The list of available filter functions will be specified by the WG, and a mechanism to add a user-defined filter will be provided. At present, there are only a few filters, these are ``upper``, ``lower``, ``concat(str)``, ``replace(regexp,str)``.
-
-That is it. As an example, the template for turtle may look like:
-
-	@prefix ex: <http://www.example.org> .
-	ex:document
-	  ex:author      "{{author.concat(", W3C")}}" ;
- 	  ex:institution "{{institution}}" .
-
-	{{#rows}}
-	[] a ex:csvrow;
-	  ex:first_column   "{{First.upper}}" ;
-	  ex:second_column  "{{Second}}" ;
- 	  ex:third_column   "{{Third}}" .
-	{{/rows}}
-
-    {{#rows}}
-    [] a ex:csvrow2;
-       ex:key_column "{{First}}" .
-    {{/rows}}
-
-    ex:comment
-
-or for JSON may look like:
-
-	{
-		"@id"         : "test", 
-		"author"      : "{{author.concat(", W3C")}}",
-		"institution" : "{{institution}}",
- 		"@graph" : [
-	{{#rows}} 	
-			{ 
-				"@type"         : "csvrow",
-				"first column"  : "{{First.upper}}",
-				"second column" : "{{Second}}",
-				"third column"  : "{{Third}}",
-			},
-	{{/rows}}
-    {{#rows}}
-            {
-                "@type" :         "csvrow2",
-                "ex:key_column" : "{{First}}"
-            }
-    {{/rows}}
-	 	]
-	}	
-
-The [test file](http://w3c.github.io/csvw/experiments/simple-templates-jquery/test.html) displays the accumulated metadata and the result of the conversion to Turtle and JSON, respectively for the test file [`simple_test/csv`](simple_test/test.csv). 
+The list of available filter functions will be specified by the WG, and a mechanism to add a user-defined filter will be provided. At present, there are only a few filters, these are ``upper``, ``lower``, ``concat(str)``, `number`, `row_number`, ``replace(regexp,str)`` (an obvious candidate to be added will be ``datatype`` that should retrieve, from the metadata, the datatype for the specific cell).
 
 If no template is found, the function returns a straightforward output: an array of JSON/Javascript objects, each object consisting of the column names as keys and the corresponding cell values as values.
+
+That is it. As an example, the template for turtle may look like. A possible combination of data, used in the current [test](http://w3c.github.io/csvw/experiments/simple-templates-jquery/test.html) are:
+
+- [CSV file](tree-ops/tree-ops.csv)
+- [metadata for the csv file](tree-ops/tree-ops.csvm) (Note: this is the same metadata as used in the specification)
+- [global metadata in the directory](tree-ops/metadata.csvm)
+- [Turtle template](tree-ops/tree-ops-turtle.tmpl), see also the [generated Turtle file store in a file](tree-ops/tree-ops.ttl)
+- [JSON-LD template](tree-ops/tree-ops-json.tmpl), see also the [generated JSON-LD file store in a file](tree-ops/tree-ops.jsonld)
+
+
+The [test file](http://w3c.github.io/csvw/experiments/simple-templates-jquery/test.html) displays the result of the conversion to Turtle and JSON using a [small jQuery file](display.js) that shows how the interface can be used in practice. 
+
 
 ## Initial language grammar ##
 
@@ -85,7 +50,7 @@ If no template is found, the function returns a straightforward output: an array
     text_or_tag      ::= template | text
     text             ::= TEXT
     template         ::= '{{' tag '}}'
-    tag              ::= name ('.' name_or_function)*
+    tag              ::= name{0,1} ('.' name_or_function)*
     name_or_function ::= name|function
     name             ::= NAME
     function         ::= name '(' QUOTE name QUOTE (, QUOTE name QUOTE)* ')'

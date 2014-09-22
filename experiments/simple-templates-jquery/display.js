@@ -1,6 +1,6 @@
 $(document).ready( function() {
   var massage = function(str) {
-    return str.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;');
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
 
   $("div#json").each(function(index) {
