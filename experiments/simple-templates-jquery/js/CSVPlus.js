@@ -66,6 +66,7 @@ Dependencies:
   *   * ``meta``: (cumulative) metadata object
   *   * ``row``: array of the row being processed by the template process
   *   * ``row_index``: index of the row being processed
+  *   * ``target_format``: target format of the template (i.e., "json", "turtle", "xml", etc. )
   * * string1 (optional) - additional string provided in the template
   * * string2 (optional) - additional string provided in the template
   * * …
@@ -393,11 +394,12 @@ Dependencies:
       // No template given, we are done; this also means the end of the line
       return template;
     } else {
+      console.log(context);
       // There is a match on the left of the string...
       var begin  = template.slice(0, matched.index);
       var middle = process_one_tag(matched[0].slice(2, -2), view, context);
       var end    = template.slice(matched.index + matched[0].length);
-      return begin + middle + render_template(end, view);
+      return begin + middle + render_template(end, view, context);
     }
   };
 
@@ -470,16 +472,17 @@ Dependencies:
         // The major switch: is the template to be repeated or not?
         if( tstruct.repeat === true ) {
           process_rows(data, meta, function(row, context) {
-            result += render_template(tstruct.template, $.extend({}, global_mview, row), context);
+            result += render_template(tstruct.template, $.extend({}, global_mview, row), $.extend({target_format:target_format}, context));
           });
         } else {
           // Just apply the template against the global view and append the outcome
           // to the result string
           context = {
-            meta        : meta,
-            row_index   : null,
-            col_index   : null,
-            row         : null
+            meta          : meta,
+            target_format : target_format,
+            row_index     : null,
+            col_index     : null,
+            row           : null
           };
           result += render_template(tstruct.template, global_mview, context);
         }
