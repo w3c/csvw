@@ -449,11 +449,12 @@ Dependencies:
   * @param {Object} meta - Tetadata object, as defined in the spec
   * @param {String} template - Template string. If ``""`` (ie, no template) a default Javascript object is generated
   * @param {Sring} target_format - can be JSON, Turtle, Javascript,…
+  * @param {Array} warnings - array of warnings that may have to be extended if an error occurs
   * @return {String or Object} - Converted data. If the ``target_format`` argument is JAVASCRIPT, the retun is an Object,
   * otherwise a string with the converted value in the ``target_format`` syntax.
   *
   */
-  var convertCSV = function(data, meta, template, target_format) {
+  var convertCSV = function(data, meta, template, target_format, warnings) {
     // There is no template: the default is to get the rows and columns in JSON
     if( template === "" ) {
       return convertCSV_default(data, meta, target_format);
@@ -494,8 +495,13 @@ Dependencies:
       });
 
       if( target_format === $.CSV_format.JSON || target_format === $.CSV_format.JAVASCRIPT ) {
-        var j_result = eval( '(' + result + ')' );
-        return target_format === $.CSV_format.JSON ? JSON.stringify(j_result,null,2) : j_result;
+        try {
+          var j_result = eval( '(' + result + ')' );
+          return target_format === $.CSV_format.JSON ? JSON.stringify(j_result,null,2) : j_result;          
+        } catch(e) {
+          warnings.push("Template (Javascript) syntax error in: " + e.message)
+          return result;
+        }
       } else {
         return result;
       }
@@ -738,7 +744,7 @@ Dependencies:
             get_template(required_template.url)
               .done( function(template) {
                 // We finally arrived at the core: make the conversion of the CSV content to whatever the user wants...
-                var final_data = convertCSV(pcsv.data, final_meta, template, required_template.format);
+                var final_data = convertCSV(pcsv.data, final_meta, template, required_template.format, final_warnings);
                 retval = {
                   data      : final_data,
                   meta      : final_meta,
