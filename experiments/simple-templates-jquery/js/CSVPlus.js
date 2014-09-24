@@ -689,7 +689,12 @@ Dependencies:
           } else {
             $.get(murl)
               .done(function (m) {
-                retval.resolve(JSON.parse(m));
+                try {
+                  retval.resolve(JSON.parse(m));
+                } catch(e) {
+                  final_warnings.push("JSON syntax error in " + murl + ": " + e.message);
+                  retval.resolve({});
+                }
               })
               .fail(function(xhr, status, error) {
                 final_warnings.push("HTTP error " + xhr.status + " (" + error + ") for resource '" + murl + "'");

@@ -15,12 +15,19 @@ $(document).ready( function() {
     var request = { url: dataset.url, format: $.CSV_format.JSON, filters: { capitalize: capitalize } };
     $.getCSV(request)
       .done( function(csv_data) {
-        // console.log(csv_data);
-        target.append("<pre>" + massage(csv_data.data) + "</pre>"); 
-        $("div#meta").append("<pre>" + JSON.stringify(csv_data.meta,null,2) + "</pre>")
+        if( csv_data.errors.length !== 0 ) {
+          target.append("<p>Error in processing the data:</p><ul>");
+          csv_data.errors.forEach(function(e) {
+            target.append("<li>" + e + "</li>");
+          });
+          target.append("</ul>");
+        } else {
+          target.append("<pre>" + massage(csv_data.data) + "</pre>"); 
+          $("div#meta").append("<pre>" + JSON.stringify(csv_data.meta,null,2) + "</pre>")          
+        }
       })
-      .fail( function(status,error) {
-          console.log(status + " " + error);
+      .fail( function(status, error) {
+        target.append("<p>CSV access failed: '" + status + ", " + error + "'</p>")
       });
   });
   $("div#turtle").each(function(index) {
@@ -31,10 +38,18 @@ $(document).ready( function() {
     $.getCSV(request)
       .done( function(csv_data) {
         // console.log(csv_data);
-        target.append("<pre>" + massage(csv_data.data) + "</pre>");       
+        if( csv_data.errors.length !== 0 ) {
+          target.append("<p>Error in processing the data:</p><ul>");
+          csv_data.errors.forEach(function(e) {
+            target.append("<li>" + e + "</li>");
+          });
+          target.append("</ul>");
+        } else {
+          target.append("<pre>" + massage(csv_data.data) + "</pre>"); 
+        }
       })
-      .fail( function(status,error) {
-          console.log(status + " " + error);
+      .fail( function(status, error) {
+        target.append("<p>CSV access failed: '" + status + ", " + error + "'</p>")
       });
   });
 });
