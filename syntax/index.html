@@ -9,9 +9,43 @@
     <script class="remove">
 var respecConfig = {
     localBiblio: {
-        "EBNF-NOTATION": "Tim Bray; Jean Paoli; C. M. Sperberg-McQueen; Eve Maler; François Yergeau. <a href=\"http://www.w3.org/TR/REC-xml/#sec-notation\"><cite>EBNF Notation</cite></a> 26 November 2008. W3C Recommendation. URL: <a href=\"http://www.w3.org/TR/REC-xml/#sec-notation\">http://www.w3.org/TR/REC-xml/#sec-notation</a>",
-        "CSV-METADATA": "Rufus Pollock; Jeni Tennison. <a href=\"http://w3c.github.io/csvw/metadata/\"><cite>Metadata Vocabulary for Tabular Data</cite></a> Editor's Draft. URL: <a href=\"http://w3c.github.io/csvw/metadata/\">http://w3c.github.io/csvw/metadata/</a>",
-        "RFC7111": "M. Hausenblas; E. Wilde; J. Tennison. <a href=\"http://tools.ietf.org/html/rfc7111\"><cite>URI Fragment Identifiers for the text/csv Media Type</cite></a>. January 2014. Internet RFC 7111. URL: <a href=\"http://www.ietf.org/rfc/rfc7111.txt\">http://www.ietf.org/rfc/rfc7111.txt</a>"
+       "tabular-metadata": {
+            "authors": [
+              "Rufus Pollock",
+              "Jeni Tennison"
+            ],
+            "title": "Metadata Vocabulary for Tabular Data",
+            "href" : "http://www.w3.org/TR/2014/WD-tabular-metadata-20140710/",
+            "rawDate": "2014-07-10",
+            "status" : "WD",
+            "publisher": "W3C"
+        },
+        "EBNF-NOTATION" : {
+          "authors" : [
+            "Tim Bray",
+            "Jean Paoli",
+            "C. Michael Sperberg-McQueen",
+            "Eve Maler",
+            "François Yergau"
+          ],
+          "title" : "EBNF Notation",
+          "rawDate" : "2008-11-26",
+          "status" : "REC",
+          "publisher" : "W3C",
+          "href" : "http://www.w3.org/TR/REC-xml/#sec-notation"
+        },
+        "RFC7111" : {
+          "authors" : [
+            "Michael Hausenblas",
+            "Erik Wilde",
+            "Jenni Tennison"
+          ],
+          "title" : "URI Fragment Identifiers for the text/csv Media Type",
+          "rawDate" : "2014-01",
+          "status": "Internet RFC",
+          "publisher" : "IETF",
+          "href" : "http://www.ietf.org/rfc/rfc7111.txt"
+        }
     },
     specStatus: "ED",
     shortName: "tabular-data-model",
@@ -85,7 +119,7 @@ var respecConfig = {
     <section id="intro">
       <h2>Introduction</h2>
       <p>
-        <dfn title="tabular data">Tabular data</dfn> is data that is structured into rows, each of which contains information about some thing. Each row contains the same number of fields (although some of these fields may be empty), which provide values of properties of the thing described by the row. In tabular data, fields within the same column provide values for the same property of the thing described by the particular row. This is what differentiates tabular data from other line-oriented formats. 
+        <dfn title="tabular data">Tabular data</dfn> is data that is structured into rows, each of which contains information about some thing. Each row contains the same number of cells (although some of these cells may be empty), which provide values of properties of the thing described by the row. In tabular data, cells within the same column provide values for the same property of the thing described by the particular row. This is what differentiates tabular data from other line-oriented formats. 
       </p>
     	<p>
         Tabular data is routinely transferred on the web in a textual format called "CSV", but the definition of "CSV" in practice is very loose. Some people use the term to mean any delimited text file. Others stick more closely to the most standard definition of CSV that there is, [[!RFC4180]]. <a href="#standards" class="sectionRef">Appendix A</a> describes the various ways in which CSV is defined.
@@ -104,22 +138,49 @@ var respecConfig = {
       <section>
         <h3>Core Tabular Data Model</h3>
         <p>
-          Data is held in a <dfn>table</dfn>.
+          The core tabular data model can be used to describe a table that lacks any annotations, whether those annotations are embedded within a CSV file or arise from a separate metadata document.
         </p>
         <p>
-          Each table has one or more <dfn title="column">columns</dfn>. The order of the columns is significant and must be preserved by applications.
+          Data is held in a <dfn>table</dfn>. The properties of a table are:
         </p>
+        <ul>
+          <li><dfn title="table columns">columns</dfn> &mdash; the list of <a title="column">columns</a> in the table. A table MUST have one or more columns and the order of the columns within the list is significant and MUST be preserved by applications</li>
+          <li><dfn title="table rows">rows</dfn> &mdash; the list of rows in the table</li>
+        </ul>
         <p>
-          Each table has one or more <dfn title="row">rows</dfn>. The order of the rows is significant and must be preserved by applications. Each row contains a <dfn>field</dfn> for each column in the table. Some of these fields may be <dfn title="empty field">empty fields</dfn> (fields which have no value). There is no distinction between empty fields and fields whose value is an empty string.
+          A <dfn>column</dfn> represents a vertical arrangement of <a title="cell">cells</a> within a <a>table</a>. The properties of a column are:
         </p>
+        <ul>
+          <li><dfn title="column table">table</dfn> &mdash; the <a>table</a> that the column appears in</li>
+          <li><dfn title="column number">number</dfn> &mdash; the position of the column amongst the <a title="table columns">columns</a> for the associated <a title="column table">table</a>, starting from 1</li>
+          <li><dfn title="column cells">cells</dfn> &mdash; the list of <a title="cell">cells</a> in the column. A column MUST contain one cell from each <a>row</a> in the table. The order of the cells in the list MUST match the order of the rows in which they appear within the <a title="table rows">rows</a> for the associated <a title="column table">table</a>.</li>
+        </ul>
+        <p>
+          A <dfn>row</dfn> represents a horizontal arrangement of <a title="cell">cells</a> within a <a>table</a>. The properties of a row are:
+        </p>
+        <ul>
+          <li><dfn title="row table">table</dfn> &mdash; the <a>table</a> that the row appears in</li>
+          <li><dfn title="row number">number</dfn> &mdash; the position of the row amongst the <a title="table rows">rows</a> for the <a title="row table">table</a>, starting from 1</li>
+          <li><dfn title="row cells">cells</dfn> &mdash; the list of <a title="cell">cells</a> in the row. A row MUST contain one cell from each <a>column</a> in the table. The order of the cells in the list MUST match the order of the columns in which they appear within the <a>table columns</a> for the row's table.</li>
+        </ul>
+        <p>
+          A <dfn>cell</dfn> represents a cell at the intersection of a <a>row</a> and a <a>column</a> within a <a>table</a>. The properties of a cell are:
+        </p>
+        <ul>
+          <li><dfn title="cell table">table</dfn> &mdash; the <a>table</a> that the cell appears in</li>
+          <li><dfn title="cell column">column</dfn> &mdash; the <a>column</a> that the cell appears in; the cell MUST be in the <a title="column cells">cells</a> for that column</li>
+          <li><dfn title="cell row">row</dfn> &mdash; the <a>row</a> that the cell appears in; the cell MUST be in the <a title="row cells">cells</a> for that row</li>
+          <li><dfn>string value</dfn> &mdash; a string that is the original syntactic representation of the value of the cell, ie how the cell appears within a CSV file; this may be an empty string</li>
+          <li><dfn title="cell value">value</dfn> &mdash; the semantic value of the cell; within the core tabular data model this is either a string which is the same as the <a>string value</a> of the cell, or <code>null</code>, if the <a>string value</a> is an empty string</li>
+        </ul>
         <p class="issue">
-          Should there be a distinction made (in the core tabular data model) between empty fields and fields whose value is an empty string? With a lack of other metadata, the only way to make the distinction would be to say there was a difference between a missing value in a CSV file (eg the second value in <code>a,,z</code>) and a quoted value (eg the second value in <code>a,"",z</code>). This seems dangerous as I don't think many clients will make a distinction between the two, so the semantics will be lost on round-tripping.
+          Should there be a distinction made (in the core tabular data model) between empty cells and cells whose value is an empty string? With a lack of other metadata, the only way to make the distinction would be to say there was a difference between a missing value in a CSV file (eg the second value in <code>a,,z</code>) and a quoted value (eg the second value in <code>a,"",z</code>). This seems dangerous as I don't think many clients will make a distinction between the two, so the semantics will be lost on round-tripping.
         </p>
       </section>
       <section>
         <h3>Annotated Tabular Data Model</h3>
         <p>
-          An <dfn>annotated table</dfn> is a <a>table</a> that is annotated with additional metadata. The table MAY have any number of <dfn title="property">properties</dfn> which provide additional information about the table as a whole. The <dfn title="value">values</dfn> of these properties may be lists, structured objects, or atomic values. Annotations on a table may include:
+          An <dfn>annotated table</dfn> is a <a>table</a> that is annotated with additional metadata. The table MAY have any number of <dfn title="property">properties</dfn> in addition to those provided in the core tabular data model described in <a href="#core-tabular-data-model" class="sectionRef"></a> which provide information about the table as a whole. The <dfn title="value">values</dfn> of these properties may be lists, structured objects, or atomic values. Annotations on a table may include:
         </p>
         <ul>
           <li>titles or descriptions of the table</li>
@@ -127,7 +188,7 @@ var respecConfig = {
           <li>links to other tables (eg to indicate tables that include related information)</li>
         </ul>
         <p>
-          The <a title="column">columns</a> within an <a>annotated table</a> are all <dfn title="annotated column">annotated columns</dfn>: columns which MAY have any number of <a title="property">properties</a>. The annotations on a column provide information about how to interpret the <a title="field">fields</a> in the column. Examples of annotations might be:
+          The <a title="column">columns</a> within an <a>annotated table</a> are all <dfn title="annotated column">annotated columns</dfn>: columns which MAY have any number of <a title="property">properties</a> in addition to those provided in the core tabular data model described in <a href="#core-tabular-data-model" class="sectionRef"></a>. The annotations on a column might provide information about how to interpret the <a title="cell">cells</a> in the column or information about the column as a whole. Examples of annotations might be:
         </p>
         <ul>
           <li>a name or label for the column</li>
@@ -135,26 +196,32 @@ var respecConfig = {
           <li>an indication of whether the column contains unique values</li>
         </ul>
         <p>
-          The <a title="row">rows</a> within an <a>annotated table</a> are all <dfn title="annotated row">annotated rows</dfn>: rows which MAY have any number of <a title="property">properties</a>. The annotations on a row provide additional metadata about the information held in the row, such as:
+          The <a title="row">rows</a> within an <a>annotated table</a> are all <dfn title="annotated row">annotated rows</dfn>: rows which MAY have any number of <a title="property">properties</a> in addition to those provided in the core tabular data model described in <a href="#core-tabular-data-model" class="sectionRef"></a>. The annotations on a row provide additional metadata about the information held in the row, such as:
         </p>
         <ul>
           <li>the certainty of the information in that row</li>
           <li>information about the source or provenance of the data in that row</li>
         </ul>
         <p>
-          The <a title="field">fields</a> within an <a>annotated row</a> are all <dfn title="annotated field">annotated fields</dfn>: fields which MAY have any number of <a title="property">properties</a>. The annotations on a field provide metadata about the value held in the field, particularly when this overrides the information provided for the <a>annotated column</a> and <a>annotated row</a> that the field falls within. Annotations on a field might be:
+          The <a title="cell">cells</a> within an <a>annotated row</a> are all <dfn title="annotated cell">annotated cells</dfn>: cells which MAY have any number of <a title="property">properties</a> in addition to those provided in the core tabular data model described in <a href="#core-tabular-data-model" class="sectionRef"></a>. The annotations on a cell provide metadata about the value held in the cell, particularly when this overrides the information provided for the <a>annotated column</a> and <a>annotated row</a> that the cell falls within. Annotations on a cell might be:
         </p>
         <ul>
           <li>notes to aid the interpretation of the value</li>
           <li>type annotations for the value</li>
           <li>a flag that indicates the value is a null value</li>
         </ul>
+        <p>
+          The <a title="cell value">value</a> of an <a>annotated cell</a> MAY be of a datatype other than a string. For example, annotations might enable a processor to understand the <a>string value</a> of the cell as representing a number or a date.
+        </p>
+        <p class="issue">
+          The permitted types of names and values of annotations need to be spelled out here.
+        </p>
         <div class="issue">
           <p>
             It might be useful to define annotated regions as follows:
           </p>
           <blockquote>
-            An <a>annotated table</a> may also contain a number of <dfn title="annotated region">annotated regions</dfn>. Regions are themselves tabular structures comprised of selected <a title="row">rows</a> and <a title="column">columns</a> and the <a title="field">fields</a> within those rows for those columns. Annotated regions are regions that have annotations associated with them. <a title="annotated column">Annotated columns</a> and <a title="annotated row">annotated rows</a> are special types of annotated regions where the region is the entirety of a single column or single row.
+            An <a>annotated table</a> may also contain a number of <dfn title="annotated region">annotated regions</dfn>. Regions are themselves tabular structures comprised of selected <a title="row">rows</a> and <a title="column">columns</a> and the <a title="cell">cells</a> within those rows for those columns. Annotated regions are regions that have annotations associated with them. <a title="annotated column">Annotated columns</a> and <a title="annotated row">annotated rows</a> are special types of annotated regions where the region is the entirety of a single column or single row.
           </blockquote>
           <p>
             But it's not currently clear that there are use cases or examples that justify it. Input is welcome on this.
@@ -200,10 +267,10 @@ var respecConfig = {
       <section>
         <h3>Embedded Metadata</h3>
         <p>
-          The first line of a CSV+ file MUST be processed as a header line unless the CSV+ file is served with a <code>header=absent</code> parameter on the media type. Each non-<a>empty field</a> in the header line provides a <strong>name</strong> annotation on the column in which it appears.
+          The first line of a CSV+ file MUST be processed as a header line unless the CSV+ file is served with a <code>header=absent</code> parameter on the media type. Each cell in the header line that includes non-whitespace characters provides a <strong>title</strong> annotation on the column in which it appears.
         </p>
         <p class="issue">
-          The <strong>name</strong> annotation needs to be linked to the relevant annotation in the metadata vocabulary.
+          The <strong>title</strong> annotation needs to be linked to the relevant annotation in the metadata vocabulary.
         </p>
       </section>
       <section>
@@ -294,7 +361,7 @@ Content-Type: text/csv;charset=ISO-8859-1
       <section id="line-endings">
         <h3>Line Endings</h3>
         <p>
-          The ends of rows in a CSV+ file MUST be either <code>CRLF</code> (<code>U+000D U+000A</code>) or <code>LF</code> (<code>U+000A</code>). Line endings within escaped <a title="field">fields</a> are not normalised.
+          The ends of rows in a CSV+ file MUST be either <code>CRLF</code> (<code>U+000D U+000A</code>) or <code>LF</code> (<code>U+000A</code>). Line endings within escaped <a title="cell">cells</a> are not normalised.
         </p>
         <div class="issue">
           <p>
@@ -311,7 +378,7 @@ Content-Type: text/csv;charset=ISO-8859-1
           Each line of a CSV+ file MUST contain the same number of comma-separated values.
         </p>
         <p>
-          Values that contain commas, line endings or double quotes MUST be escaped by having the entire value wrapped in double quotes. There MUST NOT be whitespace before or after the double quotes. Within these escaped fields, any double quotes MUST be escaped with two double quotes (<code>""</code>).
+          Values that contain commas, line endings or double quotes MUST be escaped by having the entire value wrapped in double quotes. There MUST NOT be whitespace before or after the double quotes. Within these escaped cells, any double quotes MUST be escaped with two double quotes (<code>""</code>).
         </p>
         <section id="headers">
           <h4>Headers</h4>
@@ -328,39 +395,41 @@ Content-Type: text/csv;header=absent
         <section>
           <h4>Bidirectionality in CSV+ Files</h4>
           <p>
-            Bidirectional content does not alter the definition of rows or the assignment of fields to columns. Whether or not a CSV+ file contains right-to-left characters, the first column's content is the first field of each row, which is the text prior to the first occurrence of a comma within that row.
+            Bidirectional content does not alter the definition of rows or the assignment of cells to columns. Whether or not a CSV+ file contains right-to-left characters, the first column's content is the first cell of each row, which is the text prior to the first occurrence of a comma within that row.
           </p>
           <div class="example">
             <p>
               For example, <a href="http://referendum2012.elections.eg/results/referendum-results">Egyptian Referendum results</a> are available as a CSV file at <a href="https://egelections-2011.appspot.com/Referendum2012/results/csv/EG.csv">https://egelections-2011.appspot.com/Referendum2012/results/csv/EG.csv</a>. Over the wire and in non-Unicode-aware text editors, the CSV looks like:
             </p>
             <pre>
-<bdi>ا</bdi><bdi>ل</bdi><bdi>م</bdi><bdi>ح</bdi><bdi>ا</bdi><bdi>ف</bdi><bdi>ظ</bdi><bdi>ة</bdi>,<bdi>ن</bdi><bdi>س</bdi><bdi>ب</bdi><bdi>ة</bdi><bdi> </bdi><bdi>م</bdi><bdi>و</bdi><bdi>ا</bdi><bdi>ف</bdi><bdi>ق</bdi>,<bdi>ن</bdi><bdi>س</bdi><bdi>ب</bdi><bdi>ة</bdi><bdi> </bdi><bdi>غ</bdi><bdi>ي</bdi><bdi>ر</bdi><bdi> </bdi><bdi>م</bdi><bdi>و</bdi><bdi>ا</bdi><bdi>ف</bdi><bdi>ق</bdi>,<bdi>ع</bdi><bdi>د</bdi><bdi>د</bdi><bdi> </bdi><bdi>ا</bdi><bdi>ل</bdi><bdi>ن</bdi><bdi>ا</bdi><bdi>خ</bdi><bdi>ب</bdi><bdi>ي</bdi><bdi>ن</bdi>,<bdi>ا</bdi><bdi>ل</bdi><bdi>أ</bdi><bdi>ص</bdi><bdi>و</bdi><bdi>ا</bdi><bdi>ت</bdi><bdi> </bdi><bdi>ا</bdi><bdi>ل</bdi><bdi>ص</bdi><bdi>ح</bdi><bdi>ي</bdi><bdi>ح</bdi><bdi>ة</bdi>,<bdi>ا</bdi><bdi>ل</bdi><bdi>أ</bdi><bdi>ص</bdi><bdi>و</bdi><bdi>ا</bdi><bdi>ت</bdi><bdi> </bdi><bdi>ا</bdi><bdi>ل</bdi><bdi>ب</bdi><bdi>ا</bdi><bdi>ط</bdi><bdi>ل</bdi><bdi>ة</bdi>,<bdi>ن</bdi><bdi>س</bdi><bdi>ب</bdi><bdi>ة</bdi><bdi> </bdi><bdi>ا</bdi><bdi>ل</bdi><bdi>م</bdi><bdi>ش</bdi><bdi>ا</bdi><bdi>ر</bdi><bdi>ك</bdi><bdi>ة</bdi>,<bdi>م</bdi><bdi>و</bdi><bdi>ا</bdi><bdi>ف</bdi><bdi>ق</bdi>,<bdi>غ</bdi><bdi>ي</bdi><bdi>ر</bdi><bdi> </bdi><bdi>م</bdi><bdi>و</bdi><bdi>ا</bdi><bdi>ف</bdi><bdi>ق</bdi>
-<bdi>ا</bdi><bdi>ل</bdi><bdi>ق</bdi><bdi>ل</bdi><bdi>ي</bdi><bdi>و</bdi><bdi>ب</bdi><bdi>ي</bdi><bdi>ة</bdi>,60.0,40.0,"2,639,808","853,125","15,224",32.9,"512,055","341,070"
-<bdi>ا</bdi><bdi>ل</bdi><bdi>ج</bdi><bdi>ي</bdi><bdi>ز</bdi><bdi>ة</bdi>,66.7,33.3,"4,383,701","1,493,092","24,105",34.6,"995,417","497,675"
-<bdi>ا</bdi><bdi>ل</bdi><bdi>ق</bdi><bdi>ا</bdi><bdi>ه</bdi><bdi>ر</bdi><bdi>ة</bdi>,43.2,56.8,"6,580,478","2,254,698","36,342",34.8,"974,371","1,280,327"
-<bdi>ق</bdi><bdi>ن</bdi><bdi>ا</bdi>,84.5,15.5,"1,629,713","364,509","6,743",22.8,"307,839","56,670"
+              <bdo dir="ltr">
+&#8204;ا&#8204;ل&#8204;م&#8204;ح&#8204;ا&#8204;ف&#8204;ظ&#8204;ة&#8204;,&#8204;ن&#8204;س&#8204;ب&#8204;ة&#8204; &#8204;م&#8204;و&#8204;ا&#8204;ف&#8204;ق&#8204;,&#8204;ن&#8204;س&#8204;ب&#8204;ة&#8204; &#8204;غ&#8204;ي&#8204;ر&#8204; &#8204;م&#8204;و&#8204;ا&#8204;ف&#8204;ق&#8204;,&#8204;ع&#8204;د&#8204;د&#8204; &#8204;ا&#8204;ل&#8204;ن&#8204;ا&#8204;خ&#8204;ب&#8204;ي&#8204;ن&#8204;,&#8204;ا&#8204;ل&#8204;أ&#8204;ص&#8204;و&#8204;ا&#8204;ت&#8204; &#8204;ا&#8204;ل&#8204;ص&#8204;ح&#8204;ي&#8204;ح&#8204;ة&#8204;,&#8204;ا&#8204;ل&#8204;أ&#8204;ص&#8204;و&#8204;ا&#8204;ت&#8204; &#8204;ا&#8204;ل&#8204;ب&#8204;ا&#8204;ط&#8204;ل&#8204;ة&#8204;,&#8204;ن&#8204;س&#8204;ب&#8204;ة&#8204; &#8204;ا&#8204;ل&#8204;م&#8204;ش&#8204;ا&#8204;ر&#8204;ك&#8204;ة&#8204;,&#8204;م&#8204;و&#8204;ا&#8204;ف&#8204;ق&#8204;,&#8204;غ&#8204;ي&#8204;ر&#8204; &#8204;م&#8204;و&#8204;ا&#8204;ف&#8204;ق&#8204;
+&#8204;ا&#8204;ل&#8204;ق&#8204;ل&#8204;ي&#8204;و&#8204;ب&#8204;ي&#8204;ة&#8204;,60.0,40.0,"2,639,808","853,125","15,224",32.9,"512,055","341,070"
+&#8204;ا&#8204;ل&#8204;ج&#8204;ي&#8204;ز&#8204;ة&#8204;,66.7,33.3,"4,383,701","1,493,092","24,105",34.6,"995,417","497,675"
+&#8204;ا&#8204;ل&#8204;ق&#8204;ا&#8204;ه&#8204;ر&#8204;ة&#8204;,43.2,56.8,"6,580,478","2,254,698","36,342",34.8,"974,371","1,280,327"
+&#8204;ق&#8204;ن&#8204;ا&#8204;,84.5,15.5,"1,629,713","364,509","6,743",22.8,"307,839","56,670"
 ...
+              </bdo>
             </pre>
             <p>
-              Within this CSV file, the first column appears as the content of each line before the first comma and is named <code>المحافظة</code> (appearing at the start of each row as <code><bdi>ا</bdi><bdi>ل</bdi><bdi>م</bdi><bdi>ح</bdi><bdi>ا</bdi><bdi>ف</bdi><bdi>ظ</bdi><bdi>ة</bdi></code> in the example, which is displaying the relevant characters from left to right in the order they appear "on the wire").
+              Within this CSV file, the first column appears as the content of each line before the first comma and is named <code>المحافظة</code> (appearing at the start of each row as <code><bdo dir="ltr">&#8204;ا&#8204;ل&#8204;م&#8204;ح&#8204;ا&#8204;ف&#8204;ظ&#8204;ة&#8204;</bdo></code> in the example, which is displaying the relevant characters from left to right in the order they appear "on the wire").
             </p>
             <p>
               The CSV translates to a table model that looks like:
             </p>
             <table style="width: 100%; text-align: right">
-              <col width="10%"></col>
-              <col width="10%"></col>
-              <col width="10%"></col>
-              <col width="10%"></col>
-              <col width="10%"></col>
-              <col width="10%"></col>
-              <col width="10%"></col>
-              <col width="10%"></col>
-              <col width="10%"></col>
-              <col width="10%"></col>
+              <col style="width: 10%"></col>
+              <col style="width: 10%"></col>
+              <col style="width: 10%"></col>
+              <col style="width: 10%"></col>
+              <col style="width: 10%"></col>
+              <col style="width: 10%"></col>
+              <col style="width: 10%"></col>
+              <col style="width: 10%"></col>
+              <col style="width: 10%"></col>
+              <col style="width: 10%"></col>
               <thead>
-                <tr style="text-align: centre">
+                <tr style="text-align: center">
                   <th>Column / Row</th>
                   <th>column 1</th>
                   <th>column 2</th>
@@ -392,10 +461,10 @@ Content-Type: text/csv;header=absent
               </tbody>
             </table>
             <p>
-              The fragment identifier <code>#col=3</code> identifies the third of the columns, named <code>نسبة غير موافق</code> (appearing as <code><bdi>ن</bdi><bdi>س</bdi><bdi>ب</bdi><bdi>ة</bdi><bdi> </bdi><bdi>غ</bdi><bdi>ي</bdi><bdi>ر</bdi><bdi> </bdi><bdi>م</bdi><bdi>و</bdi><bdi>ا</bdi><bdi>ف</bdi><bdi>ق</bdi></code> in the example).
+              The fragment identifier <code>#col=3</code> identifies the third of the columns, named <code>نسبة غير موافق</code> (appearing as <code><bdo dir="ltr">&#8204;ن&#8204;س&#8204;ب&#8204;ة&#8204; &#8204;غ&#8204;ي&#8204;ر&#8204; &#8204;م&#8204;و&#8204;ا&#8204;ف&#8204;ق&#8204;</bdo></code> in the example).
             </p>
             <p>
-              [[CSV-METADATA]] defines how this table model should be displayed by compliant applications, and how metadata can affect the display. The default is for the display to be determined by the content of the table. For example, if this CSV were turned into an HTML table for display into a web page, it should be displayed with the first column on the right and the last on the left, as follows:
+              [[!tabular-metadata]] defines how this table model should be displayed by compliant applications, and how metadata can affect the display. The default is for the display to be determined by the content of the table. For example, if this CSV were turned into an HTML table for display into a web page, it should be displayed with the first column on the right and the last on the left, as follows:
             </p>
             <table style="width: 100%; text-align: right">
               <thead>
@@ -473,18 +542,18 @@ Content-Type: text/csv;header=absent
              In the example above, if the CSV were served with <code>bidi=rtl</code>, or the table was detected as being a right-to-left table, then the column numbering in the model would be reversed:
             </p>
             <table style="width: 100%; text-align: right">
-              <col width="10%"></col>
-              <col width="10%"></col>
-              <col width="10%"></col>
-              <col width="10%"></col>
-              <col width="10%"></col>
-              <col width="10%"></col>
-              <col width="10%"></col>
-              <col width="10%"></col>
-              <col width="10%"></col>
-              <col width="10%"></col>
+              <col style="width: 10%"></col>
+              <col style="width: 10%"></col>
+              <col style="width: 10%"></col>
+              <col style="width: 10%"></col>
+              <col style="width: 10%"></col>
+              <col style="width: 10%"></col>
+              <col style="width: 10%"></col>
+              <col style="width: 10%"></col>
+              <col style="width: 10%"></col>
+              <col style="width: 10%"></col>
               <thead>
-                <tr style="text-align: centre">
+                <tr style="text-align: center">
                   <th>Column / Row</th>
                   <th>column 9</th>
                   <th>column 8</th>
@@ -558,9 +627,9 @@ Content-Type: text/csv;header=absent
         <dt><dfn>row terminator</dfn></dt>
         <dd>The character that is used at the end of a row. The default is <code>CRLF</code>.</dd>
         <dt><dfn>enclosure character</dfn></dt>
-        <dd>The character that is used around escaped fields. The default is <code>"</code>.</dd>
+        <dd>The character that is used around escaped cells. The default is <code>"</code>.</dd>
         <dt><dfn>escape character</dfn></dt>
-        <dd>The character that is used to escape the <a>enclosure character</a> within escaped fields. The default is <code>"</code>.</dd>
+        <dd>The character that is used to escape the <a>enclosure character</a> within escaped cells. The default is <code>"</code>.</dd>
         <dt><dfn>skip rows</dfn></dt>
         <dd>The number of rows to skip at the beginning of the file, before a header row or tabular data. The default is <code>0</code>.</dd>
         <dt><dfn>comment prefix</dfn></dt>
@@ -568,23 +637,23 @@ Content-Type: text/csv;header=absent
         <dt><dfn>header row count</dfn></dt>
         <dd>The number of header rows (following the skipped rows) in the file. The default is <code>1</code>.</dd>
         <dt><dfn>delimiter</dfn></dt>
-        <dd>The separator between fields. The default is <code>,</code>.</dd>
+        <dd>The separator between cells. The default is <code>,</code>.</dd>
         <dt><dfn>skip columns</dfn></dt>
         <dd>The number of columns to skip at the beginning of each row, before any header columns. The default is <code>0</code>.</dd>
         <dt><dfn>header column count</dfn></dt>
         <dd>The number of header columns (following the skipped columns) in each row. The default is <code>0</code>.</dd>
         <dt><dfn>skip blank rows</dfn></dt>
-        <dd>Indicates whether to ignore wholly empty rows (ie rows in which all the fields are empty). The default is <code>false</code>.</dd>
+        <dd>Indicates whether to ignore wholly empty rows (ie rows in which all the cells are empty). The default is <code>false</code>.</dd>
         <dt><dfn>trim</dfn></dt>
-        <dd>Indicates whether to trim whitespace around fields.</dd>
+        <dd>Indicates whether to trim whitespace around cells.</dd>
       </dl>
       <div class="issue">
         <p>
           When parsing, should we:
         </p>
         <ul>
-          <li>always trim whitespace around fields?</li>
-          <li>always create empty fields for missing cells?</li>
+          <li>always trim whitespace around cells?</li>
+          <li>always create empty cells for missing cells?</li>
         </ul>
       </div>
       <p>
@@ -592,13 +661,13 @@ Content-Type: text/csv;header=absent
       </p>
       <ol>
         <li>Read the file using the specified <a>encoding</a>.</li>
-        <li>Find the rows. Each row ends with a <a>row terminator</a>, but values that are enclosed within the <a>enclosure character</a> may contain the <a>row terminator</a> without it indicating the end of the row. The <a>enclosure character</a> may be escaped using the <a>escape character</a> where it appears within fields.</li>
+        <li>Find the rows. Each row ends with a <a>row terminator</a>, but values that are enclosed within the <a>enclosure character</a> may contain the <a>row terminator</a> without it indicating the end of the row. The <a>enclosure character</a> may be escaped using the <a>escape character</a> where it appears within cells.</li>
         <li>Skip the number of rows indicated by the <a>skip rows</a> parameter.</li>
         <li>Within the skipped rows, find rows that start with the <a>comment prefix</a>. These form comment annotations on the table.</li>
         <li>Gather the number of header rows indicated by the <a>header row count</a> parameter; the remaining rows are data rows.</li>
         <li>
           <p>
-            Split the header and data rows into fields using the <a>delimiter</a>. Values that are enclosed within the <a>enclosure character</a> may contain the <a>delimiter</a>. The <a>enclosure character</a> may be escaped using the <a>escape character</a> where it appears within fields.
+            Split the header and data rows into cells using the <a>delimiter</a>. Values that are enclosed within the <a>enclosure character</a> may contain the <a>delimiter</a>. The <a>enclosure character</a> may be escaped using the <a>escape character</a> where it appears within cells.
           </p>
           <p>
             If <a>trim</a> is <code>true</code> or <code>start</code> then whitespace from the start of values that are not enclosed must be removed from the value. If <a>trim</a> is <code>true</code> or <code>end</code> then whitespace from the end of values that are not enclosed must be removed from the value.
@@ -606,22 +675,22 @@ Content-Type: text/csv;header=absent
         </li>
         <li>In each row, ignore the number of columns indicated by the <a>skip columns</a> parameter. Always start from the first character in the row when counting columns (see <a href="#bidirectionality-in-csv-files" class="sectionRef"></a>).</li>
         <li>Gather the number of header columns indicated by the <a>header column count</a> parameter. Always start from the first character in the row when counting columns (see <a href="#bidirectionality-in-csv-files" class="sectionRef"></a>).</li>
-        <li>Each field within a header row that is not in a skipped or header column is a label annotation on that column.</li>
-        <li>Each field within a header column is an annotation on the row it appears in; if there is a header row then that provides the type of the annotation for the row, otherwise it is a label annotation.</li>
-        <li>If <a>skip blank rows</a> is <code>true</code> then ignore any rows in which all the field values are empty strings.</li>
+        <li>Each cell within a header row that is not in a skipped or header column is a label annotation on that column.</li>
+        <li>Each cell within a header column is an annotation on the row it appears in; if there is a header row then that provides the type of the annotation for the row, otherwise it is a label annotation.</li>
+        <li>If <a>skip blank rows</a> is <code>true</code> then ignore any rows in which all the cell values are empty strings.</li>
       </ol>
       <!-- alternative, more procedural appraoch would be something like this:
       <p>
         To <dfn>read a row</dfn>:
       </p>
       <ol>
-        <li>set <var>fields</var> to an empty list</li>
+        <li>set <var>cells</var> to an empty list</li>
         <li>set <var>skipped rows</var> to <code>0</code></li>
         <li>set <var>header rows</var> to an empty list</li>
-        <li><a>read a field</a> and add that value to the <var>fields</var> list</li>
+        <li><a>read a cell</a> and add that value to the <var>cells</var> list</li>
         <li>if the next character is whitespace, then if <a>trim</a> is <code>true</code> or <code>end</code> then ignore the next whitespace characters, otherwise raise an error.</li>
         <li>otherwise, if the next character is the <a>delimiter</a> then go back to step 2.</li>
-        <li>otherwise, if the next character is the <a>row terminator</a> then return the list of <var>fields</var> as the content of the row.</li>
+        <li>otherwise, if the next character is the <a>row terminator</a> then return the list of <var>cells</var> as the content of the row.</li>
       </ol>
     -->
     </section>
@@ -671,7 +740,7 @@ TEXTDATA =  %x20-21 / %x23-2B / %x2D-7E
         <section>
           <h4>Saved CSV</h4>
           <p>
-            Excel generates CSV files encoded using Windows-1252 with <code>LF</code> line endings. Characters that cannot be represented within Windows-1252 are replaced by underscores. Only those fields that need escaping (eg because they contain commas or double quotes) are escaped, and double quotes are escaped with two double quotes.
+            Excel generates CSV files encoded using Windows-1252 with <code>LF</code> line endings. Characters that cannot be represented within Windows-1252 are replaced by underscores. Only those cells that need escaping (eg because they contain commas or double quotes) are escaped, and double quotes are escaped with two double quotes.
           </p>
           <p>
             Dates and numbers are formatted as displayed, which means that formatting can lead to information being lost or becoming inconsistent.
@@ -680,7 +749,7 @@ TEXTDATA =  %x20-21 / %x23-2B / %x2D-7E
         <section>
           <h4>Opened CSV</h4>
           <p>
-            When opening CSV files, Excel interprets CSV files saved in UTF-8 as being encoded as Windows-1252 (whether or not a <a href="http://en.wikipedia.org/wiki/Byte_order_mark"><abbr title="Byte Order Mark">BOM</abbr></a> is present). It correctly deals with double quoted fields, except that it converts line breaks within fields into spaces. It understands <code>CRLF</code> as a line break. It detects dates (formatted as <code>YYYY-MM-DD</code>) and formats them in the default date formatting for files.
+            When opening CSV files, Excel interprets CSV files saved in UTF-8 as being encoded as Windows-1252 (whether or not a <a href="http://en.wikipedia.org/wiki/Byte_order_mark"><abbr title="Byte Order Mark">BOM</abbr></a> is present). It correctly deals with double quoted cells, except that it converts line breaks within cells into spaces. It understands <code>CRLF</code> as a line break. It detects dates (formatted as <code>YYYY-MM-DD</code>) and formats them in the default date formatting for files.
           </p>
         </section>
         <section>
@@ -689,7 +758,7 @@ TEXTDATA =  %x20-21 / %x23-2B / %x2D-7E
             Excel provides more control when importing CSV files into Excel. However, it does not properly understand UTF-8 (with or without BOM). It does however properly understand UTF-16 and can read non-ASCII characters from a UTF-16-encoded file.
           </p>
           <p>
-            A particular quirk in the importing of CSV is that if a field contains a line break, the final double quote that escapes the field will be included within it.
+            A particular quirk in the importing of CSV is that if a cell contains a line break, the final double quote that escapes the cell will be included within it.
           </p>
         </section>
         <section>
@@ -766,7 +835,7 @@ TEXTDATA =  %x20-21 / %x23-2B / %x2D-7E
       </section>
       <div class="issue">
         <p>
-          More details of behaviour of other tools should go here. This should include the most popular CSV parsing/generating libraries in common programming languages. Test files which include non-ASCII characters, double quotes and line breaks within fields are:
+          More details of behaviour of other tools should go here. This should include the most popular CSV parsing/generating libraries in common programming languages. Test files which include non-ASCII characters, double quotes and line breaks within cells are:
         </p>
         <ul>
           <li><a href="test-utf8.csv">test-utf8.csv</a></li>
