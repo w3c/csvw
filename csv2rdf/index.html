@@ -9,11 +9,67 @@
     <script class="remove">
 var respecConfig = {
     localBiblio: {
-    //     "EBNF-NOTATION": "Tim Bray; Jean Paoli; C. M. Sperberg-McQueen; Eve Maler; François Yergeau. <a href=\"http://www.w3.org/TR/REC-xml/#sec-notation\"><cite>EBNF Notation</cite></a> 26 November 2008. W3C Recommendation. URL: <a href=\"http://www.w3.org/TR/REC-xml/#sec-notation\">http://www.w3.org/TR/REC-xml/#sec-notation</a>"
-    "RFC6570": "J. Gregorio; R. Fielding; M. Hadley; M. Nottingham; D. Orchard <a href=\"http://tools.ietf.org/html/rfc6570\"><cite>URI Template</cite></a> March 2012. Proposed Internet RFC 3987. URL: <a href=\"http://tools.ietf.org/html/rfc6570\">http://tools.ietf.org/html/rfc6570</a>",
-    "tabular-data-model": "J. Tennison; G. Kellogg; <a href=\"http://www.w3.org/TR/tabular-data-model/\"><cite>Model for Tabular Data and Metadata on the Web</cite></a>, 16 May 2014. W3C Working Draft. URL: <a href=\"http://www.w3.org/TR/2014/WD-tabular-data-model-20140327/\">http://www.w3.org/TR/2014/WD-tabular-data-model-20140327/</a>. Editor's Draft: <a href=\"http://w3c.github.io/csvw/syntax/\">http://w3c.github.io/csvw/syntax/</a>.",
-    "tabular-metadata": "R. Pollock; J. Tennison; <a href=\"http://w3c.github.io/csvw/metadata/\"><cite>Metadata Vocabulary for Tabular Data</cite></a>, 16 May 2014. W3C Editor's Draft. URL: <a href=\"http://w3c.github.io/csvw/metadata/\">http://w3c.github.io/csvw/metadata/</a>. "
-  
+      "tabular-data-model": {
+          "authors": [
+            "Jeni Tennison",
+            "Gregg Kellogg"
+          ],
+          "title": "Model for Tabular Data and Metadata on the Web",
+          "href" : "http://www.w3.org/TR/2014/WD-tabular-data-model-20140710/",
+          "rawDate": "2014-07-10",
+          "status" : "WD",
+          "publisher": "W3C"
+      },
+      "tabular-metadata": {
+          "authors": [
+            "Rufus Pollock",
+            "Jeni Tennison"
+          ],
+          "title": "Metadata Vocabulary for Tabular Data",
+          "href" : "http://www.w3.org/TR/2014/WD-tabular-metadata-20140710/",
+          "rawDate": "2014-07-10",
+          "status" : "WD",
+          "publisher": "W3C"
+      },
+      "UNICODE-BIDI" : {
+        "authors" : [
+          "Mark Davis",
+          "Aharon Lanin",
+          "Andrew Glass"
+        ],
+        "title": "TR9, Unicode Bidirectional Algorithm",
+        "href": "http://unicode.org/reports/tr9/",
+        "rawDate" : "2013-09-24",
+        "publisher" : "Unicode Consortium",
+        "status" : "Report"
+      },
+      "RFC3066" : {
+          "authors" : [
+            "H. Alvestrand"
+          ],
+          "title" : "Tags for the Identification of Languages 1995",
+          "rawDate" : "2001-01",
+          "status": "Internet Best Current Practice",
+          "publisher" : "IETF",
+          "href" : "http://www.ietf.org/rfc/rfc3066.txt"
+      },
+      "RFC6570" : {
+          "authors" : [
+            "J. Gregorio",
+            "R. Fielding",
+            "M. Hadley",
+            "M. Nottingham",
+            "D. Orchard"
+          ],
+          "title" : "URI Template",
+          "rawDate" : "2002-01",
+          "status": "Proposed Internet RFC",
+          "publisher" : "IETF",
+          "href" : "http://www.ietf.org/rfc/rfc6570.txt"
+      },
+
+
+
     },
     specStatus: "ED",
     shortName: "csv2rdf",
@@ -73,6 +129,7 @@ var respecConfig = {
       .grammar td { font-family: monospace; vertical-align: top; }
       .grammar-literal { color: gray;}
       .TBD { font-style: italic; background: yellow;}
+      .steps li { margin-bottom: 0.5em;}
     </style>
   </head>
   <body>
@@ -84,21 +141,11 @@ var respecConfig = {
     </section>
     <section id="intro">
       <h2>Introduction</h2>
-      <p> <dfn title="tabular data">Tabular data</dfn> is data that is
-        structured into rows, each of which contains information about some
-        thing. Each row contains the same number of fields (although some of
-        these fields may be empty), which provide values of properties of the
-        thing described by the row. In tabular data, fields within the same
-        column provide values for the same property of the thing described by
-        the particular row. This is what differentiates tabular data from other
-        line-oriented formats. </p>
-      <p> One common form of Tabular Data is CSV RFC [[!RFC4180]] (to be
-        revised). </p>
       <p>This document describes the processing of Tabular Data
         [[!tabular-data-model]] to produce RDF [[!rdf11-concepts]]. It does not
-        cover any cleaning or trasnformation processes needed to convert the
-        initial data into Tabular Data form. Tabular Data defines an abstract
-        data model considitng of tables, columns, header rows and data rows. It
+        cover any cleaning or transformation processes needed to convert the
+        initial CSV data into Tabular Data form. Tabular Data defines an abstract
+        data model consisting of tables, columns, header rows, and data rows. It
         requires all rows to have the same number of columns. As such, Tabular
         Data does not cover all possible CSV files and ths processes described
         in this document do not apply to all possible CSV files. </p>
@@ -111,7 +158,7 @@ var respecConfig = {
         data model consisting of <dfn title="table">tables</dfn>, <dfn title="column">columns</dfn>, 
         possible <dfn title="header row">header rows</dfn> providing <dfn title="name">column names</dfn>,
         and <dfn title="row">data rows</dfn>. 
-        Each row consists of a number of <dfn title="field">fields</dfn>. It
+        Each row consists of a number of <dfn title="cell">cells</dfn>. It
         requires all rows to have the same number of columns. The specification
         relies on the terms (e.g, header, row, column) as defined
         in&nbsp;[[!tabular-data-model]].</p>
@@ -134,153 +181,122 @@ var respecConfig = {
     <section id="processing-tabular">
       <h2>Processing Annotated Tabular Data</h2>
 
-      <p>The processing of tabular data is based on the abstract
-         <a href="http://www.w3.org/TR/tabular-data-model/#annotated-model"><em>Annotated Tabular Data</em></a> 
-         format as defined in&nbsp;[[!tabular-data-model]]. It does not cover any details on how the initial data (i.e., a CSV file) is
-        parsed into one of those abstract Data formats. The processing steps below define the generated RDF [[!rdf11-concepts]]
-        triples in a serialization-syntax independent way.</p>
+      <p>The processing of tabular data is based on the abstract <a href="http://www.w3.org/TR/tabular-data-model/#annotated-model"><em>Annotated Tabular Data</em></a> format as defined in&nbsp;[[!tabular-data-model]]. It does not cover any details on how the initial data (i.e., a CSV file) is parsed into one of those abstract Data formats. The processing steps below define the generated RDF [[!rdf11-concepts]] triples in a serialization-syntax independent way.</p>
  
-      <p>Processing makes use of the metadata associated with the tabular data, and defined in the "Metadata
-        Vocabulary for Tabular Data" [[!tabular-metadata]] document. In this section the term <dfn>property</dfn>&nbsp;
-        refers to the properties defined in that document.</p>
+      <p>Processing makes use of the metadata associated with the tabular data, and defined in the "Metadata Vocabulary for Tabular Data" [[!tabular-metadata]] document. In this section the term <dfn>property</dfn> refers to the properties defined in that document.</p>
 
-      <p>The metadata for the tabular data may originate from <a href="http://www.w3.org/TR/tabular-data-model/#embedded-metadata">embedded metadata</a> only. In practice this means that the <a title="name">column names</a> are provided by a <a title="header row">header row</a>, but no other
-      metadata is provided in the format described in [[!tabular-metadata]]. In that case, for the purpose of this section, processing begins by
-      (virtually) providing metadata of the format:</p>
+      <p>The metadata for the tabular data may originate from <a href="http://www.w3.org/TR/tabular-data-model/#embedded-metadata">embedded metadata</a> only. In practice this means that the <a title="name">column names</a> MAY be provided by a <a title="header row">header row</a>, but no other metadata is provided in the format described in [[!tabular-metadata]]. In that case, for the purpose of this section, processing begins by (conceptually) establishing the metadata as:</p>
 
      <pre>[{
   "@id": "<em>URI of the CSV file</em>",
-  "columns": [{
-    "name": "<em>name<sub>1</sub></em>",
-   }, 
-   {
-    "name": "<em>name<sub>2</sub></em>",
-   }, 
-   .
-   .
-   .
-   {
-    "name": "<em>name<sub>k</sub></em>",
-  }]
+  "schema": {
+    "columns": [{
+       "name": "<em>name<sub>1</sub></em>",
+    }, 
+    {
+       "name": "<em>name<sub>2</sub></em>",
+    }, 
+    .
+    .
+    .
+    {
+        "name": "<em>name<sub>k</sub></em>",
+    }]
+  }
 }]</pre>
-    <p>Where <code>name<sub>1</sub></code>, <code>name<sub>1</sub></code>,…,<code>name<sub>k</sub></code> are the names of the columns.</p> 
-     
+      <p>where <code>name<sub>1</sub></code>, <code>name<sub>1</sub></code>,…,<code>name<sub>k</sub></code> are the names of the columns.</p> 
 
-      <p>This section uses the value of the (required) <code>@id</code>
-        property, expanded with <code>#</code>, as the default namespace.
-        I.e., if the value of the <code>@id</code> property is <code>http://www.example.org/tree-ops.csv</code>,
-        then <code>:name</code> is the CURIE abbreviation for <code>http://www.example.org/tree-ops.csv#name</code>.</p>
-      <p>The processing steps are separated in the generation of table-level
-        RDF triples, and row level RDF triples.</p>
-      <section id="processing-steps-annotated-table">
-        <h4>Processing Steps for Table-Level RDF triples</h4>
-        <p>The following RDF triples are generated as table level triples:</p>
+      <section>
+        <h4>Default namespace setting</h4>
+
+        <p>For the purpose of this specification, the <dfn title="default namespace">default namespace</dfn> is used for the value of the CURIE prefix <code>:</code>. This default namespace is set as follows:</p>
         <ul>
-          <li>If the <code>@type</code> <a>property</a> is set:
-            <ul>
-              <li> If the value <code>C</code> of the <code>@type</code>
-                property is an IRI, generate <br>
-                <code>(@id rdf:type C)</code><br>
-              </li>
-              <li> otherwise, generate <br>
-                <code>(@id rdf:type :C)</code> </li>
-            </ul>
-          </li>
-          <li> For each (optional) <a>property</a> <code>prop<sub>i</sub></code>, corresponding to a term defined in [[!DC-TERMS]], 
-            add the triple 
-            <br><code>(@id dc:prop<sub>i</sub> value<sub>i</sub>)</code><br>
-            where <code>value<sub>i</sub></code> is the value of the <code>prop<sub>i</sub></code>.
+          <li>If the <code>@base</code> <a>property</a> is set, its value is the default namespace;</li>
+          <li>Otherwise, the default namespace is the value of the (required) <code>@id</code> property, expanded with <code>#</code> unless that character is already the last character of the value is already <code>#</code>.
           </li>
         </ul>
+
+        <p>For example, if the value of the <code>@id</code> property is <code>http://www.example.org/tree-ops.csv</code>, and no <code>@base</code> is set, then <code>:name</code> is the CURIE abbreviation for <code>http://www.example.org/tree-ops.csv#name</code>.</p>
       </section>
-      <section id="processing-steps-annotated-table">
-        <h4>Processing Steps for Field-Level RDF triples</h4>
-        <ul>
-          <li> The metadata specification in [[!tabular-metadata]] requires the presence of the <code>name</code>
-            <a>property</a> for each <a>column</a>. For each of those names, a corresponding
-            IRI (referred to hereafter as <code>C<sub>i</sub></code>) is defined as follows:
-            <ul>
-              <li>If the i<sup>th</sup> column descriptor metadata includes
-                the <code>column-template</code> <a>property</a> then the
-                corresponding template rules are used to generate <code>C<sub>i</sub></code>.</li>
-              <li>Otherwise, <code>C<sub>i</sub></code> is set using the <em>normalized
-                  version</em> of <a>name</a> as a <a>CURIE</a> reference
-                combined with the default namespace (normalization means
-                adding the necessary escape characters to <a>name</a> to
-                make the CURIE expansion a valid URI)</li>
-            </ul>
-          </li>
-          <li> For each <a>row</a> "j", a common
-            <code>subject<sub>j</sub></code> is established as follows:
-            <ul>
-              <li> If the metadata specifies a primary key via a <code>primaryKey</code>
-                property, then:
-                <ul>
-                  <li>If the primary key is a single column <code>name</code>,
-                    then <code>subject<sub>j</sub> = :name</code></li>
-                  <li>otherwise, <code>subject<sub>j</sub> = :name<sub>1</sub>-name<sub>2</sub>-…-name<sub>k</sub></code>,
-                    where <code>name<sub>1</sub></code>, <code>name<sub>2</sub></code>,
-                    …, <code>name<sub>k</sub></code> are the column names
-                    listed as primary key values.</li>
-                </ul>
-              </li>
-              <li>Otherwise <code>subject<sub>j</sub></code> is set to a
-                newly generated blank node, as
-                defined in [[!rdf11-concepts]]. </li>
-            </ul>
-          </li>
-          <li>For <a>row</a> "j", the following RDF triple is generated: <br>
-            <code>(subject<sub>j</sub> csvw:row "j"^^xsd:integer)</code></li>
-          <li> For each <a>field</a> "i" in row "j", the value of <code>object<sub>i</sub></code>
-            is established as follows:
-            <ul>
-              <li>If the i<sup>th</sup> column is defined as a foreign key via
-                the <code>foreignKeys</code> property, <code>object<sub>i</sub></code>
-                is set to the IRI defined for the foreign key <span class="TBD">(This is sketchy...)</span>. </li>
-              <li>Otherwise, if the i<sup>th</sup> column descriptor metadata
-                includes the <code>type</code> property, then <code>object<sub>i</sub></code>
-                is the literal value of the field with the corresponding XSD
-                datatype [[!xmlschema11-2]]. Note that this may require a
-                transformation of the field to abide to the lexical form rules
-                of the corresponding XSD datatype (e.g., for dates)</li>
-              <li>Otherwise, if the i<sup>th</sup> column descriptor metadata
-                includes the <code>field-template</code> property, then the
-                corresponding template rules are used to generate the final
-                object value. If the i<sup>th</sup> column descriptor metadata
-                includes the <code>rdf-predicate-type</code> property with a
-                value <code>object</code>, then <code>object<sub>i</sub></code>
-                is an IRI reference; otherwise, it is an RDF Literal of type <code>xsd:string</code>
-                with the generated value as lexical form.</li>
-              <li>Otherwise, if the i<sup>th</sup> column descriptor metadata
-                includes the <code>language</code> property, then <code>object<sub>i</sub></code>
-                is an RDF literal with a language tag; the latter is set to
-                the value of the <code>language</code> property.</li>
-              <li>Otherwise, <code>object<sub>i</sub></code> is an RDF
-                Literal of type <code>xsd:string</code> with the value of the
-                field as lexical form.</li>
-            </ul>
-            Once the value of <code>object<sub>j</sub></code> established,
-            the following triple is generated: <br>
-            <code>(subject<sub>j</sub> C<sub>j</sub> object<sub>i</sub>)</code>
-          </li>
-        </ul>
+      <section>
+        <h4>Generating RDF Triples</h4>
+        <p>The processing steps are separated in the generation of table-level RDF triples, and cell-level RDF triples; these steps add RDF triples to the final RDF Graph.</p>
 
-        <div class="issue">The exact mapping to Dublin Core is underspecified; not sure how much details we want to put here.</div>
+        <section id="table-level-RDF">
+          <h4>Processing Steps for Table-Level RDF triples</h4>
+          <p>The following RDF triples are added as table level triples (<code>@id</code> in the triples stands for the value of the corresponding table <code>@id</code> <a>property</a>):</p>
+          <ul class="steps">
+            <li>If the <code>@type</code> <a>property</a> is set, add:<br>
+                <code>(@id rdf:type csv:Table)</code>
+            </li>
+            <li>If the <code>notes</code> <a>property</a> is set, its value is either an array of annotation objects, or a single annotation object, each with its own (required) <code>@id</code> <a>property</a>. For each of those annotation objects add the following triple (where <code>@id<sub>i</sub></code> is the <code>@id</code> value for the i<sup>th</sup> annotation object):<br>
+              <code>(@id csv:note @id<sub>i</sub>)</code>
+            </li>
+            <li> For each (optional) <a>property</a> <code>prop<sub>i</sub></code> with code>value<sub>i</sub></code> corresponding to a term defined in [[!DC-TERMS]], add the triple: 
+              <br><code>(@id dc:prop<sub>i</sub> value<sub>i</sub>)</code>
+            </li>
+          </ul>
+          <div class="issue">
+            Not clear what to do with the @type property. The current metadata specification requires it to have the value of "Table", leaving the actual values dependent on a possible JSON-LD context. Because it is a fixed value, a fixed value has been used in this specification, which may not be what was meant. On the other hand, it may be a problem to require implementations to interpret the @context structure...
+          </div>
+          <div class="issue">
+            The last set of triple generation may depend on whether schema.org terms are used instead of Dublin Core.
+          </div>
+        </section>
 
-        <div class="issue">Some of the metadata, e.g., description of columns, are lost. Maybe it is worth adding a separate set of triples that collects those</div>
+        <section id="cell-level-RDF">
+          <h4>Processing Steps for Cell-Level RDF triples</h4>
+          <p class="note">The metadata specification&nbsp;[[!tabular-metadata]] has an inheritence structure whereby the metadata for a cell (e.g., <code>datatype</code>) may be derived from values specified for a column, a row, or indeed the specific cell itself. This specification considers the result of this derivation for each <a>property</a>.</p>
+          <ul class="steps">
+            <li> The metadata&nbsp;[[!tabular-metadata]] defines the <code>name</code> <a>property</a> for each <a>column</a> (as part of the <code>schema</code> array). For each of those names, a corresponding IRI (referred to hereafter as <code>C<sub>i</sub></code>) is defined as follows:
+              <ul>
+                <li>If the i<sup>th</sup> column descriptor metadata includes the <code>column-template</code> <a>property</a> then the corresponding template rules are used to generate <code>C<sub>i</sub></code>.</li>
+                <li>Otherwise, <code>C<sub>i</sub></code> is set using the <dfn>normalized version</dfn> of <a>name</a> as a <a>CURIE</a> reference combined with the default namespace (normalization means encoding <a>name</a> to make the CURIE expansion a valid URI)</li>
+              </ul>
+            </li>
+            <li> For the j<sup>th</sup> <a>row</a> a <code>subject<sub>j</sub></code> is established as follows:
+              <ul>
+                <li> If the metadata specifies a primary key via a <code>primaryKey</code> property, then:
+                  <ul>
+                    <li>if the primary key refers to a single column with the <code>name</code> property set, then <code>subject<sub>j</sub></code> is set to the <a>normalized version</a> of <code>name</code> as a CURIE reference combined with the default namespace</li>
+                    <li>otherwise, <code>subject<sub>j</sub></code> is set to the <a>normalized version</a> of <code>name<sub>1</sub>-name<sub>2</sub>-…-name<sub>k</sub></code>  as a CURIE reference combined with the default namespace, where <code>name<sub>1</sub></code>, <code>name<sub>2</sub></code>,…, <code>name<sub>k</sub></code> are the column names of the columns referred to by the primary keys.</li>
+                  </ul>
+                </li>
+                <li>Otherwise <code>subject<sub>j</sub></code> is set to a newly generated blank node, as defined in [[!rdf11-concepts]]. </li>
+              </ul>
+            </li>
+            <li>For the j<sup>th</sup> <a>row</a>, the following RDF triple is added: <br>
+              <code>(:subject<sub>j</sub> csvw:row "j"^^xsd:integer)</code></li>
+            <li>If the <code>@type</code> property is specified for the j<sup>th</sup> <a>row</a>, the following RDF triple is added:<br>
+              <code>(:subject<sub>j</sub> rdf:type csv:Row)</code></li>              
+            <li> For the i<sup>th</sup> <a>cell</a> of the j<sup>th</sup> <a>row</a>, the value of <code>object<sub>i,j</sub></code> is established as follows:
+              <ul>
+                <li>If the cell’s metadata includes the <code>datatype</code> property, then <code>object<sub>i,j</sub></code> is the literal value of the cell with the corresponding XSD datatype [[!xmlschema11-2]]. Note that this may require a transformation of the cell’s content to abide to the lexical form rules of the corresponding XSD datatype (e.g., for dates), and this may require the usage of additional cell metadata (e.g., for date-like datatypes the value of the <code>format</code> property provides the date format to be used to parse the cell’s content).</li>
+                <!--
+                <li>Otherwise, if the cell’s metadata includes the <code>cell-template</code> property, then the corresponding template rules are used to generate the final object value. If the j<sup>th</sup> column descriptor metadata includes the <code>rdf-predicate-type</code> property with a value <code>object</code>, then <code>object<sub>i</sub></code> is an IRI reference; otherwise, it is an RDF Literal of type <code>xsd:string</code> with the generated value as lexical form.</li>
+               -->
+                <li>Otherwise, if the cell’s metadata includes the <code>language</code> property, then <code>object<sub>i,j</sub></code> is an RDF literal with a language tag; the latter is set to the value of the <code>language</code> property.</li>
+                <li>Otherwise, <code>object<sub>i,j</sub></code> is an RDF Literal of type <code>xsd:string</code> with the value of the cell as lexical form.</li>
+              </ul>
+              Once the value of <code>object<sub>i,j</sub></code> established, the following triple is added: <br>
+              <code>(:subject<sub>j</sub> C<sub>j</sub> object<sub>i,j</sub>)</code>
+            </li>
+          </ul>
 
-        <div class="issue">The algorithm, at present, generates triples for fields that are, in fact, primary keys (or parts of primary keys). Is that necessary, or should those triples be skipped?</div>
+          <div class="note">The <code>primaryKey</code>, as defined in the metadata document&nbsp;[[!tabular-metadata]], contains a <em>reference</em> to a column, but does not contain the name of the column itself. Hence the somewhat convoluted way of generating <code>subject<sub>j</sub></code>. </div>
 
-        <div class="issue">Do we need to add a set of triples that "bind" the graph as a whole to the resources describing individual rows? Ie, something like <code>(@id csvw:rowid subject<sub>i</sub></code> for each row? It may not be really necessary for RDF, but it may become necessary if we follow the same structure for JSON and want to have a close connection between JSON and JSON-LD; as far as I can see the latter would require a <code>@graph</code> keyword…</div>
+          <div class="issue">The specification refers to the <code>column-template</code> property, though that is not part of the metadata specification at this moment. This is in anticipation of a minimal URI-transformation for the predicate. Similar predicates may have to be used for each row to influence the row’s URI.</div>
 
-        <div class="issue">It is not clear whether the value of <code>csvw:row</code> should take into account the header row, or should refer to
-        the data rows only.</div>
+          <div class="issue">At the moment, the subject for a cell is a literal. A separate property may have to be defined (or a special value of datatype could be used) to indicate that the value should be a URI in the RDF sense. That may require some sort of a cell-level template, a bit like the <code>column-template</code>.</div>
 
-        <div class="issue">Should there be a separate <code>rdf-skip</code> property for a column, instructing the processor to 'skip' that particular field?</div>
+          <div class="issue">The exact mapping to Dublin Core is underspecified; not sure how much details we want to put here.</div>
 
-        <div class="issue">The current terminology for templates refer to them as format independent. Should there be a separate, <code>rdf-template</code> property that is to be used for RDF only (and only if there is no <code>template</code> property)?</div>
+          <div class="issue">The current metadata document says that the <code>schema</code> property is optional, or, even if set, column, row, or cell properties are all optionals. What this means is that the names of the columns may <em>not</em> be available. If so, the algorithm fails. A possibility would be to define (in the metadata document) a default fall-back for column naming if there is nothing providing them. (Or requiring the presense of <code>schema</code>/<code>column</code>).</div>
 
+          <div class="issue">The algorithm, at present, generates triples for cells that are, in fact, primary keys (or parts of primary keys). Is that necessary, or should those triples be skipped?</div>
 
+          <div class="issue">It is not clear whether the value of <code>csvw:row</code> should take into account the header row, or should refer to the data rows only. I.e., what is the number of the first data row?</div>
+        </section>
       </section>
     </section>
 
@@ -288,43 +304,49 @@ var respecConfig = {
       <h2>Processing Core Tabular Data</h2>
       <p>The <a href="http://www.w3.org/TR/tabular-data-model/#core-model"><em>Core Tabular Data</em></a>,
       as defined in&nbsp;[[!tabular-data-model]], does not have any <a title="name">column names</a>, only raw data in terms of 
-      <a title="row">data rows</a>. In that case, for the purpose of this section, processing begins by (virtually) providing metadata of the 
-      format:</p>
+      <a title="row">data rows</a>. In that case, for the purpose of this section, processing begins by (conceptually) establishing the metadata as:</p>
 
       <pre>[{
   "@id": "<em>URI of the CSV file</em>",
-  "columns": [{
-    "name": "col_1",
-   }, 
-   {
-    "name": "col_2",
-   }, 
-   .
-   .
-   .
-   {
-    "name": "col_k",
-  }]
+  "schema" : {
+    "columns": [{
+      "name": "col_1",
+     }, 
+     {
+      "name": "col_2",
+     }, 
+     .
+     .
+     .
+     {
+      "name": "col_k",
+    }]
+  }
 }]</pre>
       <p>Where "k" is the number of columns in the table. The tabular data is then processed as Annotated Tabular Data with 
       this associated metadata, as described in the <a href="#processing-tabular">previous section</a>.</p> 
+
+      <div class="issue">
+        In fact, the default metadata, for this case, i.e., the default naming of the column names, may not be something to be defined in this document; a better place would be the data model document.
+      </div>
+
 
     </section>
 
 
 
-    <section id="examples-1">
-    <h2>Examples</h2>
+    <section id="examples-1" class="informative">
+      <h2>Examples</h2>
 
-    <p>Let us consider the following example</p>
+     <p>Let us consider the following example</p>
 
-    <pre class="example" id="csv-example-core" title="CSV input">1,ADDISON AV,Celtis australis,Large Tree Routine Prune,10/18/2010
+      <pre class="example" id="csv-example-core" title="CSV input">1,ADDISON AV,Celtis australis,Large Tree Routine Prune,10/18/2010
 2,EMERSON ST,Liquidambar styraciflua,Large Tree Routine Prune,6/2/2010
 3,EMERSON ST,Liquidambar styraciflua,Large Tree Routine Prune,6/2/2010
 </pre>
 
-    <p>this is a tabular data without any header row; the generated RDF (in Turtle[[!turtle]]) is:</p>
-        <pre class="example" title="Turtle output">@prefix : &lt;http://www.example.org/file.csv#&gt; .
+      <p>this is a tabular data without any header row; the generated RDF (in Turtle[[!turtle]]) is:</p>
+      <pre class="example" title="Turtle output">@prefix :     &lt;http://www.example.org/file.csv#&gt; .
 @prefix csvw: &lt;http://www.w3.org/ns/csvw#&gt; .
 [ csvw:row 1 ;
   :col_1 "1";
@@ -349,7 +371,7 @@ var respecConfig = {
 ] .
 </pre>
 
-  <p>By adding a <a>header row</a> the data may be as follows:</p>
+    <p>By adding a <a>header row</a> the data may be as follows:</p>
 
     <pre class="example" id="csv-example" title="CSV input">GID,On Street,Species,Trim Cycle,Inventory Date
 1,ADDISON AV,Celtis australis,Large Tree Routine Prune,10/18/2010
@@ -357,8 +379,8 @@ var respecConfig = {
 3,EMERSON ST,Liquidambar styraciflua,Large Tree Routine Prune,6/2/2010
         </pre>
 
-        <p>yielding the following RDF:</p>
-        <pre class="example" title="Turtle output">@prefix : &lt;http://www.example.org/file.csv#&gt; .
+    <p>yielding the following RDF:</p>
+    <pre class="example" title="Turtle output">@prefix :     &lt;http://www.example.org/file.csv#&gt; .
 @prefix csvw: &lt;http://www.w3.org/ns/csvw#&gt; .
 [ csvw:row 2 ;
   :GID "1";
@@ -384,7 +406,7 @@ var respecConfig = {
 </pre>
 
 
-    <p>The CSV Data may also have the following associated metadata:</p>
+  <p>The CSV Data may also have the following associated metadata:</p>
 
     <pre class="example" title="CSV metadata">[{
   "@id": "http://www.example.org/tree-ops.csv",
@@ -394,43 +416,43 @@ var respecConfig = {
   "license": "http://opendefinition.org/licenses/cc-by/",
   "modified": "2010-12-31",
   "columns": [{
+    "@id": "_:GID",
     "name": "GID",
-    "type": "integer"
+    "datatype": "integer"
    }, {
     "name": "On Street",
     "description": "The street that the tree is on.",
-    "type": "string"
+    "datatype": "string"
   }, {
     "name": "Species",
     "description": "The species of the tree.",
-    "type": "string"
+    "datatype": "string"
   }, {
     "name": "Trim Cycle",
     "description": "The operation performed on the tree.",
-    "type": "string"
+    "datatype": "string"
   }, {
     "name": "Inventory Date",
     "description": "The date of the operation that was performed.",
-    "type": "date",
+    "datatype": "date",
     "format": "M/D/YYYY"
   }]
   "primaryKey": "_:GID"  
 }]</pre>
 
-        <p>The generated RDF is then:</p>
-<pre class="example" title="Turtle output">
+  <p>The generated RDF is then:</p>
+  <pre class="example" title="Turtle output">@prefix :     &lt;http://www.example.org/tree-ops.csv#> .
 @prefix csvw: &lt;http://www.w3.org/ns/csvw#> .
 @prefix xsd:  &lt;http://www.w3.org/2001/XMLSchema#> .
 @prefix dc:   &lt;http://purl.org/dc/terms/> .
-@prefix id:   &lt;http://www.example.org/tree-ops.csv#> .
 
-id: 
-  a id:Table,
+&lt;http://www.example.org/tree-ops.csv>
+  a csv:Table,
   dc:title "Tree Operations";
   dc:license &lt;http://opendefinition.org/licenses/cc-by/>;
   dc:modified "2010-12-31" .
 
-id:1 
+:1 
   csvw:row 2 ;
   :GID 1;
   :On%20Street "ADDISON AV";
@@ -438,7 +460,7 @@ id:1
   :Trim%20Cycle "Large Tree Routine Prune";
   :Inventory%20Date "2010-10-18"^^xsd:date
 .
-id:2
+:2
   csvw:row 3 ;
   :GID 2;
   :On%20Street "EMERSON ST";
@@ -446,7 +468,7 @@ id:2
   :Trim%20Cycle "Large Tree Routine Prune";
   :Inventory%20Date "2010-6-2"^^xsd:date
 .
-id:3 
+:3 
   csvw:row 4 ;
   :GID 3;
   :On%20Street "EMERSON ST";
@@ -455,40 +477,39 @@ id:3
   :Inventory%20Date "2010-6-20"^^xsd:date
 .
 </pre>
-        <p>Note the value for <code>:GID</code> is now an integer, and the value for <code>:Inventory%20Date</code> is a proper date.</p>
+    <p>Note the value for <code>:GID</code> is now an integer, and the value for <code>:Inventory%20Date</code> is a proper date.</p>
 
-        <p class="TBD">More examples should be added here</p>
+    <p class="TBD">More examples should be added here</p>
 
     </section>
-    <section id="templates">
+    <section class="appendix" id="templates">
       <h2>Templates</h2>
-      <p class="TBD">This section may have to be re-worked, made it generic, possibly moved
-        to another document</p>
-      <section id="graph-template">
+      <p class="note">This section was part of an earlier version of the document and has not been re-worked to fit the previous sections.</p>
+       <section id="graph-template">
         <h2>Graph Templates</h2>
-        <p>An RDF graph can be used as a template for mapping fields from a row
+        <p>An RDF graph can be used as a template for mapping cells from a row
           by following a couple of conventions.</p>
         <ul>
-          <li>A literal may be composed of one or more <a title="field reference">Field
+          <li>A literal may be composed of one or more <a title="cell reference">Cell
               References</a>.</li>
-          <li>A URI may be composed of one or more <a title="field reference">Field
+          <li>A URI may be composed of one or more <a title="cell reference">Cell
               References</a>.</li>
         </ul>
         <p>A graph template is defined (as a named graph?) within a metadata
           mapping file as set of RDF triples where any value may include one or
-          more <a title="field reference">Field References</a>. Each record is
+          more <a title="cell reference">Cell References</a>. Each record is
           processed to emit triples based on transforming the graph template
-          into a series of triples created from the result of substiting <a title="field reference">Field
-            References</a> for their referenced field values. Triples which
+          into a series of triples created from the result of substiting <a title="cell reference">Cell
+            References</a> for their referenced cell values. Triples which
           result in any position having a value of <code>csv:nil</code> are
           excluded from output. </p>
-        <section id="field-references">
-          <h3>Field References</h3>
-          <p>A <dfn>Field Reference</dfn> is a brace-surrounded value matching
+        <section id="cell-references">
+          <h3>Cell References</h3>
+          <p>A <dfn>Cell Reference</dfn> is a brace-surrounded value matching
             a <a title="name">column name</a> from the CSV input. During record expansion, <a
-              title="field reference">field references</a> are replaced with the
-            value of the field from the specific record being mapped.</p>
-          <pre class="example" title="Field Reference">          [
+              title="cell reference">cell references</a> are replaced with the
+            value of the cell from the specific record being mapped.</p>
+          <pre class="example" title="Cell Reference">          [
           schema:name "{name}"@en;
           schema:homepage &lt;{+homepage}&gt;;
           schema:image &lt;{+image}&gt;
@@ -510,7 +531,7 @@ id:3
             </tbody>
           </table>
           <p>The resulting output graph would be the following:</p>
-          <pre class="example" title="Field Reference Result">          [
+          <pre class="example" title="Cell Reference Result">          [
             schema:name "Homer Simpson"@en;
             schema:homepage &lt;http://example/homer&gt;;
             schema:image &lt;http://example/avatar/homer.png&gt;
@@ -519,30 +540,23 @@ id:3
         </section>
 
 
-
-
         <section id="uri-templates">
           <h3>URI Templates</h3>
           <p>A URI Template is a URI containing one or more variables as
-            described in [[!RFC6570]]. URI variables are treated as <a title="field reference">Field
+            described in [[!RFC6570]]. URI variables are treated as <a title="cell reference">Cell
               References</a>. The expansion of URI Templates is modified so that
-            if the URI template contains any unmapped <a>Field Reference</a>
+            if the URI template contains any unmapped <a>Cell Reference</a>
             the resulting URI is replaced with <code>csv:nil</code>. After
             processing, all triples containing <code>csv:nil</code> in any
             position are removed.</p>
           <p>A URI template having the scheme "_" (otherwise illegal) results in
-            a blank node if all <a>Field References</a>
+            a blank node if all <a>Cell References</a>
             are substituted.</p>
           <p>{COL} value </p>
           <p>Lookup </p>
           <p>String functions (SPARQL? i.e. XSD functions and operators) </p>
         </section>
       </section>
-    </section>
-    <section id="csv-ld">
-      <h2>CSV-LD</h2>
-      <p> A further procedure mapping to JSON-LD. </p>
-      <div class="issue">Better as a separate document?</div>
     </section>
   </body>
 </html>
