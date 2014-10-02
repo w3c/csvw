@@ -270,9 +270,12 @@ Dependencies:
     return true;
   } 
 
+  /* =========================================================================== */
+  /* =========================================================================== */
+  /* =========================================================================== */
 
   /* =========================================================================== */
-  /* Mini mustache implementation                        */
+  /* Mini mustache implementation                                                */
   /* =========================================================================== */
 
   /**
@@ -408,6 +411,74 @@ Dependencies:
     }
   };
 
+  /**
+  * Convert the CSV data with templates.
+  *
+  * @method c_templates
+  * @private
+  * @param {Array} data - The CSV data itself, an array of array (latter being a row from the file)
+  * @param {Object} meta - Metadata object, as defined in the spec
+  * @param {String} template - Template string. 
+  * @param {Sring} target_format - can be JSON, Turtle, Javascript,…
+  * @param {Array} warnings - array of warnings that may have to be extended if an error occurs
+  * @return {String or Object} - Converted data. If the ``target_format`` argument is JAVASCRIPT, the retun is an Object,
+  * otherwise a string with the converted value in the ``target_format`` syntax.
+  *
+  */
+  var c_templates = function(data, meta, template, target_format, warnings) {
+    // There is no template: the default is to get the rows and columns in JSON
+    // Cut the template into global/repeat portion
+    // the result is an array of separate templates
+    var templates = split_template(template);
+
+    // The 'global' template is used on a "view" (in mustache jargon)
+    // containing only the top level keys from the metadata. This
+    // can be set once and for all
+    var global_mview = {};
+    Object.keys(meta).forEach( function(key) {
+      if( typeof meta[key] === "string" ) global_mview[key] = meta[key];
+    });
+
+    // The main processing cycle: Go through the templates and perform 
+    // each individually. The results are concatenated into one string to be returned
+    var result = "";
+    templates.forEach( function(tstruct) {
+      // The major switch: is the template to be repeated or not?
+      if( tstruct.repeat === true ) {
+        process_rows(data, meta, function(row, context) {
+          result += render_template(tstruct.template, $.extend({}, global_mview, row), $.extend({target_format:target_format}, context));
+        });
+      } else {
+        // Just apply the template against the global view and append the outcome
+        // to the result string
+        context = {
+          meta          : meta,
+          target_format : target_format,
+          row_index     : null,
+          col_index     : null,
+          row           : null
+        };
+        result += render_template(tstruct.template, global_mview, context);
+      }
+    });
+
+    if( target_format === $.CSV_format.JSON || target_format === $.CSV_format.JAVASCRIPT ) {
+      try {
+        var j_result = eval( '(' + result + ')' );
+        return target_format === $.CSV_format.JSON ? JSON.stringify(j_result,null,2) : j_result;          
+      } catch(e) {
+        warnings.push("Template (Javascript) syntax error in: " + e.message)
+        return result;
+      }
+    } else {
+      return result;
+    }
+  }
+
+  /* =========================================================================== */
+  /* =========================================================================== */
+  /* =========================================================================== */
+
   /* =========================================================================== */
   /*  The core, ie, converting the CSV data                                      */
   /*   (the core of the standard implementation...)                              */
@@ -415,20 +486,19 @@ Dependencies:
   /**
   * Create a default conversion into JSON.
   * This is called when there is no template, ie, provides the default conversion
-  * of a CSV file. At present, all it does is to output the data in ``JSON`` or ``JAVASCRIPT``
-  * array of objects; each object is a row with column names serving as keys and cells
-  * as values. The exact format is still to be defined by the WG. 
+  * of a CSV file. This is the conversion that is defined, as a standard, by the WG
+  * 
   *
-  * @method convertCSV_default
+  * @method c_default
   * @private
   * @param {Array} data - The CSV data itself, an array of array (latter being a row from the file)
-  * @param {Object} meta - Tetadata object, as defined in the spec
+  * @param {Object} meta - Metadata object, as defined in the spec
   * @param {Sring} target_format - can be JSON, Turtle, Javascript,…
   * @return {String or Object} - Converted data. If the ``target_format`` argument is JAVASCRIPT, the retun is an Object,
   * otherwise a string with the converted value in the ``target_format`` syntax.
   *
   */
-  var convertCSV_default = function(data, meta, target_format) {
+  var c_default = function(data, meta, target_format, warnings) {
     var retval = []
     process_rows(data, meta, function(row, context) {
       retval.push(row);
@@ -436,17 +506,21 @@ Dependencies:
     return target_format === $.CSV_format.JSON ? JSON.stringify(retval, null, 2) : retval;
   };
 
+
+  /* ============================================================================== */
+  /* ============================================================================== */
+  /* ============================================================================== */
+
+  /* ============================================================================== */
   /**
-  * Create a default conversion into JSON.
-  * This is called when there is no template, ie, provides the default conversion
-  * of a CSV file. At present, all it does is to output the data in ``JSON`` or ``JAVASCRIPT``
-  * array of objects; each object is a row with column names serving as keys and cells
-  * as values. The exact format is still to be defined by the WG. 
+  * Main conversion entry point. In reality, this is just a switch between the 'direct'
+  * i.e., default mapping as defined by the standard, and the templated version if a template
+  * has been added to the metadata.
   *
   * @method convertCSV
   * @private
   * @param {Array} data - The CSV data itself, an array of array (latter being a row from the file)
-  * @param {Object} meta - Tetadata object, as defined in the spec
+  * @param {Object} meta - Metadata object, as defined in the spec
   * @param {String} template - Template string. If ``""`` (ie, no template) a default Javascript object is generated
   * @param {Sring} target_format - can be JSON, Turtle, Javascript,…
   * @param {Array} warnings - array of warnings that may have to be extended if an error occurs
@@ -456,57 +530,12 @@ Dependencies:
   */
   var convertCSV = function(data, meta, template, target_format, warnings) {
     // There is no template: the default is to get the rows and columns in JSON
-    if( template === "" ) {
-      return convertCSV_default(data, meta, target_format);
-    } else {
-      // Cut the template into global/repeat portion
-      // the result is an array of separate templates
-      var templates = split_template(template);
-
-      // The 'global' template is used on a "view" (in mustache jargon)
-      // containing only the top level keys from the metadata. This
-      // can be set once and for all
-      var global_mview = {};
-      Object.keys(meta).forEach( function(key) {
-        if( typeof meta[key] === "string" ) global_mview[key] = meta[key];
-      });
-
-      // The main processing cycle: Go through the templates and perform 
-      // each individually. The results are concatenated into one string to be returned
-      var result = "";
-      templates.forEach( function(tstruct) {
-        // The major switch: is the template to be repeated or not?
-        if( tstruct.repeat === true ) {
-          process_rows(data, meta, function(row, context) {
-            result += render_template(tstruct.template, $.extend({}, global_mview, row), $.extend({target_format:target_format}, context));
-          });
-        } else {
-          // Just apply the template against the global view and append the outcome
-          // to the result string
-          context = {
-            meta          : meta,
-            target_format : target_format,
-            row_index     : null,
-            col_index     : null,
-            row           : null
-          };
-          result += render_template(tstruct.template, global_mview, context);
-        }
-      });
-
-      if( target_format === $.CSV_format.JSON || target_format === $.CSV_format.JAVASCRIPT ) {
-        try {
-          var j_result = eval( '(' + result + ')' );
-          return target_format === $.CSV_format.JSON ? JSON.stringify(j_result,null,2) : j_result;          
-        } catch(e) {
-          warnings.push("Template (Javascript) syntax error in: " + e.message)
-          return result;
-        }
-      } else {
-        return result;
-      }
-    }
+    return ( template === "" ) ? c_default(data, meta, target_format, warnings) : c_templates(data, meta, template, target_formats, warnings);
   }
+
+  /* =========================================================================== */
+  /* =========================================================================== */
+  /* =========================================================================== */
 
   /* =========================================================================== */
   /**  
