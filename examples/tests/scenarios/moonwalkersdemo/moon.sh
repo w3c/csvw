@@ -2,7 +2,10 @@
 export JAVA_HOME=$(/usr/libexec/java_home)
 
 # This script assumes a working RMLProcessor installation including Maven, Java 1.7. ( build with:  mvn -e clean install)  
-# See http://rml.io/RML_R2RML.html for details
+# See http://rml.io/RML_R2RML.html for details, and http://rml.io/RML_R2RML.html 
+# "RML is defined as a superset of the W3C-standardized mapping language, R2RML, that maps data in relational databases to the RDF data model"
+# publications: http://rml.io/RML_publications.html
+# e.g. http://events.linkeddata.org/ldow2014/papers/ldow2014_paper_01.pdf
 
 # The template/mapping file is expressed in RML
 # This is a generalization of W3C R2RML that extends the notion of 'column' to include JSON and XML inputs, as well as CSV.
