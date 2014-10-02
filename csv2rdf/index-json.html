@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type">
+    <meta content="width=device-width,initial-scale=1" name="viewport">
+    <title>Generating JSON from Tabular Data on the Web</title>
+    <script class="remove" src="http://www.w3.org/Tools/respec/respec-w3c-common">
+	  </script>
+    <script class="remove">
+var respecConfig = {
+    localBiblio: {
+      "tabular-data-model": {
+          "authors": [
+            "Jeni Tennison",
+            "Gregg Kellogg"
+          ],
+          "title": "Model for Tabular Data and Metadata on the Web",
+          "href" : "http://www.w3.org/TR/2014/WD-tabular-data-model-20140710/",
+          "rawDate": "2014-07-10",
+          "status" : "WD",
+          "publisher": "W3C"
+      },
+      "tabular-metadata": {
+          "authors": [
+            "Rufus Pollock",
+            "Jeni Tennison"
+          ],
+          "title": "Metadata Vocabulary for Tabular Data",
+          "href" : "http://www.w3.org/TR/2014/WD-tabular-metadata-20140710/",
+          "rawDate": "2014-07-10",
+          "status" : "WD",
+          "publisher": "W3C"
+      },
+      "UNICODE-BIDI" : {
+        "authors" : [
+          "Mark Davis",
+          "Aharon Lanin",
+          "Andrew Glass"
+        ],
+        "title": "TR9, Unicode Bidirectional Algorithm",
+        "href": "http://unicode.org/reports/tr9/",
+        "rawDate" : "2013-09-24",
+        "publisher" : "Unicode Consortium",
+        "status" : "Report"
+      },
+      "RFC3066" : {
+          "authors" : [
+            "H. Alvestrand"
+          ],
+          "title" : "Tags for the Identification of Languages 1995",
+          "rawDate" : "2001-01",
+          "status": "Internet Best Current Practice",
+          "publisher" : "IETF",
+          "href" : "http://www.ietf.org/rfc/rfc3066.txt"
+      },
+      "RFC6570" : {
+          "authors" : [
+            "J. Gregorio",
+            "R. Fielding",
+            "M. Hadley",
+            "M. Nottingham",
+            "D. Orchard"
+          ],
+          "title" : "URI Template",
+          "rawDate" : "2002-01",
+          "status": "Proposed Internet RFC",
+          "publisher" : "IETF",
+          "href" : "http://www.ietf.org/rfc/rfc6570.txt"
+      },
+      "JSON" : {
+          "authors" : [
+            "D. Crockford",
+          ],
+          "title" : "The application/json Media Type for JavaScript Object Notation (JSON)",
+          "rawDate" : "2006-01",
+          "status": "Informational RFC",
+          "publisher" : "IETF",
+          "href" : "http://www.ietf.org/rfc/rfc4627.txt"
+      }, 
+
+
+
+    },
+    specStatus: "ED",
+    shortName: "csv2json",
+    // publishDate:  "2014-04-01",
+    previousPublishDate: "2014-??-??",
+    previousMaturity: "unoffical",
+    //previousURI: "http://www.w3.org/TR/2014/WD-csv2rdf-2014????/",
+    edDraftURI: "http://w3c.github.io/csvw/csv2rdf/index-json.html",
+    // lcEnd: "3000-01-01",
+    // crEnd: "3000-01-01",
+    editors:
+     [{
+            name: "Jeremy Tandy",
+            company: "Met Office",
+            companyURL: "http://www.metoffice.gov.uk/"
+      },{
+       name: "Ivan Herman",
+       url: "http://www.w3.org/People/Ivan",
+       company: "W3C",
+       companyURL: "http://www.w3.org"
+     }],
+    wg: "CSV on the Web Working Group",
+    wgURI: "http://www.w3.org/2013/csvw/",
+    wgPublicList: "public-csv-wg",
+    wgPatentURI: "http://www.w3.org/2004/01/pp-impl/68238/status",
+    otherLinks: [{
+      key: "Repository",
+      data: [{
+          value: "We are on Github",
+          href: "https://github.com/w3c/csvw/"
+        }, {
+          value: "File a bug",
+          href: "https://github.com/w3c/csvw/issues"
+        }]
+      } , 
+      {
+        key: "Changes",
+        data: [{
+        //     value: "Diff to previous version",
+        //     href: "diff-20140327.html"
+        //   }, {}
+           value: "Commit history",
+           href: "https://github.com/w3c/csvw/commits/gh-pages"
+         }]
+       }] ,
+    inlineCSS: true,
+    noIDLIn: true,
+    noLegacyStyle: false
+    };
+    </script>
+    <style type="text/css">
+      .grammar td { font-family: monospace; vertical-align: top; }
+      .grammar-literal { color: gray;}
+      .TBD { font-style: italic; background: yellow;}
+      .steps li { margin-bottom: 0.5em;}
+    </style>
+  </head>
+  <body>
+    <section id="abstract">
+      <p> T.B.D.</p>
+    </section>
+    <section id="sotd">
+      <p> <em>Work-in-progress.</em> </p>
+    </section>
+    <section id="intro">
+      <h2>Introduction</h2>
+      <p>This document describes the processing of Tabular Data
+        [[!tabular-data-model]] to produce JSON [[!JSON]]. It does not
+        cover any cleaning or transformation processes needed to convert the
+        initial CSV data into Tabular Data form. Tabular Data defines an abstract
+        data model consisting of tables, columns, header rows, and data rows. It
+        requires all rows to have the same number of columns. As such, Tabular
+        Data does not cover all possible CSV files and ths processes described
+        in this document do not apply to all possible CSV files. </p>
+    </section>
+    <section id="conformance">
+      <p>This document describes the processing of Tabular Data
+        [[!tabular-data-model]] to produce JSON [[!JSON]]. It does not
+        cover any cleaning or transformation processes needed to convert the
+        initial data into Tabular Data form. Tabular Data defines an abstract
+        data model consisting of <dfn title="table">tables</dfn>, <dfn title="column">columns</dfn>, 
+        possible <dfn title="header row">header rows</dfn> providing <dfn title="name">column names</dfn>,
+        and <dfn title="row">data rows</dfn>. 
+        Each row consists of a number of <dfn title="cell">cells</dfn>. It
+        requires all rows to have the same number of columns. The specification
+        relies on the terms (e.g, header, row, column) as defined
+        in&nbsp;[[!tabular-data-model]].</p>
+    </section>
+    <section id="processing-tabular">
+      <h2>Processing Annotated Tabular Data</h2>
+
+      <p>The processing of tabular data is based on the abstract <a href="http://www.w3.org/TR/tabular-data-model/#annotated-model"><em>Annotated Tabular Data</em></a> format as defined in&nbsp;[[!tabular-data-model]]. It does not cover any details on how the initial data (i.e., a CSV file) is parsed into one of those abstract Data formats. The processing steps below define the generated JSON [[!JSON]] as a single JSON object with name/value pairs.</p>
+ 
+      <p>Processing makes use of the metadata associated with the tabular data, and defined in the "Metadata Vocabulary for Tabular Data" [[!tabular-metadata]] document. In this section the term <dfn>property</dfn> refers to the properties defined in that document.</p>
+
+      <p>The metadata for the tabular data may originate from <a href="http://www.w3.org/TR/tabular-data-model/#embedded-metadata">embedded metadata</a> only. In practice this means that the <a title="name">column names</a> MAY be provided by a <a title="header row">header row</a>, but no other metadata is provided in the format described in [[!tabular-metadata]]. In that case, for the purpose of this section, processing begins by (conceptually) establishing the metadata as:</p>
+
+     <pre>[{
+  "@id": "<em>URI of the CSV file</em>",
+  "schema": {
+    "columns": [{
+       "name": "<em>name<sub>1</sub></em>",
+    }, 
+    {
+       "name": "<em>name<sub>2</sub></em>",
+    }, 
+    .
+    .
+    .
+    {
+        "name": "<em>name<sub>k</sub></em>",
+    }]
+  }
+}]</pre>
+      <p>where <code>name<sub>1</sub></code>, <code>name<sub>1</sub></code>,…,<code>name<sub>k</sub></code> are the names of the columns.</p> 
+
+
+    <section>
+        <h4>Generating JSON</h4>
+        <p>The processing steps are separated in the generation of table-level name/value pairs, and name/value pairs; these steps add RDF triples to the final JSON object.</p>
+
+        <section id="table-level-JSON">
+          <h4>Processing Steps for Table-Level Name/Value Pairs</h4>
+          <p>The following pairs are added as table level name/value pairs (in what follows, <code>@id</code> (resp. <code>@base</code>) stands for the value of the corresponding table <code>@id</code> (resp. <code>@base</code>) <a>property</a>):</p>
+          <ul class="steps">
+            <li>Add the identification pair:<br>
+                <code>"@id": @id</code>
+            </li>
+            <li>If the <code>@base</code> <a>property</a> is set, add:<br>
+                <code>"@base": @base</code></li>
+            <li>If the <code>@type</code> <a>property</a> is set, add:<br>
+                <code>"@type": "Table"</code>
+            </li>
+            <li>If the <code>notes</code> <a>property</a> is set, its value is either an array of annotation objects, or a single annotation object, each with its own (required) <code>@id</code> <a>property</a>. For each of those annotation objects add the following name/value pair (where <code>@id<sub>i</sub></code> is the <code>@id</code> value for the i<sup>th</sup> annotation object):<br>
+              <code>"note": "@id<sub>i</sub>"</code>
+            </li>
+            <li> For each (optional) <a>property</a> <code>prop<sub>i</sub></code> with <code>value<sub>i</sub></code> corresponding to a term defined in [[!DC-TERMS]], add the name/value pair: 
+              <br><code>"prop<sub>i</sub>": "value<sub>i</sub>"</code>
+            </li>
+          </ul>
+          <div class="issue">
+            The last set of n/v generation may depend on whether schema.org terms are used instead of Dublin Core.
+          </div>
+        </section>
+
+        <section id="cell-level-JSON">
+          <h4>Processing Steps for Cell-Level Name/Value triples</h4>
+          <p class="note">The metadata specification&nbsp;[[!tabular-metadata]] has an inheritence structure whereby the metadata for a cell (e.g., <code>datatype</code>) may be derived from values specified for a column, a row, or indeed the specific cell itself. This specification considers the result of this derivation for each <a>property</a>.</p>
+          <p>The steps below define a new JSON object for each row. These objects are added as an array as a table-level name/value pair as follows:<br>
+            <code>"rows": [{<em>object for first row</em>},{<em>object for second row</em>},…,{<em>object for last row</em>}]</code>
+          </p>
+          <p>The objects themselves are generates through the following steps:</p>
+          <ul class="steps">
+            <li> The metadata&nbsp;[[!tabular-metadata]] defines the <code>name</code> <a>property</a> for each <a>column</a> (as part of the <code>schema</code> array). For each of those names, a corresponding IRI (referred to hereafter as <code>C<sub>i</sub></code>) is defined as follows:
+              <ul>
+                <li>If the i<sup>th</sup> column descriptor metadata includes the <code>column-template</code> <a>property</a> then the corresponding template rules are used to generate <code>C<sub>i</sub></code>.</li>
+                <li>Otherwise, <code>C<sub>i</sub></code> is set to the value of <code>name</code></li>
+              </ul>
+            </li>
+            <li> For the j<sup>th</sup> <a>row</a> a <code>subject<sub>j</sub></code> is established as follows:
+              <ul>
+                <li> If the metadata specifies a primary key via a <code>primaryKey</code> property, then:
+                  <ul>
+                    <li>if the primary key refers to a single column with the <code>name</code> property set, then <code>subject<sub>j</sub></code> is set to the <a>normalized version</a> value of <code>name</code></li>
+
+                    <li>otherwise, <code>subject<sub>j</sub></code> is set to the <a>normalized version</a> of <code>name<sub>1</sub>-name<sub>2</sub>-…-name<sub>k</sub></code>, where <code>name<sub>1</sub></code>, <code>name<sub>2</sub></code>,…, <code>name<sub>k</sub></code> are the column names of the columns referred to by the primary keys.</li>
+                  </ul>
+                  Add then the name/value pair<br>
+                    <code>"@id": "subject<sub>j</sub>"</code>
+                </li>
+              </ul>
+            </li>
+            <li>For the j<sup>th</sup> <a>row</a>, the following name/value pair is added: <br>
+              <code>"row": j</code></li>
+            <li>If the <code>@type</code> property is specified for the j<sup>th</sup> <a>row</a>, the following RDF triple is added:<br>
+              <code>"@type" "Row"</code></li>              
+            <li> For the i<sup>th</sup> <a>cell</a> of the j<sup>th</sup> <a>row</a>, the value of <code>object<sub>i,j</sub></code> is established as follows:
+              <ul>
+                <li>If the cell’s metadata includes the <code>datatype</code> property, then:
+                    <ul>
+                      <li>if the datatype value is a number or a boolean then <code>object<sub>i,j</sub></code> is the cell’s value converted to that format;</li>
+                      <li>otherwise <code>object<sub>i,j</sub></code> is a JSON object of the form<br>
+                        <code>{ "@value": "<em>cell value</em>", "@type": "<em>value of datatype property</em>"}</code>
+                      </li>
+                    </ul>
+                </li>
+                <li>Otherwise, if the cell’s metadata includes the <code>language</code> property, then <code>object<sub>i,j</sub></code> is a JSON object of the form<br>
+                    <code>{ "@value": "<em>cell value</em>", "@language": "<em>value of language property</em>"}</code>
+                <li>Otherwise, <code>object<sub>i,j</sub></code> is the string value of the cell.</li>
+              </ul>
+              Once the value of <code>object<sub>i,j</sub></code> established, the following name/value pair is added: <br>
+              <code>"C<sub>j</sub>": object<sub>i,j</sub></code>
+            </li>
+          </ul>
+        </section>
+      </section>
+    </section>
+     <section id="processing-core">
+      <h2>Processing Core Tabular Data</h2>
+      <p>The <a href="http://www.w3.org/TR/tabular-data-model/#core-model"><em>Core Tabular Data</em></a>,
+      as defined in&nbsp;[[!tabular-data-model]], does not have any <a title="name">column names</a>, only raw data in terms of 
+      <a title="row">data rows</a>. In that case, for the purpose of this section, processing begins by (conceptually) establishing the metadata as:</p>
+
+      <pre>[{
+  "@id": "<em>URI of the CSV file</em>",
+  "schema" : {
+    "columns": [{
+      "name": "col_1",
+     }, 
+     {
+      "name": "col_2",
+     }, 
+     .
+     .
+     .
+     {
+      "name": "col_k",
+    }]
+  }
+}]</pre>
+      <p>Where "k" is the number of columns in the table. The tabular data is then processed as Annotated Tabular Data with 
+      this associated metadata, as described in the <a href="#processing-tabular">previous section</a>.</p> 
+
+      <div class="issue">
+        In fact, the default metadata, for this case, i.e., the default naming of the column names, may not be something to be defined in this document; a better place would be the data model document.<br/>
+        However, the meeting on 2014.10.01 had a temporary consensus that this step is unnecessary. If the tabular data does <em>not</em> define column names, then the default generation simply does not happen. If this is the final agreement in the group, this whole section should be removed.
+      </div>
+
+
+    </section>
+
+
+
+    <section id="examples-1" class="informative">
+      <h2>Examples</h2>
+
+     <p>Let us consider the following example (first row established the column names):</p>
+
+    <pre class="example" id="csv-example" title="CSV input">GID,On Street,Species,Trim Cycle,Inventory Date
+1,ADDISON AV,Celtis australis,Large Tree Routine Prune,10/18/2010
+2,EMERSON ST,Liquidambar styraciflua,Large Tree Routine Prune,6/2/2010
+3,EMERSON ST,Liquidambar styraciflua,Large Tree Routine Prune,6/2/2010
+        </pre>
+
+    <p>yielding the following JSON:</p>
+    <pre class="example" title="JSON output">{
+  "rows" : [
+    {
+      "row": 1,
+      "GID":              "1",
+      "On%20Street":      "ADDISON AV",
+      "Species":          "Celtis australis",
+      "Trim%20Cycle":     "Large Tree Routine Prune",
+      "Inventory%20Date": "10/18/2010"
+    },
+    {
+      "row": 2,
+      "GID":              "2",
+      "On%20Street":      "EMERSON ST",
+      "Species":          "Liquidambar styraciflua",
+      "Trim%20Cycle":     "Large Tree Routine Prune",
+      "Inventory%20Date": "6/2/2010"
+    },
+    {
+      "row": 3,
+      "GID":              "3",
+      "On%20Street":      "ADDISON AV",
+      "Species":          "Celtis australis",
+      "Trim%20Cycle":     "Large Tree Routine Prune",
+      "Inventory%20Date": "6/2/2010"
+    }]
+}
+</pre>
+
+
+  <p>The CSV Data may also have the following associated metadata:</p>
+
+    <pre class="example" title="CSV metadata">[{
+  "@id": "http://www.example.org/tree-ops.csv",
+  "@type": "Table",
+  "title": "Tree Operations",
+  "keywords": ["tree", "street", "maintenance"],
+  "license": "http://opendefinition.org/licenses/cc-by/",
+  "modified": "2010-12-31",
+  "columns": [{
+    "@id": "_:GID",
+    "name": "GID",
+    "datatype": "integer"
+   }, {
+    "name": "On Street",
+    "description": "The street that the tree is on.",
+    "datatype": "string"
+  }, {
+    "name": "Species",
+    "description": "The species of the tree.",
+    "datatype": "string"
+  }, {
+    "name": "Trim Cycle",
+    "description": "The operation performed on the tree.",
+    "datatype": "string"
+  }, {
+    "name": "Inventory Date",
+    "description": "The date of the operation that was performed.",
+    "datatype": "date",
+    "format": "M/D/YYYY"
+  }]
+  "primaryKey": "_:GID"  
+}]</pre>
+
+  <p>The generated JSON is then:</p>
+  <pre class="example" title="JSON output">{
+  "@id": "http://www.example.org/tree-ops.csv",
+  "@type": "Table",
+  "title": "Tree Operations",
+  "dc:license": "http://opendefinition.org/licenses/cc-by/",
+  "dc:modified": "2010-12-31",
+  "rows" : [
+    {
+      "@id":              "1",
+      "row":              1,
+      "GID":              1,
+      "On%20Street":      "ADDISON AV",
+      "Species":          "Celtis australis",
+      "Trim%20Cycle":     "Large Tree Routine Prune",
+      "Inventory%20Date": { 
+                             "@value" :  "10/18/2010",
+                             "datatype": "date"
+                          }
+    },
+    {
+      "@id":              "2",
+      "row":              2,
+      "GID":              2,
+      "On%20Street":      "EMERSON ST",
+      "Species":          "Liquidambar styraciflua",
+      "Trim%20Cycle":     "Large Tree Routine Prune",
+      "Inventory%20Date": { 
+                             "@value" :  "6/2/2010",
+                             "datatype": "date"
+                          }
+    },
+    {
+      "@id":              "3",
+      "row":              3,
+      "GID":              3,
+      "On%20Street":      "ADDISON AV",
+      "Species":          "Celtis australis",
+      "Trim%20Cycle":     "Large Tree Routine Prune",
+      "Inventory%20Date": { 
+                             "@value" :  "6/2/2010",
+                             "datatype": "date"
+                          }
+    }]
+}
+</pre>
+    <p>Note the value for <code>:GID</code> is now an integer, and the value for <code>:Inventory%20Date</code> is a proper date.</p>
+
+    <p class="TBD">More examples should be added here</p>
+
+    </section>
+  </body>
+</html>

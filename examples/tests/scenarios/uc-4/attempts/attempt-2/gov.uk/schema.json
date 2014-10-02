@@ -1,0 +1,291 @@
+{
+	"@context": {
+		"@language": "en"
+	},
+	"resources": [{
+		"@id": "departments.csv",
+		"name": "departments",
+		"columns": [{
+			"name": "department",
+			"title": "Department",
+			"description": "The full name of a UK government department.",
+			"required": true
+		}]
+	}, {
+		"@id": "grades.csv",
+		"name": "grades",
+		"columns": [{
+			"name": "grade",
+			"title": "Grade",
+			"description": "Senior UK civil service grade.",
+			"required": true
+		}]
+	}, {
+		"@id": "professions.csv",
+		"name": "professions",
+		"columns": [{
+			"name": "profession",
+			"title": "Profession",
+			"description": "A professional/occupational group based on Professional Skills for UK Government standard CS professions.",
+			"required": true
+		}]
+	}, {
+		"name": "organisation",
+		"columns": [{
+			"name": "organisation",
+			"title": "Organisation",
+			"description": "Full name of organisation, this could be a repeat of the parent department or alternatively the name of an NDPB, Agency, etc.",
+			"required": true
+		}, {
+			"name": "department",
+			"title": "Parent Department",
+			"description": "The full name of the parent or sponsor department.",
+			"reference": "departments#department",
+			"required": true
+		}]
+	}, {
+		"name": "units",
+		"columns": [{
+			"name": "unit",
+			"title": "Unit",
+			"description": "An area/workstream name used within your organisation to define the different areas of the organisation, e.g. Human Resources, Corporate Services, Private Office Group. This should be defined at a level that best represents your organisational structure, e.g. DG or DD level.",
+			"required": true
+		}, {
+			"name": "organisation",
+			"title": "Organisation",
+			"description": "Full name of organisation, this could be a repeat of the parent department or alternatively the name of an NDPB, Agency, etc.",
+			"required": true
+		}]
+	}, {
+		"name": "job-titles",
+		"columns": [{
+			"name": "job-title",
+			"title": "Generic Job Title",
+			"description": "The generic job title for the particular grade.",
+			"required": true
+		}]
+	}, {
+		"name": "junior-grades",
+		"columns": [{
+			"name": "grade",
+			"title": "Grade",
+			"description": "The level of grade the posts carry.",
+			"required": true
+		}, {
+			"name": "minimum-pay",
+			"title": "Payscale Minimum (£)",
+			"description": "The minimum salary of the particular grade payscale.",
+			"datatype": "integer",
+			"required": true
+		}, {
+			"name": "maximum-pay",
+			"title": "Payscale Maximum (£)",
+			"description": "The maximum salary of the particular grade payscale.",
+			"datatype": "integer",
+			"required": true
+		}]
+	}, {
+		"name": "senior-data",
+		"columns": [{
+			"name": "id",
+			"title": "Post Unique Reference",
+			"description": "Individual reference code assigned to a post within an organisation.",
+			"comment": "Cannot be XX.
+
+	If a post is eliminated, the reference must be as well and not re-used.
+
+	If a person does not have a post but is still being paid by the organisation then ‘0’ (zero) should be used.
+
+	Can only be duplicate for people that share a role.",
+			"format": "[^ ]+",
+			"required": true
+		}, {
+			"name": "name",
+			"title": "Name",
+			"description": "Postholder’s name for SCS 2 and above.",
+			"comment": "Name not disclosed for SCS 1.
+
+	If the name is not disclosed write ‘N/D’.
+
+	If the post is vacant write ‘vacant’.
+
+	If the post has been eliminated write ‘eliminated’.",
+			"required": true
+		}, {
+			"name": "grade",
+			"title": "Grade",
+			"description": "The equivalent SCS grade for the post.",
+			"reference": "grades#grade",
+			"required": true
+		}, {
+			"name": "job-title",
+			"title": "Job Title",
+			"description": "The generic title for the grade, e.g. Permanent Secretary, Chief Executive, Director General, etc. or the area of responsibility, e.g. Strategic Communications, Human Resources, Operations, etc.",
+			"comment": "Cannot be blank or ‘N/D’.
+
+	If post reference is ‘0’ write ‘Not in post’.",
+			"required": true
+		}, {
+			"name": "job-function",
+			"title": "Job/Team Function",
+			"description": "Short description of the core purpose of the job/team.",
+			"comment": "Should not be a list of objectives.
+
+	Meaningful to the taxpayer/user.
+
+	Plain English, try to avoid using acronyms.
+
+	If the post reference is ‘0’’, write ‘N/A’.",
+			"format": "\\S(\\s\\S){0,99}", // up to 100 words long
+			"required": true
+		}, {
+			"name": "unit",
+			"title": "Unit",
+			"description": "An area/workstream name used within your organisation to define the different areas of the organisation, e.g. Human Resources, Corporate Services, Private Office Group. This should be defined at a level that best represents your organisational structure, e.g. DG or DD level.",
+			"reference": "units#unit",
+			"required": true
+		}, {
+			"name": "phone",
+			"title": "Contact Phone",
+			"description": "Contact telephone number for the postholder. This can include a group contact number instead of an individual’s number.",
+			"comment": "UK or international telephone number.
+
+	If post is vacant or eliminated write ‘N/A’.
+
+	If name has been withheld, then a group telephone number must be entered.",
+			"required": true
+		}, {
+			"name": "email",
+			"title": "Contact E-mail",
+			"description": "Contact email address for postholder, either an individual or group departmental email address.",
+			"comment": "If post is vacant a group email can still be provided or alternatively write ‘N/A’.
+
+	If post is eliminated write ‘N/A’.
+
+	If name has been withheld, provide a group email address.",
+			"required": true
+		}, {
+			"name": "reports-to",
+			"title": "Reports to Senior Post",
+			"description": "The corresponding unique post reference for the person the post/postholder reports to.",
+			"comment": "For the most senior person in the organisation this should be shown as `XX`.",
+			"null": "XX",
+			"required": true
+		}, {
+			"name": "salary-of-reports",
+			"title": "Salary Cost of Reports (£)",
+			"description": "An accumulative total cost of SCS 1 staff and below that report to a post unique reference at SCS 1 level or above.",
+			"comment": "Staff costs should only be included in one group, i.e. this is not a cumulative total as you go up the hierarchy.
+
+	If an SCS 1 has a team of 5 staff or less, they should be rolled into a larger team within their reporting area or to a more senior member of staff.
+
+	If an SCS 2 or above has a small team of 5 or less, these staff can be rolled into another within that particular reporting structure.
+
+	If no reports then write ‘0’.",
+			"datatype": "integer",
+			"required": true
+		}, {
+			"name": "fte",
+			"title": "FTE",
+			"description": "Indicates whether this is a full or part time post.",
+			"datatype": "decimal",
+			"minimum": 0.1,
+			"maximum": 1,
+			"format": "(1|0.\\d{1,2})",
+			"required": true
+		}, {
+			"name": "pay-floor",
+			"title": "Actual Pay Floor (£)",
+			"description": "The salary cost of an SCS 2 or above rounded down to the nearest 5000.",
+			"comment": "SCS1 salary should not be disclosed.
+
+	If post is vacant, write ‘0’.
+
+	If SCS 1 post write ‘N/D’.",
+			"datatype": "integer",
+			"null": "N/D",
+			"required": true
+		}, {
+			"name": "pay-ceiling",
+			"title": "Actual Pay Ceiling (£)",
+			"description": "An automatically completed cell with pay ceiling based as £5k above figure entered as ‘actual pay floor’.",
+			"comment": "This box is automatically populated.",
+			"datatype": "integer",
+			"null": "N/D",
+			"required": true
+		}, {
+			"title": ""
+		}, {
+			"name": "profession",
+			"title": "Profession",
+			"description": "A list of professional/occupational groups based on Professional Skills for Government standard CS professions.",
+			"comment": "You will need to select the closest description to the teams main function.",
+			"reference": "professions#profession",
+			"required": true
+		}, {
+			"name": "notes",
+			"title": "Notes",
+			"description": "Can be used to add additional supporting text to line detail, e.g.
+
+	  * Parent Dept paying part/all of a secondee’s salary
+	  * Indicate parental leave
+	  * Date a post was eliminated
+	  * Date a post became vacant
+	  * Indicate a job share post
+	  * A previous role title if changed
+	  * A post has altered since last organogram due to split of duties or merger of posts
+	  * Additional duties held by a person that does not report to their normal line management
+	  * A small SCS team that has been reported within a larger team
+	  * Finish date of assignments for those that work on a project by project basis
+
+	There may be other instances where additional clarity will help read across from the current organogram to previous ones or from one department’s organogram to another."
+		}, {
+			"name": "valid",
+			"title": "Valid?",
+			"datatype": "boolean",
+			"format": "1|0",
+			"required": true
+		}]
+	}, {
+		"name": "junior-data",
+		"columns": [{
+			"name": "unit",
+			"title": "Unit",
+			"description": "An area/workstream name used within your organisation to define the different areas of the organisation, e.g. Human Resources, Corporate Services, Private Office Group. This should be defined at a level that best represents your organisational structure, e.g. DG or DD level.",
+			"reference": "units#unit"
+		}, {
+			"name": "reporting-to",
+			"title": "Reporting Senior Post",
+			"description": "The corresponding unique post reference for the SCS person the junior posts reports to.",
+			"reference": "senior-data#id",
+			"required": true
+		}, {
+			"name": "grade",
+			"title": "Grade",
+			"description": "The level of grade the posts carry.",
+			"reference": "grades#grade",
+			"required": true
+		}, {
+			"name": "job-title",
+			"title": "Generic Job Title",
+			"description": "The generic job title for the particular grade.",
+			"reference": "job-titles#job-title",
+			"required": true
+		}, {
+			"name": "posts",
+			"title": "Number of Posts in FTE",
+			"description": "The number of posts, expressed in FTE, within the Unit that carry the particular grade and job title.",
+			"datatype": "decimal",
+			"minimum": 0.1,
+			"format": "[1-9][0-9]*(.\\d{1,2})?",
+			"required": true
+		}, {
+			"name": "profession",
+			"title": "Profession",
+			"description": "A list of professional/occupational groups based on Professional Skills for Government standard CS professions.",
+			"comment": "You will need to select the closest description to the teams main function.",
+			"reference": "professions#profession",
+			"required": true
+		}]
+	}]
+}
