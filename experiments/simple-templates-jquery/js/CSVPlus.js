@@ -479,6 +479,63 @@ Dependencies:
   /* =========================================================================== */
   /* =========================================================================== */
 
+  /* THIS IS JUST A ROUGH DRAFT OF WHAT COULD BE DONE!!! */
+  var json_conversions = {
+    start : function(state) {
+      state.top = {}
+    },
+
+    set_object : function( state, id) {
+      state.object = {};
+
+      if( state.top.rows === undefined ) {
+        state.top.rows = [];
+      }
+
+      state.top.rows.push(state.object);
+
+      if( id !== undefined ) {
+        state.object["@id"] = id;
+      }
+    },
+
+    add_k_v : function( state, key, value ) {
+      state.object[key] = value
+    },
+
+    close_object : function( state ) {},
+
+    end : function(state) {},
+
+  };
+
+  var turtle_conversions = {
+    start : function(state) {
+      state.top = "@prefix csv: <blabla> ;\n"
+    },
+
+    set_object : function(state, id) {
+      if( id === undefined ) {
+        state.current_block = "[] a csv:row;\n";
+      } else {
+        state.current_block = "<" + id + "> a csv:row;\n";
+      }
+    },
+
+    add_k_v : function(state, key, value) {
+      state.current_block += "    " + key + " " + value + ";\n";
+    },
+
+    close_object :function(state) {
+      state.current_block += ".\n\n";
+      state.top += state.current_block;
+    },
+
+    end : function(state) {},
+  }
+
+
+
   /* =========================================================================== */
   /*  The core, ie, converting the CSV data                                      */
   /*   (the core of the standard implementation...)                              */
