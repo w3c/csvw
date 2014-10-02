@@ -5,3 +5,7 @@ Currently everything is in the same directory. Next step would be to amend the
 demo to use CSV WG usecases and example files. 
 
 This dir created by Dan Brickley with lots of help from Anastasia Dimou
+
+This version is for events, ... 
+
+e.g. https://support.google.com/webmasters/answer/4620133?hl=en
