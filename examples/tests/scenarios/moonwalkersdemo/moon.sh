@@ -20,13 +20,14 @@ RMLPROC=$HOME/working/csv/RMLProcessor # From https://github.com/mmlab/RMLProces
 DIR=$HOME/working/csv/git/csvw/examples/tests/scenarios/moonwalkersdemo # Unix path to working folder containing:
 
  RMLFILE=museum-model.rml.ttl          # An RML mapping file, expressing CSV to RDF templates. 
+ PATHINRML=/example5/moon-walkers.csv  # Path as written in the RMLFile
  CSVFILE=moon-walkers.csv              # CSV file, including 
  OUTFILE=_output.nt.txt                # File for output RDF graph (W3C N-Triples format)
 
 ## END CONFIGURATION
 
 
-echo "/example5/moon-walkers.csv=$DIR/$CSVFILE" > source.properties
+echo "$PATHINRML=$DIR/$CSVFILE" > source.properties
 echo "!OVERWRITING $DIR/source.properties! contents:"
 cat "$DIR/source.properties"
 
