@@ -183,21 +183,19 @@ Dependencies:
   var get_template_data = function(options, meta) {
     // The (user's) option dictates the required output format
     // The metadata contains (possibly) the template for different formats
-    var retval = { url: "", format: $.CSV_format.JAVASCRIPT };
+    var retval = { url: "", format: options.format };
     // See if there is a template to be extracted. If not, the template will be returned as ""
     if( meta.template !== undefined ) {
       if( $.isArray(meta.template) ) {
         for( var i = 0; i < meta.template.length; i++ ) {
           if( meta.template[i].url !== undefined && meta.template[i].format === options.format ) {
             retval.url = meta.template[i].url;
-            retval.format = meta.template[i].format;
             break;
           }          
         }
       } else {
         if( meta.template.url !== undefined && meta.template.format === options.format ) {
           retval.url = meta.template.url;
-          retval.format = meta.template.format;
         }
       }
     }
@@ -297,7 +295,6 @@ Dependencies:
     var set_global = function(t) {
       retval.push({ repeat:false, template:t })
     };
-    // console.log(template);
     var retval       = [];
     var templ = template;
     while( templ !== "" ) {
@@ -556,11 +553,14 @@ Dependencies:
   *
   */
   var c_default = function(data, meta, target_format, warnings) {
-    var retval = []
-    process_rows(data, meta, function(row, context) {
-      retval.push(row);
-    });
-    return target_format === $.CSV_format.JSON ? JSON.stringify(retval, null, 2) : retval;
+    var retval = [];
+    if( target_format === $.CSV_format.JSON ) {
+      return JSON.stringify( "{ 'namivan' : 'ezvan' }", null, 2);
+    } else {
+      return "<http://namivan> <http://ezvan> 'Bizony' .";
+    }
+
+    // return target_format === $.CSV_format.JSON ? JSON.stringify(retval, null, 2) : retval;
   };
 
 
@@ -825,8 +825,8 @@ Dependencies:
           .done(function(linked_meta, local_meta, global_meta){
             // These should be merged
             var final_meta = mergeMeta(embedded_meta, linked_meta, local_meta, global_meta);
-
             var required_template = get_template_data(settings, final_meta);
+
             get_template(required_template.url)
               .done( function(template) {
                 // We finally arrived at the core: make the conversion of the CSV content to whatever the user wants...
