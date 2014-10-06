@@ -112,12 +112,12 @@ There are a number of characteristics of this CSV file worth noting:
 <h2>Assessment of the data</h2>
 Each row of this dataset provides a set of observation values, potentially with further qualification, for the month specified by the values in columns `yyyy` and `mm`. Because the temporal domain is consistent within each row, it is tempting to treat the entire row as pertaining to a single observation event - as defined in [Observations and Measurements][om] (O&M) or the [Semantic Sensor Network ontology][ssno] (SSN). 
 
-However, this is not the case as each observed property will have been measured using a different measuring instrument and / or procedure. Therefore we must treat the row as a aggregated set of values - effectively this is a 'productized' view of the data.
+However, this is not the case as each observation value will have been measured using a different measuring instrument and / or procedure. Therefore we must treat the row as a aggregated set of values - effectively this is a 'productized' view of the data containing the _values_ of the results of several discrete observation events.
 
 [om]: http://www.opengeospatial.org/standards/om
 [ssno]: http://www.w3.org/2005/Incubator/ssn/ssnx/ssn
 
-For each discrete observation value we know:
+For each observation value we know:
 - the location - every observation value in this dataset is for Camborne ... in O&M and SSN this is termed `featureOfInterest`
 - the quantity kind being measured ... in O&M and SSN this is termed `observedProperty`
 - the unit of measurement
