@@ -51,6 +51,7 @@ Dependencies:
     JSON : "json",
     JAVASCRIPT : "javascript",
     TURTLE : "turtle",
+    RDF : "rdf",
     XML : "xml"
   };  
 
@@ -138,14 +139,16 @@ Dependencies:
   * @method default_meta
   * @private
   * @param {Array} data - row of raw data, as extracted from the CSV files
+  * @param {String} url - url of the CSV data
   * @param {boolean} headers - Whether the first row in the data give the column headers; if ``false``, 
   *    the column names are generated as described in the data model document. Note that if the value is ``true``,
   *    the first row in ``data`` will be removed.
   * @return {Object} - New metadata
   */
-  var default_meta = function(data, headers) {
+  var default_meta = function(data, url, headers) {
     // The default metadata just includes the names of the columns
     var retval = {
+      "@id"   : url,
       schema : {
         columns : []
       }
@@ -476,62 +479,50 @@ Dependencies:
   /* =========================================================================== */
   /* =========================================================================== */
 
-  /* THIS IS JUST A ROUGH DRAFT OF WHAT COULD BE DONE!!! */
-  var json_conversions = {
-    start : function(state) {
-      state.top = {}
+  var js_conversions = {
+    start : function( state, data, meta, warnings ) {
+      state.obj = {
+        "@type" : "Table",
+        "@id"   : state["@id"],
+        "@base" : state["@base"],
+      };
+      if( state["@context"] !== undefined ) {
+        state.retval = state["@context"];
+      };
     },
 
-    set_object : function( state, id) {
-      state.object = {};
-
-      if( state.top.rows === undefined ) {
-        state.top.rows = [];
+    end : function( state, meta, target_format, warnings ) {
+      if( target_format === $.CSV_format.JSON ) {
+        state.retval = JSON.stringify( state.retval )
       }
-
-      state.top.rows.push(state.object);
-
-      if( id !== undefined ) {
-        state.object["@id"] = id;
-      }
+      state.retval = target_format === $.CSV_format.JSON ? JSON.stringify( state.obj, null, 2 ) : state.obj;
     },
-
-    add_k_v : function( state, key, value ) {
-      state.object[key] = value
-    },
-
-    close_object : function( state ) {},
-
-    end : function(state) {},
 
   };
 
-  var turtle_conversions = {
-    start : function(state) {
-      state.top = "@prefix csv: <blabla> ;\n"
+  var rdf_conversions = {
+    start : function( state, data, meta, warnings ) {
+      state.graph = new RDFJSInterface.Graph();
+      state.rdf   = new RDFJSInterface.RDFEnvironment();
+
+      state.rdf.setPrefix("csv", "http://www.w3.org/ns/csvw#");
+      state.rdf.setDefaultPrefix(state["@base"]);
+
+      state.graph.add(state.rdf.createTriple( state.rdf.createNamedNode(state["@id"]),
+                                              state.rdf.createNamedNode("rdf:type"),
+                                              state.rdf.createNamedNode("csv:Table") ));
     },
 
-    set_object : function(state, id) {
-      if( id === undefined ) {
-        state.current_block = "[] a csv:row;\n";
-      } else {
-        state.current_block = "<" + id + "> a csv:row;\n";
-      }
+    end : function( state, meta, target_format, warnings ) {
+      state.retval = target_format === $.CSV_format.TURTLE ? state.graph.toNT() : state.graph;
     },
+  };
 
-    add_k_v : function(state, key, value) {
-      state.current_block += "    " + key + " " + value + ";\n";
-    },
-
-    close_object :function(state) {
-      state.current_block += ".\n\n";
-      state.top += state.current_block;
-    },
-
-    end : function(state) {},
-  }
-
-
+  var conversions = {};
+  conversions[$.CSV_format.JSON]       = js_conversions;
+  conversions[$.CSV_format.JAVASCRIPT] = js_conversions;
+  conversions[$.CSV_format.TURTLE]     = rdf_conversions;
+  conversions[$.CSV_format.RDF]        = rdf_conversions;
 
   /* =========================================================================== */
   /*  The core, ie, converting the CSV data                                      */
@@ -553,7 +544,42 @@ Dependencies:
   *
   */
   var c_default = function(data, meta, target_format, warnings) {
-    var retval = [];
+    var conv_functions = conversions[target_format];
+
+ 
+
+
+    // This object is shared by all conversion functions as a common state, and also stores
+    // the final output
+    var state = {
+      retval  : undefined,
+      "@id"   : meta["@id"],
+      "@base" : meta["@id"] + "#",
+    };
+    if( meta["@context"] !== undefined ) {
+      state["@context"] = meta["@context"];
+      // TODO: this has to be refined with a proper URI handling
+      if( state["@context"]["@base"] !== undefined ) {
+        state["@base"] = state["@context"]["@base"]
+      }
+    } 
+
+    // state.graph = new RDFJSInterface.Graph();
+    // state.rdf   = new RDFJSInterface.RDFEnvironment();
+
+    // Start: set up the environment for each output format
+    conv_functions.start( state, data, meta, warnings );
+
+    // This is where the real processing happens
+
+    // End: close the processing altogether. This may involve a serialization
+    conv_functions.end( state, meta, target_format, warnings );
+
+    // Just return the generated thing:
+    return state.retval;
+
+
+
     if( target_format === $.CSV_format.JSON ) {
       return JSON.stringify( "{ 'namivan' : 'ezvan' }", null, 2);
     } else {
@@ -746,7 +772,7 @@ Dependencies:
 
         /*---- Find the reference to the various metadata ----*/
         /* Get the default metadata, ie, the column headers */
-        var embedded_meta = default_meta(pcsv.data, headers);
+        var embedded_meta = default_meta(pcsv.data, url, headers);
 
         // Local metadata reference 
         var linked_meta_url = "";
