@@ -587,7 +587,7 @@ Dependencies:
   */
   var convertCSV = function(data, meta, template, target_format, warnings) {
     // There is no template: the default is to get the rows and columns in JSON
-    return ( template === "" ) ? c_default(data, meta, target_format, warnings) : c_templates(data, meta, template, target_formats, warnings);
+    return ( template === "" ) ? c_default(data, meta, target_format, warnings) : c_templates(data, meta, template, target_format, warnings);
   }
 
   /* =========================================================================== */
