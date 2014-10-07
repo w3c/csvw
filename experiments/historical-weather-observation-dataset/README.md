@@ -76,7 +76,7 @@ For reference, the column titles (in line 6) are interpreted as follows:
 - `tmax`: mean daily maximum temperature
 - `tmin`: mean daily minimum temperature
 - `af`: number of days of air front
-- `rain`: total rain (accumulation)
+- `rain`: total rain accumulation
 - `sun`: total sunshine duration
 
 ### Conversion to standard CSV format ###

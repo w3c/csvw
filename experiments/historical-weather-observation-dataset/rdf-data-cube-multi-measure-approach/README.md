@@ -34,64 +34,8 @@ On the subject of missing values (as specified using the token `---`) there are 
 
 In this example, we will take the simple option and just omit the missing values.
 
-For reference, the data from the CSV file for a couple of sample observations is:
-
-```
-Camborne,,,,,,,,,,,,
-Location 1627E 407N 87m amsl,,,,,,,,,,,,
-Estimated data is marked with a * after the  value.,,,,,,,,,,,,
-Missing  data (more than 2 days missing in month) is  marked by  ---.,,,,,,,,,,,,
-"Sunshine data taken from an automatic Kipp & Zonen sensor marked with a #, otherwise sunshine data taken from a Campbell Stokes recorder.",,,,,,,,,,,,
-yyyy,mm,tmax,,tmin,,af,,rain,,sun,,
-,,degC,,degC,,days,,mm,,hours,,
-...
-```
-
-The RDF (expressed using the terse-triple-language, ttl) for the dataset and a these sample observations are provided below:
-
-```
-@prefix dcat: <http://www.w3.org/ns/dcat#>
-@prefix dct:  <http://purl.org/dc/terms/> .
-@prefix ex:   <http://www.example.org/def/historical-data#> .
-@prefix qb:   <http://purl.org/linked-data/cube#> .
-
-:cambornedata1 a qb:DataSet ;
-    dct:title "Camborne data"@en ;
-    dct:description "Historical observation weather data for Camborne"@en ;
-    dcat:distribution 
-        [ dcat:downloadURL <http://www.metoffice.gov.uk/pub/data/weather/uk/climate/stationdata/cambornedata.txt> ; 
-          dcat:license <http://www.nationalarchives.gov.uk/doc/open-government-licence/version/2/> ] ;
-    dct:spatial <http://data.ordnancesurvey.co.uk/id/50kGazetteer/42095> ;
-    qb:structure ex:dsd1 .
-
-:record-1978-9 a qb:Observation ;
-    qb:dataSet :cambornedata1 ;
-    ex:refPeriod <http://reference.data.gov.uk/id/gregorian-interval/1978-09-01T00:00:00/P1M> ;
-    ex:tmax 17.5 ;
-    ex:tmin 11.3 ;
-    ex:af 0 ;
-    ex:rain 26.7  .
-
-:record-1978-10 a qb:Observation ;
-    qb:dataSet :cambornedata1 ;
-    ex:refPeriod <http://reference.data.gov.uk/id/gregorian-interval/1978-10-01T00:00:00/P1M> ;
-    ex:tmax 15.6 ;
-    ex:tmin 10.7 ;
-    ex:af 0 ;
-    ex:rain 20.4 .
-```
-
-For information, details of the Camborne object, a `NamedPlace`, as defined by Ordnance Survey is provided below:
-
-```
-<http://data.ordnancesurvey.co.uk/id/50kGazetteer/42095> 
-    a <http://data.ordnancesurvey.co.uk/ontology/50kGazetteer/NamedPlace> ;
-    rdfs:label "Camborne" ;
-    <http://data.ordnancesurvey.co.uk/ontology/spatialrelations/northing> 40500 ;
-    <http://data.ordnancesurvey.co.uk/ontology/spatialrelations/easting> 164500 .
-``` 
-
-_(The eagle-eyed amongst you will notice that the coordinates of Camborne as defined by Ordnance Survey don't quite match those expressed within the [CSV](../cambornedata.csv). This is because the location where the observation occurs is actually a representative sampling point for the Camborne area - not the centroid of the geographic area. Ontologies such as SSN and O&M deal with this properly, so we'll wait until experiment 4 before fixing this issue!)_
+[Source CSV](source/cambornedata.csv) - extract of the full dataset containing only two rows
+[Target RDF/turtle output](output/cambornedata-abbreviated.ttl) - abbreviated form of RDF Data Cube
 
 Mapping from the CSV dataset to this 'abbreviated form' of an RDF Data Cube observation is relatively simple. That said, there are a few points to note:
 - the first five rows (before the header-line) need to be ignored (assumption that the dataset metadata is taken verbatim from the CSV metadata?)
@@ -103,34 +47,15 @@ Mapping from the CSV dataset to this 'abbreviated form' of an RDF Data Cube obse
 - the `---` missing value token needs to be interpreted as an empty cell and therefore skipped over 
 - the cell values for attribute components (e.g. `*`, `#` or `Provisional`) need to be converted to their associated concepts
 
-For completeness, a _normalized_ version of the data-cube observations is provided below showing all the attributes and dimensions expanded out:
+The intent for this experiment is to generate the [abbreviated RDF Data Cube output](output/cambornedata-abbreviated.ttl) without resorting to external templating.
 
-```
-:record-1978-9 a qb:Observation ;
-    qb:dataSet :cambornedata1 ;
-    dct:spatial <http://data.ordnancesurvey.co.uk/id/50kGazetteer/42095> ;
-    ex:refPeriod <http://reference.data.gov.uk/id/gregorian-interval/1978-09-01T00:00:00/P1M> ;
-    ex:tmax 17.5 ;
-    ex:tmin 11.3 ;
-    ex:af 0 ;
-    ex:rain 26.7  .
+[CSV+ metadata](metadata.json) ... *DISCLAIMER: this is work in progress*
 
-:record-1978-10 a qb:Observation ;
-    qb:dataSet :cambornedata1 ;
-    dct:spatial <http://data.ordnancesurvey.co.uk/id/50kGazetteer/42095> ;
-    ex:refPeriod <http://reference.data.gov.uk/id/gregorian-interval/1978-10-01T00:00:00/P1M> ;
-    ex:tmax 15.6 ;
-    ex:tmin 10.7 ;
-    ex:af 0 ;
-    ex:rain 20.4 .
-```
+CSV metadata questions:
 
-For the multi-measure approach this is not very interesting as it only adds the `dct:spatial` attribute; the unit of measurement attributes remain attached to the measure component properties themselves ... e.g. `ex:tmax`
-
-```
-ex:tmax a owl:DatatypeProperty, qb:MeasureProperty ;
-	rdfs:label "mean daily maximum temperature"@en ;
-	skos:notation "tmax" ;
-	qudt:unit <http://qudt.org/vocab/unit#DegreeCelsius> ;
-	rdfs:range xsd:decimal .
-```
+1. how to declare the dataset (table) to be @type `qb:DataSet`? ... the [metadata vocabulary](http://w3c.github.io/csvw/metadata/index.html) asserts that @type MUST be `Table`. Should I use `type`?
+2. [DCAT](http://www.w3.org/TR/vocab-dcat/) attaches `dct:license` to a `dcat:Distribution` Class whereas [Jeni's example](https://github.com/w3c/csvw/blob/gh-pages/examples/tests/scenarios/uc-4/attempts/attempt-3/metadata.json) attaches `license` directly to the Table object. Should we follow the DCAT pattern? 
+3. How to express the `dcat:distribution/dcat:downloadURL` property?
+4. How to refer to the RDF Data Cube dataset structure definition? ... it's too big to go in the metadata & it's not a CSV so doesn't seem to fit in the  `resources` section.
+5. Check URI template syntax ...
+6. How to declare 'missing value' token?
