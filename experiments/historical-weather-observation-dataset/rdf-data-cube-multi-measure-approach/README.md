@@ -35,6 +35,7 @@ On the subject of missing values (as specified using the token `---`) there are 
 In this example, we will take the simple option and just omit the missing values.
 
 [Source CSV](source/cambornedata.csv) - extract of the full dataset containing only two rows
+
 [Target RDF/turtle output](output/cambornedata-abbreviated.ttl) - abbreviated form of RDF Data Cube
 
 Mapping from the CSV dataset to this 'abbreviated form' of an RDF Data Cube observation is relatively simple. That said, there are a few points to note:
