@@ -5,6 +5,7 @@ This experiement is based on a [historical weather observation dataset for Cambo
 
 ## Transformation experiments ##
 A number of transformation experiments are conducted here, each with increasing complexity:
+
 1. [Literal transformation to RDF Data Cube using the 'multi-measure' approach](rdf-data-cube-multi-measure-approach/README.md).
 2. Literal transformation to RDF Data Cube using the 'measure-dimension' approach.
 3. Adopting the use of QUDT to describe the measured values.
