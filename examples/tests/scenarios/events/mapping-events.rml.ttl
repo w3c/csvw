@@ -1,51 +1,83 @@
+@prefix schema: <http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
 @prefix rr: <http://www.w3.org/ns/r2rml#>.
-@prefix  rml: <http://semweb.mmlab.be/ns/rml#> .
+@prefix rml: <http://semweb.mmlab.be/ns/rml#> .
 @prefix ql: <http://semweb.mmlab.be/ns/ql#> .
 @prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
-@prefix schema: <http://schema.org/> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix ex: <http://example.com/>.
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+# TARGET TRIPLES:
+#
+# _:b0 <http://schema.org/location> _:b1 .
+# _:b0 <http://schema.org/name> "B.B. King" .
+# _:b0 <http://schema.org/offers> _:b2 .
+# _:b0 <http://schema.org/startDate> "2014-04-12T19:30"^^<http://schema.org/Date> .
+# _:b0 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/MusicEvent> .
+#
+# _:b1 <http://schema.org/address> "79 Washington St., Providence, RI" .
+# _:b1 <http://schema.org/name> "Lupo’s Heartbreak Hotel" .
+# _:b1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Place> .
+#
+# _:b2 <http://schema.org/url> <https://www.etix.com/ticket/1771656> .
+# _:b2 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Offer> .
+
+# SAMPLE OUTPUT:
+#
+# _:eEqVJqC38u <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Offer> .
+# _:eEqVJqC38u <http://schema.org/url> "https://www.etix.com/ticket/1771656" .
+# _:aN0oBWfbsk <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/MusicEvent> .
+# _:aN0oBWfbsk <http://schema.org/startDate> "2014-04-12T19:30"^^<http://schema.org/Date> .
+# _:aN0oBWfbsk <http://schema.org/name> "B.B. King" .
+# _:LxUa7FLIyE <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Place> .
+# _:LxUa7FLIyE <http://schema.org/address> "79 Washington St.; Providence; RI" .
+# _:LxUa7FLIyE <http://schema.org/name> "Lupo\u2019s Heartbreak Hotel" .
 
 # Name, StartDate, location_name, location_address, ticket_url
 
-<#WikipediaExportMapping>
-  rml:logicalSource [
-    rml:source "/events-listing.csv";
-    rml:referenceFormulation ql:CSV;
-  ];
-  rr:subjectMap [
-    rr:template "http://ex.com/{Name}";
-    rr:class schema:MusicEvent ;
-  ];
+<#MusicEvent>
+  rr:subjectMap [ rr:termType rr:BlankNode; rr:class schema:MusicEvent; ];
+  rml:logicalSource [ rml:source "/events-listing.csv"; rml:referenceFormulation ql:CSV; ];
 
-  rr:predicateObjectMap 
-  [
+  rr:predicateObjectMap [
     rr:predicate schema:name;
-    rr:objectMap 
-    [
-      rml:reference "Name";
-      rr:datatype xsd:date;
-    ]
+    rr:objectMap [ rml:reference "Name"; ]
   ];
 
-
-  rr:predicateObjectMap 
-  [
-    rr:predicate schema:x-locAddr;
-    rr:objectMap 
-    [
-      rml:reference "location_address";
-      rr:datatype xsd:date;
-    ]
+  rr:predicateObjectMap [
+    rr:predicate schema:startDate;
+    rr:objectMap [ rml:reference "StartDate";  rr:datatype schema:Date; ]
   ];
 
-  rr:predicateObjectMap 
-  [
-    rr:predicate schema:x-locName;
-    rr:objectMap 
-    [
-      rml:reference "location_name";
-      rr:datatype xsd:date; 
-    ]
-  ].
+  rr:predicateObjectMap [
+     rr:predicate schema:location;
+     rr:objectMap [ rr:parentTriplesMap <#Place> ]
+  ];
+
+  rr:predicateObjectMap [
+     rr:predicate schema:offers;
+     rr:objectMap [ rr:parentTriplesMap <#Offer> ]
+  ] .
+
+
+<#Place>
+  rr:subjectMap [ rr:termType rr:BlankNode;  rr:class schema:Place; ];
+  rml:logicalSource [ rml:source "/events-listing.csv"; rml:referenceFormulation ql:CSV; ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:address;
+    rr:objectMap [  rml:reference "location_address"; ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:name;
+    rr:objectMap [ rml:reference "location_name"; ]
+  ] .
+
+
+<#Offer>
+  rr:subjectMap [ rr:termType rr:BlankNode;  rr:class schema:Offer; ];
+  rml:logicalSource [ rml:source "/events-listing.csv"; rml:referenceFormulation ql:CSV; ];
+  rr:predicateObjectMap [
+    rr:predicate schema:url;
+    rr:objectMap [  rml:reference "ticket_url"; rr:termType rr:IRI; ]
+  ] .
