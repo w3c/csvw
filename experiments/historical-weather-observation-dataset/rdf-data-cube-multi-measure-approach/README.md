@@ -84,7 +84,7 @@ For information, details of the Camborne object, a `NamedPlace`, as defined by O
     <http://data.ordnancesurvey.co.uk/ontology/spatialrelations/easting> 164500 .
 ``` 
 
-_(The eagle-eyed amongst you will notice that the coordinates of Camborne as defined by Ordnance Survey don't quite match those expressed within the CSV. This is because the location where the observation occurs is actually a representative sampling point for the Camborne area - not the centroid of the geographic area. Ontologies such as SSN and O&M deal with this properly, so we'll wait until experiment 4 before fixing this issue!)_
+_(The eagle-eyed amongst you will notice that the coordinates of Camborne as defined by Ordnance Survey don't quite match those expressed within the [CSV](../cambornedata.csv). This is because the location where the observation occurs is actually a representative sampling point for the Camborne area - not the centroid of the geographic area. Ontologies such as SSN and O&M deal with this properly, so we'll wait until experiment 4 before fixing this issue!)_
 
 Mapping from the CSV dataset to this 'abbreviated form' of an RDF Data Cube observation is relatively simple. That said, there are a few points to note:
 - the first five rows (before the header-line) need to be ignored (assumption that the dataset metadata is taken verbatim from the CSV metadata?)
@@ -95,3 +95,35 @@ Mapping from the CSV dataset to this 'abbreviated form' of an RDF Data Cube obse
 - cells with empty values need to be skipped over
 - the `---` missing value token needs to be interpreted as an empty cell and therefore skipped over 
 - the cell values for attribute components (e.g. `*`, `#` or `Provisional`) need to be converted to their associated concepts
+
+For completeness, a _normalized_ version of the data-cube observations is provided below showing all the attributes and dimensions expanded out:
+
+```
+:record-1978-9 a qb:Observation ;
+    qb:dataSet :cambornedata1 ;
+    dct:spatial <http://data.ordnancesurvey.co.uk/id/50kGazetteer/42095> ;
+    ex:refPeriod <http://reference.data.gov.uk/id/gregorian-interval/1978-09-01T00:00:00/P1M> ;
+    ex:tmax 17.5 ;
+    ex:tmin 11.3 ;
+    ex:af 0 ;
+    ex:rain 26.7  .
+
+:record-1978-10 a qb:Observation ;
+    qb:dataSet :cambornedata1 ;
+    dct:spatial <http://data.ordnancesurvey.co.uk/id/50kGazetteer/42095> ;
+    ex:refPeriod <http://reference.data.gov.uk/id/gregorian-interval/1978-10-01T00:00:00/P1M> ;
+    ex:tmax 15.6 ;
+    ex:tmin 10.7 ;
+    ex:af 0 ;
+    ex:rain 20.4 .
+```
+
+For the multi-measure approach this is not very interesting as it only adds the `dct:spatial` attribute; the unit of measurement attributes remain attached to the measure component properties themselves ... e.g. `ex:tmax`
+
+```
+ex:tmax a owl:DatatypeProperty, qb:MeasureProperty ;
+	rdfs:label "mean daily maximum temperature"@en ;
+	skos:notation "tmax" ;
+	qudt:unit <http://qudt.org/vocab/unit#DegreeCelsius> ;
+	rdfs:range xsd:decimal .
+```
