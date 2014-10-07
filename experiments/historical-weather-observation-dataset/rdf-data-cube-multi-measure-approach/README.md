@@ -34,13 +34,20 @@ On the subject of missing values (as specified using the token `---`) there are 
 
 In this example, we will take the simple option and just omit the missing values.
 
-The RDF (expressed using the terse-triple-language, ttl) for the dataset and a couple of sample observations are provided below. 
+For reference, the data from the CSV file for a couple of sample observations is:
 
-For reference, the data from the CSV file for these observations is:
-
+```
+Camborne,,,,,,,,,,,,
+Location 1627E 407N 87m amsl,,,,,,,,,,,,
+Estimated data is marked with a * after the  value.,,,,,,,,,,,,
+Missing  data (more than 2 days missing in month) is  marked by  ---.,,,,,,,,,,,,
+"Sunshine data taken from an automatic Kipp & Zonen sensor marked with a #, otherwise sunshine data taken from a Campbell Stokes recorder.",,,,,,,,,,,,
 yyyy,mm,tmax,,tmin,,af,,rain,,sun,,
-1978,9,17.5,,11.3,,0,,26.7,,---,,
-1978,10,15.6,,10.7,,0,,20.4,,---,,
+,,degC,,degC,,days,,mm,,hours,,
+...
+```
+
+The RDF (expressed using the terse-triple-language, ttl) for the dataset and a these sample observations are provided below:
 
 ```
 @prefix dcat: <http://www.w3.org/ns/dcat#>
