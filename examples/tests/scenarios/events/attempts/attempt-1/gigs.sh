@@ -30,7 +30,7 @@ DIR=$HOME/working/csv/git/csvw/examples/tests/scenarios/events/attempts/attempt-
 ## END CONFIGURATION
 
 
-echo "$PATHINRML=$DIR/$CSVFILE" > source.properties
+echo "$PATHINRML=$DIR/$CSVFILE" > $DIR/source.properties
 echo "!OVERWRITING $DIR/source.properties! contents:"
 cat "$DIR/source.properties"
 
