@@ -1,11 +1,34 @@
-<h1>Historical weather observation experiment</h1>
-
-<h2>Describing the source dataset</h2>
-This experiement is based on a [historical weather observation dataset for Camborne][1]
+# Historical weather observation experiment #
+This experiement is based on a [historical weather observation dataset for Camborne][1]. The intent is to examine just how far we can get without needing to resort to external templating - and, in doing so, determine where to draw the line for the functionality required to support _most_ transformations without exposing the user to undue complexity.
 
 [1]: http://www.metoffice.gov.uk/pub/data/weather/uk/climate/stationdata/cambornedata.txt
 
-<h3>Raw data (fixed width)</h3>
+## Transformation experiments ##
+A number of transformation experiments are conducted here, each with increasing complexity:
+1. [Literal transformation to RDF Data Cube using the 'multi-measure' approach](rdf-data-cube-multi-measure-approach/README.md).
+2. Literal transformation to RDF Data Cube using the 'measure-dimension' approach.
+3. Adopting the use of QUDT to describe the measured values.
+4. Adopting the Semantic Sensor Network (SSN) ontology to describe the semantics associated with the observation.
+
+?? what about W3C prov-o ??
+
+A "direct mapping", where no metadata is provided, is not included.
+
+Target vocabularies (ontologies) used include:
+- [RDF Data Cube][qb] which is designed to enable the publication of multi-dimensional data, such as statistics, on the web in such a way that it can be linked to related data sets and concepts. Given this design ethos, it seems that tabular data, having 2-dimensions, should be well aligned to the RDF Data Cube model.
+- [Quantities, Units, Dimensions and Data Types][qudt] ontology which provides an standardised mechanism for describing physical properties, measured values thereof and the units used to measure those properties. 
+- [Semantic Sensor Network ontology][ssno] (SSN) which provides rich semantics specifically relating to the observation of physical values using the "sensor-stimulus-observation" pattern.
+
+Note that SSN is strongly related to [ISO 19156:2011 Observations and Measurements][om] (O&M) which is widely used in the Geospatial Information community and is used as the basis for data models emerging from the World Meteorological Organization (WMO).
+
+[qb]: http://www.w3.org/TR/vocab-data-cube/
+[qudt]: http://qudt.org/
+[om]: http://www.opengeospatial.org/standards/om
+[ssno]: http://www.w3.org/2005/Incubator/ssn/ssnx/ssn
+
+## Describing the source dataset ##
+
+### Raw data (fixed width) ###
 A snippet of the raw data is provided below:
 
 ```
@@ -55,7 +78,7 @@ For reference, the column titles (in line 6) are interpreted as follows:
 - `rain`: total rain (accumulation)
 - `sun`: total sunshine duration
 
-<h3>Conversion to standard CSV format</h3>
+### Conversion to standard CSV format ###
 [Instructions are provided describing how to import these historical weather observation datasets into Microsoft Excel][2]. Standard CSV format can be exported; a snippet of which is provided below:
 
 [2]: http://www.metoffice.gov.uk/climate/uk/about/station-data/import
@@ -109,20 +132,3 @@ There are a number of characteristics of this CSV file worth noting:
 - Values of sunshine duration are measured using a Campbell Stokes recorded unless qualified with a "#" in the following column in which case they are measured using an automatic Kipp & Zonen sensor - the difference in measurement instrument affects how the data values are interpreted
 - Rows marked with "Provisional" in the final column are yet to pass through quality control assessment
 
-<h2>Assessment of the data</h2>
-Each row of this dataset provides a set of observation values, potentially with further qualification, for the month specified by the values in columns `yyyy` and `mm`. Because the temporal domain is consistent within each row, it is tempting to treat the entire row as pertaining to a single observation event - as defined in [Observations and Measurements][om] (O&M) or the [Semantic Sensor Network ontology][ssno] (SSN). 
-
-However, this is not the case as each observation value will have been measured using a different measuring instrument and / or procedure. Therefore we must treat the row as a aggregated set of values - effectively this is a 'productized' view of the data containing the _values_ of the results of several discrete observation events.
-
-[om]: http://www.opengeospatial.org/standards/om
-[ssno]: http://www.w3.org/2005/Incubator/ssn/ssnx/ssn
-
-For each observation value we know:
-- the location - every observation value in this dataset is for Camborne ... in O&M and SSN this is termed `featureOfInterest`
-- the quantity kind being measured ... in O&M and SSN this is termed `observedProperty`
-- the unit of measurement
-- the time for which the observation value is representative ... in O&M this is termed `phenomenonTime` and in SSN it is `observationSamplingTime`
-
-O&M also provides a mechansim to capture data quality information - which would enable us to assert that a given result has been subject to a quality control process, albeit that we have no details of that process nor whether the 'raw' measured values were amended as the result of that assessment.
-
-However, with the exception of the sunshine duration, we have no information on the provenance (lineage) of the observation values. We don't have information on the procedure used, the instrument used nor even the type of instrument.
