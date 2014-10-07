@@ -1,11 +1,9 @@
 
 This directory contains a working example for invocation of RMLProcessor.
 
-Currently everything is in the same directory. Next step would be to amend the 
-demo to use CSV WG usecases and example files. 
+This is in attempts/attempt-1 ( dir created by Dan Brickley with lots of help from Anastasia Dimou )
+Google is to match schema.org data e.g. https://support.google.com/webmasters/answer/4620133?hl=en
 
-This dir created by Dan Brickley with lots of help from Anastasia Dimou
+TODO: attempt-2 should try same thing but with a mustache-based approach.
 
-This version is for events, ... 
 
-e.g. https://support.google.com/webmasters/answer/4620133?hl=en

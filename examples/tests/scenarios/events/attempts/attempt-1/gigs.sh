@@ -20,12 +20,12 @@ export JAVA_HOME=$(/usr/libexec/java_home)
 
 RMLPROC=$HOME/working/csv/RMLProcessor # From https://github.com/mmlab/RMLProcessor/tree/development
 
-DIR=$HOME/working/csv/git/csvw/examples/tests/scenarios/events # Unix path to working folder containing:
+DIR=$HOME/working/csv/git/csvw/examples/tests/scenarios/events/attempts/attempt-1 # Unix path to working folder containing:
 
  RMLFILE=mapping-events.rml.ttl          # An RML mapping file, expressing CSV to RDF templates. 
  PATHINRML=/events-listing.csv  # Path as written in the RMLFile
- CSVFILE=events-listing.csv              # CSV file, including 
- OUTFILE=_output.nt.txt                # File for output RDF graph (W3C N-Triples format)
+ CSVFILE=../../source/events-listing.csv              # CSV file, including 
+ OUTFILE=../../output/_output_attempt-1.nt.txt # File for output RDF graph (W3C N-Triples format)
 
 ## END CONFIGURATION
 
