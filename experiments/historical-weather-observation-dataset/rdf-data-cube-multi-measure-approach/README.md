@@ -10,7 +10,7 @@ _Tabular data is data that is structured into rows, each of which contains infor
 
 The RDF Data Cube 'multi-measure' approach seems well aligned to our definition of tabular, row-oriented data: each `qb:Observation` (data cube observation) comprises a number of measure components. So we can treat the `qb:Observation` as the subject of each row.
 
-The [dataset structure definition][dsd] for this example is provided [here](dataset-structure-definition.ttl).
+The [dataset structure definition][dsd] for this example is provided [here](data-structure-definition.ttl).
 
 [dsd]: http://www.w3.org/TR/vocab-data-cube/#dsd
 
