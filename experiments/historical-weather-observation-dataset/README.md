@@ -123,13 +123,13 @@ For convenience, a [local copy](cambornedata.csv) is provided.
 There are a number of characteristics of this CSV file worth noting:
 - The first 5 lines are descriptive metadata
 - The header row (containing the column titles) is line 6
-- Not all columns have titles; the additional columns inserted to capture qualification of the observation values do not provide a title (e.g. estimated "*", instrument type "#" and quality control status "Provisional")
+- Not all columns have titles; the additional columns inserted to capture qualification of the observation values do not provide a title (e.g. estimated `*`, instrument type `#` and quality control status `Provisional`)
 - Additional attributes (e.g. unit of measurement) for some columns are provided in line 7; therefore ... 
 - The data does not begin until line 8
 - A primary key for each row may be comprised from concatenating the values of `yyyy` and `mm`
 - The observation values are attributable to the entire month
 - The token `---` is used to indicate missing data
-- Observation values are considered to be 'measured' unless further qualified with a "*" in the following column in which case they are considered to be estimated
-- Values of sunshine duration are measured using a Campbell Stokes recorded unless qualified with a "#" in the following column in which case they are measured using an automatic Kipp & Zonen sensor - the difference in measurement instrument affects how the data values are interpreted
+- Observation values are considered to be 'measured' unless further qualified with a `*` in the following column in which case they are considered to be estimated
+- Values of sunshine duration are measured using a Campbell Stokes recorder unless qualified with a `#` in the following column in which case they are measured using an automatic Kipp & Zonen sensor - the difference in measurement instrument affects how the data values are interpreted
 - Rows marked with "Provisional" in the final column are yet to pass through quality control assessment
 
