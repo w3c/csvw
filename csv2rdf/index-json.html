@@ -213,15 +213,20 @@ var respecConfig = {
             <li>If the <code>@type</code> <a>property</a> is set, add:<br>
                 <code>"@type": "Table"</code>
             </li>
+            <!--
             <li>If the <code>notes</code> <a>property</a> is set, its value is either an array of annotation objects, or a single annotation object, each with its own (required) <code>@id</code> <a>property</a>. For each of those annotation objects add the following name/value pair (where <code>@id<sub>i</sub></code> is the <code>@id</code> value for the i<sup>th</sup> annotation object):<br>
               <code>"note": "@id<sub>i</sub>"</code>
             </li>
+             -->
             <li> For each (optional) <a>property</a> <code>prop<sub>i</sub></code> with <code>value<sub>i</sub></code> corresponding to a term defined in [[!DC-TERMS]], add the name/value pair: 
               <br><code>"prop<sub>i</sub>": "value<sub>i</sub>"</code>
             </li>
           </ul>
           <div class="issue">
-            The last set of n/v generation may depend on whether schema.org terms are used instead of Dublin Core.
+            Relevant issue: <a href="https://github.com/w3c/csvw/issues/30">Issue 30</a>.
+          </div>
+          <div class="issue">
+            Relevant issue: <a href="https://github.com/w3c/csvw/issues/29">Issue 29</a> for the dublin core related properties.
           </div>
         </section>
 
@@ -229,7 +234,7 @@ var respecConfig = {
           <h4>Processing Steps for Cell-Level Name/Value triples</h4>
           <p class="note">The metadata specification&nbsp;[[!tabular-metadata]] has an inheritence structure whereby the metadata for a cell (e.g., <code>datatype</code>) may be derived from values specified for a column, a row, or indeed the specific cell itself. This specification considers the result of this derivation for each <a>property</a>.</p>
           <p>The steps below define a new JSON object for each row. These objects are added as an array as a table-level name/value pair as follows:<br>
-            <code>"rows": [{<em>object for first row</em>},{<em>object for second row</em>},…,{<em>object for last row</em>}]</code>
+            <code>"@rows": [{<em>object for first row</em>},{<em>object for second row</em>},…,{<em>object for last row</em>}]</code>
           </p>
           <p>The objects themselves are generates through the following steps:</p>
           <ul class="steps">
@@ -274,45 +279,18 @@ var respecConfig = {
               <code>"C<sub>j</sub>": object<sub>i,j</sub></code>
             </li>
           </ul>
+          <div class="issue">The specification refers to the <code>column-template</code> property, though that is not part of the metadata specification at this moment. This is in anticipation of a minimal URI-transformation for the predicate. Similar predicates may have to be used for each row to influence the row’s URI.</div>
+          
+          <div class="issue">
+            Relevant issue: <a href="https://github.com/w3c/csvw/issues/31">Issue 31</a>.
+          </div>
+          <div class="issue">Relevant issue: <a href="https://github.com/w3c/csvw/issues/32">Issue 32</a></div>
+          <div class="issue">
+            Relevant issue: <a href="https://github.com/w3c/csvw/issues/33">Issue 33</a>
+          </div>
         </section>
       </section>
     </section>
-     <section id="processing-core">
-      <h2>Processing Core Tabular Data</h2>
-      <p>The <a href="http://www.w3.org/TR/tabular-data-model/#core-model"><em>Core Tabular Data</em></a>,
-      as defined in&nbsp;[[!tabular-data-model]], does not have any <a title="name">column names</a>, only raw data in terms of 
-      <a title="row">data rows</a>. In that case, for the purpose of this section, processing begins by (conceptually) establishing the metadata as:</p>
-
-      <pre>[{
-  "@id": "<em>URI of the CSV file</em>",
-  "schema" : {
-    "columns": [{
-      "name": "col_1",
-     }, 
-     {
-      "name": "col_2",
-     }, 
-     .
-     .
-     .
-     {
-      "name": "col_k",
-    }]
-  }
-}]</pre>
-      <p>Where "k" is the number of columns in the table. The tabular data is then processed as Annotated Tabular Data with 
-      this associated metadata, as described in the <a href="#processing-tabular">previous section</a>.</p> 
-
-      <div class="issue">
-        In fact, the default metadata, for this case, i.e., the default naming of the column names, may not be something to be defined in this document; a better place would be the data model document.<br/>
-        However, the meeting on 2014.10.01 had a temporary consensus that this step is unnecessary. If the tabular data does <em>not</em> define column names, then the default generation simply does not happen. If this is the final agreement in the group, this whole section should be removed.
-      </div>
-
-
-    </section>
-
-
-
     <section id="examples-1" class="informative">
       <h2>Examples</h2>
 
@@ -326,7 +304,7 @@ var respecConfig = {
 
     <p>yielding the following JSON:</p>
     <pre class="example" title="JSON output">{
-  "rows" : [
+  "@rows" : [
     {
       "row": 1,
       "GID":              "1",
@@ -396,7 +374,7 @@ var respecConfig = {
   "title": "Tree Operations",
   "dc:license": "http://opendefinition.org/licenses/cc-by/",
   "dc:modified": "2010-12-31",
-  "rows" : [
+  "@rows" : [
     {
       "@id":              "1",
       "row":              1,

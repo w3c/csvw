@@ -223,21 +223,20 @@ var respecConfig = {
             <li>If the <code>@type</code> <a>property</a> is set, add:<br>
                 <code>(@id rdf:type csv:Table)</code>
             </li>
+            <!--
             <li>If the <code>notes</code> <a>property</a> is set, its value is either an array of annotation objects, or a single annotation object, each with its own (required) <code>@id</code> <a>property</a>. For each of those annotation objects add the following triple (where <code>@id<sub>i</sub></code> is the <code>@id</code> value for the i<sup>th</sup> annotation object):<br>
               <code>(@id csv:note @id<sub>i</sub>)</code>
             </li>
-            <li> For each (optional) <a>property</a> <code>prop<sub>i</sub></code> with code>value<sub>i</sub></code> corresponding to a term defined in [[!DC-TERMS]], add the triple: 
+             -->
+            <li> For each (optional) <a>property</a> <code>prop<sub>i</sub></code> with <code>value<sub>i</sub></code> corresponding to a term defined in [[!DC-TERMS]], add the triple: 
               <br><code>(@id dc:prop<sub>i</sub> value<sub>i</sub>)</code>
             </li>
           </ul>
           <div class="issue">
-            Not clear what to do with the @type property. The current metadata specification requires it to have the value of "Table", leaving the actual values dependent on a possible JSON-LD context. Because it is a fixed value, a fixed value has been used in this specification, which may not be what was meant. On the other hand, it may be a problem to require implementations to interpret the @context structure...
+            Relevant issue: <a href="https://github.com/w3c/csvw/issues/30">Issue 30</a>.
           </div>
           <div class="issue">
-            The last set of triple generation may depend on whether schema.org terms are used instead of Dublin Core.
-          </div>
-          <div class="issue">
-            Some of the Dublin Core properties are defined in such a way that the value is understood to be a URI Reference. The mapping should follow that, but it is not clear what this specification should say about this.
+            Relevant issue: <a href="https://github.com/w3c/csvw/issues/29">Issue 29</a> for the dublin core related properties.
           </div>
         </section>
 
@@ -282,54 +281,22 @@ var respecConfig = {
 
           <div class="note">The <code>primaryKey</code>, as defined in the metadata document&nbsp;[[!tabular-metadata]], contains a <em>reference</em> to a column, but does not contain the name of the column itself. Hence the somewhat convoluted way of generating <code>subject<sub>j</sub></code>. </div>
 
+          
           <div class="issue">The specification refers to the <code>column-template</code> property, though that is not part of the metadata specification at this moment. This is in anticipation of a minimal URI-transformation for the predicate. Similar predicates may have to be used for each row to influence the row’s URI.</div>
+          
 
-          <div class="issue">At the moment, the subject for a cell is a literal. A separate property may have to be defined (or a special value of datatype could be used) to indicate that the value should be a URI in the RDF sense. That may require some sort of a cell-level template, a bit like the <code>column-template</code>.</div>
+          <div class="issue">
+            Relevant issue: <a href="https://github.com/w3c/csvw/issues/31">Issue 31</a>.
+          </div>
+          <div class="issue">Relevant issue: <a href="https://github.com/w3c/csvw/issues/32">Issue 32</a></div>
 
-          <div class="issue">The exact mapping to Dublin Core is underspecified; not sure how much details we want to put here.</div>
+          <div class="issue">
+            Relevant issue: <a href="https://github.com/w3c/csvw/issues/33">Issue 33</a>
+          </div>
 
-          <div class="issue">The current metadata document says that the <code>schema</code> property is optional, or, even if set, column, row, or cell properties are all optionals. What this means is that the names of the columns may <em>not</em> be available. If so, the algorithm fails. A possibility would be to define (in the metadata document) a default fall-back for column naming if there is nothing providing them. (Or requiring the presense of <code>schema</code>/<code>column</code>).</div>
-
-          <div class="issue">The algorithm, at present, generates triples for cells that are, in fact, primary keys (or parts of primary keys). Is that necessary, or should those triples be skipped?</div>
-
-          <div class="issue">It is not clear whether the value of <code>csvw:row</code> should take into account the header row, or should refer to the data rows only. I.e., what is the number of the first data row?</div>
         </section>
       </section>
     </section>
-
-     <section id="processing-core">
-      <h2>Processing Core Tabular Data</h2>
-      <p>The <a href="http://www.w3.org/TR/tabular-data-model/#core-model"><em>Core Tabular Data</em></a>,
-      as defined in&nbsp;[[!tabular-data-model]], does not have any <a title="name">column names</a>, only raw data in terms of 
-      <a title="row">data rows</a>. In that case, for the purpose of this section, processing begins by (conceptually) establishing the metadata as:</p>
-
-      <pre>[{
-  "@id": "<em>URI of the CSV file</em>",
-  "schema" : {
-    "columns": [{
-      "name": "col_1",
-     }, 
-     {
-      "name": "col_2",
-     }, 
-     .
-     .
-     .
-     {
-      "name": "col_k",
-    }]
-  }
-}]</pre>
-      <p>Where "k" is the number of columns in the table. The tabular data is then processed as Annotated Tabular Data with 
-      this associated metadata, as described in the <a href="#processing-tabular">previous section</a>.</p> 
-
-      <div class="issue">
-        In fact, the default metadata, for this case, i.e., the default naming of the column names, may not be something to be defined in this document; a better place would be the data model document.<br/>
-        However, the meeting on 2014.10.01 had a temporary consensus that this step is unnecessary. If the tabular data does <em>not</em> define column names, then the default generation simply does not happen. If this is the final agreement in the group, this whole section should be removed.
-      </div>
-    </section>
-
-
 
     <section id="examples-1" class="informative">
       <h2>Examples</h2>
