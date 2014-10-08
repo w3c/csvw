@@ -582,7 +582,9 @@ Dependencies:
       } else {
         if( "datatype" in object ) {
           var d = state.rdf.createNamedNode("xsd:" + object.datatype)
-          var o = state.rdf.createLiteral(object.value, null, d)
+          var o = state.rdf.createLiteral(object.value, null, d);
+        } else {
+          var o = state.rdf.createLiteral(object.value);
         }
       }
       state.graph.add(state.rdf.createTriple( state.current,p,o ));
@@ -741,6 +743,19 @@ Dependencies:
       conv_functions.add_type(state, "Row");
       // Set the row number as a signal
       conv_functions.add(state, {value: "row", prefix: "csv"}, {value: rindex, isuri: false, datatype: "integer"});
+      // Go through the individual cells now
+      data_row.forEach( function(cell, cindex) {
+        var predicate = {
+          value  : col_names[cindex].uri,
+          prefix : "",
+        };
+        // This is where the datatype issue will come in!
+        var subject = {
+          value : cell,
+          isuri : false,
+        }
+        conv_functions.add(state, predicate, subject);
+      })
     });
 
 
