@@ -479,27 +479,61 @@ Dependencies:
   /* =========================================================================== */
   /* =========================================================================== */
 
+  /* =========================================================================== */
+  /* Default RDF/JSON conversion                                                 */
+  /* =========================================================================== */
+
+  /**
+  * Objects referring to the default conversion functions for Javascript and JSON
+  * 
+  * @property js_conversions
+  * @private
+  */
   var js_conversions = {
     start : function( state, data, meta, warnings ) {
       state.obj = {
-        "@type" : "Table",
         "@id"   : state["@id"],
         "@base" : state["@base"],
+        "@rows" : []
       };
-      if( state["@context"] !== undefined ) {
-        state.retval = state["@context"];
+      state.current = state.obj;
+      if( "@context" in state ) {
+        state.obj["@context"] = state["@context"];
       };
     },
 
     end : function( state, meta, target_format, warnings ) {
-      if( target_format === $.CSV_format.JSON ) {
-        state.retval = JSON.stringify( state.retval )
-      }
       state.retval = target_format === $.CSV_format.JSON ? JSON.stringify( state.obj, null, 2 ) : state.obj;
     },
 
+    add_type : function( state, type ) {
+      state.current["@type"] = type;
+    },
+
+    add_core_property : function( state, term, value, uri, isid ) {
+      state.current[term] = value;
+    },
+
+    new_row: function( state, rid ) {
+      state.current = {};
+      state.obj["@rows"].push(state.current);
+      if( rid !== undefined ) {
+        state.current["@id"] = rid;
+      }
+    },
+
+    add : function( state, key, val ) {
+      var v = ("datatype" in val && val.datatype == "integer" ) ? 1*val.value : val.value;
+      state.current[key.value] = v;
+    },
   };
 
+  /**
+  * Objects referring to the default conversion functions for RDF and Turtle/NT
+  * 
+  * @property rdf_conversions
+  * @private
+  */
   var rdf_conversions = {
     start : function( state, data, meta, warnings ) {
       state.graph = new RDFJSInterface.Graph();
@@ -508,26 +542,113 @@ Dependencies:
       state.rdf.setPrefix("csv", "http://www.w3.org/ns/csvw#");
       state.rdf.setDefaultPrefix(state["@base"]);
 
-      state.graph.add(state.rdf.createTriple( state.rdf.createNamedNode(state["@id"]),
-                                              state.rdf.createNamedNode("rdf:type"),
-                                              state.rdf.createNamedNode("csv:Table") ));
+      state.current = state.rdf.createNamedNode(state["@id"]);
     },
 
     end : function( state, meta, target_format, warnings ) {
       state.retval = target_format === $.CSV_format.TURTLE ? state.graph.toNT() : state.graph;
     },
+
+    add_type : function( state, type ) {
+      state.graph.add(state.rdf.createTriple( state.current,
+                                              state.rdf.createNamedNode("rdf:type"),
+                                              state.rdf.createNamedNode("csv:" + type) ));
+    },
+
+    add_core_property : function( state, term, value, uri, isid ) {
+      var p = state.rdf.createNamedNode( uri !== undefined ? uri : ":" + term );
+      var o = isid ? state.rdf.createNamedNode(value) : state.rdf.createLiteral(value);
+      state.graph.add(state.rdf.createTriple( state.current,p,o ));
+    },
+
+    new_row: function( state, rid ) {
+      if( rid === undefined ) {
+        state.current = state.rdf.createBlankNode();
+      } else {
+        state.current = state.rdf.createNamedNode(rid)
+      }
+    },
+
+    add : function( state, predicate, object ) {
+      // See how the URI for the predicate is set up
+      if( "prefix" in predicate ) {
+        var p = state.rdf.createNamedNode(predicate.prefix + ":" + predicate.value)
+      } else {
+        var p = state.rdf.createNamedNode(predicate.value)
+      }
+
+      if( object.isuri ) {
+        var o = state.rdf.createNamedNode(object.value)
+      } else {
+        if( "datatype" in object ) {
+          var d = state.rdf.createNamedNode("xsd:" + object.datatype)
+          var o = state.rdf.createLiteral(object.value, null, d)
+        }
+      }
+      state.graph.add(state.rdf.createTriple( state.current,p,o ));
+    },
   };
 
+  /**
+  * Object referring to the conversion function objects, keyed through the possible formats
+  *
+  * @property conversions
+  * @private
+  */
   var conversions = {};
   conversions[$.CSV_format.JSON]       = js_conversions;
   conversions[$.CSV_format.JAVASCRIPT] = js_conversions;
   conversions[$.CSV_format.TURTLE]     = rdf_conversions;
   conversions[$.CSV_format.RDF]        = rdf_conversions;
 
-  /* =========================================================================== */
-  /*  The core, ie, converting the CSV data                                      */
-  /*   (the core of the standard implementation...)                              */
-  /* =========================================================================== */
+  /**
+  * The core global properties that are defined by the group, i.e., not dependent on
+  * DCMI or schema.org 
+  *
+  * @property core_properties
+  */
+  var core_properties = [
+    "creator",
+    "license",
+    "created",
+    "modified",
+    "description"
+  ];
+
+  /**
+  * Resolve core property. The property is looked up in the (possible) 
+  * context structure to see if a URI is assigned to it and, if yes
+  * whether it is specified as having a URI as a value/object
+  *
+  * @method resolve_core_property
+  * @private
+  * @param {Sring} term - the term to be looked up
+  * @param {Object} meta - Metadata object, as defined in the spec
+  * @return {Object} with values of 'uri' (if an URI is assigned to the term) and a 'id' boolean value on 
+  * whether the value should be a URI or a string.
+  *
+  */
+  var resolve_core_property = function( term, meta ) {
+    var retval = {
+      uri: undefined,
+      isid: false
+    }
+    if( "@context" in meta ) {
+      var context = meta["@context"];
+      if( term in context ) {
+        // bingo...
+        var cval = context[term];
+        if( typeof cval === "string" ) {
+          retval.uri = cval;
+        } else {
+          retval.uri  = "@id" in cval ? cval["@id"] : undefined;
+          retval.isid = ("@type" in cval) && (cval["@type"] === "@id");
+        }
+      }
+    }
+    return retval;
+  }
+
   /**
   * Create a default conversion into JSON.
   * This is called when there is no template, ie, provides the default conversion
@@ -539,54 +660,78 @@ Dependencies:
   * @param {Array} data - The CSV data itself, an array of array (latter being a row from the file)
   * @param {Object} meta - Metadata object, as defined in the spec
   * @param {Sring} target_format - can be JSON, Turtle, Javascript,…
-  * @return {String or Object} - Converted data. If the ``target_format`` argument is JAVASCRIPT, the retun is an Object,
+  * @return {String or Object} - Converted data. If the ``target_format`` argument is JAVASCRIPT, the return is an Object,
   * otherwise a string with the converted value in the ``target_format`` syntax.
   *
   */
   var c_default = function(data, meta, target_format, warnings) {
     var conv_functions = conversions[target_format];
-
- 
-
-
     // This object is shared by all conversion functions as a common state, and also stores
     // the final output
+    var url = new URI(meta["@id"]).normalize().toString();
     var state = {
       retval  : undefined,
-      "@id"   : meta["@id"],
-      "@base" : meta["@id"] + "#",
+      "@id"   : url,
+      "@base" : url + "#",
     };
-    if( meta["@context"] !== undefined ) {
+    if( "@context" in meta ) {
       state["@context"] = meta["@context"];
       // TODO: this has to be refined with a proper URI handling
       if( state["@context"]["@base"] !== undefined ) {
-        state["@base"] = state["@context"]["@base"]
+        state["@base"] = new URI( state["@context"]["@base"] ).normalize().toString();
       }
     } 
 
-    // state.graph = new RDFJSInterface.Graph();
-    // state.rdf   = new RDFJSInterface.RDFEnvironment();
-
-    // Start: set up the environment for each output format
+    // Start: set up the environment
     conv_functions.start( state, data, meta, warnings );
 
-    // This is where the real processing happens
+    // Set the 'Table' type
+    conv_functions.add_type( state, "Table" );
 
-    // End: close the processing altogether. This may involve a serialization
-    conv_functions.end( state, meta, target_format, warnings );
-
-    // Just return the generated thing:
-    return state.retval;
-
-
-
-    if( target_format === $.CSV_format.JSON ) {
-      return JSON.stringify( "{ 'namivan' : 'ezvan' }", null, 2);
-    } else {
-      return "<http://namivan> <http://ezvan> 'Bizony' .";
+    // Get the global, core properties into the output
+    for( var i = 0; i < core_properties.length; i++ ) {
+      var term = core_properties[i];
+      if( term in meta ) {
+        // Get the characteristics of the term from the (possible) @context
+        var term_c = resolve_core_property( term, meta);
+        conv_functions.add_core_property( state, term, meta[term], term_c.uri, term_c.isid )        
+      }
     }
 
-    // return target_format === $.CSV_format.JSON ? JSON.stringify(retval, null, 2) : retval;
+    // Establish the final column names (or URIs)
+    var col_names = [];
+    for( var i = 0; i < meta.schema.columns.length; i++ ) {
+      // This will become more complicated if there is a URI template!!!!
+      col_names.push( {
+        name:     meta.schema.columns.name,
+        can_name: new URI( meta.schema.columns.name ).normalize().toString(),
+        isURI :   false
+      });
+    }
+
+
+    // Go through each row:
+    data.forEach( function(data_row, rindex) {
+      // Establish the subject/@id to be used for that row.
+      if( "primaryKey" in meta.schema ) {
+        // establish the subject
+        var rid = "aaaa";
+        conv_functions.new_row(state, rid);
+      } else {
+        conv_functions.new_row(state)
+      }
+      // Set the row type
+      conv_functions.add_type(state, "Row");
+      // Set the row number as a signal
+      conv_functions.add(state, {value: "row", prefix: "csv"}, {value: rindex, isuri: false, datatype: "integer"});
+    });
+
+
+    // End: close the processing altogether. This may involve a serialization, depending on the target format
+    conv_functions.end( state, meta, target_format, warnings );
+
+    // Just return the generated output:
+    return state.retval;
   };
 
 
