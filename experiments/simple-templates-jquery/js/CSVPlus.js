@@ -565,7 +565,7 @@ Dependencies:
       if( rid === undefined ) {
         state.current = state.rdf.createBlankNode();
       } else {
-        state.current = state.rdf.createNamedNode(rid)
+        state.current = state.rdf.createNamedNode(":" + rid)
       }
     },
 
@@ -698,24 +698,41 @@ Dependencies:
       }
     }
 
-    // Establish the final column names (or URIs)
-    var col_names = [];
-    for( var i = 0; i < meta.schema.columns.length; i++ ) {
-      // This will become more complicated if there is a URI template!!!!
-      col_names.push( {
-        name:     meta.schema.columns.name,
-        can_name: new URI( meta.schema.columns.name ).normalize().toString(),
-        isURI :   false
-      });
-    }
+    // Establish the final column names (or URIs) and primary keys (if any)
+    var col_names    = [];
+    var primary_keys = [];
+    var primaryKey   = "primaryKey" in meta.schema ? ($.isArray(meta.schema.primaryKey) ? meta.schema.primaryKey : [meta.schema.primaryKey]) : [];
 
+    meta.schema.columns.forEach( function(col, index) {
+      // This structure anticipates on the URI templates a bit
+      col_names.push({
+        name  : col.name,
+        uri   : new URI(col.name).normalize().toString(),
+        isURI : false,
+        index : index
+      });
+      // Check the primary key
+
+      if( "@id" in col ) {
+        // Check if that id is present in the defined keys
+        var i = $.inArray(col["@id"], primaryKey);
+        if( i >= 0 ) {
+          primary_keys[i] = index;
+        }
+      }
+    });
 
     // Go through each row:
     data.forEach( function(data_row, rindex) {
       // Establish the subject/@id to be used for that row.
       if( "primaryKey" in meta.schema ) {
         // establish the subject
-        var rid = "aaaa";
+        var rid_array = [];
+        primary_keys.forEach( function(key,index) {
+          rid_array.push(data_row[key]);
+        })
+        var rid = new URI( rid_array.join("-") ).normalize().toString();
+        // console.log(rid);
         conv_functions.new_row(state, rid);
       } else {
         conv_functions.new_row(state)
