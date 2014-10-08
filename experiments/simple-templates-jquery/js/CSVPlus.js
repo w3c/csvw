@@ -619,7 +619,7 @@ Dependencies:
 
   /**
   * Resolve core property. The property is looked up in the (possible) 
-  * context structure to see if a URI is assigned to it and, if yes
+  * ``@context`` structure to see if a URI is assigned to it and, if yes,
   * whether it is specified as having a URI as a value/object
   *
   * @method resolve_core_property
@@ -627,7 +627,7 @@ Dependencies:
   * @param {Sring} term - the term to be looked up
   * @param {Object} meta - Metadata object, as defined in the spec
   * @return {Object} with values of 'uri' (if an URI is assigned to the term) and a 'id' boolean value on 
-  * whether the value should be a URI or a string.
+  * whether the value should be a URI or a string. The former defaults to ``undefined``, the latter to ``false``.
   *
   */
   var resolve_core_property = function( term, meta ) {
@@ -652,9 +652,12 @@ Dependencies:
   }
 
   /**
-  * Create a default conversion into JSON.
+  * Create a default conversion.
   * This is called when there is no template, ie, provides the default conversion
-  * of a CSV file. This is the conversion that is defined, as a standard, by the WG
+  * of a CSV file. This is the conversion that is defined, as a standard, by the WG.
+  *
+  * This method implements the overall structure in a final format agnostic way. The ``target_format`` argument
+  * is used to choose among the possible conversion function sets, using the ``conversions`` object.
   * 
   *
   * @method c_default
@@ -662,8 +665,8 @@ Dependencies:
   * @param {Array} data - The CSV data itself, an array of array (latter being a row from the file)
   * @param {Object} meta - Metadata object, as defined in the spec
   * @param {Sring} target_format - can be JSON, Turtle, Javascript,…
-  * @return {String or Object} - Converted data. If the ``target_format`` argument is JAVASCRIPT, the return is an Object,
-  * otherwise a string with the converted value in the ``target_format`` syntax.
+  * @return {String or Object} - Converted data. If the ``target_format`` argument is JAVASCRIPT, the return is an Object; if it is RDF,
+  * the return is a Graph as defined by the rdf_interface package; otherwise a string with the converted value in the ``target_format`` syntax.
   *
   */
   var c_default = function(data, meta, target_format, warnings) {

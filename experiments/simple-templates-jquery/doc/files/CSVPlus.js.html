@@ -145,6 +145,7 @@ Dependencies:
     JSON : &quot;json&quot;,
     JAVASCRIPT : &quot;javascript&quot;,
     TURTLE : &quot;turtle&quot;,
+    RDF : &quot;rdf&quot;,
     XML : &quot;xml&quot;
   };  
 
@@ -232,14 +233,16 @@ Dependencies:
   * @method default_meta
   * @private
   * @param {Array} data - row of raw data, as extracted from the CSV files
+  * @param {String} url - url of the CSV data
   * @param {boolean} headers - Whether the first row in the data give the column headers; if &#x60;&#x60;false&#x60;&#x60;, 
   *    the column names are generated as described in the data model document. Note that if the value is &#x60;&#x60;true&#x60;&#x60;,
   *    the first row in &#x60;&#x60;data&#x60;&#x60; will be removed.
   * @return {Object} - New metadata
   */
-  var default_meta = function(data, headers) {
+  var default_meta = function(data, url, headers) {
     // The default metadata just includes the names of the columns
     var retval = {
+      &quot;@id&quot;   : url,
       schema : {
         columns : []
       }
@@ -277,21 +280,19 @@ Dependencies:
   var get_template_data = function(options, meta) {
     // The (user&#x27;s) option dictates the required output format
     // The metadata contains (possibly) the template for different formats
-    var retval = { url: &quot;&quot;, format: $.CSV_format.JAVASCRIPT };
+    var retval = { url: &quot;&quot;, format: options.format };
     // See if there is a template to be extracted. If not, the template will be returned as &quot;&quot;
     if( meta.template !== undefined ) {
       if( $.isArray(meta.template) ) {
         for( var i = 0; i &lt; meta.template.length; i++ ) {
           if( meta.template[i].url !== undefined &amp;&amp; meta.template[i].format === options.format ) {
             retval.url = meta.template[i].url;
-            retval.format = meta.template[i].format;
             break;
           }          
         }
       } else {
         if( meta.template.url !== undefined &amp;&amp; meta.template.format === options.format ) {
           retval.url = meta.template.url;
-          retval.format = meta.template.format;
         }
       }
     }
@@ -364,9 +365,12 @@ Dependencies:
     return true;
   } 
 
+  /* =========================================================================== */
+  /* =========================================================================== */
+  /* =========================================================================== */
 
   /* =========================================================================== */
-  /* Mini mustache implementation                        */
+  /* Mini mustache implementation                                                */
   /* =========================================================================== */
 
   /**
@@ -388,7 +392,6 @@ Dependencies:
     var set_global = function(t) {
       retval.push({ repeat:false, template:t })
     };
-    // console.log(template);
     var retval       = [];
     var templ = template;
     while( templ !== &quot;&quot; ) {
@@ -502,99 +505,394 @@ Dependencies:
     }
   };
 
-  /* =========================================================================== */
-  /*  The core, ie, converting the CSV data                                      */
-  /*   (the core of the standard implementation...)                              */
-  /* =========================================================================== */
   /**
-  * Create a default conversion into JSON.
-  * This is called when there is no template, ie, provides the default conversion
-  * of a CSV file. At present, all it does is to output the data in &#x60;&#x60;JSON&#x60;&#x60; or &#x60;&#x60;JAVASCRIPT&#x60;&#x60;
-  * array of objects; each object is a row with column names serving as keys and cells
-  * as values. The exact format is still to be defined by the WG. 
+  * Convert the CSV data with templates.
   *
-  * @method convertCSV_default
+  * @method c_templates
   * @private
   * @param {Array} data - The CSV data itself, an array of array (latter being a row from the file)
-  * @param {Object} meta - Tetadata object, as defined in the spec
+  * @param {Object} meta - Metadata object, as defined in the spec
+  * @param {String} template - Template string. 
   * @param {Sring} target_format - can be JSON, Turtle, Javascript,…
+  * @param {Array} warnings - array of warnings that may have to be extended if an error occurs
   * @return {String or Object} - Converted data. If the &#x60;&#x60;target_format&#x60;&#x60; argument is JAVASCRIPT, the retun is an Object,
   * otherwise a string with the converted value in the &#x60;&#x60;target_format&#x60;&#x60; syntax.
   *
   */
-  var convertCSV_default = function(data, meta, target_format) {
-    var retval = []
-    process_rows(data, meta, function(row, context) {
-      retval.push(row);
+  var c_templates = function(data, meta, template, target_format, warnings) {
+    // There is no template: the default is to get the rows and columns in JSON
+    // Cut the template into global/repeat portion
+    // the result is an array of separate templates
+    var templates = split_template(template);
+
+    // The &#x27;global&#x27; template is used on a &quot;view&quot; (in mustache jargon)
+    // containing only the top level keys from the metadata. This
+    // can be set once and for all
+    var global_mview = {};
+    Object.keys(meta).forEach( function(key) {
+      if( typeof meta[key] === &quot;string&quot; ) global_mview[key] = meta[key];
     });
-    return target_format === $.CSV_format.JSON ? JSON.stringify(retval, null, 2) : retval;
+
+    // The main processing cycle: Go through the templates and perform 
+    // each individually. The results are concatenated into one string to be returned
+    var result = &quot;&quot;;
+    templates.forEach( function(tstruct) {
+      // The major switch: is the template to be repeated or not?
+      if( tstruct.repeat === true ) {
+        process_rows(data, meta, function(row, context) {
+          result += render_template(tstruct.template, $.extend({}, global_mview, row), $.extend({target_format:target_format}, context));
+        });
+      } else {
+        // Just apply the template against the global view and append the outcome
+        // to the result string
+        context = {
+          meta          : meta,
+          target_format : target_format,
+          row_index     : null,
+          col_index     : null,
+          row           : null
+        };
+        result += render_template(tstruct.template, global_mview, context);
+      }
+    });
+
+    if( target_format === $.CSV_format.JSON || target_format === $.CSV_format.JAVASCRIPT ) {
+      try {
+        var j_result = eval( &#x27;(&#x27; + result + &#x27;)&#x27; );
+        return target_format === $.CSV_format.JSON ? JSON.stringify(j_result,null,2) : j_result;          
+      } catch(e) {
+        warnings.push(&quot;Template (Javascript) syntax error in: &quot; + e.message)
+        return result;
+      }
+    } else {
+      return result;
+    }
+  }
+
+  /* =========================================================================== */
+  /* =========================================================================== */
+  /* =========================================================================== */
+
+  /* =========================================================================== */
+  /* Default RDF/JSON conversion                                                 */
+  /* =========================================================================== */
+
+  /**
+  * Objects referring to the default conversion functions for Javascript and JSON
+  * 
+  * @property js_conversions
+  * @private
+  */
+  var js_conversions = {
+    start : function( state, data, meta, warnings ) {
+      state.obj = {
+        &quot;@id&quot;   : state[&quot;@id&quot;],
+        &quot;@base&quot; : state[&quot;@base&quot;],
+        &quot;@rows&quot; : []
+      };
+      state.current = state.obj;
+      if( &quot;@context&quot; in state ) {
+        state.obj[&quot;@context&quot;] = state[&quot;@context&quot;];
+      };
+    },
+
+    end : function( state, meta, target_format, warnings ) {
+      state.retval = target_format === $.CSV_format.JSON ? JSON.stringify( state.obj, null, 2 ) : state.obj;
+    },
+
+    add_type : function( state, type ) {
+      state.current[&quot;@type&quot;] = type;
+    },
+
+    add_core_property : function( state, term, value, uri, isid ) {
+      state.current[term] = value;
+    },
+
+    new_row: function( state, rid ) {
+      state.current = {};
+      state.obj[&quot;@rows&quot;].push(state.current);
+      if( rid !== undefined ) {
+        state.current[&quot;@id&quot;] = rid;
+      }
+    },
+
+    add : function( state, key, val ) {
+      var v = (&quot;datatype&quot; in val &amp;&amp; val.datatype == &quot;integer&quot; ) ? 1*val.value : val.value;
+      state.current[key.value] = v;
+    },
   };
 
   /**
-  * Create a default conversion into JSON.
+  * Objects referring to the default conversion functions for RDF and Turtle/NT
+  * 
+  * @property rdf_conversions
+  * @private
+  */
+  var rdf_conversions = {
+    start : function( state, data, meta, warnings ) {
+      state.graph = new RDFJSInterface.Graph();
+      state.rdf   = new RDFJSInterface.RDFEnvironment();
+
+      state.rdf.setPrefix(&quot;csv&quot;, &quot;http://www.w3.org/ns/csvw#&quot;);
+      state.rdf.setDefaultPrefix(state[&quot;@base&quot;]);
+
+      state.current = state.rdf.createNamedNode(state[&quot;@id&quot;]);
+    },
+
+    end : function( state, meta, target_format, warnings ) {
+      state.retval = target_format === $.CSV_format.TURTLE ? state.graph.toNT() : state.graph;
+    },
+
+    add_type : function( state, type ) {
+      state.graph.add(state.rdf.createTriple( state.current,
+                                              state.rdf.createNamedNode(&quot;rdf:type&quot;),
+                                              state.rdf.createNamedNode(&quot;csv:&quot; + type) ));
+    },
+
+    add_core_property : function( state, term, value, uri, isid ) {
+      var p = state.rdf.createNamedNode( uri !== undefined ? uri : &quot;:&quot; + term );
+      var o = isid ? state.rdf.createNamedNode(value) : state.rdf.createLiteral(value);
+      state.graph.add(state.rdf.createTriple( state.current,p,o ));
+    },
+
+    new_row: function( state, rid ) {
+      if( rid === undefined ) {
+        state.current = state.rdf.createBlankNode();
+      } else {
+        state.current = state.rdf.createNamedNode(&quot;:&quot; + rid)
+      }
+    },
+
+    add : function( state, predicate, object ) {
+      // See how the URI for the predicate is set up
+      if( &quot;prefix&quot; in predicate ) {
+        var p = state.rdf.createNamedNode(predicate.prefix + &quot;:&quot; + predicate.value)
+      } else {
+        var p = state.rdf.createNamedNode(predicate.value)
+      }
+
+      if( object.isuri ) {
+        var o = state.rdf.createNamedNode(object.value)
+      } else {
+        if( &quot;datatype&quot; in object ) {
+          var d = state.rdf.createNamedNode(&quot;xsd:&quot; + object.datatype)
+          var o = state.rdf.createLiteral(object.value, null, d);
+        } else {
+          var o = state.rdf.createLiteral(object.value);
+        }
+      }
+      state.graph.add(state.rdf.createTriple( state.current,p,o ));
+    },
+  };
+
+  /**
+  * Object referring to the conversion function objects, keyed through the possible formats
+  *
+  * @property conversions
+  * @private
+  */
+  var conversions = {};
+  conversions[$.CSV_format.JSON]       = js_conversions;
+  conversions[$.CSV_format.JAVASCRIPT] = js_conversions;
+  conversions[$.CSV_format.TURTLE]     = rdf_conversions;
+  conversions[$.CSV_format.RDF]        = rdf_conversions;
+
+  /**
+  * The core global properties that are defined by the group, i.e., not dependent on
+  * DCMI or schema.org 
+  *
+  * @property core_properties
+  */
+  var core_properties = [
+    &quot;creator&quot;,
+    &quot;license&quot;,
+    &quot;created&quot;,
+    &quot;modified&quot;,
+    &quot;description&quot;
+  ];
+
+  /**
+  * Resolve core property. The property is looked up in the (possible) 
+  * &#x60;&#x60;@context&#x60;&#x60; structure to see if a URI is assigned to it and, if yes,
+  * whether it is specified as having a URI as a value/object
+  *
+  * @method resolve_core_property
+  * @private
+  * @param {Sring} term - the term to be looked up
+  * @param {Object} meta - Metadata object, as defined in the spec
+  * @return {Object} with values of &#x27;uri&#x27; (if an URI is assigned to the term) and a &#x27;id&#x27; boolean value on 
+  * whether the value should be a URI or a string. The former defaults to &#x60;&#x60;undefined&#x60;&#x60;, the latter to &#x60;&#x60;false&#x60;&#x60;.
+  *
+  */
+  var resolve_core_property = function( term, meta ) {
+    var retval = {
+      uri: undefined,
+      isid: false
+    }
+    if( &quot;@context&quot; in meta ) {
+      var context = meta[&quot;@context&quot;];
+      if( term in context ) {
+        // bingo...
+        var cval = context[term];
+        if( typeof cval === &quot;string&quot; ) {
+          retval.uri = cval;
+        } else {
+          retval.uri  = &quot;@id&quot; in cval ? cval[&quot;@id&quot;] : undefined;
+          retval.isid = (&quot;@type&quot; in cval) &amp;&amp; (cval[&quot;@type&quot;] === &quot;@id&quot;);
+        }
+      }
+    }
+    return retval;
+  }
+
+  /**
+  * Create a default conversion.
   * This is called when there is no template, ie, provides the default conversion
-  * of a CSV file. At present, all it does is to output the data in &#x60;&#x60;JSON&#x60;&#x60; or &#x60;&#x60;JAVASCRIPT&#x60;&#x60;
-  * array of objects; each object is a row with column names serving as keys and cells
-  * as values. The exact format is still to be defined by the WG. 
+  * of a CSV file. This is the conversion that is defined, as a standard, by the WG.
+  *
+  * This method implements the overall structure in a final format agnostic way. The &#x60;&#x60;target_format&#x60;&#x60; argument
+  * is used to choose among the possible conversion function sets, using the &#x60;&#x60;conversions&#x60;&#x60; object.
+  * 
+  *
+  * @method c_default
+  * @private
+  * @param {Array} data - The CSV data itself, an array of array (latter being a row from the file)
+  * @param {Object} meta - Metadata object, as defined in the spec
+  * @param {Sring} target_format - can be JSON, Turtle, Javascript,…
+  * @return {String or Object} - Converted data. If the &#x60;&#x60;target_format&#x60;&#x60; argument is JAVASCRIPT, the return is an Object; if it is RDF,
+  * the return is a Graph as defined by the rdf_interface package; otherwise a string with the converted value in the &#x60;&#x60;target_format&#x60;&#x60; syntax.
+  *
+  */
+  var c_default = function(data, meta, target_format, warnings) {
+    var conv_functions = conversions[target_format];
+    // This object is shared by all conversion functions as a common state, and also stores
+    // the final output
+    var url = new URI(meta[&quot;@id&quot;]).normalize().toString();
+    var state = {
+      retval  : undefined,
+      &quot;@id&quot;   : url,
+      &quot;@base&quot; : url + &quot;#&quot;,
+    };
+    if( &quot;@context&quot; in meta ) {
+      state[&quot;@context&quot;] = meta[&quot;@context&quot;];
+      // TODO: this has to be refined with a proper URI handling
+      if( state[&quot;@context&quot;][&quot;@base&quot;] !== undefined ) {
+        state[&quot;@base&quot;] = new URI( state[&quot;@context&quot;][&quot;@base&quot;] ).normalize().toString();
+      }
+    } 
+
+    // Start: set up the environment
+    conv_functions.start( state, data, meta, warnings );
+
+    // Set the &#x27;Table&#x27; type
+    conv_functions.add_type( state, &quot;Table&quot; );
+
+    // Get the global, core properties into the output
+    for( var i = 0; i &lt; core_properties.length; i++ ) {
+      var term = core_properties[i];
+      if( term in meta ) {
+        // Get the characteristics of the term from the (possible) @context
+        var term_c = resolve_core_property( term, meta);
+        conv_functions.add_core_property( state, term, meta[term], term_c.uri, term_c.isid )        
+      }
+    }
+
+    // Establish the final column names (or URIs) and primary keys (if any)
+    var col_names    = [];
+    var primary_keys = [];
+    var primaryKey   = &quot;primaryKey&quot; in meta.schema ? ($.isArray(meta.schema.primaryKey) ? meta.schema.primaryKey : [meta.schema.primaryKey]) : [];
+
+    meta.schema.columns.forEach( function(col, index) {
+      // This structure anticipates on the URI templates a bit
+      col_names.push({
+        name  : col.name,
+        uri   : new URI(col.name).normalize().toString(),
+        isURI : false,
+        index : index
+      });
+      // Check the primary key
+
+      if( &quot;@id&quot; in col ) {
+        // Check if that id is present in the defined keys
+        var i = $.inArray(col[&quot;@id&quot;], primaryKey);
+        if( i &gt;= 0 ) {
+          primary_keys[i] = index;
+        }
+      }
+    });
+
+    // Go through each row:
+    data.forEach( function(data_row, rindex) {
+      // Establish the subject/@id to be used for that row.
+      if( &quot;primaryKey&quot; in meta.schema ) {
+        // establish the subject
+        var rid_array = [];
+        primary_keys.forEach( function(key,index) {
+          rid_array.push(data_row[key]);
+        })
+        var rid = new URI( rid_array.join(&quot;-&quot;) ).normalize().toString();
+        // console.log(rid);
+        conv_functions.new_row(state, rid);
+      } else {
+        conv_functions.new_row(state)
+      }
+      // Set the row type
+      conv_functions.add_type(state, &quot;Row&quot;);
+      // Set the row number as a signal
+      conv_functions.add(state, {value: &quot;row&quot;, prefix: &quot;csv&quot;}, {value: rindex, isuri: false, datatype: &quot;integer&quot;});
+      // Go through the individual cells now
+      data_row.forEach( function(cell, cindex) {
+        var predicate = {
+          value  : col_names[cindex].uri,
+          prefix : &quot;&quot;,
+        };
+        // This is where the datatype issue will come in!
+        var subject = {
+          value : cell,
+          isuri : false,
+        }
+        conv_functions.add(state, predicate, subject);
+      })
+    });
+
+
+    // End: close the processing altogether. This may involve a serialization, depending on the target format
+    conv_functions.end( state, meta, target_format, warnings );
+
+    // Just return the generated output:
+    return state.retval;
+  };
+
+
+  /* ============================================================================== */
+  /* ============================================================================== */
+  /* ============================================================================== */
+
+  /* ============================================================================== */
+  /**
+  * Main conversion entry point. In reality, this is just a switch between the &#x27;direct&#x27;
+  * i.e., default mapping as defined by the standard, and the templated version if a template
+  * has been added to the metadata.
   *
   * @method convertCSV
   * @private
   * @param {Array} data - The CSV data itself, an array of array (latter being a row from the file)
-  * @param {Object} meta - Tetadata object, as defined in the spec
+  * @param {Object} meta - Metadata object, as defined in the spec
   * @param {String} template - Template string. If &#x60;&#x60;&quot;&quot;&#x60;&#x60; (ie, no template) a default Javascript object is generated
   * @param {Sring} target_format - can be JSON, Turtle, Javascript,…
+  * @param {Array} warnings - array of warnings that may have to be extended if an error occurs
   * @return {String or Object} - Converted data. If the &#x60;&#x60;target_format&#x60;&#x60; argument is JAVASCRIPT, the retun is an Object,
   * otherwise a string with the converted value in the &#x60;&#x60;target_format&#x60;&#x60; syntax.
   *
   */
-  var convertCSV = function(data, meta, template, target_format) {
+  var convertCSV = function(data, meta, template, target_format, warnings) {
     // There is no template: the default is to get the rows and columns in JSON
-    if( template === &quot;&quot; ) {
-      return convertCSV_default(data, meta, target_format);
-    } else {
-      // Cut the template into global/repeat portion
-      // the result is an array of separate templates
-      var templates = split_template(template);
-
-      // The &#x27;global&#x27; template is used on a &quot;view&quot; (in mustache jargon)
-      // containing only the top level keys from the metadata. This
-      // can be set once and for all
-      var global_mview = {};
-      Object.keys(meta).forEach( function(key) {
-        if( typeof meta[key] === &quot;string&quot; ) global_mview[key] = meta[key];
-      });
-
-      // The main processing cycle: Go through the templates and perform 
-      // each individually. The results are concatenated into one string to be returned
-      var result = &quot;&quot;;
-      templates.forEach( function(tstruct) {
-        // The major switch: is the template to be repeated or not?
-        if( tstruct.repeat === true ) {
-          process_rows(data, meta, function(row, context) {
-            result += render_template(tstruct.template, $.extend({}, global_mview, row), $.extend({target_format:target_format}, context));
-          });
-        } else {
-          // Just apply the template against the global view and append the outcome
-          // to the result string
-          context = {
-            meta          : meta,
-            target_format : target_format,
-            row_index     : null,
-            col_index     : null,
-            row           : null
-          };
-          result += render_template(tstruct.template, global_mview, context);
-        }
-      });
-
-      if( target_format === $.CSV_format.JSON || target_format === $.CSV_format.JAVASCRIPT ) {
-        var j_result = eval( &#x27;(&#x27; + result + &#x27;)&#x27; );
-        return target_format === $.CSV_format.JSON ? JSON.stringify(j_result,null,2) : j_result;
-      } else {
-        return result;
-      }
-    }
+    return ( template === &quot;&quot; ) ? c_default(data, meta, target_format, warnings) : c_templates(data, meta, template, target_format, warnings);
   }
+
+  /* =========================================================================== */
+  /* =========================================================================== */
+  /* =========================================================================== */
 
   /* =========================================================================== */
   /**  
@@ -748,7 +1046,7 @@ Dependencies:
 
         /*---- Find the reference to the various metadata ----*/
         /* Get the default metadata, ie, the column headers */
-        var embedded_meta = default_meta(pcsv.data, headers);
+        var embedded_meta = default_meta(pcsv.data, url, headers);
 
         // Local metadata reference 
         var linked_meta_url = &quot;&quot;;
@@ -783,7 +1081,12 @@ Dependencies:
           } else {
             $.get(murl)
               .done(function (m) {
-                retval.resolve(JSON.parse(m));
+                try {
+                  retval.resolve(JSON.parse(m));
+                } catch(e) {
+                  final_warnings.push(&quot;JSON syntax error in &quot; + murl + &quot;: &quot; + e.message);
+                  retval.resolve({});
+                }
               })
               .fail(function(xhr, status, error) {
                 final_warnings.push(&quot;HTTP error &quot; + xhr.status + &quot; (&quot; + error + &quot;) for resource &#x27;&quot; + murl + &quot;&#x27;&quot;);
@@ -822,12 +1125,12 @@ Dependencies:
           .done(function(linked_meta, local_meta, global_meta){
             // These should be merged
             var final_meta = mergeMeta(embedded_meta, linked_meta, local_meta, global_meta);
-
             var required_template = get_template_data(settings, final_meta);
+
             get_template(required_template.url)
               .done( function(template) {
                 // We finally arrived at the core: make the conversion of the CSV content to whatever the user wants...
-                var final_data = convertCSV(pcsv.data, final_meta, template, required_template.format);
+                var final_data = convertCSV(pcsv.data, final_meta, template, required_template.format, final_warnings);
                 retval = {
                   data      : final_data,
                   meta      : final_meta,

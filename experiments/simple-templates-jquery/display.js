@@ -8,7 +8,7 @@ $(document).ready( function() {
     return uval[0].toUpperCase() + uval.slice(1);
   }
 
-  $("div#json").each(function(index) {
+  $("div.json").each(function(index) {
     var dataset = $(this).prop('dataset');
     var url     = dataset.url;
     var target  = $(this);
@@ -18,20 +18,19 @@ $(document).ready( function() {
         if( csv_data.data !== undefined && csv_data.data !== null && csv_data !== "" ) {
           target.append("<pre>" + massage(csv_data.data) + "</pre>");           
         }
-        if( csv_data.errors.length !== 0 ) {
-          target.append("<p>Error/warning in processing the data:</p><ul>");
-          csv_data.errors.forEach(function(e) {
-            target.append("<li>" + e + "</li>");
-          });
-          target.append("</ul>");
-        }
-        $("div#meta").append("<pre>" + JSON.stringify(csv_data.meta,null,2) + "</pre>")          
+        // if( csv_data.errors.length !== 0 ) {
+        //   target.append("<p>Error/warning in processing the data:</p><ul>");
+        //   csv_data.errors.forEach(function(e) {
+        //     target.append("<li>" + e + "</li>");
+        //   });
+        //   target.append("</ul>");
+        // }
       })
       .fail( function(status, error) {
-        target.append("<p>CSV access failed: '" + status + ", " + error + "'</p>")
+        console.log("<p>CSV access failed: '" + status + ", " + error + "'</p>")
       });
   });
-  $("div#turtle").each(function(index) {
+  $("div.turtle").each(function(index) {
     var dataset = $(this).prop('dataset');
     var url     = dataset.url;
     var target  = $(this);
@@ -41,16 +40,16 @@ $(document).ready( function() {
         if( csv_data.data !== undefined && csv_data.data !== null && csv_data !== "" ) {
           target.append("<pre>" + massage(csv_data.data) + "</pre>");           
         }
-        if( csv_data.errors.length !== 0 ) {
-          target.append("<p>Error/warning in processing the data:</p><ul>");
-          csv_data.errors.forEach(function(e) {
-            target.append("<li>" + e + "</li>");
-          });
-          target.append("</ul>");
-        }
+        // if( csv_data.errors.length !== 0 ) {
+        //   target.append("<p>Error/warning in processing the data:</p><ul>");
+        //   csv_data.errors.forEach(function(e) {
+        //     target.append("<li>" + e + "</li>");
+        //   });
+        //   target.append("</ul>");
+        // }
       })
       .fail( function(status, error) {
-        target.append("<p>CSV access failed: '" + status + ", " + error + "'</p>")
+        console.log("<p>CSV access failed: '" + status + ", " + error + "'</p>")
       });
   });
 });
