@@ -1,0 +1,813 @@
+{
+    "project": {},
+    "files": {
+        "CSVPlus.js": {
+            "name": "CSVPlus.js",
+            "modules": {
+                "CSVPlus": 1
+            },
+            "classes": {
+                "$": 1,
+                "$.CSV_format": 1
+            },
+            "fors": {
+                "$": 1
+            },
+            "namespaces": {}
+        },
+        "mustache.js": {
+            "name": "mustache.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        }
+    },
+    "modules": {
+        "CSVPlus": {
+            "name": "CSVPlus",
+            "submodules": {},
+            "classes": {
+                "$": 1,
+                "$.CSV_format": 1
+            },
+            "fors": {
+                "$": 1
+            },
+            "namespaces": {},
+            "tag": "main",
+            "file": "CSVPlus.js",
+            "line": 41,
+            "description": "Experimental CSV+ extension to jQuery, including location of the CSV+ metadata and a mustache-like simple\ntemplate to convert the CSV data into a javascript object, JSON, Turtle, XML, or any other text.\n\n* Author: Ivan Herman\n* Licence: © Copyright W3C® SOFTWARE NOTICE AND LICENSE <http://www.w3.org/Consortium/Legal/2002/copyright-software-20021231>, Ivan Herman, 2014",
+            "itemtype": "main"
+        }
+    },
+    "classes": {
+        "$": {
+            "name": "$",
+            "shortname": "$",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "CSVPlus",
+            "namespace": "",
+            "file": "CSVPlus.js",
+            "line": 30,
+            "description": "Extension jQuery (a.k.a. $)to handle CSV+ files.",
+            "static": 1
+        },
+        "$.CSV_format": {
+            "name": "$.CSV_format",
+            "shortname": "$.CSV_format",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "CSVPlus",
+            "namespace": "",
+            "file": "CSVPlus.js",
+            "line": 41,
+            "description": "Constants to be used for the output format: ``JSON``, ``JAVASCRIPT``, ``TURTLE``, ``XML``.",
+            "static": 1,
+            "final": 1
+        }
+    },
+    "classitems": [
+        {
+            "file": "CSVPlus.js",
+            "line": 61,
+            "description": "Filters that the current implementation recognizes for templates. The list has to be defined by\nthe WG, eventually. Each of the filters is invoked with the arguments:\n* ``var`` - String\n* ``context`` - Template context object containing:\n  * ``column_name``: name of the column (used in the ``{{name}}`` part of the template tag)\n  * ``meta``: (cumulative) metadata object\n  * ``row``: array of the row being processed by the template process\n  * ``row_index``: index of the row being processed\n  * ``target_format``: target format of the template (i.e., \"json\", \"turtle\", \"xml\", etc. )\n* ``string1`` (optional) - additional string provided in the template\n* ``string2`` (optional) - additional string provided in the template\n* …\n* ``stringn`` (optional) - additional string provided in the template\nThe filter returns a string to be used as a replacement.\n\nAt the moment, the following filters are defined:\n* upper - convert to upper case\n* lower - convert to lower case\n* number - convert the string into a number\n* row_number - return the index of the data row being processed (starting with 1)\n* replace - replace the regexp (in ``string1``) with the string value in ``string2``\n* concat - concatenate ``val`` with ``string1``\n* preconcat - concatenate ``string1`` with ``val``\n* URI_encode - encode the string following RFC3986 (to be used as a URI component)",
+            "itemtype": "property",
+            "name": "builtin_filters",
+            "type": "Array",
+            "static": 1,
+            "final": 1,
+            "access": "private",
+            "tagname": "",
+            "class": "$",
+            "module": "CSVPlus"
+        },
+        {
+            "file": "CSVPlus.js",
+            "line": 113,
+            "description": "Merge the various objects into one; the priority is right to left, i.e., key-value pairs on the\nright override, if any, a similar key value on the left.\n\nUsed to merge the various metadata objects",
+            "itemtype": "method",
+            "name": "mergeMeta",
+            "access": "private",
+            "tagname": "",
+            "params": [
+                {
+                    "name": "m1",
+                    "description": "- Lowest priority object",
+                    "type": "Object"
+                },
+                {
+                    "name": "m2",
+                    "description": "- Object",
+                    "type": "Object"
+                },
+                {
+                    "name": "m3",
+                    "description": "- Object",
+                    "type": "Object"
+                },
+                {
+                    "name": "m4",
+                    "description": "- Highest priority object",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "- New class consisting of the merge incoming objects",
+                "type": "Object"
+            },
+            "class": "$",
+            "module": "CSVPlus"
+        },
+        {
+            "file": "CSVPlus.js",
+            "line": 132,
+            "description": "Default metadata: to be used when no metadata is specified whatsoever.\nIt lists the column names, whether from the first row or creating a column name on the fly\n(this depends on user setting, ie, whether the first row is indeed column names).\n\nAdditional metadatata items may be added, this will depend on the WG's final spec.",
+            "itemtype": "method",
+            "name": "default_meta",
+            "access": "private",
+            "tagname": "",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "- row of raw data, as extracted from the CSV files",
+                    "type": "Array"
+                },
+                {
+                    "name": "url",
+                    "description": "- url of the CSV data",
+                    "type": "String"
+                },
+                {
+                    "name": "headers",
+                    "description": "- Whether the first row in the data give the column headers; if ``false``, \n   the column names are generated as described in the data model document. Note that if the value is ``true``,\n   the first row in ``data`` will be removed.",
+                    "type": "Boolean"
+                }
+            ],
+            "return": {
+                "description": "- New metadata",
+                "type": "Object"
+            },
+            "class": "$",
+            "module": "CSVPlus"
+        },
+        {
+            "file": "CSVPlus.js",
+            "line": 172,
+            "description": "Extract the current templates, if any, from the metadata. This depends on the user’s option\nthat determines what the output format should be.\n\nDefault case is to return no template in Javascript object",
+            "itemtype": "method",
+            "name": "get_template_data",
+            "access": "private",
+            "tagname": "",
+            "params": [
+                {
+                    "name": "options",
+                    "description": "- User’s options object",
+                    "type": "Object"
+                },
+                {
+                    "name": "meta",
+                    "description": "- CSV metadata",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "- template data of the form:\n* ``url``: URL of the template file. Default is empty\n* ``format``: output format (ie, Javascript, JSON, etc.). Default is JAVASCRIPT_FORMAT",
+                "type": "Object"
+            },
+            "class": "$",
+            "module": "CSVPlus"
+        },
+        {
+            "file": "CSVPlus.js",
+            "line": 208,
+            "description": "Turn a data row into an object with column names (as specified in the metadata) as keys and cells as values.\nThe row is then processed through a callback function. The method performs these actions for each row in the \ndata separately",
+            "itemtype": "method",
+            "name": "process_rows",
+            "access": "private",
+            "tagname": "",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "- current data row",
+                    "type": "Array"
+                },
+                {
+                    "name": "meta",
+                    "description": "- CSV metadata",
+                    "type": "Object"
+                },
+                {
+                    "name": "callback",
+                    "description": "- callback called with two arguments:\n* row: the data row Array\n* context: object containing:\n  * ``meta``: the CSV metadata\n  * ``row_index``: the index of the row within the whole CSV file\n  * ``row``: the current data row Array",
+                    "type": "Function"
+                }
+            ],
+            "class": "$",
+            "module": "CSVPlus"
+        },
+        {
+            "file": "CSVPlus.js",
+            "line": 239,
+            "description": "Extract the arguments from a tag, ie, if a filter looks like\n``filter(\"a\",\"b\",\"c\")``, then extract an array of the form ``[a,b,c]`` from the\n``\"a\",\"b\",\"c\"`` string.\n\nThe method is used recursively to fill the incoming (initially empty) array.",
+            "itemtype": "method",
+            "name": "get_args",
+            "access": "private",
+            "tagname": "",
+            "params": [
+                {
+                    "name": "arg_string",
+                    "description": "- the string to be parsed",
+                    "type": "String"
+                },
+                {
+                    "name": "args_array",
+                    "description": "- the array to be filled with the individual arguments",
+                    "type": "Array"
+                }
+            ],
+            "class": "$",
+            "module": "CSVPlus"
+        },
+        {
+            "file": "CSVPlus.js",
+            "line": 282,
+            "description": "The full template has to be cut into a series of separate templates\n * global templates\n * per-row templates to be repeated\n\nThe result of the processing is an array of templates with a flag on whether it is\nglobal or not. The objects returned in the array are of the form:\n* ``repeat`` (boolean): true means this is a template for rows, i.e,, to be repeated for all the rows\n* ``template``: the template itself.",
+            "itemtype": "method",
+            "name": "split_template",
+            "access": "private",
+            "tagname": "",
+            "params": [
+                {
+                    "name": "template",
+                    "description": "- The full template",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "- objects of the form described above.",
+                "type": "Array"
+            },
+            "class": "$",
+            "module": "CSVPlus"
+        },
+        {
+            "file": "CSVPlus.js",
+            "line": 331,
+            "description": "Process one (optionally filtered) mustache tag, i.e., the content of something like ``{{a.b.c.d}}`` \nThe first symbol should be used to get a value; all the others are filters.\n\n(The implementation does not handle escape characters... :-()",
+            "itemtype": "method",
+            "name": "process_one_tag",
+            "access": "private",
+            "tagname": "",
+            "params": [
+                {
+                    "name": "tag",
+                    "description": "- The tag itself",
+                    "type": "String"
+                },
+                {
+                    "name": "view",
+                    "description": "- A mapping object providing a value for the (first) symbol",
+                    "type": "Object"
+                },
+                {
+                    "name": "context",
+                    "description": "- Object containing:",
+                    "type": "Object",
+                    "props": [
+                        {
+                            "name": "meta",
+                            "description": "- Metadata associated to the CSV file",
+                            "type": "Object"
+                        },
+                        {
+                            "name": "index",
+                            "description": "- Index of the row being processed, if applicable, -1 otherwise",
+                            "type": "Object"
+                        },
+                        {
+                            "name": "row",
+                            "description": "- Full row being processed, if applicable, ``null`` otherwise",
+                            "type": "Object"
+                        }
+                    ]
+                }
+            ],
+            "return": {
+                "description": "- value of the tag, i.e., the value from ``view``, possibly ran through the chain of filters",
+                "type": "String"
+            },
+            "class": "$",
+            "module": "CSVPlus"
+        },
+        {
+            "file": "CSVPlus.js",
+            "line": 384,
+            "description": "Process a template, i.e., find all the tags, process them individually (through the ``process_one_tag`` method)\nand return the concatenated result.\nProcess a template, without the {{#rows}}...{{\\#rows}} sections. The function goes through the templates recursively,\nby taking the templates from left-to-right and concatenating the results.",
+            "itemtype": "method",
+            "name": "render_template",
+            "access": "private",
+            "tagname": "",
+            "params": [
+                {
+                    "name": "template",
+                    "description": "- The full template",
+                    "type": "String"
+                },
+                {
+                    "name": "view",
+                    "description": "- A mapping object providing a value for the (first) symbol",
+                    "type": "Object"
+                },
+                {
+                    "name": "context",
+                    "description": "- Object containing:",
+                    "type": "Object",
+                    "props": [
+                        {
+                            "name": "meta",
+                            "description": "- Metadata associated to the CSV file",
+                            "type": "Object"
+                        },
+                        {
+                            "name": "index",
+                            "description": "- Index of the row being processed, if applicable, -1 otherwise",
+                            "type": "Object"
+                        },
+                        {
+                            "name": "row",
+                            "description": "- Full row being processed, if applicable, ``null`` otherwise",
+                            "type": "Object"
+                        }
+                    ]
+                }
+            ],
+            "return": {
+                "description": "- value of the full template",
+                "type": "String"
+            },
+            "class": "$",
+            "module": "CSVPlus"
+        },
+        {
+            "file": "CSVPlus.js",
+            "line": 414,
+            "description": "Convert the CSV data with templates.",
+            "itemtype": "method",
+            "name": "c_templates",
+            "access": "private",
+            "tagname": "",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "- The CSV data itself, an array of array (latter being a row from the file)",
+                    "type": "Array"
+                },
+                {
+                    "name": "meta",
+                    "description": "- Metadata object, as defined in the spec",
+                    "type": "Object"
+                },
+                {
+                    "name": "template",
+                    "description": "- Template string.",
+                    "type": "String"
+                },
+                {
+                    "name": "target_format",
+                    "description": "- can be JSON, Turtle, Javascript,…",
+                    "type": "Sring"
+                },
+                {
+                    "name": "warnings",
+                    "description": "- array of warnings that may have to be extended if an error occurs",
+                    "type": "Array"
+                }
+            ],
+            "return": {
+                "description": "- Converted data. If the ``target_format`` argument is JAVASCRIPT, the retun is an Object,\notherwise a string with the converted value in the ``target_format`` syntax.",
+                "type": "String or Object"
+            },
+            "class": "$",
+            "module": "CSVPlus"
+        },
+        {
+            "file": "CSVPlus.js",
+            "line": 486,
+            "description": "Objects referring to the default conversion functions for Javascript and JSON",
+            "itemtype": "property",
+            "name": "js_conversions",
+            "access": "private",
+            "tagname": "",
+            "class": "$",
+            "module": "CSVPlus"
+        },
+        {
+            "file": "CSVPlus.js",
+            "line": 531,
+            "description": "Objects referring to the default conversion functions for RDF and Turtle/NT",
+            "itemtype": "property",
+            "name": "rdf_conversions",
+            "access": "private",
+            "tagname": "",
+            "class": "$",
+            "module": "CSVPlus"
+        },
+        {
+            "file": "CSVPlus.js",
+            "line": 594,
+            "description": "Object referring to the conversion function objects, keyed through the possible formats",
+            "itemtype": "property",
+            "name": "conversions",
+            "access": "private",
+            "tagname": "",
+            "class": "$",
+            "module": "CSVPlus"
+        },
+        {
+            "file": "CSVPlus.js",
+            "line": 606,
+            "description": "The core global properties that are defined by the group, i.e., not dependent on\nDCMI or schema.org",
+            "itemtype": "property",
+            "name": "core_properties",
+            "class": "$",
+            "module": "CSVPlus"
+        },
+        {
+            "file": "CSVPlus.js",
+            "line": 620,
+            "description": "Resolve core property. The property is looked up in the (possible) \n``@context`` structure to see if a URI is assigned to it and, if yes,\nwhether it is specified as having a URI as a value/object",
+            "itemtype": "method",
+            "name": "resolve_core_property",
+            "access": "private",
+            "tagname": "",
+            "params": [
+                {
+                    "name": "term",
+                    "description": "- the term to be looked up",
+                    "type": "Sring"
+                },
+                {
+                    "name": "meta",
+                    "description": "- Metadata object, as defined in the spec",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "with values of 'uri' (if an URI is assigned to the term) and a 'id' boolean value on \nwhether the value should be a URI or a string. The former defaults to ``undefined``, the latter to ``false``.",
+                "type": "Object"
+            },
+            "class": "$",
+            "module": "CSVPlus"
+        },
+        {
+            "file": "CSVPlus.js",
+            "line": 654,
+            "description": "Create a default conversion.\nThis is called when there is no template, ie, provides the default conversion\nof a CSV file. This is the conversion that is defined, as a standard, by the WG.\n\nThis method implements the overall structure in a final format agnostic way. The ``target_format`` argument\nis used to choose among the possible conversion function sets, using the ``conversions`` object.",
+            "itemtype": "method",
+            "name": "c_default",
+            "access": "private",
+            "tagname": "",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "- The CSV data itself, an array of array (latter being a row from the file)",
+                    "type": "Array"
+                },
+                {
+                    "name": "meta",
+                    "description": "- Metadata object, as defined in the spec",
+                    "type": "Object"
+                },
+                {
+                    "name": "target_format",
+                    "description": "- can be JSON, Turtle, Javascript,…",
+                    "type": "Sring"
+                }
+            ],
+            "return": {
+                "description": "- Converted data. If the ``target_format`` argument is JAVASCRIPT, the return is an Object; if it is RDF,\nthe return is a Graph as defined by the rdf_interface package; otherwise a string with the converted value in the ``target_format`` syntax.",
+                "type": "String or Object"
+            },
+            "class": "$",
+            "module": "CSVPlus"
+        },
+        {
+            "file": "CSVPlus.js",
+            "line": 778,
+            "description": "Main conversion entry point. In reality, this is just a switch between the 'direct'\ni.e., default mapping as defined by the standard, and the templated version if a template\nhas been added to the metadata.",
+            "itemtype": "method",
+            "name": "convertCSV",
+            "access": "private",
+            "tagname": "",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "- The CSV data itself, an array of array (latter being a row from the file)",
+                    "type": "Array"
+                },
+                {
+                    "name": "meta",
+                    "description": "- Metadata object, as defined in the spec",
+                    "type": "Object"
+                },
+                {
+                    "name": "template",
+                    "description": "- Template string. If ``\"\"`` (ie, no template) a default Javascript object is generated",
+                    "type": "String"
+                },
+                {
+                    "name": "target_format",
+                    "description": "- can be JSON, Turtle, Javascript,…",
+                    "type": "Sring"
+                },
+                {
+                    "name": "warnings",
+                    "description": "- array of warnings that may have to be extended if an error occurs",
+                    "type": "Array"
+                }
+            ],
+            "return": {
+                "description": "- Converted data. If the ``target_format`` argument is JAVASCRIPT, the retun is an Object,\notherwise a string with the converted value in the ``target_format`` syntax.",
+                "type": "String or Object"
+            },
+            "class": "$",
+            "module": "CSVPlus"
+        },
+        {
+            "file": "CSVPlus.js",
+            "line": 804,
+            "description": "Public interface, as a jQuery extension. The function\n \n 1. Fetches the CSV content (in memory, i.e., it is very inefficient for large CSV files)\n 1. Retrieves and combines the metadata associated to the CSV (i.e., trough the link response header, and at the well known places; see the specification)\n 1. Retrieves the associated templates (if any), based on the requested output format\n 1. Converts the CSV content into either a Javascript object or a text file with a specified syntax (JSON, Turtle, XML) and makes the result available through asyncrhonous callbacks \n\nThe method can either be used as an asynchronous function through callbacks, or as a Deferred object.",
+            "example": [
+                "\n Simple, asynchronous usage:\n\n     $.getCSV(\"http://www.example.org\", function(csv_data) {\n       // display the CSV data; by default, the data is a javascript object\n       display(csv_data.data[\"Col1\"]);\n       display(csv_data.data[\"Col2\"]);\n       ...\n     });\n \n Using JSON output, and display the result in a ``<pre>`` element\n\n     var request = { url: \"http://www.example.org\", format: \"json\"};\n     $.getCSV(request, function(csv_data) {\n       $(\"div#example\").append(\"<pre>\" + massage(csv_data.data) + \"</pre>\");\n     });\n\n Same, but using the “Promise” style, and adding an error handling\n\n     var request = { url: \"http://www.example.org\", format: \"json\"};\n     $.getCSV(request)\n       .done(function(csv_data) {\n         $(\"div#example\").append(\"<pre>\" + massage(csv_data.data) + \"</pre>\");\n       })\n       .fail( function(status,error) {\n        console.log(status + \" \" + error);\n       });"
+            ],
+            "itemtype": "method",
+            "name": "$.getCSV",
+            "async": 1,
+            "params": [
+                {
+                    "name": "options",
+                    "description": "- identification of the CSV. If it is a string, it is the URL of the CSV file. If it is an object, it has the following (optional) fields:",
+                    "type": "String or Object",
+                    "props": [
+                        {
+                            "name": "url",
+                            "description": "- URL of csv file (required),",
+                            "type": "String"
+                        },
+                        {
+                            "name": "delimiter",
+                            "description": "- CSV delimiter character (optional, default is ``\"\"``, ie, auto-detect)",
+                            "type": "String"
+                        },
+                        {
+                            "name": "comments",
+                            "description": "- Specifies a comment character (like ``\"#\"``) to skip lines; ``false`` if no comment is allowed (optional, default is '#')",
+                            "type": "String"
+                        },
+                        {
+                            "name": "format",
+                            "description": "- Expected output format (can be \"json\", \"javascript\", \"turtle\", etc.; default is \"javascript\")",
+                            "type": "String"
+                        },
+                        {
+                            "name": "filters",
+                            "description": "- Object providing user-defined filters; each key denotes a (template) filter function. \n A filter is invoked with the arguments:\n * ``var`` - String\n * ``context`` - Template context object containing:\n   * ``column_name``: name of the column (used in the ``{{name}}`` part of the template tag)\n   * ``meta``: (cumulative) metadata object\n   * ``row``: array of the row being processed by the template process\n   * ``row_index``: index of the row being processed\n   * ``target_format``: target format of the template (i.e., \"json\", \"turtle\", \"xml\", etc. )\n * ``string1`` (optional) - additional string provided in the template\n * ``string2`` (optional) - additional string provided in the template\n * …\n * ``stringn`` (optional) - additional string provided in the template\n\n The filter returns a string to be used as a replacement.",
+                            "type": "Object"
+                        }
+                    ]
+                },
+                {
+                    "name": "success",
+                    "description": "- Callback to process the result, called with an input argument, i.e., result object",
+                    "type": "Function",
+                    "optional": true
+                },
+                {
+                    "name": "failure",
+                    "description": "- Callback to process in case of HTTP errors. Function two arguments: HTTP Status code and error message",
+                    "type": "Function",
+                    "optional": true
+                }
+            ],
+            "return": {
+                "description": "- A promise with the result object of the form:\n * ``data``: result of the CSV conversion in the format required by the options\n * ``meta``: the (combined) metadata of the CSV content\n * ``errors``: array of error or warning messages (including possible CSV parsing errors)",
+                "type": "Promise Object"
+            },
+            "class": "$",
+            "module": "CSVPlus"
+        },
+        {
+            "file": "mustache.js",
+            "line": 64,
+            "description": "Breaks up the given `template` string into a tree of tokens. If the `tags`\nargument is given here it must be an array with two string values: the\nopening and closing tags used in the template (e.g. [ \"<%\", \"%>\" ]). Of\ncourse, the default is to use mustaches (i.e. mustache.tags).\n\nA token is an array with at least 4 elements. The first element is the\nmustache symbol that was used inside the tag, e.g. \"#\" or \"&\". If the tag\ndid not contain a symbol (i.e. {{myValue}}) this element is \"name\". For\nall text that appears outside a symbol this element is \"text\".\n\nThe second element of a token is its \"value\". For mustache tags this is\nwhatever else was inside the tag besides the opening symbol. For text tokens\nthis is the text itself.\n\nThe third and fourth elements of the token are the start and end indices,\nrespectively, of the token in the original template.\n\nTokens that are the root node of a subtree contain two more elements: 1) an\narray of tokens in the subtree and 2) the index in the original template at\nwhich the closing tag for that section begins.",
+            "class": "",
+            "module": "CSVPlus"
+        },
+        {
+            "file": "mustache.js",
+            "line": 212,
+            "description": "Combines the values of consecutive text tokens in the given `tokens` array\nto a single token.",
+            "class": "",
+            "module": "CSVPlus"
+        },
+        {
+            "file": "mustache.js",
+            "line": 237,
+            "description": "Forms the given array of `tokens` into a nested tree structure where\ntokens that represent a section have two additional items: 1) an array of\nall tokens that appear in that section and 2) the index in the original\ntemplate that represents the end of that section.",
+            "class": "",
+            "module": "CSVPlus"
+        },
+        {
+            "file": "mustache.js",
+            "line": 272,
+            "description": "A simple string scanner that is used by the template parser to find\ntokens in template strings.",
+            "class": "",
+            "module": "CSVPlus"
+        },
+        {
+            "file": "mustache.js",
+            "line": 282,
+            "description": "Returns `true` if the tail is empty (end of string).",
+            "class": "",
+            "module": "CSVPlus"
+        },
+        {
+            "file": "mustache.js",
+            "line": 289,
+            "description": "Tries to match the given regular expression at the current position.\nReturns the matched text if it can match, the empty string otherwise.",
+            "class": "",
+            "module": "CSVPlus"
+        },
+        {
+            "file": "mustache.js",
+            "line": 307,
+            "description": "Skips all text until the given regular expression can be matched. Returns\nthe skipped string, which is the entire tail if no match can be made.",
+            "class": "",
+            "module": "CSVPlus"
+        },
+        {
+            "file": "mustache.js",
+            "line": 332,
+            "description": "Represents a rendering context by wrapping a view object and\nmaintaining a reference to the parent context.",
+            "class": "",
+            "module": "CSVPlus"
+        },
+        {
+            "file": "mustache.js",
+            "line": 342,
+            "description": "Creates a new context using the given view with this context\nas the parent.",
+            "class": "",
+            "module": "CSVPlus"
+        },
+        {
+            "file": "mustache.js",
+            "line": 350,
+            "description": "Returns the value of the given name in this context, traversing\nup the context hierarchy if the value is absent in this context's view.",
+            "class": "",
+            "module": "CSVPlus"
+        },
+        {
+            "file": "mustache.js",
+            "line": 390,
+            "description": "A Writer knows how to take a stream of tokens and render them to a\nstring, given a context. It also maintains a cache of templates to\navoid the need to parse the same template twice.",
+            "class": "",
+            "module": "CSVPlus"
+        },
+        {
+            "file": "mustache.js",
+            "line": 399,
+            "description": "Clears all cached templates in this writer.",
+            "class": "",
+            "module": "CSVPlus"
+        },
+        {
+            "file": "mustache.js",
+            "line": 406,
+            "description": "Parses and caches the given `template` and returns the array of tokens\nthat is generated from the parse.",
+            "class": "",
+            "module": "CSVPlus"
+        },
+        {
+            "file": "mustache.js",
+            "line": 420,
+            "description": "High-level method that is used to render the given `template` with\nthe given `view`.\n\nThe optional `partials` argument may be an object that contains the\nnames and templates of partials that are used in the template. It may\nalso be a function that is used to load partial templates on the fly\nthat takes a single argument: the name of the partial.",
+            "class": "",
+            "module": "CSVPlus"
+        },
+        {
+            "file": "mustache.js",
+            "line": 435,
+            "description": "Low-level method that renders the given array of `tokens` using\nthe given `context` and `partials`.\n\nNote: The `originalTemplate` is only ever used to extract the portion\nof the original template that was contained in a higher-order section.\nIf the template doesn't use higher-order sections, this argument may\nbe omitted.",
+            "class": "",
+            "module": "CSVPlus"
+        },
+        {
+            "file": "mustache.js",
+            "line": 534,
+            "description": "Clears all cached templates in the default writer.",
+            "class": "",
+            "module": "CSVPlus"
+        },
+        {
+            "file": "mustache.js",
+            "line": 541,
+            "description": "Parses and caches the given template in the default writer and returns the\narray of tokens it contains. Doing this ahead of time avoids the need to\nparse templates on the fly as they are rendered.",
+            "class": "",
+            "module": "CSVPlus"
+        },
+        {
+            "file": "mustache.js",
+            "line": 550,
+            "description": "Renders the `template` with the given `view` and `partials` using the\ndefault writer.",
+            "class": "",
+            "module": "CSVPlus"
+        }
+    ],
+    "warnings": [
+        {
+            "message": "unknown tag: license",
+            "line": " CSVPlus.js:1"
+        },
+        {
+            "message": "Missing item type\nBreaks up the given `template` string into a tree of tokens. If the `tags`\nargument is given here it must be an array with two string values: the\nopening and closing tags used in the template (e.g. [ \"<%\", \"%>\" ]). Of\ncourse, the default is to use mustaches (i.e. mustache.tags).\n\nA token is an array with at least 4 elements. The first element is the\nmustache symbol that was used inside the tag, e.g. \"#\" or \"&\". If the tag\ndid not contain a symbol (i.e. {{myValue}}) this element is \"name\". For\nall text that appears outside a symbol this element is \"text\".\n\nThe second element of a token is its \"value\". For mustache tags this is\nwhatever else was inside the tag besides the opening symbol. For text tokens\nthis is the text itself.\n\nThe third and fourth elements of the token are the start and end indices,\nrespectively, of the token in the original template.\n\nTokens that are the root node of a subtree contain two more elements: 1) an\narray of tokens in the subtree and 2) the index in the original template at\nwhich the closing tag for that section begins.",
+            "line": " mustache.js:64"
+        },
+        {
+            "message": "Missing item type\nCombines the values of consecutive text tokens in the given `tokens` array\nto a single token.",
+            "line": " mustache.js:212"
+        },
+        {
+            "message": "Missing item type\nForms the given array of `tokens` into a nested tree structure where\ntokens that represent a section have two additional items: 1) an array of\nall tokens that appear in that section and 2) the index in the original\ntemplate that represents the end of that section.",
+            "line": " mustache.js:237"
+        },
+        {
+            "message": "Missing item type\nA simple string scanner that is used by the template parser to find\ntokens in template strings.",
+            "line": " mustache.js:272"
+        },
+        {
+            "message": "Missing item type\nReturns `true` if the tail is empty (end of string).",
+            "line": " mustache.js:282"
+        },
+        {
+            "message": "Missing item type\nTries to match the given regular expression at the current position.\nReturns the matched text if it can match, the empty string otherwise.",
+            "line": " mustache.js:289"
+        },
+        {
+            "message": "Missing item type\nSkips all text until the given regular expression can be matched. Returns\nthe skipped string, which is the entire tail if no match can be made.",
+            "line": " mustache.js:307"
+        },
+        {
+            "message": "Missing item type\nRepresents a rendering context by wrapping a view object and\nmaintaining a reference to the parent context.",
+            "line": " mustache.js:332"
+        },
+        {
+            "message": "Missing item type\nCreates a new context using the given view with this context\nas the parent.",
+            "line": " mustache.js:342"
+        },
+        {
+            "message": "Missing item type\nReturns the value of the given name in this context, traversing\nup the context hierarchy if the value is absent in this context's view.",
+            "line": " mustache.js:350"
+        },
+        {
+            "message": "Missing item type\nA Writer knows how to take a stream of tokens and render them to a\nstring, given a context. It also maintains a cache of templates to\navoid the need to parse the same template twice.",
+            "line": " mustache.js:390"
+        },
+        {
+            "message": "Missing item type\nClears all cached templates in this writer.",
+            "line": " mustache.js:399"
+        },
+        {
+            "message": "Missing item type\nParses and caches the given `template` and returns the array of tokens\nthat is generated from the parse.",
+            "line": " mustache.js:406"
+        },
+        {
+            "message": "Missing item type\nHigh-level method that is used to render the given `template` with\nthe given `view`.\n\nThe optional `partials` argument may be an object that contains the\nnames and templates of partials that are used in the template. It may\nalso be a function that is used to load partial templates on the fly\nthat takes a single argument: the name of the partial.",
+            "line": " mustache.js:420"
+        },
+        {
+            "message": "Missing item type\nLow-level method that renders the given array of `tokens` using\nthe given `context` and `partials`.\n\nNote: The `originalTemplate` is only ever used to extract the portion\nof the original template that was contained in a higher-order section.\nIf the template doesn't use higher-order sections, this argument may\nbe omitted.",
+            "line": " mustache.js:435"
+        },
+        {
+            "message": "Missing item type\nClears all cached templates in the default writer.",
+            "line": " mustache.js:534"
+        },
+        {
+            "message": "Missing item type\nParses and caches the given template in the default writer and returns the\narray of tokens it contains. Doing this ahead of time avoids the need to\nparse templates on the fly as they are rendered.",
+            "line": " mustache.js:541"
+        },
+        {
+            "message": "Missing item type\nRenders the `template` with the given `view` and `partials` using the\ndefault writer.",
+            "line": " mustache.js:550"
+        }
+    ]
+}
