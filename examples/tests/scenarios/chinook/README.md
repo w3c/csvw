@@ -11,7 +11,6 @@ License is https://chinookdatabase.codeplex.com/license ("Microsoft Public Licen
 
 First two lines of each CSV file follow: 
 
- head -2 *
 ==> Album.csv <==
 AlbumId,Title,ArtistId
 1,"For Those About To Rock We Salute You",1
