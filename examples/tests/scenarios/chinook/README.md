@@ -9,7 +9,7 @@ into CSV files. These are stored in csv/ so you shouldn't need the script.
 
 License is https://chinookdatabase.codeplex.com/license "Microsoft Public License (Ms-PL)"
 
-![Chinook relational schema](![alt text](https://raw.githubusercontent.com/w3c/csvw/gh-pages/examples/tests/scenarios/chinook/ChinookSchema.PNG "Chinook schema")
+![Chinook relational schema](https://raw.githubusercontent.com/w3c/csvw/gh-pages/examples/tests/scenarios/chinook/ChinookSchema.PNG "Chinook schema")
 
 First 2 lines of each CSV file follow: 
 
