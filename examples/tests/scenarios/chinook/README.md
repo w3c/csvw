@@ -9,7 +9,9 @@ into CSV files. These are stored in csv/ so you shouldn't need the script.
 
 License is https://chinookdatabase.codeplex.com/license "Microsoft Public License (Ms-PL)"
 
-First two lines of each CSV file follow: 
+![Chinook relational schema](![alt text](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Chinook schema")
+
+First 2 lines of each CSV file follow: 
 
 ##Album.csv
 * AlbumId,Title,ArtistId
@@ -39,7 +41,7 @@ First two lines of each CSV file follow:
 * InvoiceLineId,InvoiceId,TrackId,UnitPrice,Quantity
 * 1,1,2,0.99,1
 
-##MediaType.csv <==
+##MediaType.csv
 * MediaTypeId,Name
 * 1,"MPEG audio file"
 
