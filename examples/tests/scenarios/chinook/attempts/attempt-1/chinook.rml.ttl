@@ -1,0 +1,705 @@
+@prefix schema:   <http://schema.org/> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#>.
+@prefix rr:       <http://www.w3.org/ns/r2rml#>.
+@prefix rml:      <http://semweb.mmlab.be/ns/rml#> .
+@prefix ql:       <http://semweb.mmlab.be/ns/ql#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dcterms:  <http://purl.org/dc/terms/>.
+@prefix ex:		  <http://example.com/>.	
+
+
+
+<#InvoiceLine>
+  
+  rml:logicalSource [ 
+    rml:source "https://raw.githubusercontent.com/w3c/csvw/gh-pages/examples/tests/scenarios/chinook/csv/InvoiceLine.csv";
+    rml:referenceFormulation ql:CSV
+  ];
+
+  rr:subjectMap [ 
+    rr:template "http://example.com/invoiceline/{InvoiceLineId}"; 
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate dcterms:identifier;
+    rr:objectMap [ 
+      rml:reference "InvoiceLineId" 
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate ex:invoice;
+    rr:objectMap [
+      rr:parentTriplesMap <#Invoice>;
+      rr:joinCondition [
+        rr:child "InvoiceId" ;
+        rr:parent "InvoiceId"
+      ]
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate ex:track;
+    rr:objectMap [
+      rr:parentTriplesMap <#Track>;
+      rr:joinCondition [
+        rr:child "TrackId" ;
+        rr:parent "TrackId"
+      ]
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:priceSpecification;
+    rr:objectMap [
+      rr:parentTriplesMap <#Price>;
+    ]
+  ].
+
+
+<#Price>
+  rml:logicalSource [ 
+    rml:source "https://raw.githubusercontent.com/w3c/csvw/gh-pages/examples/tests/scenarios/chinook/csv/InvoiceLine.csv";
+    rml:referenceFormulation ql:CSV
+  ];
+
+  rr:subjectMap [ 
+    rr:template "http://example.com/price/{UnitPrice}";
+    rr:class schema:PriceSpecification;
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:price;
+    rr:objectMap [ 
+      rml:reference "UnitPrice" 
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate ex:quantity;
+    rr:objectMap [ 
+      rml:reference "Quantity" 
+    ]
+  ].
+
+
+<#Invoice>
+  
+  rml:logicalSource [ 
+    rml:source "https://raw.githubusercontent.com/w3c/csvw/gh-pages/examples/tests/scenarios/chinook/csv/Invoice.csv";
+    rml:referenceFormulation ql:CSV
+  ];
+
+  rr:subjectMap [ 
+    rr:template "http://example.com/invoice/{InvoiceId}"; 
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate dcterms:identifier;
+    rr:objectMap [ 
+      rml:reference "InvoiceId" 
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:customer;
+    rr:objectMap [
+      rr:parentTriplesMap <#Customer>;
+      rr:joinCondition [
+        rr:child "CustomerId" ;
+        rr:parent "CustomerId"
+      ]
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate ex:invoiceDate;
+    rr:objectMap [ 
+      rml:reference "InvoiceDate";
+      rr:datatype xsd:dateTime
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:billingAddress;
+    rr:objectMap [
+      rr:parentTriplesMap <#BillingAddress>;
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate ex:total;
+    rr:objectMap [ 
+      rml:reference "Total";
+      rr:datatype xsd:decimal
+    ]
+  ].
+
+
+<#BillingAddress>
+  
+  rml:logicalSource [ 
+    rml:source "https://raw.githubusercontent.com/w3c/csvw/gh-pages/examples/tests/scenarios/chinook/csv/Invoice.csv";
+    rml:referenceFormulation ql:CSV
+  ];
+
+  rr:subjectMap [ 
+    rr:termType rr:BlankNode; 
+    rr:class schema:PostalAddress
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:streetAdress;
+    rr:objectMap [ 
+      rml:reference "BillingAddress"
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:addressLocality;
+    rr:objectMap [ 
+      rml:reference "BillingCity"
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:addressRegion;
+    rr:objectMap [ 
+      rml:reference "BillingState"
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:addressCountry;
+    rr:objectMap [ 
+      rml:reference "BillingCountry"
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:postalCode;
+    rr:objectMap [ 
+      rml:reference "BillingPostalCode"
+    ]
+  ].
+
+
+<#Customer>
+  
+  rml:logicalSource [ 
+    rml:source "https://raw.githubusercontent.com/w3c/csvw/gh-pages/examples/tests/scenarios/chinook/csv/Customer.csv";
+    rml:referenceFormulation ql:CSV
+  ];
+
+  rr:subjectMap [ 
+    rr:template "http://example.com/customer/{CustomerId}"; 
+    rr:class schema:Person
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate dcterms:identifier;
+    rr:objectMap [ 
+      rml:reference "CustomerId" 
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:familyName;
+    rr:objectMap [ 
+      rml:reference "LastName"
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:givenName;
+    rr:objectMap [ 
+      rml:reference "FirstName"
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:address;
+    rr:objectMap [
+      rr:parentTriplesMap <#CustomerAddress>;
+    ]
+  ].
+
+
+<#CustomerAddress>
+  
+  rml:logicalSource [ 
+    rml:source "https://raw.githubusercontent.com/w3c/csvw/gh-pages/examples/tests/scenarios/chinook/csv/Customer.csv";
+    rml:referenceFormulation ql:CSV
+  ];
+
+  rr:subjectMap [ 
+    rr:termType rr:BlankNode; 
+    rr:class schema:PostalAddress
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:streetAdress;
+    rr:objectMap [ 
+      rml:reference "Address"
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:addressLocality;
+    rr:objectMap [ 
+      rml:reference "City"
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:addressRegion;
+    rr:objectMap [ 
+      rml:reference "State"
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:addressCountry;
+    rr:objectMap [ 
+      rml:reference "Country"
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:postalCode;
+    rr:objectMap [ 
+      rml:reference "PostalCode"
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:telephone;
+    rr:objectMap [ 
+      rml:reference "Phone"
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:faxNumber;
+    rr:objectMap [ 
+      rml:reference "Fax"
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:email;
+    rr:objectMap [ 
+      rml:reference "Email"
+    ]
+  ].
+
+
+
+<#Playlist>
+  
+  rml:logicalSource [ 
+    rml:source "https://raw.githubusercontent.com/w3c/csvw/gh-pages/examples/tests/scenarios/chinook/csv/Playlist.csv";
+    rml:referenceFormulation ql:CSV
+  ];
+
+  rr:subjectMap [ 
+    rr:template "http://example.com/playlist/{PlaylistId}"; 
+    rr:class schema:MusicPlaylist; 
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate dcterms:identifier;
+    rr:objectMap [ 
+      rml:reference "PlaylistId" 
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:name;
+    rr:objectMap [ 
+      rml:reference "Name"
+    ]
+  ].
+
+
+<#PlaylistTrack>
+  
+  rml:logicalSource [ 
+    rml:source "https://raw.githubusercontent.com/w3c/csvw/gh-pages/examples/tests/scenarios/chinook/csv/PlaylistTrack.csv";
+    rml:referenceFormulation ql:CSV
+  ];
+
+  rr:subjectMap [ 
+    rr:template "http://example.com/playlist/{PlaylistId}"; 
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:track;
+    rr:objectMap [
+      rr:parentTriplesMap <#Track>;
+      rr:joinCondition [
+        rr:child "TrackId" ;
+        rr:parent "TrackId"
+      ]
+    ]
+  ].
+
+
+<#Track>
+  
+  rml:logicalSource [ 
+    rml:source "https://raw.githubusercontent.com/w3c/csvw/gh-pages/examples/tests/scenarios/chinook/csv/Track.csv";
+    rml:referenceFormulation ql:CSV
+  ];
+
+  rr:subjectMap [ 
+    rr:template "http://example.com/track/{TrackId}"; 
+    rr:class schema:MusicRecording; 
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate dcterms:identifier;
+    rr:objectMap [ 
+      rml:reference "TrackId" 
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:name;
+    rr:objectMap [ 
+      rml:reference "Name"
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:inAlbum;
+    rr:objectMap [
+      rr:parentTriplesMap <#Album>;
+      rr:joinCondition [
+        rr:child "AlbumId" ;
+        rr:parent "AlbumId"
+      ]
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:associatedMedia;
+    rr:objectMap [
+      rr:parentTriplesMap <#MediaType>;
+      rr:joinCondition [
+        rr:child "MediaTypeId" ;
+        rr:parent "MediaTypeId"
+      ]
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:genre;
+    rr:objectMap [
+      rr:parentTriplesMap <#Genre>;
+      rr:joinCondition [
+        rr:child "GenreId" ;
+        rr:parent "GenreId"
+      ]
+    ]
+  ];
+
+#  rr:predicateObjectMap [
+#    rr:predicate schema:recordingOf;
+#      rr:objectMap [
+#        rr:parentTriplesMap <#Composer>
+#      ]
+#  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:duration;
+    rr:objectMap [ 
+      rr:parentTriplesMap <#Duration>
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:priceSpecification;
+    rr:objectMap [
+      rr:parentTriplesMap <#TrackPrice>;
+    ]
+  ].
+
+
+<#TrackPrice>
+  rml:logicalSource [ 
+    rml:source "https://raw.githubusercontent.com/w3c/csvw/gh-pages/examples/tests/scenarios/chinook/csv/Track.csv";
+    rml:referenceFormulation ql:CSV
+  ];
+
+  rr:subjectMap [ 
+    rr:template "http://example.com/price/{UnitPrice}";
+    rr:class schema:PriceSpecification;
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:price;
+    rr:objectMap [ 
+      rml:reference "UnitPrice" 
+    ]
+  ].
+
+
+#Composer
+
+
+<#Duration>
+  
+  rml:logicalSource [ 
+    rml:source "https://raw.githubusercontent.com/w3c/csvw/gh-pages/examples/tests/scenarios/chinook/csv/Track.csv";
+    rml:referenceFormulation ql:CSV
+  ];
+
+  rr:subjectMap [ 
+    rr:template "http://example.com/duration/{Milliseconds}"; 
+    rr:class schema:Duration; 
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:name;
+    rr:objectMap [ 
+      rml:reference "Milliseconds" 
+    ]
+  ].
+
+
+<#Album>
+  
+  rml:logicalSource [ 
+    rml:source "https://raw.githubusercontent.com/w3c/csvw/gh-pages/examples/tests/scenarios/chinook/csv/Album.csv";
+    rml:referenceFormulation ql:CSV
+  ];
+
+  rr:subjectMap [ 
+    rr:template "http://example.com/album/{AlbumId}"; 
+    rr:class schema:MusicAlbum; 
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate dcterms:identifier;
+    rr:objectMap [ 
+      rml:reference "AlbumId" 
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:name;
+    rr:objectMap [ 
+      rml:reference "Title"
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:byArtist;
+    rr:objectMap [
+      rr:parentTriplesMap <#Artist>;
+      rr:joinCondition [
+        rr:child "ArtistId" ;
+        rr:parent "ArtistId"
+      ]
+    ]
+  ].
+
+
+
+<#Artist>
+  
+  rml:logicalSource [ 
+    rml:source "https://raw.githubusercontent.com/w3c/csvw/gh-pages/examples/tests/scenarios/chinook/csv/Artist.csv";
+    rml:referenceFormulation ql:CSV
+  ];
+
+  rr:subjectMap [ 
+    rr:template "http://example.com/artist/{ArtistId}"; 
+    rr:class schema:MusicGroup; 
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate dcterms:identifier;
+    rr:objectMap [ 
+      rml:reference "ArtistId" 
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate rdfs:label;
+    rr:objectMap [ 
+      rml:reference "Name"
+    ]
+  ].
+
+
+  <#MediaType>
+  
+  rml:logicalSource [ 
+    rml:source "https://raw.githubusercontent.com/w3c/csvw/gh-pages/examples/tests/scenarios/chinook/csv/MediaType.csv";
+    rml:referenceFormulation ql:CSV
+  ];
+
+  rr:subjectMap [ 
+    rr:template "http://example.com/mediatype/{MediaTypeId}"; 
+    rr:class schema:MusicObject; 
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate dcterms:identifier;
+    rr:objectMap [ 
+      rml:reference "MediaTypeId" 
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:name;
+    rr:objectMap [ 
+      rml:reference "Name"
+    ]
+  ].
+
+
+  <#Genre>
+  
+  rml:logicalSource [ 
+    rml:source "https://raw.githubusercontent.com/w3c/csvw/gh-pages/examples/tests/scenarios/chinook/csv/Genre.csv";
+    rml:referenceFormulation ql:CSV
+  ];
+
+  rr:subjectMap [ 
+    rr:template "http://example.com/genre/{GenreId}"; 
+    rr:class schema:MusicGroup; 
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate dcterms:identifier;
+    rr:objectMap [ 
+      rml:reference "GenreId" 
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:name;
+    rr:objectMap [ 
+      rml:reference "Name"
+    ]
+  ].
+
+
+<#Employee>
+  
+  rml:logicalSource [ 
+    rml:source "https://raw.githubusercontent.com/w3c/csvw/gh-pages/examples/tests/scenarios/chinook/csv/Employee.csv";
+    rml:referenceFormulation ql:CSV
+  ];
+
+  rr:subjectMap [ 
+    rr:template "http://example.com/employee/{EmployeeId}"; 
+    rr:class schema:Person
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:familyName;
+    rr:objectMap [ 
+      rml:reference "LastName"
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:givenName;
+    rr:objectMap [ 
+      rml:reference "FirstName"
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate ex:reportsTo;
+    rr:objectMap [
+      rml:reference "ReportsTo" 
+      ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:birthDate;
+    rr:objectMap [ 
+      rml:reference "BirthDate"
+    ]
+  ];
+
+  rr:predicateObjectMap [
+        rr:predicate schema:address;
+        rr:objectMap [
+            rr:parentTriplesMap <#EmployeeAddress>;
+        ]
+    ].
+
+
+<#EmployeeAddress>
+  
+  rml:logicalSource [ 
+    rml:source "https://raw.githubusercontent.com/w3c/csvw/gh-pages/examples/tests/scenarios/chinook/csv/Employee.csv";
+    rml:referenceFormulation ql:CSV
+  ];
+
+  rr:subjectMap [ 
+    rr:termType rr:BlankNode; 
+    rr:class schema:PostalAddress
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:streetAdress;
+    rr:objectMap [ 
+      rml:reference "Address"
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:addressLocality;
+    rr:objectMap [ 
+      rml:reference "City"
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:addressRegion;
+    rr:objectMap [ 
+      rml:reference "State"
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:addressCountry;
+    rr:objectMap [ 
+      rml:reference "Country"
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:postalCode;
+    rr:objectMap [ 
+      rml:reference "PostalCode"
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:telephone;
+    rr:objectMap [ 
+      rml:reference "Phone"
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:faxNumber;
+    rr:objectMap [ 
+      rml:reference "Fax"
+    ]
+  ];
+
+  rr:predicateObjectMap [
+    rr:predicate schema:email;
+    rr:objectMap [ 
+      rml:reference "Email"
+    ]
+  ].
