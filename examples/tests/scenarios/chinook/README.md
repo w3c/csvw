@@ -7,7 +7,11 @@ See http://chinookdatabase.codeplex.com/releases/view/55681
 chinook_tocsv.sh is a quick script that converts the Chinook free sample database
 into CSV files. These are stored in csv/ so you shouldn't need the script.
 
-License is https://chinookdatabase.codeplex.com/license "Microsoft Public License (Ms-PL)"
+For CSVW R2RML, see also http://rml.io/RML_examples.html (Flanders city example) for multiple CSV examples.
+
+
+
+Chinook DB License is https://chinookdatabase.codeplex.com/license "Microsoft Public License (Ms-PL)"
 
 ![Chinook relational schema](https://raw.githubusercontent.com/w3c/csvw/gh-pages/examples/tests/scenarios/chinook/ChinookSchema.PNG "Chinook schema")
 
