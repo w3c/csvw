@@ -1,10 +1,31 @@
 @prefix schema: <http://schema.org/> .
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
 @prefix rr: <http://www.w3.org/ns/r2rml#>.
 @prefix rml: <http://semweb.mmlab.be/ns/rml#> .
 @prefix ql: <http://semweb.mmlab.be/ns/ql#> .
-@prefix crm: <http://www.cidoc-crm.org/cidoc-crm/> .
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# CSV fields are: Name, StartDate, location_name, location_address, ticket_url
+
+<#myCSV> rml:source "https://raw.githubusercontent.com/w3c/csvw/gh-pages/examples/tests/scenarios/events/source/events-listing.csv"; rml:referenceFormulation ql:CSV .
+
+<#MusicEvent>
+  rml:logicalSource <#myCSV>;
+  rr:subjectMap [ rr:termType rr:BlankNode; rr:class schema:MusicEvent; ];
+  rr:predicateObjectMap [ rr:predicate schema:name; rr:objectMap [ rml:reference "Name"; ] ];
+  rr:predicateObjectMap [ rr:predicate schema:startDate; rr:objectMap [ rml:reference "StartDate";  rr:datatype schema:Date; ]  ];
+  rr:predicateObjectMap [ rr:predicate schema:location;  rr:objectMap [ rr:parentTriplesMap <#Place> ]  ];
+  rr:predicateObjectMap [ rr:predicate schema:offers; rr:objectMap [ rr:parentTriplesMap <#Offer> ] ] .
+
+<#Place>
+  rml:logicalSource <#myCSV>;
+  rr:subjectMap [ rr:termType rr:BlankNode;  rr:class schema:Place; ];
+  rr:predicateObjectMap [ rr:predicate schema:address; rr:objectMap [  rml:reference "location_address"; ] ];
+  rr:predicateObjectMap [  rr:predicate schema:name; rr:objectMap [ rml:reference "location_name"; ] ] .
+
+<#Offer>
+  rml:logicalSource <#myCSV>;
+  rr:subjectMap [ rr:termType rr:BlankNode;  rr:class schema:Offer; ];
+  rr:predicateObjectMap [  rr:predicate schema:url;  rr:objectMap [  rml:reference "ticket_url"; rr:termType rr:IRI; ]  ] .
+
 
 # TARGET TRIPLES:
 #
@@ -35,52 +56,3 @@
 # _:voy2QbB1nC <http://schema.org/url> <https://www.etix.com/ticket/1771656> .
 
 
-# Name, StartDate, location_name, location_address, ticket_url
-
-<#MusicEvent>
-  rr:subjectMap [ rr:termType rr:BlankNode; rr:class schema:MusicEvent; ];
-  rml:logicalSource [ rml:source "https://raw.githubusercontent.com/w3c/csvw/gh-pages/examples/tests/scenarios/events/source/events-listing.csv"; rml:referenceFormulation ql:CSV; ];
-
-  rr:predicateObjectMap [
-    rr:predicate schema:name;
-    rr:objectMap [ rml:reference "Name"; ]
-  ];
-
-  rr:predicateObjectMap [
-    rr:predicate schema:startDate;
-    rr:objectMap [ rml:reference "StartDate";  rr:datatype schema:Date; ]
-  ];
-
-  rr:predicateObjectMap [
-     rr:predicate schema:location;
-     rr:objectMap [ rr:parentTriplesMap <#Place> ]
-  ];
-
-  rr:predicateObjectMap [
-     rr:predicate schema:offers;
-     rr:objectMap [ rr:parentTriplesMap <#Offer> ]
-  ] .
-
-
-<#Place>
-  rr:subjectMap [ rr:termType rr:BlankNode;  rr:class schema:Place; ];
-  rml:logicalSource [ rml:source "https://raw.githubusercontent.com/w3c/csvw/gh-pages/examples/tests/scenarios/events/source/events-listing.csv"; rml:referenceFormulation ql:CSV; ];
-
-  rr:predicateObjectMap [
-    rr:predicate schema:address;
-    rr:objectMap [  rml:reference "location_address"; ]
-  ];
-
-  rr:predicateObjectMap [
-    rr:predicate schema:name;
-    rr:objectMap [ rml:reference "location_name"; ]
-  ] .
-
-
-<#Offer>
-  rr:subjectMap [ rr:termType rr:BlankNode;  rr:class schema:Offer; ];
-  rml:logicalSource [ rml:source "https://raw.githubusercontent.com/w3c/csvw/gh-pages/examples/tests/scenarios/events/source/events-listing.csv"; rml:referenceFormulation ql:CSV; ];
-  rr:predicateObjectMap [
-    rr:predicate schema:url;
-    rr:objectMap [  rml:reference "ticket_url"; rr:termType rr:IRI; ]
-  ] .
