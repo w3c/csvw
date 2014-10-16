@@ -32,19 +32,11 @@ DIR=$HOME/working/csv/git/csvw/examples/tests/scenarios/events/attempts/attempt-
 
 #### NOT NEEDED NOW. echo "$PATHINRML=$DIR/$CSVFILE" > $DIR/source.properties
 #### echo "!OVERWRITING $DIR/source.properties! contents:"
-####  cat "$DIR/source.properties"
 
+#### OLD:
 #### cd $RMLPROC; mvn exec:java -f $RMLPROC/pom.xml -e -Dexec.args="$DIR/$RMLFILE $DIR/$OUTFILE -sp $DIR/source.properties"
 
-echo mvn -e exec:java -Dexec.args="$DIR/$RMLFILE $DIR/$OUTFILE"
-cd $RMLPROC; mvn -e exec:java -Dexec.args="$DIR/$RMLFILE $DIR/$OUTFILE"
+## cd $RMLPROC; mvn -e exec:java -f $RMLPROC/pom.xml  -Dexec.args="$DIR/$RMLFILE $DIR/$OUTFILE"
 
-#### echo "!Cleaning $DIR/source.properties"
-#### rm $DIR/source.properties # obsolete
+cd $RMLPROC; mvn -e exec:java -f $RMLPROC/pom.xml  -Dexec.args="$DIR/$RMLFILE /tmp/helloworld.txt"
 
-
-# TODO
-# Remark: I changed the public RMLProcessor (development branch) to make it even simpler to run the mappings just by providing the mapping document (URL or local file) and the output file, 
-# for instance:
-
-#  mvn exec:java -Dexec.args="https://raw.githubusercontent.com/w3c/csvw/gh-pages/examples/tests/scenarios/chinook/attempts/attempt-1/chinook.rml.ttl /path/to/local/output/file/chinook.rml.nt"
