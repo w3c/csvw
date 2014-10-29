@@ -174,7 +174,7 @@ var respecConfig = {
           <li><dfn title="cell value">value</dfn> &mdash; the semantic value of the cell; within the core tabular data model (with no other metadata available) this is either a string which is the same as the <a>string value</a> of the cell, or <code>null</code>, if the <a>string value</a> is an empty string</li>
         </ul>
         <p class="issue">
-          Should an empty string value always count as a <code>null</code> semantic value within the core data model (ie when there is no other metadata telling the processor how to interpret that value), or should the semantic value be an empty string?
+          Should an empty string value always count as a <code>null</code> semantic value within the core data model (ie when there is no other metadata telling the processor how to interpret that value), or should the semantic value be an empty string? <a href="https://github.com/w3c/csvw/issues/40">GitHub ></a>
         </p>
         <p class="note">
           There presence or absence of quotes around a value within a CSV file is a syntactic detail that is not reflected in the tabular data model. In other words, there is no distinction in the model between the second value in <code>a,,z</code> and the second value in <code>a,"",z</code>.
@@ -217,7 +217,7 @@ var respecConfig = {
           The <a title="cell value">value</a> of an <a>annotated cell</a> MAY be of a datatype other than a string. For example, annotations might enable a processor to understand the <a>string value</a> of the cell as representing a number or a date.
         </p>
         <p class="issue">
-          The permitted types of names and values of annotations need to be spelled out here.
+          The permitted types of names and values of annotations need to be spelled out here. <a href="https://github.com/w3c/csvw/issues/41">GitHub ></a>
         </p>
       </section>
       <section>
@@ -250,7 +250,6 @@ var respecConfig = {
       <ol>
         <li>metadata supplied by the user of the implementation that is processing the tabular data, see <a href="#overriding-metadata" class="sectionRef"></a></li>
         <li>metadata embedded within the tabular data file itself, see <a href="#embedded-metadata" class="sectionRef"></a></li>
-        <li>metadata within a package that the tabular data file belongs to, see <a href="#package" class="sectionRef"></a></li>
         <li>metadata in a document linked to using a <code>Link</code> header associated with the tabular data file, see <a href="#link-header" class="sectionRef"></a></li>
         <li>file-specific metadata in a document located based on the location of the tabular data file, see <a href="#standard-file-metadata" class="sectionRef"></a></li>
         <li>directory-specific metadata in a document located based on the location of the tabular data file, see <a href="#standard-directory-metadata" class="sectionRef"></a></li>
@@ -259,7 +258,7 @@ var respecConfig = {
         Processors MUST attempt to locate a metadata document based on each of these locations in order, and use first metadata document that is successfully located in this way.
       </p>
       <p class="issue">
-        What should processors do if they have been passed a metadata file and located a CSV file from that metadata file. Should they still check for metadata files related specifically to the CSV file itself? For example, say that an application has been pointed at a metadata file at <code>http://example.org/metadata.json</code> which references <code>http://example.org/toilets.csv</code> but there is also a metadata file at <code>http://example.org/toilets.csv-metadata.json</code>. If the processor had been originally pointed to <code>http://example.org/toilets.csv</code> then it would have located the file-specific metadata at <code>http://example.org/toilets.csv-metadata.json</code>, but coming via <code>http://example.org/metadata.json</code> means that file-specific metadata is skipped.
+        What should processors do if they have been passed a metadata file and located a CSV file from that metadata file. Should they still check for metadata files related specifically to the CSV file itself? For example, say that an application has been pointed at a metadata file at <code>http://example.org/metadata.json</code> which references <code>http://example.org/toilets.csv</code> but there is also a metadata file at <code>http://example.org/toilets.csv-metadata.json</code>. If the processor had been originally pointed to <code>http://example.org/toilets.csv</code> then it would have located the file-specific metadata at <code>http://example.org/toilets.csv-metadata.json</code>, but coming via <code>http://example.org/metadata.json</code> means that file-specific metadata is skipped. <a href="https://github.com/w3c/csvw/issues/42">GitHub ></a>
       </p>
       <section>
         <h3>Overriding Metadata</h3>
@@ -270,22 +269,7 @@ var respecConfig = {
       <section>
         <h3>Embedded Metadata</h3>
         <p>
-          Most syntaxes for tabular data provide a facility for embedding some metadata within the tabular data file itself. The definition of a syntax for tabular data SHOULD include a description of how the syntax maps to an annotated data model.
-        </p>
-        <p>
-          The first line of a CSV+ file MUST be processed as a header line unless the CSV+ file is served with a <code>header=absent</code> parameter on the media type. Each cell in the header line that includes non-whitespace characters provides a <strong>title</strong> annotation on the column in which it appears.
-        </p>
-        <p class="issue">
-          The <strong>title</strong> annotation needs to be linked to the relevant annotation in the metadata vocabulary.
-        </p>
-      </section>
-      <section>
-        <h3>Package</h3>
-        <p>
-          Tabular data files may be published within a package alongside other relevant tabular data files and metadata about those files. This specification does not place any constraints on the packaging format that is used or on those that processors should support.
-        </p>
-        <p class="issue">
-          What expectations should we place on the unpackaged directory structure? For example, must it contain a <code>metadata.json</code> file at its root? Might it include other metadata files (eg file-specific ones) and if so how should they be used?
+          Most syntaxes for tabular data provide a facility for embedding some metadata within the tabular data file itself. The definition of a syntax for tabular data SHOULD include a description of how the syntax maps to an annotated data model. See <a href="#parsing-tabular-data" class="sectionRef"></a> for a description of this for CSV files.
         </p>
       </section>
       <section>
@@ -294,7 +278,7 @@ var respecConfig = {
           When retrieving a tabular data file via HTTP, the response MAY include a <code>Link</code> header with <code>rel=describedby</code> and <code>type=application/csv-metadata+json</code> that points to a metadata file that describes the tabular data file. If, by inspection, the referenced file is not a valid metadata file then it MUST be ignored. If there is more than one valid metadata file linked to through multiple <code>Link</code> headers, then the metadata referenced by <code>Link</code> headers that appear later in the response are used in preference to those referenced by earlier <code>Link</code> headers.
         </p>
         <p class="issue">
-          Suggest that we drop the requirement to ignore invalid metadata files, given that the correct metadata file should be identified through the type of the link.
+          Suggest that we drop the requirement to ignore invalid metadata files, given that the correct metadata file should be identified through the type of the link. <a href="https://github.com/w3c/csvw/issues/43">GitHub ></a>
         </p>
       </section>
       <section>
@@ -360,6 +344,9 @@ Content-Type: text/csv;charset=ISO-8859-1
           <p>
             Do we have a strong reason to specify a default charset? Should we be defining <code>application/csv</code> instead, to avoid doing unrecommended things with a <code>text/*</code> media type.
           </p>
+          <p>
+            <a href="https://github.com/w3c/csvw/issues/44">GitHub ></a>
+          </p>
         </div>
       </section>
       <section id="line-endings">
@@ -373,6 +360,9 @@ Content-Type: text/csv;charset=ISO-8859-1
           </p>
           <p>
             Should we be defining <code>application/csv</code> instead, to prevent having to adhere to this rule, or should we stick to the <code>CRLF</code> rule?
+          </p>
+          <p>
+            <a href="https://github.com/w3c/csvw/issues/45">GitHub ></a>
           </p>
         </div>
       </section>
@@ -600,6 +590,9 @@ Content-Type: text/csv;header=absent
             <p>
               We invite comment on the best way to approach bidirectionality in CSV files.
             </p>
+            <p>
+              <a href="https://github.com/w3c/csvw/issues/46">GitHub ></a>
+            </p>
           </div>
         </section>
       </section>
@@ -659,6 +652,9 @@ Content-Type: text/csv;header=absent
           <li>always trim whitespace around cells?</li>
           <li>always create empty cells for missing cells?</li>
         </ul>
+        <p>
+          <a href="https://github.com/w3c/csvw/issues/47">GitHub ></a>
+        </p>
       </div>
       <p>
         The algorithm for parsing a document containing tabular data is as follows:
