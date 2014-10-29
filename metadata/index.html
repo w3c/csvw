@@ -197,51 +197,51 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         The metadata defined in this specification is used to annotate an existing <a href="http://w3c.github.io/csvw/syntax/#dfn-annotated-table">annotated table</a> as defined in [[!tabular-data-model]]. Annotated tables form the basis for all further processing, such as validating or displaying the table. All compliant applications MUST create annotated tables based on the algorithm defined here.
       </p>
       <p>
-        Metadata documents contain descriptions of tables, columns, rows, cells and regions which are used to create annotations. There are two types of description objects:
+        Metadata documents contain descriptions of tables, columns, rows, cells and regions which are used to create annotations on a tabular data model. There are two types of description objects:
       </p>
       <ul>
-        <li>descriptions that appear within a schema, and that may apply across multiple tabular data files</li>
-        <li>descriptions of particular tables, columns, rows, cells and regions within a single tabular data file</li>
+        <li>descriptions that appear within a schema, and that may apply across multiple tabular data files &mdash; these are used to describe the general structure of a tabular data file</li>
+        <li>descriptions of particular tables, columns, rows, cells and regions within a single tabular data file &mdash; these are used for notes or flags on particular data</li>
       </ul>
       <p>
         The description objects themselves contain a number of properties. These are:
       </p>
       <ul>
-        <li>properties that are used to identify the table, column, row or cell that the annotations should appear on; these match up to properties on those objects in the core tabular data model defined in [[!tabular-data-model]] and do not form additional annotations</li>
+        <li>properties that are used to identify the table or column that the annotations should appear on; these match up to properties on those objects in the core tabular data model defined in [[!tabular-data-model]] and do not form additional annotations</li>
         <li>properties that map directly to annotations that appear directly on the table, column, row or cell whose description they appear on, such as the <code>name</code> of a column or the <code>dc:provenance</code> of a table</li>
-        <li>properties that are specified on the description of a table, column or row to provide a default value for the equivalent annotation on each of the cells that appear in that table, column or row</li>
+        <li>properties that are specified on the description of a table or column to provide a default value for the equivalent annotation on each of the cells that appear in that table or column</li>
       </ul>
       <p>
         For example, in the <a>column description</a>
       </p>
       <pre class="example highlight">
 {
-"name": "inventory-date",
-"title": "Inventory Date",
-"dc:description": "The date of the operation that was performed.",
-"datatype": "date",
-"format": "M/D/YYYY"
+  "name": "inventory-date",
+  "title": "Inventory Date",
+  "dc:description": "The date of the operation that was performed.",
+  "datatype": "date",
+  "format": "M/D/YYYY"
 }
       </pre>
       <p>
         the properties <code>name</code>, <code>title</code> and <code>dc:description</code> are <a title="direct annotation">direct annotations</a> that become <code>name</code>, <code>title</code> and <code>dc:description</code> properties on the column in the data model. The <code>datatype</code> and <code>format</code> properties are <a title="inherited property">inherited properties</a> that become <code>datatype</code> and <code>format</code> properties on the cells within the column.
       </p>
       <section>
-        <h4>Direct Annotations</h4>
+        <h3>Direct Annotations</h3>
         <p>
           <dfn title="direct annotation">Direct annotations</dfn> are properties on the description object for a given table, column, row or cell which map directly to properties on the described table, column, row or cell. The name of the annotation is the same as the name of the property on the annotation. The value of the annotation is the same as the value of the property on the description object.
         </p>
       </section>
       <section>
-        <h4>Inherited Properties</h4>
+        <h3>Inherited Properties</h3>
         <p>
-          A cell may be assigned annotations based on properties on the description objects for the table, column or row that it appears in. These properties are known as <dfn title="inherited property">inherited properties</dfn> and are listed in <a href="#cells" class="sectionRef"></a>. To ascertain a value for these annotations, an application MUST identify the relevant property in the descriptions of the table, column and row.
+          A cell may be assigned annotations based on properties on the description objects for the table, column or row that it appears in. These properties are known as <dfn title="inherited property">inherited properties</dfn> and are listed in <a href="#cells" class="sectionRef"></a>. To ascertain a value for these annotations, an application MUST identify the relevant property in the descriptions of the table or column.
         </p>
         <p>
-          Applications MUST raise an error if the value of a property in a column or row description is not <a>compatible with</a> the value of that property on the table. Applications MUST raise an error if the value of a property on a row is not <a>compatible with</a> the values of that property on all the columns in the table. Application MUST raise an error if the value of a property on a cell is not <a>compatible with</a> the values of that property on both the column and the row that the cell is associated with.
+          Applications MUST raise an error if the value of a property in a column description is not <a>compatible with</a> the value of that property on the table. Applications MUST raise an error if the value of a property on a cell is not <a>compatible with</a> the values of that property on the column that the cell is associated with.
         </p>
         <p>
-          A value for a cell, column or row is <dfn>compatible with</dfn> with a value on a row, column or table if they are the same value or if the first value is a sub-value of the second value. The definitions of individual inherited properties indicate what values count as sub-values of others.
+          A value for a cell or column is <dfn>compatible with</dfn> with a value on a column or table if they are the same value or if the first value is a sub-value of the second value. The definitions of individual inherited properties indicate what values count as sub-values of others.
         </p>
       </section>
     </section>
@@ -441,7 +441,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           <dt><code>@language</code></dt>
           <dd>
             <p>
-              indicates the default language for the values of properties in the metadata document; if present, its value MUST be a language code [[!RFC3066]] which is the <dfn>default language</dfn> for the values of other properties in the metadata document
+              indicates the default language for the values of properties in the metadata document; if present, its value MUST be a language code [[!BCP47]] which is the <dfn>default language</dfn> for the values of other properties in the metadata document
             </p>
             <p class="note">
               Note that the <code>@language</code> property of the <code>@context</code> object, which gives the default language used within the metadata file, is distinct from the <code>language</code> property on a <a>description object</a>, which gives the language used in the data within a table or column.
@@ -843,9 +843,6 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             If included, <code>@type</code> MUST be set to <code>"Schema"</code>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.
           </dd>
         </dl>
-        <p class="issue">
-          Is it useful to define things about rows or cells within a schema or should it only contain descriptions of columns?
-        </p>
         <p>
           The description MAY contain any common properties as defined in <a href="#common-properties" class="sectionRef"></a> to provide extra metadata about the schema as a whole.
         </p>
@@ -916,371 +913,303 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         </section>
       </section>
       <section>
-        <h3>Rows</h3>
+        <h2>Inherited Properties</h2>
         <p>
-          Rows can be described using row <a title="description object">description objects</a>. A row description object is a JSON object within a metadata file that includes properties that describe an individual row.
+          Cell descriptions may override <a title="inherited property">inherited properties</a>, as described in <a href="#annotating-tables" class="sectionRef"></a>. It is good practice to define these properties on columns, so that all cells within a given column are handled in the same way, or on tables if appropriate. These properties are:
         </p>
+        <dl>
+          <dt id="cell-empty-value"><code>null</code></dt>
+          <dd>
+            <p>
+              The string used for null values. If not specified, the default for this is the empty string.
+            </p>
+          </dd>
+          <dt id="cell-language"><code>language</code></dt>
+          <dd>
+            <p>
+              A language code as defined by [[!BCP47]]. Indicates the language of the value within the cell.
+            </p>
+          </dd>
+          <dt id="cell-text-direction"><code>text-direction</code></dt>
+          <dd>
+            <p>
+              One of <code>"rtl"</code> or <code>"ltr"</code> (the default). Indicates whether the text within cells should be displayed by default as left-to-right or right-to-left text. See <a href="#bidirectional-tables" class="sectionRef"></a> for more details.
+            </p>
+          </dd>
+          <dt id="cell-separator"><code>separator</code></dt>
+          <dd>
+            <p>
+              The character used to separate items in the string value of the cell. If <code>null</code> or unspecified, the cell does not contain a list. Otherwise, application MUST split the string value of the cell on the specified separator character and parse each of the resulting strings separately. The cell's value will then be a list. Conversion specifications MUST use the separator to determine the conversion of a cell into the target format. See <a href="#parsing-cells"></a> for more details.
+            </p>
+          </dd>
+          <dt id="cell-format"><code>format</code></dt>
+          <dd>
+            <p>
+              A definition of the format of the cell, used when parsing the cell as described in <a href="#parsing-cells"></a>.
+            </p>
+          </dd>
+          <dt id="cell-datatype"><code>datatype</code></dt>
+          <dd>
+            <p>
+              The main datatype of the values of the cell. If the cell contains a list (ie <code>separator</code> is specified and not <code>null</code>) then this is the datatype of each value within the list. Conversion specifications MUST use the datatype of the value to determine the conversion of a cell into the target format. See <a href="#datatypes"></a> for more details.
+            </p>
+          </dd>
+          <dt id="cell-length"><code>length</code></dt>
+          <dd>
+            <p>
+              The exact length of the value of the cell. See <a href="#length-constraints" class="sectionRef"></a> for details.
+            </p>
+          </dd>
+          <dt id="cell-minLength"><code>minLength</code></dt>
+          <dd>
+            <p>
+              The minimum length of the value of the cell. See <a href="#length-constraints" class="sectionRef"></a> for details.
+            </p>
+          </dd>
+          <dt id="cell-maxLength"><code>maxLength</code></dt>
+          <dd>
+            <p>
+              The maximum length of the value of the cell. See <a href="#length-constraints" class="sectionRef"></a> for details.
+            </p>
+          </dd>
+          <dt id="cell-minimum"><code>minimum</code></dt>
+          <dd>
+            <p>
+              The minimum value for the cell (inclusive); equivalent to <code>minInclusive</code>. See <a href="#value-constraints" class="sectionRef"></a> for details.
+            </p>
+          </dd>
+          <dt id="cell-maximum"><code>maximum</code></dt>
+          <dd>
+            <p>
+              The maximum value for the cell (inclusive); equivalent to <code>maxInclusive</code>. See <a href="#value-constraints" class="sectionRef"></a> for details.
+            </p>
+          </dd>
+          <dt id="cell-minInclusive"><code>minInclusive</code></dt>
+          <dd>
+            <p>
+              The minimum value for the cell (inclusive). See <a href="#value-constraints" class="sectionRef"></a> for details.
+            </p>
+          </dd>
+          <dt id="cell-maxInclusive"><code>maxInclusive</code></dt>
+          <dd>
+            <p>
+              The maximum value for the cell (inclusive). See <a href="#value-constraints" class="sectionRef"></a> for details.
+            </p>
+          </dd>
+          <dt id="cell-minExclusive"><code>minExclusive</code></dt>
+          <dd>
+            <p>
+              The minimum value for the cell (exclusive). See <a href="#value-constraints" class="sectionRef"></a> for details.
+            </p>
+          </dd>
+          <dt id="cell-maxExclusive"><code>maxExclusive</code></dt>
+          <dd>
+            <p>
+              The maximum value for the cell (exclusive). See <a href="#value-constraints" class="sectionRef"></a> for details.
+            </p>
+          </dd>
+        </dl>
+      </section>
+      <section>
+        <h2>Datatypes</h2>
+        <p>
+          Cells within tables may be annotated with a <code>datatype</code> which indicates the type of the value obtained by parsing the value of the cell. The format expected in the cell is determined by the <code>format</code> annotation, if there is one, or uses a default format determined by the type.
+        </p>
+        <p>
+          The possible datatypes are:
+        </p>
+        <ul>
+          <li>
+            <p>the datatypes defined in [[!xmlschema-2]] with the exception of those that rely on XML mechanisms for definition, namely:</p>
+            <ul>
+              <li><code>anySimpleType</code></li>
+              <li><code>string</code>; a sub-value of <code>anySimpleType</code></li>
+              <li><code>normalizedString</code>; a sub-value of <code>string</code></li>
+              <li><code>token</code>; a sub-value of <code>normalizedString</code></li>
+              <li><code>language</code>; a sub-value of <code>token</code></li>
+              <li><code>Name</code>; a sub-value of <code>token</code></li>
+              <li><code>NCName</code>; a sub-value of <code>Name</code></li>
+              <li><code>boolean</code>; a sub-value of <code>anySimpleType</code></li>
+              <li><code>decimal</code>; a sub-value of <code>anySimpleType</code></li>
+              <li><code>integer</code>; a sub-value of <code>decimal</code></li>
+              <li><code>nonPositiveInteger</code>; a sub-value of <code>integer</code></li>
+              <li><code>negativeInteger</code>; a sub-value of <code>nonPositiveInteger</code></li>
+              <li><code>long</code>; a sub-value of <code>integer</code></li>
+              <li><code>int</code>; a sub-value of <code>long</code></li>
+              <li><code>short</code>; a sub-value of <code>int</code></li>
+              <li><code>byte</code>; a sub-value of <code>short</code></li>
+              <li><code>nonNegativeInteger</code>; a sub-value of <code>integer</code></li>
+              <li><code>unsignedLong</code>; a sub-value of <code>nonNegativeInteger</code></li>
+              <li><code>unsignedInt</code>; a sub-value of <code>unsignedLong</code></li>
+              <li><code>unsignedShort</code>; a sub-value of <code>unsignedInt</code></li>
+              <li><code>unsignedByte</code>; a sub-value of <code>unsignedShort</code></li>
+              <li><code>positiveInteger</code>; a sub-value of <code>nonNegativeInteger</code></li>
+              <li><code>float</code>; a sub-value of <code>anySimpleType</code></li>
+              <li><code>double</code>; a sub-value of <code>anySimpleType</code></li>
+              <li><code>duration</code>; a sub-value of <code>anySimpleType</code></li>
+              <li><code>dateTime</code>; a sub-value of <code>anySimpleType</code></li>
+              <li><code>time</code>; a sub-value of <code>anySimpleType</code></li>
+              <li><code>date</code>; a sub-value of <code>anySimpleType</code></li>
+              <li><code>gYearMonth</code>; a sub-value of <code>anySimpleType</code></li>
+              <li><code>gYear</code>; a sub-value of <code>anySimpleType</code></li>
+              <li><code>gMonthDay</code>; a sub-value of <code>anySimpleType</code></li>
+              <li><code>gDay</code>; a sub-value of <code>anySimpleType</code></li>
+              <li><code>gMonth</code>; a sub-value of <code>anySimpleType</code></li>
+              <li><code>hexBinary</code>; a sub-value of <code>anySimpleType</code></li>
+              <li><code>base64Binary</code>; a sub-value of <code>anySimpleType</code></li>
+              <li><code>anyURI</code>; a sub-value of <code>anySimpleType</code></li>
+            </ul>
+          </li>
+          <li>the datatype <code>number</code> which is exactly equivalent to <code>double</code></li>
+          <li>the datatype <code>binary</code> which is exactly equivalent to <code>base64Binary</code></li>
+          <li>the datatype <code>datetime</code> which is exactly equivalent to <code>dateTime</code></li>
+          <li>the datatype <code>any</code> which is exactly equivalent to <code>anySimpleType</code></li>
+          <li>the datatype <code>xml</code> which indicates the cell contains an XML fragment</li>
+          <li>the datatype <code>html</code> which indicates the cell contains an HTML fragment</li>
+          <li>the datatype <code>json</code> which indicates the cell contains a JSON value</li>
+          <li>the datatype <code>object</code> which indicates the cell contains a JSON object; a sub-value of <code>json</code></li>
+          <li>the datatype <code>array</code> which indicates the cell contains a JSON array; a sub-value of <code>json</code></li>
+        </ul>
         <section>
-          <h4>Required Properties</h4>
+          <h3>Length Constraints</h3>
           <p>
-            The following properties MUST appear on a row description:
+            The <code>length</code>, <code>minLength</code> and <code>maxLength</code> properties indicate the exact, minimum and maximum lengths of the values of cells.
           </p>
-          <dl>
-            <dt><code>row</code></dt>
-            <dd>an integer; the number of the row the description object describes</dd>
-          </dl>
+          <p>
+            Applications MUST raise an error if both <code>length</code> and <code>minLength</code> are specified and they do not have the same value. Similarly, applications MUST raise an error if both <code>length</code> and <code>maxLength</code> are specified and they do not have the same value. Applications MUST raise an error if <code>length</code>, <code>maxLength</code> or <code>minLength</code> are specified and the cell value is not a list (ie <code>separator</code> is not specified), a string or one of its subtypes, or a binary value.
+          </p>
+          <p>
+            The length of a value of a cell is determined as follows:
+          </p>
+          <ul>
+            <li>if the cell is <code>null</code> its length is zero</li>
+            <li>if the value is a list, its length is the number of items in the list</li>
+            <li>if the value is a string or one of its subtypes, its length is the number of characters in the value</li>
+            <li>if the value is of a binary type, its length is the number of bytes in the binary value</li>
+          </ul>
         </section>
         <section>
-          <h4>Optional Properties</h4>
-          <dl>
-            <dt id="row-ld-type"><code>@type</code></dt>
-            <dd>
-              <p>
-                If included, <code>@type</code> MUST be set to <code>"Row"</code>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.
-              </p>
-            </dd>
-          </dl>
+          <h3>Value Constraints</h3>
           <p>
-            The description MAY contain any common properties as defined in <a href="#common-properties" class="sectionRef"></a> to provide extra metadata about the row as a whole (common across all tabular data that shares the schema), such as a full description.
+            The <code>minimum</code>, <code>maximum</code>, <code>minInclusive</code>, <code>maxInclusive</code>, <code>minExclusive</code> and <code>maxExclusive</code> properties indicate limits on the values of cells. These apply to numeric and date/time types. The <code>minimum</code> property is equivalent to the <code>minInclusive</code> property and the <code>maximum</code> property is equivalent to the <code>maxInclusive</code> property.
           </p>
           <p>
-            The description MAY contain any of the <a title="inherited property">inherited properties</a> defined for cells in <a href="#inherited-properties" class="sectionRef"></a>.
+            Validation against these properties is as defined in [[!xmlschema-2]].
           </p>
         </section>
       </section>
       <section>
-        <h3>Cells</h3>
+        <h2>Parsing cells</h2>
         <p>
-          Cells can be described using cell <a title="description object">description objects</a>. A cell description object is a JSON object within a metadata file that includes properties that describe an individual cell.
+          Unlike many other data formats, tabular data is designed to be read by humans. For that reason, it's common for data to be represented within tabular data in a human-readable way. The <code>separator</code> and <code>format</code> properties indicates the format used to represent data within the table. This is used:
         </p>
+        <ul>
+          <li>by <strong>validators</strong> to check that the data in the table is in the expected format</li>
+          <li>by <strong>converters</strong> to parse the values before mapping them into values in the target of the conversion</li>
+          <li>when <strong>displaying</strong> data, to map it into formats that are meaningful for those viewing the data (as opposed to those publishing it)</li>
+          <li>when <strong>inputting</strong> data, to turn entered values into representations in a consistent format</li>
+        </ul>
+        <p>
+          The process of parsing the string value of a cell into a single value or a list of values is as follows:
+        </p>
+        <ol>
+          <li>unless the <code>datatype</code> is <code>string</code> or <code>anySimpleType</code> or <code>any</code>, strip leading and trailing whitespace from the value</li>
+          <li>if the value is the same as the <code>null</code> value, then the value is <code>null</code></li>
+          <li>if the <code>separator</code> property is not <code>null</code>, create a list of values by splitting the string at the character specified by the <code>separator</code> property</li>
+          <li>validate the value(s) against the <code>format</code>, if one is specified, as described below; raise an error if any of the values do not match the specified format</li>
+          <li>parse the value(s) using the <code>format</code>, as described below</li>
+        </ol>
         <section>
-          <h4>Required Properties</h4>
+          <h3>Formats for strings</h3>
           <p>
-            The following properties MUST appear on a cell description:
+            If the <code>datatype</code> is a string type, the <code>format</code> property provides a regular expression for the string values, in the syntax defined by [[!ECMASCRIPT]].
           </p>
-          <dl>
-            <dt><code>row</code></dt>
-            <dd>an integer; the number of the row on which the cell appears</dd>
-            <dt><code>column</code></dt>
-            <dd>an integer; the number of the column on which the cell appears</dd>
-          </dl>
-       </section>
-        <section>
-          <h4>Optional Properties</h4>
-          <dl>
-            <dt id="cell-ld-type"><code>@type</code></dt>
-            <dd>
-              <p>
-                If included, <code>@type</code> MUST be set to <code>"Cell"</code>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.
-              </p>
-            </dd>
-          </dl>
-          <p>
-            The description MAY contain any common properties as defined in <a href="#common-properties" class="sectionRef"></a> to provide extra metadata about the cell (common across all tabular data that shares the schema), such as a full description.
-          </p>
-          <p>
-            The description MAY contain any of the <a title="inherited property">inherited properties</a> defined for cells in <a href="#inherited-properties" class="sectionRef"></a>.
+          <p class="issue">
+            We invite comment about which reference to use for regular expression syntax. Other possibilities are to use that defined by XML Schema or XPath.
           </p>
         </section>
         <section>
-          <h4>Inherited Properties</h4>
+          <h3>Formats for numeric types</h3>
           <p>
-            Cell descriptions may override <a title="inherited property">inherited properties</a>, as described in <a href="#annotating-tables" class="sectionRef"></a>. It is good practice to define these properties on columns, so that all cells within a given column are handled in the same way, or on tables if appropriate. These properties are:
+            It is not uncommon for numbers within tabular data to be formatted for human consumption, which may involve using commas for decimal points, grouping digits in the number using commas, or adding currency symbols or percent signs to the number.
           </p>
-          <dl>
-            <dt id="cell-empty-value"><code>null</code></dt>
-            <dd>
-              <p>
-                The string used for null values. If not specified, the default for this is the empty string.
-              </p>
-            </dd>
-            <dt id="cell-language"><code>language</code></dt>
-            <dd>
-              <p>
-                A language code as defined by [[!BCP47]]. Indicates the language of the value within the cell.
-              </p>
-            </dd>
-            <dt id="cell-text-direction"><code>text-direction</code></dt>
-            <dd>
-              <p>
-                One of <code>"rtl"</code> or <code>"ltr"</code> (the default). Indicates whether the text within cells should be displayed by default as left-to-right or right-to-left text. See <a href="#bidirectional-tables" class="sectionRef"></a> for more details.
-              </p>
-            </dd>
-            <dt id="cell-separator"><code>separator</code></dt>
-            <dd>
-              <p>
-                The character used to separate items in the string value of the cell. If <code>null</code> or unspecified, the cell does not contain a list. Otherwise, application MUST split the string value of the cell on the specified separator character and parse each of the resulting strings separately. The cell's value will then be a list. Conversion specifications MUST use the separator to determine the conversion of a cell into the target format. See <a href="#parsing-cells"></a> for more details.
-              </p>
-            </dd>
-            <dt id="cell-format"><code>format</code></dt>
-            <dd>
-              <p>
-                A definition of the format of the cell, used when parsing the cell as described in <a href="#parsing-cells"></a>.
-              </p>
-            </dd>
-            <dt id="cell-datatype"><code>datatype</code></dt>
-            <dd>
-              <p>
-                The main datatype of the values of the cell. If the cell contains a list (ie <code>separator</code> is specified and not <code>null</code>) then this is the datatype of each value within the list. Conversion specifications MUST use the datatype of the value to determine the conversion of a cell into the target format. See <a href="#datatypes"></a> for more details.
-              </p>
-            </dd>
-            <dt id="cell-length"><code>length</code></dt>
-            <dd>
-              <p>
-                The exact length of the value of the cell. See <a href="#length-constraints" class="sectionRef"></a> for details.
-              </p>
-            </dd>
-            <dt id="cell-minLength"><code>minLength</code></dt>
-            <dd>
-              <p>
-                The minimum length of the value of the cell. See <a href="#length-constraints" class="sectionRef"></a> for details.
-              </p>
-            </dd>
-            <dt id="cell-maxLength"><code>maxLength</code></dt>
-            <dd>
-              <p>
-                The maximum length of the value of the cell. See <a href="#length-constraints" class="sectionRef"></a> for details.
-              </p>
-            </dd>
-            <dt id="cell-minimum"><code>minimum</code></dt>
-            <dd>
-              <p>
-                The minimum value for the cell (inclusive); equivalent to <code>minInclusive</code>. See <a href="#value-constraints" class="sectionRef"></a> for details.
-              </p>
-            </dd>
-            <dt id="cell-maximum"><code>maximum</code></dt>
-            <dd>
-              <p>
-                The maximum value for the cell (inclusive); equivalent to <code>maxInclusive</code>. See <a href="#value-constraints" class="sectionRef"></a> for details.
-              </p>
-            </dd>
-            <dt id="cell-minInclusive"><code>minInclusive</code></dt>
-            <dd>
-              <p>
-                The minimum value for the cell (inclusive). See <a href="#value-constraints" class="sectionRef"></a> for details.
-              </p>
-            </dd>
-            <dt id="cell-maxInclusive"><code>maxInclusive</code></dt>
-            <dd>
-              <p>
-                The maximum value for the cell (inclusive). See <a href="#value-constraints" class="sectionRef"></a> for details.
-              </p>
-            </dd>
-            <dt id="cell-minExclusive"><code>minExclusive</code></dt>
-            <dd>
-              <p>
-                The minimum value for the cell (exclusive). See <a href="#value-constraints" class="sectionRef"></a> for details.
-              </p>
-            </dd>
-            <dt id="cell-maxExclusive"><code>maxExclusive</code></dt>
-            <dd>
-              <p>
-                The maximum value for the cell (exclusive). See <a href="#value-constraints" class="sectionRef"></a> for details.
-              </p>
-            </dd>
-          </dl>
+          <p>
+            If the <code>datatype</code> is a numeric type, the <code>format</code> property indicates the expected format for that number. Validators MUST check that the numbers in the column adhere to the specified format. Converters MUST use the <code>format</code> property to parse the number when mapping it into a suitable type in the target language of the conversion.
+          </p>
+          <p>
+            When the <code>datatype</code> is a numeric type, the <code>format</code> property's value MUST be a number format as specified in [[!xslt-21]].
+          </p>
+          <p class="issue">
+            We invite comment on the best format to specify how to parse numbers.
+          </p>
         </section>
         <section>
-          <h3>Datatypes</h3>
+          <h3>Formats for booleans</h3>
           <p>
-            Cells within tables may be annotated with a <code>datatype</code> which indicates the type of the value obtained by parsing the value of the cell. The format expected in the cell is determined by the <code>format</code> annotation, if there is one, or uses a default format determined by the type.
+            Boolean values may be represented in many ways aside from the standard <code>1</code> and <code>0</code> or <code>true</code> and <code>false</code>.
           </p>
           <p>
-            The possible datatypes are:
+            If the <code>datatype</code> is <code>boolean</code>, the <code>format</code> property provides the true and false values expected, separated by <code>|</code>. For example if <code>format</code> is <code>Y|N</code> then cells must hold either <code>Y</code> or <code>N</code> with <code>Y</code> meaning <code>true</code> and <code>N</code> meaning <code>false</code>.
           </p>
-          <ul>
-            <li>
-              <p>the datatypes defined in [[!xmlschema-2]] with the exception of those that rely on XML mechanisms for definition, namely:</p>
-              <ul>
-                <li><code>anySimpleType</code></li>
-                <li><code>string</code>; a sub-value of <code>anySimpleType</code></li>
-                <li><code>normalizedString</code>; a sub-value of <code>string</code></li>
-                <li><code>token</code>; a sub-value of <code>normalizedString</code></li>
-                <li><code>language</code>; a sub-value of <code>token</code></li>
-                <li><code>Name</code>; a sub-value of <code>token</code></li>
-                <li><code>NCName</code>; a sub-value of <code>Name</code></li>
-                <li><code>boolean</code>; a sub-value of <code>anySimpleType</code></li>
-                <li><code>decimal</code>; a sub-value of <code>anySimpleType</code></li>
-                <li><code>integer</code>; a sub-value of <code>decimal</code></li>
-                <li><code>nonPositiveInteger</code>; a sub-value of <code>integer</code></li>
-                <li><code>negativeInteger</code>; a sub-value of <code>nonPositiveInteger</code></li>
-                <li><code>long</code>; a sub-value of <code>integer</code></li>
-                <li><code>int</code>; a sub-value of <code>long</code></li>
-                <li><code>short</code>; a sub-value of <code>int</code></li>
-                <li><code>byte</code>; a sub-value of <code>short</code></li>
-                <li><code>nonNegativeInteger</code>; a sub-value of <code>integer</code></li>
-                <li><code>unsignedLong</code>; a sub-value of <code>nonNegativeInteger</code></li>
-                <li><code>unsignedInt</code>; a sub-value of <code>unsignedLong</code></li>
-                <li><code>unsignedShort</code>; a sub-value of <code>unsignedInt</code></li>
-                <li><code>unsignedByte</code>; a sub-value of <code>unsignedShort</code></li>
-                <li><code>positiveInteger</code>; a sub-value of <code>nonNegativeInteger</code></li>
-                <li><code>float</code>; a sub-value of <code>anySimpleType</code></li>
-                <li><code>double</code>; a sub-value of <code>anySimpleType</code></li>
-                <li><code>duration</code>; a sub-value of <code>anySimpleType</code></li>
-                <li><code>dateTime</code>; a sub-value of <code>anySimpleType</code></li>
-                <li><code>time</code>; a sub-value of <code>anySimpleType</code></li>
-                <li><code>date</code>; a sub-value of <code>anySimpleType</code></li>
-                <li><code>gYearMonth</code>; a sub-value of <code>anySimpleType</code></li>
-                <li><code>gYear</code>; a sub-value of <code>anySimpleType</code></li>
-                <li><code>gMonthDay</code>; a sub-value of <code>anySimpleType</code></li>
-                <li><code>gDay</code>; a sub-value of <code>anySimpleType</code></li>
-                <li><code>gMonth</code>; a sub-value of <code>anySimpleType</code></li>
-                <li><code>hexBinary</code>; a sub-value of <code>anySimpleType</code></li>
-                <li><code>base64Binary</code>; a sub-value of <code>anySimpleType</code></li>
-                <li><code>anyURI</code>; a sub-value of <code>anySimpleType</code></li>
-              </ul>
-            </li>
-            <li>the datatype <code>number</code> which is exactly equivalent to <code>double</code></li>
-            <li>the datatype <code>binary</code> which is exactly equivalent to <code>base64Binary</code></li>
-            <li>the datatype <code>datetime</code> which is exactly equivalent to <code>dateTime</code></li>
-            <li>the datatype <code>any</code> which is exactly equivalent to <code>anySimpleType</code></li>
-            <li>the datatype <code>xml</code> which indicates the cell contains an XML fragment</li>
-            <li>the datatype <code>html</code> which indicates the cell contains an HTML fragment</li>
-            <li>the datatype <code>json</code> which indicates the cell contains a JSON value</li>
-            <li>the datatype <code>object</code> which indicates the cell contains a JSON object; a sub-value of <code>json</code></li>
-            <li>the datatype <code>array</code> which indicates the cell contains a JSON array; a sub-value of <code>json</code></li>
-          </ul>
-          <section>
-            <h4>Length Constraints</h4>
-            <p>
-              The <code>length</code>, <code>minLength</code> and <code>maxLength</code> properties indicate the exact, minimum and maximum lengths of the values of cells.
-            </p>
-            <p>
-              Applications MUST raise an error if both <code>length</code> and <code>minLength</code> are specified and they do not have the same value. Similarly, applications MUST raise an error if both <code>length</code> and <code>maxLength</code> are specified and they do not have the same value. Applications MUST raise an error if <code>length</code>, <code>maxLength</code> or <code>minLength</code> are specified and the cell value is not a list (ie <code>separator</code> is not specified), a string or one of its subtypes, or a binary value.
-            </p>
-            <p>
-              The length of a value of a cell is determined as follows:
-            </p>
-            <ul>
-              <li>if the cell is <code>null</code> its length is zero</li>
-              <li>if the value is a list, its length is the number of items in the list</li>
-              <li>if the value is a string or one of its subtypes, its length is the number of characters in the value</li>
-              <li>if the value is of a binary type, its length is the number of bytes in the binary value</li>
-            </ul>
-          </section>
-          <section>
-            <h4>Value Constraints</h4>
-            <p>
-              The <code>minimum</code>, <code>maximum</code>, <code>minInclusive</code>, <code>maxInclusive</code>, <code>minExclusive</code> and <code>maxExclusive</code> properties indicate limits on the values of cells. These apply to numeric and date/time types. The <code>minimum</code> property is equivalent to the <code>minInclusive</code> property and the <code>maximum</code> property is equivalent to the <code>maxInclusive</code> property.
-            </p>
-            <p>
-              Validation against these properties is as defined in [[!xmlschema-2]].
-            </p>
-          </section>
         </section>
         <section>
-          <h3>Parsing cells</h3>
+          <h3>Formats for dates and times</h3>
           <p>
-            Unlike many other data formats, tabular data is designed to be read by humans. For that reason, it's common for data to be represented within tabular data in a human-readable way. The <code>separator</code> and <code>format</code> properties indicates the format used to represent data within the table. This is used:
+            Dates and times are commonly represented in tabular data in formats other than those defined in [[!xmlschema-2]].
           </p>
-          <ul>
-            <li>by <strong>validators</strong> to check that the data in the table is in the expected format</li>
-            <li>by <strong>converters</strong> to parse the values before mapping them into values in the target of the conversion</li>
-            <li>when <strong>displaying</strong> data, to map it into formats that are meaningful for those viewing the data (as opposed to those publishing it)</li>
-            <li>when <strong>inputting</strong> data, to turn entered values into representations in a consistent format</li>
-          </ul>
           <p>
-            The process of parsing the string value of a cell into a single value or a list of values is as follows:
+            If the <code>datatype</code> is a date or time type, the <code>format</code> property indicates the expected format for that date or time. Validators MUST check that the dates or times in the column adhere to the specified format. Converters MUST use the <code>format</code> property to parse the date or time when mapping it into a suitable type in the target language of the conversion.
           </p>
-          <ol>
-            <li>unless the <code>datatype</code> is <code>string</code> or <code>anySimpleType</code> or <code>any</code>, strip leading and trailing whitespace from the value</li>
-            <li>if the value is the same as the <code>null</code> value, then the value is <code>null</code></li>
-            <li>if the <code>separator</code> property is not <code>null</code>, create a list of values by splitting the string at the character specified by the <code>separator</code> property</li>
-            <li>validate the value(s) against the <code>format</code>, if one is specified, as described below; raise an error if any of the values do not match the specified format</li>
-            <li>parse the value(s) using the <code>format</code>, as described below</li>
-          </ol>
-          <section>
-            <h4>Formats for strings</h4>
-            <p>
-              If the <code>datatype</code> is a string type, the <code>format</code> property provides a regular expression for the string values, in the syntax defined by [[!ECMASCRIPT]].
-            </p>
-            <p class="issue">
-              We invite comment about which reference to use for regular expression syntax. Other possibilities are to use that defined by XML Schema or XPath.
-            </p>
-          </section>
-          <section>
-            <h4>Formats for numeric types</h4>
-            <p>
-              It is not uncommon for numbers within tabular data to be formatted for human consumption, which may involve using commas for decimal points, grouping digits in the number using commas, or adding currency symbols or percent signs to the number.
-            </p>
-            <p>
-              If the <code>datatype</code> is a numeric type, the <code>format</code> property indicates the expected format for that number. Validators MUST check that the numbers in the column adhere to the specified format. Converters MUST use the <code>format</code> property to parse the number when mapping it into a suitable type in the target language of the conversion.
-            </p>
-            <p>
-              When the <code>datatype</code> is a numeric type, the <code>format</code> property's value MUST be a number format as specified in [[!xslt-21]].
-            </p>
-            <p class="issue">
-              We invite comment on the best format to specify how to parse numbers.
-            </p>
-          </section>
-          <section>
-            <h4>Formats for booleans</h4>
-            <p>
-              Boolean values may be represented in many ways aside from the standard <code>1</code> and <code>0</code> or <code>true</code> and <code>false</code>.
-            </p>
-            <p>
-              If the <code>datatype</code> is <code>boolean</code>, the <code>format</code> property provides the true and false values expected, separated by <code>|</code>. For example if <code>format</code> is <code>Y|N</code> then cells must hold either <code>Y</code> or <code>N</code> with <code>Y</code> meaning <code>true</code> and <code>N</code> meaning <code>false</code>.
-            </p>
-          </section>
-          <section>
-            <h4>Formats for dates and times</h4>
-            <p>
-              Dates and times are commonly represented in tabular data in formats other than those defined in [[!xmlschema-2]].
-            </p>
-            <p>
-              If the <code>datatype</code> is a date or time type, the <code>format</code> property indicates the expected format for that date or time. Validators MUST check that the dates or times in the column adhere to the specified format. Converters MUST use the <code>format</code> property to parse the date or time when mapping it into a suitable type in the target language of the conversion.
-            </p>
-            <p>
-              When the <code>datatype</code> is a date or time type, the <code>format</code> property's value MUST be a date/time format as specified in [[!xslt-21]].
-            </p>
-            <p class="issue">
-              We invite comment on which format to use when parsing dates and times.
-            </p>
-          </section>
-          <section>
-            <h4>Formats for durations</h4>
-            <p class="issue">
-              We invite comment on whether there are standard formats to use when parsing durations.
-            </p>
-          </section>
+          <p>
+            When the <code>datatype</code> is a date or time type, the <code>format</code> property's value MUST be a date/time format as specified in [[!xslt-21]].
+          </p>
+          <p class="issue">
+            We invite comment on which format to use when parsing dates and times.
+          </p>
         </section>
         <section>
-          <h3>Additional Constraints</h3>
-
-          <p>A set of constraints can be associated with a cell. These constraints can be used 
-          to validate data against a JSON Table Schema. The constraints might be used by consumers 
-          to validate, for example, the contents of a data package, or as a means to validate 
-          data being collected or updated via a data entry interface.</p>
-
-          <p>A constraints descriptor is a JSON hash. It <code>MAY</code> contain any of the following 
-          keys.</p>
-
-          <ul>
-            <li><code>minLength</code> – An integer that specifies the minimum number of characters for a value</li>
-            <li><code>maxLength</code> – An integer that specifies the maximum number of characters for a value</li>
-            <li><code>unique</code> – A boolean. If <code>true</code>, then all values for that cell MUST be unique within the 
-          data file in which it is found. This defines a unique key for a row although a row could 
-          potentially have several such keys.</li>
-            <li><code>pattern</code> – A regular expression that can be used to test cell values. If the regular 
-          expression matches then the value is valid. Values will be treated as a string of characters. 
-          It is recommended that values of this cell conform to the standard 
-          <a href="http://www.w3.org/TR/xmlschema-2/#regexs">XML Schema regular expression syntax</a>. See also 
-          <a href="http://www.regular-expressions.info/xml.html">this reference</a>.</li>
-            <li><code>minimum</code> – specifies a minimum value for a cell. This is different to <code>minLength</code> which 
-          checks number of characters. A <code>minimum</code> value constraint checks whether a cell value is greater than 
-          or equal to the specified value. The range checking depends on the <code>type</code> of the cell. E.g. an 
-          integer cell may have a minimum value of 100; a date cell might have a minimum date. If a 
-          <code>minimum</code> value constraint is specified then the cell descriptor <code>MUST</code> contain a <code>type</code> key</li>
-            <li><code>maximum</code> – as above, but specifies a maximum value for a cell.</li>
-          </ul>
-
-          <p>A constraints descriptor may contain multiple constraints, in which case a consumer <code>MUST</code> apply 
-          all the constraints when determining if a cell value is valid.</p>
-
-          <p>A data file, e.g. an entry in a data package, is considered to be valid if all of its cells are valid 
-          according to their declared <code>type</code> and <code>constraints</code>.</p>
-
+          <h3>Formats for durations</h3>
+          <p class="issue">
+            We invite comment on whether there are standard formats to use when parsing durations.
+          </p>
         </section>
+      </section>
+      <section>
+        <h2>Additional Constraints</h2>
+
+        <p>A set of constraints can be associated with a cell. These constraints can be used 
+        to validate data against a JSON Table Schema. The constraints might be used by consumers 
+        to validate, for example, the contents of a data package, or as a means to validate 
+        data being collected or updated via a data entry interface.</p>
+
+        <p>A constraints descriptor is a JSON hash. It <code>MAY</code> contain any of the following 
+        keys.</p>
+
+        <ul>
+          <li><code>minLength</code> – An integer that specifies the minimum number of characters for a value</li>
+          <li><code>maxLength</code> – An integer that specifies the maximum number of characters for a value</li>
+          <li><code>unique</code> – A boolean. If <code>true</code>, then all values for that cell MUST be unique within the 
+        data file in which it is found. This defines a unique key for a row although a row could 
+        potentially have several such keys.</li>
+          <li><code>pattern</code> – A regular expression that can be used to test cell values. If the regular 
+        expression matches then the value is valid. Values will be treated as a string of characters. 
+        It is recommended that values of this cell conform to the standard 
+        <a href="http://www.w3.org/TR/xmlschema-2/#regexs">XML Schema regular expression syntax</a>. See also 
+        <a href="http://www.regular-expressions.info/xml.html">this reference</a>.</li>
+          <li><code>minimum</code> – specifies a minimum value for a cell. This is different to <code>minLength</code> which 
+        checks number of characters. A <code>minimum</code> value constraint checks whether a cell value is greater than 
+        or equal to the specified value. The range checking depends on the <code>type</code> of the cell. E.g. an 
+        integer cell may have a minimum value of 100; a date cell might have a minimum date. If a 
+        <code>minimum</code> value constraint is specified then the cell descriptor <code>MUST</code> contain a <code>type</code> key</li>
+          <li><code>maximum</code> – as above, but specifies a maximum value for a cell.</li>
+        </ul>
+
+        <p>A constraints descriptor may contain multiple constraints, in which case a consumer <code>MUST</code> apply 
+        all the constraints when determining if a cell value is valid.</p>
+
+        <p>A data file, e.g. an entry in a data package, is considered to be valid if all of its cells are valid 
+        according to their declared <code>type</code> and <code>constraints</code>.</p>
+
       </section>
     </section>
     <section>
