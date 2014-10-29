@@ -628,12 +628,12 @@ Content-Type: text/csv;header=absent
       <dl>
         <dt><dfn>encoding</dfn></dt>
         <dd>The character encoding for the file, one of the encodings listed in [[!encoding]]. The default is <code>utf-8</code>.</dd>
-        <dt><dfn>row terminator</dfn></dt>
+        <dt><dfn>line terminator</dfn></dt>
         <dd>The character that is used at the end of a row. The default is <code>CRLF</code>.</dd>
-        <dt><dfn>enclosure character</dfn></dt>
+        <dt><dfn>quote character</dfn></dt>
         <dd>The character that is used around escaped cells. The default is <code>"</code>.</dd>
         <dt><dfn>escape character</dfn></dt>
-        <dd>The character that is used to escape the <a>enclosure character</a> within escaped cells. The default is <code>"</code>.</dd>
+        <dd>The character that is used to escape the <a>quote character</a> within escaped cells. The default is <code>"</code> (such that <code>""</code> is used to escape <code>"</code> within an escaped cell).</dd>
         <dt><dfn>skip rows</dfn></dt>
         <dd>The number of rows to skip at the beginning of the file, before a header row or tabular data. The default is <code>0</code>.</dd>
         <dt><dfn>comment prefix</dfn></dt>
@@ -649,7 +649,7 @@ Content-Type: text/csv;header=absent
         <dt><dfn>skip blank rows</dfn></dt>
         <dd>Indicates whether to ignore wholly empty rows (ie rows in which all the cells are empty). The default is <code>false</code>.</dd>
         <dt><dfn>trim</dfn></dt>
-        <dd>Indicates whether to trim whitespace around cells.</dd>
+        <dd>Indicates whether to trim whitespace around cells; may be <code>true</code>, <code>false</code>, <code>start</code> or <code>end</code>. The default is <code>false</code>.</dd>
       </dl>
       <div class="issue">
         <p>
@@ -665,13 +665,12 @@ Content-Type: text/csv;header=absent
       </p>
       <ol>
         <li>Read the file using the specified <a>encoding</a>.</li>
-        <li>Find the rows. Each row ends with a <a>row terminator</a>, but values that are enclosed within the <a>enclosure character</a> may contain the <a>row terminator</a> without it indicating the end of the row. The <a>enclosure character</a> may be escaped using the <a>escape character</a> where it appears within cells.</li>
-        <li>Skip the number of rows indicated by the <a>skip rows</a> parameter.</li>
-        <li>Within the skipped rows, find rows that start with the <a>comment prefix</a>. These form comment annotations on the table.</li>
+        <li>Find the rows. Each row ends with a <a>line terminator</a>, but values that are enclosed within the <a>quote character</a> may contain the <a>line terminator</a> without it indicating the end of the row. The <a>quote character</a> may be escaped using the <a>escape character</a> where it appears within cells. If the <a>escape character</a> is not the same as the <a>quote character</a> then the <a>escape character</a> is also used to escape the character that immediately follows it.</li>
+        <li>Skip the number of rows indicated by the <a>skip rows</a> parameter. These form comment annotations on the table. If a skipped row begins with the <a>comment prefix</a>, strip that prefix from the beginning of the row to create the content of the comment annotation.</li>
         <li>Gather the number of header rows indicated by the <a>header row count</a> parameter; the remaining rows are data rows.</li>
         <li>
           <p>
-            Split the header and data rows into cells using the <a>delimiter</a>. Values that are enclosed within the <a>enclosure character</a> may contain the <a>delimiter</a>. The <a>enclosure character</a> may be escaped using the <a>escape character</a> where it appears within cells.
+            Split the header and data rows into cells using the <a>delimiter</a>. Values that are enclosed within the <a>quote character</a> may contain the <a>delimiter</a>. The <a>quote character</a> may be escaped using the <a>escape character</a> where it appears within cells. If the <a>escape character</a> is not the same as the <a>quote character</a> then the <a>escape character</a> is also used to escape the character that immediately follows it.
           </p>
           <p>
             If <a>trim</a> is <code>true</code> or <code>start</code> then whitespace from the start of values that are not enclosed must be removed from the value. If <a>trim</a> is <code>true</code> or <code>end</code> then whitespace from the end of values that are not enclosed must be removed from the value.
