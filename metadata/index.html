@@ -591,63 +591,6 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             The description MAY contain any of the properties defined in <a href="#inherited-properties" class="sectionRef"></a> to describe cells within the table.
           </p>
         </section>
-        <!--
-        <section>
-          <h4>Foreign Keys</h4>
-
-          <div class="alert alert-success">
-          Foreign Keys by necessity must be able to reference other data objects. These
-          data objects require a specific structure for the spec to work. This spec
-          assumes the data objects being referenced are <a href="/data-packages/">Data
-          Packages</a>. Thus, to use Foreign Keys you must be referencing Data Packages.
-          </div>
-
-          <p>A foreign key is a reference where entries in a given field (or fields) on this
-          table (‘resource’ in data package terminology) is a reference to an entry in a
-          field (or fields) on a separate resource.</p>
-
-          <p>The <code>foreignKeys</code> attribute, if present, MUST be an Array. Each entry in the
-          array must be a <code>foreignKey</code>. A <code>foreignKey</code> MUST be a Hash and:</p>
-
-          <ul>
-            <li><code>MUST</code> have an attribute <code>fields</code>. <code>fields</code> is a string or array specifying the 
-          field or fields on this resource that form the source part of the foreign
-          key. The structure of the string or array is as per <code>primaryKey</code> above.</li>
-            <li><code>MUST</code> have an attribute <code>reference</code> which MUST be a Hash. The Hash
-              <ul>
-                <li><code>MAY</code> have an attribute <code>datapackage</code>. This attribute is a string being a url or
-          name to a datapackage. If absent the implication is that this is a
-          reference to a resource within the current data package.</li>
-                <li><code>MUST</code> have an attribute <code>resource</code> which is the name of the resource
-          within the referenced data package</li>
-                <li><code>MUST</code> have an attribute <code>fields</code> which is a string if the outer <code>fields</code> is a
-          string, else an array of the same length as the outer <code>fields</code>, describing the
-          field (or fields) references on the destination resource. The structure of
-          the string or array is as per <code>primaryKey</code> above.</li>
-              </ul>
-            </li>
-          </ul>
-
-          <p>Here’s an example:</p>
-
-          <pre><code>  "fields": [
-              {
-                "name": "state"
-              }
-            ],
-            "foreignKeys": [
-              {
-                "fields": "state"
-                "reference": {
-                  "datapackage": "http://data.okfn.org/data/mydatapackage/",
-                  "resource": "the-resource",
-                  "fields": "state_id"
-                }
-              }
-            ]
-          </code></pre>
-        </section>
-      -->
       </section>
       <section>
         <h3>Dialect Descriptions</h3>
@@ -829,8 +772,43 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           <dt id="table-primaryKey"><code>primaryKey</code></dt>
           <dd>
             <p>
-              An <a>column reference property</a> that holds either a single references to a column description object or an array of references.
+              A <a>column reference property</a> that holds either a single reference to a column description object or an array of references.
             </p>
+            <p>
+              Validators MUST check that each row has a unique combination of cells in the indicated columns. For example, if <code>primaryKey</code> is set to <code>["familyName", "givenName"]</code> then every row must have a unique value for the combination of the <code>familyName</code> and <code>givenName</code> columns.
+            </p>
+          </dd>
+          <dt id="table-foreignKeys"><code>foreignKeys</code></dt>
+          <dd>
+            <p>
+              An array of <a title="foreign key definition">foreign key definitions</a> that define how columns within this table link to columns within other tables. A <dfn>foreign key definition</dfn> is a JSON object with the properties:
+            </p>
+            <dl>
+              <dt id="foreign-key-columns"><code>columns</code></dt>
+              <dd>
+                A <a>column reference property</a> that holds either a single reference to a column description object within this schema, or an array of references.
+              </dd>
+              <dt id="foreign-key-reference"><code>reference</code></dt>
+              <dd>
+                <p>
+                  An object with the properties:
+                </p>
+                <dl>
+                  <dt id="foreign-key-reference-resource"><code>resource</code></dt>
+                  <dd>
+                    A URL that is the identifier for a specific resource that is being referenced. If this is present then <code>schema</code> MUST NOT be present.
+                  </dd>
+                  <dt id="foreign-key-reference-schema"><code>schema</code></dt>
+                  <dd>
+                    A URL that is the identifier for a schema that is being referenced. If this is present then <code>resource</code> MUST NOT be present.
+                  </dd>
+                  <dt id="foreign-key-reference"><code>columns</code></dt>
+                  <dd>
+                    A <a>column reference property</a> that holds either a single reference to a column description object within this schema, or an array of references.
+                  </dd>
+                </dl>
+              </dd>
+            </dl>
             <p>
               Validators MUST check that each row has a unique combination of cells in the indicated columns. For example, if <code>primaryKey</code> is set to <code>["familyName", "givenName"]</code> then every row must have a unique value for the combination of the <code>familyName</code> and <code>givenName</code> columns.
             </p>
@@ -846,6 +824,170 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         <p>
           The description MAY contain any of the <a title="inherited property">inherited properties</a> defined for cells in <a href="#inherited-properties" class="sectionRef"></a>.
         </p>
+        <section>
+          <h4>Examples</h4>
+          <section>
+            <h5>Foreign Key Reference Between Resources</h5>
+            <p>
+              A list of countries is published at <a href="https://dspl.googlecode.com/hg/datasets/google/canonical/countries.csv"><code>https://dspl.googlecode.com/hg/datasets/google/canonical/countries.csv</code></a> with the structure:
+            </p>
+            <pre class="example highlight">
+country,latitude,longitude,name
+AD,42.546245,1.601554,Andorra
+AE,23.424076,53.847818,"United Arab Emirates"
+AF,33.93911,67.709953,Afghanistan
+            </pre>
+            <p>
+              Another file contains information about the population in some countries each year, at <a href="https://dspl.googlecode.com/hg/datasets/google/dspl-sample/country_slice.csv"><code>https://dspl.googlecode.com/hg/datasets/google/dspl-sample/country_slice.csv</code></a> with the structure:
+            </p>
+            <pre class="example highlight">
+country,year,population
+AF,1960,9616353
+AF,1961,9799379
+AF,1962,9989846
+            </pre>
+            <p>
+              The following metadata for the group of tables links the two together by defining a <code>foreignKeys</code> property:
+            </p>
+            <pre class="example highlight">
+{
+  "resources": [{
+    "@id": "https://dspl.googlecode.com/hg/datasets/google/canonical/countries.csv",
+    "schema": {
+      "columns": [{
+        "name": "country",
+        "datatype": "string"
+      }, {
+        "name": "latitude",
+        "datatype": "number"
+      }, {
+        "name": "longitude",
+        "datatype": "number"
+      }, {
+        "name": "name",
+        "datatype": "string"
+      }],
+      "primaryKey": "country"
+    }
+  }, {
+    "@id": "https://dspl.googlecode.com/hg/datasets/google/dspl-sample/country_slice.csv",
+    "schema": {
+      "columns": [{
+        "name": "country",
+        "datatype": "string"
+      }, {
+        "name": "year",
+        "datatype": "gYear"
+      }, {
+        "name": "population",
+        "datatype": "integer"
+      }],
+      "foreignKeys": [{
+        "columns": "country",
+        "reference": {
+          "resource": "https://dspl.googlecode.com/hg/datasets/google/canonical/countries.csv",
+          "columns": "country"
+        }
+      }]
+    }
+  }]
+}
+             </pre>
+          </section>
+          <section>
+            <h4>Foreign Key Reference Between Schemas</h4>
+            <p>
+              When publishing information about public sector roles and salaries, as in <a href="http://w3c.github.io/csvw/use-cases-and-requirements/#UC-OrganogramData">Use Case 4</a>, the UK government requires departments to publish two files which are interlinked. The first lists senior grades (simplified here) eg at <code>HEFCE_organogram_senior_data_31032011.csv</code>:
+            </p>
+            <pre class="example">
+Post Unique Reference,              Name,Grade,             Job Title,Reports to Senior Post
+                90115,        Steve Egan,SCS1A,Deputy Chief Executive,                 90334
+                90250,     David Sweeney,SCS1A,              Director,                 90334
+                90284,       Heather Fry,SCS1A,              Director,                 90334
+                90334,Sir Alan Langlands, SCS4,       Chief Executive,                    xx
+            </pre>
+            <p>
+              The second provides information about the number of junior positions that report to those individuals (simplified here) eg at <code>HEFCE_organogram_junior_data_31032011.csv</code>:
+            </p>
+            <pre class="example">
+Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic Job Title,Number of Posts in FTE,          Profession
+                90284,    4,               17426,               20002,    Administrator,                     2,Operational Delivery
+                90284,    5,               19546,               22478,    Administrator,                     1,Operational Delivery
+                90115,    4,               17426,               20002,    Administrator,                  8.67,Operational Delivery
+                90115,    5,               19546,               22478,    Administrator,                   0.5,Operational Delivery
+            </pre>
+            <p>
+              The schemas are reused by multiple departments and for multiple pairs of files. The schemas are therefore defined in separate files, and they need to define links between the schemas which are then picked up as applying between tables that use those schemas.
+            </p>
+            <p>
+              The metadata file for the particular publication of the files above is:
+            </p>
+            <pre class="example highlight">
+{
+  "resources": [{
+    "@id": "HEFCE_organogram_senior_data_31032011.csv",
+    "schema": "http://example.org/schema/senior-roles.json"
+  }, {
+    "@id": "HEFCE_organogram_junior_data_31032011.csv",
+    "schema": "http://example.org/schema/junior-roles.json"
+  }]
+}
+            </pre>
+            <p>
+              The schema for the senior role CSV (at <code>http://example.org/schema/senior-roles.json</code>) is as follows; it includes a foreign key reference to itself:
+            </p>
+            <pre class="example highlight">
+{
+  "@id": "http://example.org/schema/senior-roles.json",
+  "columns": [{
+    "name": "ref",
+    "title": "Post Unique Reference"
+  }, {
+    "name": "name",
+    "title": "Name"
+  }, {
+    "name": "grade",
+    "title": "Grade"
+  }, {
+    "name": "job",
+    "title": "Job Title"
+  }, {
+    "name": "reportsTo",
+    "title": "Reports to Senior Post"
+  }],
+  "primaryKey": "ref",
+  "foreignKeys": [{
+    "columns": "reportsTo",
+    "reference": {
+      "schema": "http://example.org/schema/senior-roles.json",
+      "columns": "ref"
+    }
+  }]
+}
+            </pre>
+            <p>
+              The schema for the junior role CSV (at <code>http://example.org/schema/junior-roles.json</code>) is as follows; it includes a foreign key reference to the senior roles schema:
+            </p>
+            <pre class="example highlight">
+{
+  "@id": "http://example.org/schema/junior-roles.json",
+  "columns": [{
+    "name": "reportsTo",
+    "title": "Reporting Senior Post"
+  }, 
+  ...
+  ],
+  "foreignKeys": [{
+    "columns": "reportsTo",
+    "reference": {
+      "schema": "http://example.org/schema/senior-roles.json",
+      "columns": "ref"
+    }
+  }]
+}
+            </pre>
+          </section>
+        </section>
       </section>
       <section>
         <h3>Columns</h3>
