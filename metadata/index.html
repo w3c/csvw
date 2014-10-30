@@ -194,22 +194,22 @@ GID,On Street,Species,Trim Cycle,Inventory Date
     <section>
       <h2>Annotating Tables</h2>
       <p>
-        The metadata defined in this specification is used to annotate an existing <a href="http://w3c.github.io/csvw/syntax/#dfn-annotated-table">annotated table</a> as defined in [[!tabular-data-model]]. Annotated tables form the basis for all further processing, such as validating or displaying the table. All compliant applications MUST create annotated tables based on the algorithm defined here.
+        The metadata defined in this specification is used to annotate an existing <a href="http://w3c.github.io/csvw/syntax/#dfn-annotated-table">annotated table</a> or <a href="http://w3c.github.io/csvw/syntax/#dfn-group-of-tables">group of tables</a>, as defined in [[!tabular-data-model]]. Annotated tables form the basis for all further processing, such as validating or displaying the tables. All compliant applications MUST create annotated tables based on the algorithm defined here.
       </p>
       <p>
-        Metadata documents contain descriptions of tables, columns, rows, cells and regions which are used to create annotations on a tabular data model. There are two types of description objects:
+        Metadata documents contain descriptions of groups of tables, tables, columns, rows, cells and regions which are used to create annotations on a tabular data model. There are two types of description objects:
       </p>
       <ul>
         <li>descriptions that appear within a schema, and that may apply across multiple tabular data files &mdash; these are used to describe the general structure of a tabular data file</li>
-        <li>descriptions of particular tables, columns, rows, cells and regions within a single tabular data file &mdash; these are used for notes or flags on particular data</li>
+        <li>descriptions of particular groups of tables, tables, columns, rows, cells and regions within a single tabular data file &mdash; these are used for notes or flags on particular data</li>
       </ul>
       <p>
         The description objects themselves contain a number of properties. These are:
       </p>
       <ul>
         <li>properties that are used to identify the table or column that the annotations should appear on; these match up to properties on those objects in the core tabular data model defined in [[!tabular-data-model]] and do not form additional annotations</li>
-        <li>properties that map directly to annotations that appear directly on the table, column, row or cell whose description they appear on, such as the <code>name</code> of a column or the <code>dc:provenance</code> of a table</li>
-        <li>properties that are specified on the description of a table or column to provide a default value for the equivalent annotation on each of the cells that appear in that table or column</li>
+        <li>properties that map directly to annotations that appear directly on the group of tables, table, column, row or cell whose description they appear on, such as the <code>name</code> of a column or the <code>dc:provenance</code> of a table</li>
+        <li>properties that are specified on the description of a group of tables, table or column to provide a default value for the equivalent annotation on each of the cells that appear in that table or column</li>
       </ul>
       <p>
         For example, in the <a>column description</a>
@@ -235,13 +235,13 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       <section>
         <h3>Inherited Properties</h3>
         <p>
-          A cell may be assigned annotations based on properties on the description objects for the table, column or row that it appears in. These properties are known as <dfn title="inherited property">inherited properties</dfn> and are listed in <a href="#cells" class="sectionRef"></a>. To ascertain a value for these annotations, an application MUST identify the relevant property in the descriptions of the table or column.
+          A cell may be assigned annotations based on properties on the description objects for the group of tables, table, column or row that it appears in. These properties are known as <dfn title="inherited property">inherited properties</dfn> and are listed in <a href="#cells" class="sectionRef"></a>. To ascertain a value for these annotations, an application MUST identify the relevant property in the descriptions of the table or column.
         </p>
         <p>
-          Applications MUST raise an error if the value of a property in a column description is not <a>compatible with</a> the value of that property on the table. Applications MUST raise an error if the value of a property on a cell is not <a>compatible with</a> the values of that property on the column that the cell is associated with.
+          Applications MUST raise an error if the value of a property in a table description is not <a>compatible with</a> the value of that property on the group of tables. Applications MUST raise an error if the value of a property in a column description is not <a>compatible with</a> the value of that property on the table. Applications MUST raise an error if the value of a property on a cell is not <a>compatible with</a> the values of that property on the column that the cell is associated with.
         </p>
         <p>
-          A value for a cell or column is <dfn>compatible with</dfn> with a value on a column or table if they are the same value or if the first value is a sub-value of the second value. The definitions of individual inherited properties indicate what values count as sub-values of others.
+          A value for a cell, column or table is <dfn>compatible with</dfn> with a value on a column, table or group of tables if they are the same value or if the first value is a sub-value of the second value. The definitions of individual inherited properties indicate what values count as sub-values of others.
         </p>
       </section>
     </section>
@@ -250,13 +250,13 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       <p>
         This section defines a set of properties and permitted values for annotating tabular data, and how these annotations should be interpreted by applications.
       </p>
-      <p class="issue">
-        We intend to support metadata for packages. In this version of this specification, we are scoping to single metadata files defining single tabular data files.
+      <p>
+        A metadata document is a JSON document which holds an object at the top level. This object is a <a>description object</a> of either a table group or a single table. A <dfn>description object</dfn> is a JSON object that describes a component of the tabular data model (a table group, a table, a column, a row or a cell) and has one or more properties are mapped into properties on that component. 
       </p>
       <section>
-        <h3>Syntax</h3>
+        <h3>Property Syntax</h3>
         <p>
-          A metadata document is a JSON document which holds an object at the top level. This object is a <a>description object</a> of a table. A <dfn>description object</dfn> is a JSON object that describes a component of a table (a table, a column, a row or a cell) and has one or more properties are mapped into properties on that component. There are different types of properties on description objects:
+          There are different types of properties on description objects:
         </p>
         <dl>
           <dt><dfn title="link property">link properties</dfn></dt>
@@ -435,7 +435,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       <section>
         <h3>Top-Level Properties</h3>
         <p>
-          The top-level object MAY have a <code>@context</code> property. This holds an object that provides metadata for interpreting other properties, namely:
+          The top-level object (whether it is a <a>table group description</a> or a <a>table description</a>) MAY have a <code>@context</code> property. This holds an object that provides metadata for interpreting other properties, namely:
         </p>
         <dl>
           <dt><code>@language</code></dt>
@@ -444,7 +444,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               indicates the default language for the values of properties in the metadata document; if present, its value MUST be a language code [[!BCP47]] which is the <dfn>default language</dfn> for the values of other properties in the metadata document
             </p>
             <p class="note">
-              Note that the <code>@language</code> property of the <code>@context</code> object, which gives the default language used within the metadata file, is distinct from the <code>language</code> property on a <a>description object</a>, which gives the language used in the data within a table or column.
+              Note that the <code>@language</code> property of the <code>@context</code> object, which gives the default language used within the metadata file, is distinct from the <code>language</code> property on a <a>description object</a>, which gives the language used in the data within a group of tables, table or column.
             </p>
           </dd>
           <dt><code>@base</code></dt>
@@ -453,7 +453,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               indicates the base URL against which other URLs within the description are resolved; if present, its value MUST be a URL which is resolved against the base URL of the metadata document (the location from which it was retrieved) to provide the <dfn>base URL</dfn> for other URLs in the metadata document
             </p>
             <p class="note">
-              Note that the <code>@base</code> property of the <code>@context</code> object provides the base URL used for URLs within the metadata document, not the URLs that appear within tables it describes.
+              Note that the <code>@base</code> property of the <code>@context</code> object provides the base URL used for URLs within the metadata document, not the URLs that appear within the group of tables or table it describes.
             </p>
           </dd>
         </dl>
@@ -461,7 +461,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       <section>
         <h3>Common Properties</h3>
         <p>
-          Descriptions of tables, schemas, columns, rows and cells MAY contain any properties whose names are either absolute URLs or prefixed names. For example, a table description may contain <code>dc:description</code>, <code>dcat:keyword</code> or <code>schema:copyrightHolder</code> properties to provide a description, keywords or the name of the copyright holder, as defined in <a href="http://dublincore.org/documents/2010/10/11/dcmi-terms/#elements-description">Dublin Core Terms</a>, <a href="http://www.w3.org/TR/vocab-dcat/#Property:dataset_keyword">DCAT</a> or <a href="http://schema.org/copyrightHolder">schema.org</a>.
+          Descriptions of groups of tables, tables, schemas, columns, rows and cells MAY contain any properties whose names are either absolute URLs or prefixed names. For example, a table description may contain <code>dc:description</code>, <code>dcat:keyword</code> or <code>schema:copyrightHolder</code> properties to provide a description, keywords or the name of the copyright holder, as defined in <a href="http://dublincore.org/documents/2010/10/11/dcmi-terms/#elements-description">Dublin Core Terms</a>, <a href="http://www.w3.org/TR/vocab-dcat/#Property:dataset_keyword">DCAT</a> or <a href="http://schema.org/copyrightHolder">schema.org</a>.
         </p>
         <p>
           The same prefixes are pre-defined as for [[rdfa-core]] within the <a href="http://www.w3.org/2011/rdfa-context/rdfa-1.1">RDFa 1.1 Initial Context</a> and MUST NOT be overridden. Properties from other vocabularies MUST be defined using full URLs.
@@ -470,202 +470,53 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           Forbidding the declaration of new prefixes ensures consistent processing between JSON-LD-aware and non-JSON-LD-aware processors.
         </p>
       </section>
-      <!--
       <section>
         <h3>Table Groups</h3>
         <p>
-          Groups of tabular data files are often provided within a self-contained package, though they do not have to be.
-        </p>
-        <p class="note">
-          The following is a more-or-less direct copy from <a href="http://dataprotocols.org/data-packages/">Data Package Format</a>, with added issues.
+          A <dfn>table group description</dfn> is a JSON object that describes a group of tables.
         </p>
         <section>
-          <h4>Required Fields</h4>
-          <p>A valid metadata document MUST include the following fields:</p>
-          <ul>
-            <li>
-              <p><code>name</code> (required) - short url-usable (and preferably human-readable) name of
-          the package. This MUST be lower-case and contain only alphanumeric characters
-          along with “.”, “_” or “-“ characters. It will function as a unique
-          identifier and therefore SHOULD be unique in relation to any registry in
-          which this package will be deposited (and preferably globally unique).</p>
-
-              <p>The name SHOULD be invariant, meaning that it SHOULD NOT change when a data
-          package is updated, unless the new package version should be considered a
-          distinct package, e.g. due to significant changes in structure or
-          interpretation. Version distinction SHOULD be left to the version field. As
-          a corollary, the name also SHOULD NOT include an indication of time range
-          covered.</p>
-            </li>
-          </ul>
-          <p class="issue">
-            The requirement for a name seems more like a requirement for metadata used within a package registry than when interpreting CSV files (which might or might not be in a package). Should <code>name</code> be required? Should it have the syntactic constraints described above?
-          </p>
-          <p>In addition to the above fields, it is recommended that the following fields SHOULD 
-        be included in every package descriptor:</p>
-          <p class="issue">
-            There are four levels of requirement here: MUST, SHOULD, MAY ("recommended") and optional. In practice, given that the metadata is completely extensible, there are probably only two practical levels: required (ie if the annotation is absent anything validating the metadata file MUST raise an error) and optional, so probably worth reclassifying in that way. Should anything be required?
-          </p>
-          <ul>
-            <li>
-              <p><code>resources</code> - a JSON array of hashes that describe the contents of 
-          the package. The structure of the resource hash is described in the “Resource Information”
-          section.</p>
-              <p class="issue">
-                This should be reworded not to be reliant as a property, not reliant on JSON.
-              </p>
-            </li>
-            <li>
-              <p><code>license</code> (or <code>licenses</code>) - is a field specifying the license (or licenses)
-          under which the package is provided. You MAY specify either a <code>license</code> field
-          or a <code>licenses</code> field but NOT both.</p>
-              <p class="issue">
-                Suggest having a single annotation (<code>license</code>) and leaving the pluralisation to the JSON serialisation.
-              </p>
-              <p><strong>This property is not legally binding and does not necessarily mean your
-          package is licensed under the terms you define in this property.</strong></p>
-              <p class="issue">
-                Not clear what the point is of providing licence information in the metadata file if it can't be interpreted by receivers of the metadata as indicating the licence that the data is being made available under?
-              </p>
-              <ul>
-                <li>
-                  <p><code>license</code> MUST be a string and its value SHOULD be an <a href="http://licenses.opendefinition.org/">Open Definition license
-          ID</a> (preferably one that is <a href="http://opendefinition.org/licenses/">Open Definition
-          approved</a>.</p>
-
-                  <pre><code>{ "license" : "PDDL-1.0" }
-          </code></pre>
-                  <p class="issue">
-                    Constrain to a URL instead?
-                  </p>
-                </li>
-                <li>
-                  <p><code>licenses</code> MUST be an array. Each entry MUST be a hash with a <code>type</code> and a
-          <code>url</code> property linking to the actual text. The <code>type</code> SHOULD be an [Open
-          Definition license ID][od-license] if an ID exists for the license and
-          otherwise may be the general license name or identifier. Here is an
-          Example:</p>
-
-                  <pre><code>"licenses": [{
-            "type": "PDDL-1.0",
-            "url": "http://opendatacommons.org/licenses/pddl/"
-          }]
-          </code></pre>
-                </li>
-              </ul>
-            </li>
-            <li>
-              <p><code>datapackage_version</code> - the version of the data package specification this
-          datapackage.json conforms to. It should follow the Semantic Versioning
-          requirements (http://semver.org/). The current version of this specification is given at 
-          the top of this document.</p>
-              <p class="issue">
-                This should probably be a serialisation thing rather than a metadata property, as it's about the format of the metadata file rather than of the group of tables.
-              </p>
-            </li>
-          </ul>
+          <h4>Required Properties</h4>
+          <dl>
+            <dt id="table-group-resources"><code>resources</code></dt>
+            <dd>
+              An array of <a title="table description">table descriptions</a> for the tables in the group.
+            </dd>
+          </dl>
         </section>
         <section>
-          <h4>Recommended Fields</h3>
-          <p class="issue">
-            Align these to Dublin Core / DCAT?
+          <h4>Optional Properties</h3>
+          <p>
+            The description of a group of tables MAY also contain:
           </p>
-          <p>Additionally, a package descriptor MAY include the following keys and values:</p>
-          <ul>
-            <li><code>title</code> - a title or one sentence description for this package</li>
-            <li><code>description</code> - a description of the package. The first paragraph (up to the
-          first double line break should be usable as summary information for the package)</li>
-            <li><code>homepage</code> - URL string for the data packages web site</li>
-            <li><code>version</code> - a version string identifying the version of the package. It should conform to the Semantic Versioning requirements
-          (http://semver.org/).</li>
-            <li>
-              <p><code>sources</code> - an array of source hashes. Each source hash may have <code>name</code>, <code>web</code> and <code>email</code> fields. Example:</p>
-
-              <pre><code>"sources": [{
-            "name": "World Bank and OECD",
-            "web": "http://data.worldbank.org/indicator/NY.GDP.MKTP.CD"
-          }]
-          </code></pre>
-            </li>
-            <li><code>keywords</code> - an Array of string keywords to assist users searching for the
-          package in catalogs.</li>
-            <li><code>image</code> - a link to an image to use for this data package</li>
-          </ul>
-        </section>
-        <section>
-          <h4>Optional Fields</h4>
-          <p class="issue">
-            Align these to Dublin Core / DCAT?
-          </p>
-          <ul>
-            <li><code>maintainers</code> - Array of maintainers of the package. Each maintainer is a hash
-          which must have a “name” property and may optionally provide “email” and
-          “web” properties.</li>
-            <li>
-              <p><code>contributors</code> - an Array of hashes each containing the details of a
-          contributor. Must contain a ‘name’ property and MAY contain an email and web
-          property. By convention, the first contributor is the original author of the
-          package. Example:</p>
-
-              <pre><code>"contributors":[ {
-            "name": "Joe Bloggs",
-            "email": "joe@bloggs.com",
-            "web": "http://www.bloggs.com"
-          }]
-          </code></pre>
-            </li>
-            <li><code>publisher</code> - like contributors </li>
-            <li><code>base</code> - a base URI used to resolve <code>resources</code> that specify relative paths in
-          the event that the actual data files specified by those resource paths are not
-          located in the same directory in which the descriptor file (<code>datapackage.json</code>)
-          resides.</li>
-            <li>
-              <p><code>dataDependencies</code> - Hash of prerequisite data packages on which this package
-          depends in order to install. Follows same format as CommonJS Packages spec
-          v1.1.Each dependency defines the lowest compatible MAJOR[.MINOR[.PATCH]]
-          dependency versions (only one per MAJOR version) with which the package has
-          been tested and is assured to work. The version may be a simple version
-          string (see the version property for acceptable forms), or it may be a hash
-          group of dependencies which define a set of options, any one of which
-          satisfies the dependency. The ordering of the group is significant and
-          earlier entries have higher priority. Example:</p>
-
-              <pre><code>"dataDependencies": {
-             "country-codes": "",
-             "unemployment": "2.1",
-             "geo-boundaires": {
-               "acmecorp-geo-boundaries": ["1.0", "2.0"],
-               "othercorp-geo-boundaries": "0.9.8",
-             },
-          }
-          </code></pre>
-              <p class="issue">
-                This is again about package management rather than interpretation of tabular data, so suggest omitting it from this specification.
+          <dl>
+            <dt id="table-group-schema"><code>schema</code></dt>
+            <dd>
+              An <a>object property</a> that provides a <a>schema description</a> as described in <a href="#schemas" class="sectionRef"></a>, for all the tables in the group. This may be provided as an embedded object within the JSON metadata or as a URL reference to a separate JSON schema document.
+            </dd>
+            <dt id="table-group-direction"><code>table-direction</code></dt>
+            <dd>
+              <p>
+                One of <code>"rtl"</code>, <code>"ltr"</code> or <code>"default"</code>. Indicates whether the tables in the group should be displayed with the first column on the right, on the left, or based on the first character in the table that has a specific direction. See <a href="#bidirectional-tables" class="sectionRef"></a> for more details.
               </p>
-            </li>
-          </ul>
-
-          <div class="note">
-            <p>NOTE: A Data Package author MAY add any number of additional fields beyond those
-          listed in the specification here.  For example, suppose you were storing
-          time series data and want to list the temporal coverage of the data in the
-          Data Package you could add a field <code>temporal</code> (cf <a href="http://dublincore.org/documents/usageguide/qualifiers.shtml#temporal">Dublin Core</a>):</p>
-
-            <pre><code>"temporal": {
-            "name": "19th Century",
-            "start": "1800-01-01",
-            "end": "1899-12-31"
-          }
-          </code></pre>
-
-            <p>This flexibility enables specific communities to extend Data Packages as
-          appropriate for the data they manage. As an example, the <a href="/tabular-data-package/">Tabular Data
-          Package</a> specification extends Data Package to the case
-          where all the data is tabular and stored in CSV.</p>
-          </div>
+            </dd>
+            <dt id="table-group-dialect"><code>dialect</code></dt>
+            <dd>
+              If provided, <code>dialect</code> provides hints to processors about how to parse the referenced files for to create tabular data models for the tables in the group. See <a href="#dialect-descriptions" class="sectionRef"></a> for more details.
+            </dd>
+            <dt id="table-ld-type"><code>@type</code></dt>
+            <dd>
+              If included, <code>@type</code> MUST be set to <code>"TableGroup"</code>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.
+            </dd>
+          </dl>
+          <p>
+            The description MAY contain any common properties as defined in <a href="#common-properties" class="sectionRef"></a> to provide extra metadata about the set of tables as a whole.
+          </p>
+          <p>
+            The description MAY contain any of the properties defined in <a href="#inherited-properties" class="sectionRef"></a> to describe cells within the tables.
+          </p>
         </section>
       </section>
-    -->
       <section>
         <h3>Tables</h3>
         <p>
@@ -1290,7 +1141,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             We intend to include other sections here about:
           </p>
           <ul>
-            <li>displaying metadata about tables, columns, rows, cells and regions</li>
+            <li>displaying metadata about groups of tables, tables, columns, rows, cells and regions</li>
             <li>what headings to use for columns when displaying tabular content</li>
             <li>how to format values in cells</li>
           </ul>
@@ -1323,7 +1174,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       <section>
         <h3>Validating Tables</h3>
         <p class="issue">
-          We intend to detail how to validate a CSV file against metadata. This would be normative: compliant validators would have to report the errors and warnings that we define. We invite comment on whether this is a useful thing to specify.
+          We intend to detail how to validate groups of tabular data files against metadata. This would be normative: compliant validators would have to report the errors and warnings that we define. We invite comment on whether this is a useful thing to specify.
         </p>
       </section>
       <section>
