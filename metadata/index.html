@@ -286,6 +286,36 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               in which case the <code>dc:hasVersion</code> property on the table would be an array of three values, links to other versions of the table.
             </p>
           </dd>
+          <dt><dfn title="URI template property">URI template properties</dfn></dt>
+          <dd>
+            <p>
+              A URI template property contains a [[!URI-TEMPLATE]] which can be used to generate a URI. These URI templates are expanded in the context of each row by combining the template with a set of variables with values. The variables that are set are:
+            </p>
+            <dl>
+              <dt><code>_row</code></dt>
+              <dd><code>_row</code> is set to the row number of the row that is currently being processed</dd>
+              <dt>column names</dt>
+              <dd>a variable is set for each column within the schema; the name of the variable is the percent-encoded name of the column and the value is the canonical representation of the value of the cell in that column in the row that is currently being processed</dd>
+            </dl>
+            <p>
+              For example, the <code>urlTemplate</code> property holds a URI template that is used to generate a URL identifier for each row, which might look like:
+            </p>
+            <pre class="example highlight">
+"urlTemplate": "http://example.org/#row={_row}"
+            </pre>
+            <p>
+              The identifiers that are generated for the rows would then look like <code>http://example.org/#row=1</code>, <code>http://example.org/#row=2</code> and so on.
+            </p>
+            <p>
+              Alternatively, with the CSV and metadata in the <a href="#introduction" class="sectionRef"></a>, the <code>urlTemplate</code> might look like:
+            </p>
+            <pre class="example highlight">
+"urlTemplate": "http://example.org/tree/{on%2Dstreet}/{GID}"
+            </pre>
+            <p>
+              This would generate URIs such as <code>http://example.org/tree/ADDISON%20AV/1</code> and <code>http://example.org/tree/EMERSON%20ST/2</code>.
+            </p>
+          </dd>
           <dt><dfn title="column reference property">column reference properties</dfn></dt>
           <dd>
             <p>These hold one or more references to other column description objects. The referenced description object must have an <code>name</code> property. Column reference properties can then reference column description objects through values that are:</p>
@@ -812,6 +842,10 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <p>
               Validators MUST check that each row has a unique combination of cells in the indicated columns. For example, if <code>primaryKey</code> is set to <code>["familyName", "givenName"]</code> then every row must have a unique value for the combination of the <code>familyName</code> and <code>givenName</code> columns.
             </p>
+          </dd>
+          <dt id="schema-urlTemplate"><code>urlTemplate</code></dt>
+          <dd>
+            A <a>URI template property</a> that MAY be used to create a unique identifier for each row when mapping data to other formats.
           </dd>
           <dt id="schema-ld-type"><code>@type</code></dt>
           <dd>
