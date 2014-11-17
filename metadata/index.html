@@ -301,10 +301,10 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               For example, the <code>urlTemplate</code> property holds a URI template that is used to generate a URL identifier for each row, which might look like:
             </p>
             <pre class="example highlight">
-"urlTemplate": "http://example.org/#row={_row}"
+"urlTemplate": "http://example.org/example.csv#row={_row}"
             </pre>
             <p>
-              The identifiers that are generated for the rows would then look like <code>http://example.org/#row=1</code>, <code>http://example.org/#row=2</code> and so on.
+              The identifiers that are generated for the rows would then look like <code>http://example.org/example.csv#row=1</code>, <code>http://example.org/example.csv#row=2</code> and so on.
             </p>
             <p>
               Alternatively, with the CSV and metadata in the <a href="#introduction" class="sectionRef"></a>, the <code>urlTemplate</code> might look like:
@@ -314,6 +314,15 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             </pre>
             <p>
               This would generate URIs such as <code>http://example.org/tree/ADDISON%20AV/1</code> and <code>http://example.org/tree/EMERSON%20ST/2</code>.
+            </p>
+            <p>
+              Once the URI has been generated, it is resolved against the location of the resource (eg the CSV file) to create an absolute URI. For example, given a <code>urlTemplate</code> within a schema such as:
+            </p>
+            <pre>
+"urlTemplate": "#row={_row}"
+            </pre>
+            <p>
+              and given a CSV file at <code>http://example.com/temp.csv</code>, the URL for the first row will be <code>http://example.com/temp.csv#row=1</code>.
             </p>
           </dd>
           <dt><dfn title="column reference property">column reference properties</dfn></dt>
@@ -826,11 +835,11 @@ GID,On Street,Species,Trim Cycle,Inventory Date
                 <dl>
                   <dt id="foreign-key-reference-resource"><code>resource</code></dt>
                   <dd>
-                    A URL that is the identifier for a specific resource that is being referenced. If this is present then <code>schema</code> MUST NOT be present.
+                    A URL that is the identifier for a specific resource that is being referenced. If this is present then <code>schema</code> MUST NOT be present. The metadata document MUST contain a description of the resource.
                   </dd>
                   <dt id="foreign-key-reference-schema"><code>schema</code></dt>
                   <dd>
-                    A URL that is the identifier for a schema that is being referenced. If this is present then <code>resource</code> MUST NOT be present.
+                    A URL that is the identifier for a schema that is being referenced. If this is present then <code>resource</code> MUST NOT be present. The metadata document that forms the basis of processing MUST contain a description of a resource that uses the referenced schema, and there MUST NOT be more than one such resource.
                   </dd>
                   <dt id="foreign-key-reference"><code>columns</code></dt>
                   <dd>
@@ -839,8 +848,8 @@ GID,On Street,Species,Trim Cycle,Inventory Date
                 </dl>
               </dd>
             </dl>
-            <p>
-              Validators MUST check that each row has a unique combination of cells in the indicated columns. For example, if <code>primaryKey</code> is set to <code>["familyName", "givenName"]</code> then every row must have a unique value for the combination of the <code>familyName</code> and <code>givenName</code> columns.
+            <p class="note">
+              It is not required for the resource or schema referenced from a <code>foreignKeys</code> property to have a similarly defined <code>primaryKey</code>.
             </p>
           </dd>
           <dt id="schema-urlTemplate"><code>urlTemplate</code></dt>
@@ -863,19 +872,19 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           <section>
             <h5>Foreign Key Reference Between Resources</h5>
             <p>
-              A list of countries is published at <a href="https://dspl.googlecode.com/hg/datasets/google/canonical/countries.csv"><code>https://dspl.googlecode.com/hg/datasets/google/canonical/countries.csv</code></a> with the structure:
+              A list of countries is published at <code>http://example.org/countries.csv</code> with the structure:
             </p>
             <pre class="example highlight">
-country,latitude,longitude,name
+countryCode,latitude,longitude,name
 AD,42.546245,1.601554,Andorra
 AE,23.424076,53.847818,"United Arab Emirates"
 AF,33.93911,67.709953,Afghanistan
             </pre>
             <p>
-              Another file contains information about the population in some countries each year, at <a href="https://dspl.googlecode.com/hg/datasets/google/dspl-sample/country_slice.csv"><code>https://dspl.googlecode.com/hg/datasets/google/dspl-sample/country_slice.csv</code></a> with the structure:
+              Another file contains information about the population in some countries each year, at <code>http://example.com/country_slice.csv</code> with the structure:
             </p>
             <pre class="example highlight">
-country,year,population
+countryRef,year,population
 AF,1960,9616353
 AF,1961,9799379
 AF,1962,9989846
@@ -886,10 +895,10 @@ AF,1962,9989846
             <pre class="example highlight">
 {
   "resources": [{
-    "@id": "https://dspl.googlecode.com/hg/datasets/google/canonical/countries.csv",
+    "@id": "https://example.org/countries.csv",
     "schema": {
       "columns": [{
-        "name": "country",
+        "name": "countryCode",
         "datatype": "string"
       }, {
         "name": "latitude",
@@ -901,13 +910,14 @@ AF,1962,9989846
         "name": "name",
         "datatype": "string"
       }],
+      "urlTemplate": "http://example.org/countries.csv{#countryCode}",
       "primaryKey": "country"
     }
   }, {
-    "@id": "https://dspl.googlecode.com/hg/datasets/google/dspl-sample/country_slice.csv",
+    "@id": "http://example.com/country_slice.csv",
     "schema": {
       "columns": [{
-        "name": "country",
+        "name": "countryRef",
         "datatype": "string"
       }, {
         "name": "year",
@@ -917,16 +927,19 @@ AF,1962,9989846
         "datatype": "integer"
       }],
       "foreignKeys": [{
-        "columns": "country",
+        "columns": "countryRef",
         "reference": {
-          "resource": "https://dspl.googlecode.com/hg/datasets/google/canonical/countries.csv",
-          "columns": "country"
+          "resource": "http://example.org/countries.csv",
+          "columns": "countryCode"
         }
       }]
     }
   }]
 }
-             </pre>
+            </pre>
+            <p>
+              When the population data in <code>country_slice.csv</code> is processed (displayed or mapped into another format), a link can be made from the content of the <code>countryRef</code> column based on the <code>urlTemplate</code> for <code>country.csv</code>. For example, if the <code>countryRef</code> column (the value of <code>columns</code> in the <code>foreignKeys</code> object) in <code>country_slice.csv</code> contains the value <code>UK</code> then the processor will use that value to populate the <code>countryCode</code> variable (the value of <code>reference.columns</code> in the <code>foreignKeys</code> object) when interpreting the <code>urlTemplate</code> for <code>country.csv</code>, and create the URL <code>http://example.org/countries.csv#UK</code>. The processor does not need to retrieve <code>http://example.org/countries.csv</code> or check that the value <code>UK</code> appears within the <code>countryCode</code> column to create this link: it is created purely based on the <code>urlTemplate</code> in the description of the referenced resource.
+            </p>
           </section>
           <section>
             <h4>Foreign Key Reference Between Schemas</h4>
@@ -990,6 +1003,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
     "title": "Reports to Senior Post"
   }],
   "primaryKey": "ref",
+  "urlTemplate": "#post-{ref}",
   "foreignKeys": [{
     "columns": "reportsTo",
     "reference": {
@@ -1020,6 +1034,9 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
   }]
 }
             </pre>
+            <p>
+              In the first line of <code>HEFCE_organogram_junior_data_31032011.csv</code>, the <code>reportsTo</code> (<code>Reporting Senior Post</code>) column contains the value <code>90284</code>. When creating a link from that column, the <code>urlTemplate</code> defined within the schema at <code>http://example.org/schema/senior-roles.json</code> is used to generate a URL by expanding the variable reference for <code>ref</code> based on the value from the <code>reportsTo</code> column. This gives the relative URL <code>#post-90284</code> which is then resolved against the base URL of the resource that uses the <code>senior-roles.json</code> schema within the original metadata file, namely <code>HEFCE_organogram_senior_data_31032011.csv</code>.
+            </p>
           </section>
         </section>
       </section>
