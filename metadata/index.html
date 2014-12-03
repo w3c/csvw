@@ -86,6 +86,7 @@ var respecConfig = {
       }]
     }],
     inlineCSS: true,
+    issueBase: "https://github.com/w3c/csvw/issues/",
     noIDLIn: true,
     noLegacyStyle: false
     };
@@ -118,7 +119,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 3,EMERSON ST,Liquidambar styraciflua,Large Tree Routine Prune,6/2/2010
       </pre>
       <p>
-        A human consumer of this data might be able to figure out the meaning of the different columns, particularly if there were some additional human-readable documentation made available. Automated processors would have a much harder time; realistically they would be limited to displaying the information in a table. Making available machine-readable metadata helps with the interpretation of the tabular data. For example, say that the following metadata file were available at <code>http://example.org/trees-ops.csv.csvm</code>:
+        A human consumer of this data might be able to figure out the meaning of the different columns, particularly if there were some additional human-readable documentation made available. Automated processors would have a much harder time; realistically they would be limited to displaying the information in a table. Making available machine-readable metadata helps with the interpretation of the tabular data. For example, say that the following metadata file were available at <code>http://example.org/trees-ops.csv-metadata.json</code>:
       </p>
       <pre class="example highlight">
 {
@@ -126,54 +127,53 @@ GID,On Street,Species,Trim Cycle,Inventory Date
   "@context": {
     "@language": "en"
   }
-  "title": "Tree Operations",
-  "keywords": ["tree", "street", "maintenance"],
-  "publisher": [{
-    "name": "Example Municipality",
-    "web": "http://example.org"
+  "dc:title": "Tree Operations",
+  "dc:keywords": ["tree", "street", "maintenance"],
+  "dc:publisher": [{
+    "sch:name": "Example Municipality",
+    "sch:web": "http://example.org"
   }],
-  "license": "http://opendefinition.org/licenses/cc-by/",
-  "modified": "2010-12-31",
+  "dc:license": "http://opendefinition.org/licenses/cc-by/",
+  "dc:modified": "2010-12-31",
   "schema": {
     "columns": [{
-      "@id": "_:GID",
       "name": "GID",
       "title": [
         "GID",
         "Generic Identifier"
       ],
-      "description": "An identifier for the operation on a tree.",
+      "dc:description": "An identifier for the operation on a tree.",
       "datatype": "string",
       "required": true,
       "unique": true
     }, {
       "name": "on-street",
       "title": "On Street",
-      "description": "The street that the tree is on.",
+      "dc:description": "The street that the tree is on.",
       "datatype": "string"
     }, {
       "name": "species",
       "title": "Species",
-      "description": "The species of the tree.",
+      "dc:description": "The species of the tree.",
       "datatype": "string"
     }, {
       "name": "trim-cycle",
       "title": "Trim Cycle",
-      "description": "The operation performed on the tree.",
+      "dc:description": "The operation performed on the tree.",
       "datatype": "string"
     }, {
       "name": "inventory-date",
       "title": "Inventory Date",
-      "description": "The date of the operation that was performed.",
+      "dc:description": "The date of the operation that was performed.",
       "datatype": "date",
       "format": "M/D/YYYY"
     }]
-    "primaryKey": "_:GID"  
+    "primaryKey": "GID"  
   }
 }
       </pre>
       <p>
-        Given the location of the CSV file, this metadata file can be located by appending <code>.csvm</code> to the URL (as described in <a href="http://www.w3.org/TR/tabular-data-model/#standard-path">Model for Tabular Data and Metadata on the Web</a>). It provides information for different types of applications:
+        Given the location of the CSV file, this metadata document can be located by appending <code>-metadata.json</code> to the URL (as described in <a href="http://www.w3.org/TR/tabular-data-model/#standard-file-metadata">Model for Tabular Data and Metadata on the Web</a>). It provides information for different types of applications:
       </p>
       <ul>
         <li><strong>Viewers</strong> can use the indicated metadata to provide a more user-friendly or human-readable view of the CSV file, which might include displaying it in a table or as graphs or charts.</li>
@@ -188,137 +188,62 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       <p>
         This document defines the format and structure of metadata documents, and how these are interpreted to create an Annotated Tabular Data Model. It also defines how to validate tabular data based on some of these annotations. This metadata can be expressed as an RDF graph. However, all applications that conform to this specification (including validators and applications that read or convert tabular data) MUST read the JSON-based format described in this document.
       </p>
-      <p class="issue">
+      <p class="issue" data-number="48">
         We are aiming for the JSON format to be interpretable as JSON-LD, but without any requirement to include context within the JSON itself (to save people from having to do boilerplate). We invite comments on the utility of this approach: is it useful for CSV metadata to be interpretable as JSON-LD? Is it helpful to be able to map it to RDF? Would it be better to rename some of the JSON-LD keywords, such as <code>@id</code> and <code>@type</code>?
       </p>
     </section>
     <section>
-      <h2>Processing Tables</h2>
+      <h2>Annotating Tables</h2>
       <p>
-        This section describes how particular types of applications should use the metadata supplied about a CSV file when they process that CSV file.
+        The metadata defined in this specification is used to annotate an existing <a href="http://w3c.github.io/csvw/syntax/#dfn-annotated-table">annotated table</a> or <a href="http://w3c.github.io/csvw/syntax/#dfn-group-of-tables">group of tables</a>, as defined in [[!tabular-data-model]]. Annotated tables form the basis for all further processing, such as validating or displaying the tables. All compliant applications MUST create annotated tables based on the algorithm defined here.
       </p>
-      <section>
-        <h3>Annotating Tables</h3>
-        <p>
-          The metadata defined in this specification is used to annotate an existing <a href="http://w3c.github.io/csvw/syntax/#dfn-annotated-table">annotated table</a> as defined in [[!tabular-data-model]]. Annotated tables form the basis for all further processing, such as validating or displaying the table. All compliant applications MUST create annotated tables based on the algorithm defined here.
-        </p>
-        <p>
-          Metadata documents contain descriptions of tables, columns, rows, cells and regions which are used to create annotations. There are two types of description objects:
-        </p>
-        <ul>
-          <li>descriptions that appear within a schema, and that may apply across multiple CSV files</li>
-          <li>descriptions of particular tables, columns, rows, cells and regions within a single CSV file</li>
-        </ul>
-        <p>
-          The description objects themselves contain a number of properties. These are:
-        </p>
-        <ul>
-          <li>properties that are used to identify the table, column, row or cell that the annotations should appear on; these match up to properties on those objects in the core tabular data model defined in [[!tabular-data-model]] and do not form additional annotations</li>
-          <li>properties that map directly to annotations that appear directly on the table, column, row or cell whose description they appear on, such as the <code>name</code> of a column or the <code>provenance</code> of a table</li>
-          <li>properties that are specified on the description of a table, column or row to provide a default value for the equivalent annotation on each of the cells that appear in that table, column or row</li>
-        </ul>
-        <p>
-          For example, in the <a>column description</a>
-        </p>
-        <pre class="example highlight">
+      <p>
+        Metadata documents contain descriptions of groups of tables, tables, columns, rows, cells and regions which are used to create annotations on a tabular data model. There are two types of description objects:
+      </p>
+      <ul>
+        <li>descriptions that appear within a schema, and that may apply across multiple tabular data files &mdash; these are used to describe the general structure of a tabular data file</li>
+        <li>descriptions of particular groups of tables, tables, columns, rows, cells and regions within a single tabular data file &mdash; these are used for notes or flags on particular data</li>
+      </ul>
+      <p>
+        The description objects themselves contain a number of properties. These are:
+      </p>
+      <ul>
+        <li>properties that are used to identify the table or column that the annotations should appear on; these match up to properties on those objects in the core tabular data model defined in [[!tabular-data-model]] and do not form additional annotations</li>
+        <li>properties that map directly to annotations that appear directly on the group of tables, table, column, row or cell whose description they appear on, such as the <code>name</code> of a column or the <code>dc:provenance</code> of a table</li>
+        <li>properties that are specified on the description of a group of tables, table or column to provide a default value for the equivalent annotation on each of the cells that appear in that table or column</li>
+      </ul>
+      <p>
+        For example, in the <a>column description</a>
+      </p>
+      <pre class="example highlight">
 {
   "name": "inventory-date",
   "title": "Inventory Date",
-  "description": "The date of the operation that was performed.",
+  "dc:description": "The date of the operation that was performed.",
   "datatype": "date",
   "format": "M/D/YYYY"
 }
-        </pre>
+      </pre>
+      <p>
+        the properties <code>name</code>, <code>title</code> and <code>dc:description</code> are <a title="direct annotation">direct annotations</a> that become <code>name</code>, <code>title</code> and <code>dc:description</code> properties on the column in the data model. The <code>datatype</code> and <code>format</code> properties are <a title="inherited property">inherited properties</a> that become <code>datatype</code> and <code>format</code> properties on the cells within the column.
+      </p>
+      <section>
+        <h3>Direct Annotations</h3>
         <p>
-          the properties <code>name</code>, <code>title</code> and <code>description</code> are <a title="direct annotation">direct annotations</a> that become <code>name</code>, <code>title</code> and <code>description</code> properties on the column in the data model. The <code>datatype</code> and <code>format</code> properties are <a title="inherited property">inherited properties</a> that become <code>datatype</code> and <code>format</code> properties on the cells within the column.
-        </p>
-        <section>
-          <h4>Direct Annotations</h4>
-          <p>
-            <dfn title="direct annotation">Direct annotations</dfn> are properties on the description object for a given table, column, row or cell which map directly to properties on the described table, column, row or cell. The name of the annotation is the same as the name of the property on the annotation. The value of the annotation is the same as the value of the property on the description object.
-          </p>
-        </section>
-        <section>
-          <h4>Inherited Properties</h4>
-          <p>
-            A cell may be assigned annotations based on properties on the description objects for the table, column or row that it appears in. These properties are known as <dfn title="inherited property">inherited properties</dfn> and are listed in <a href="#cells" class="sectionRef"></a>. To ascertain a value for these annotations, an application MUST identify the relevant property in the descriptions of the table, column and row.
-          </p>
-          <p>
-            Applications MUST raise an error if the value of a property in a column or row description is not <a>compatible with</a> the value of that property on the table. Applications MUST raise an error if the value of a property on a row is not <a>compatible with</a> the values of that property on all the columns in the table. Application MUST raise an error if the value of a property on a cell is not <a>compatible with</a> the values of that property on both the column and the row that the cell is associated with.
-          </p>
-          <p>
-            A value for a cell, column or row is <dfn>compatible with</dfn> with a value on a row, column or table if they are the same value or if the first value is a sub-value of the second value. The definitions of individual inherited properties indicate what values count as sub-values of others.
-          </p>
-        </section>
-      </section>
-      <section>
-        <h3>Displaying Tables</h3>
-        <div class="issue">
-          <p>
-            We intend to include other sections here about:
-          </p>
-          <ul>
-            <li>displaying metadata about tables, columns, rows, cells and regions</li>
-            <li>what headings to use for columns when displaying tabular content</li>
-            <li>how to format values in cells</li>
-          </ul>
-          <p>
-            Much of this is likely to be non-normative. We invite comment on whether it's useful to provide this kind of guidance.
-          </p>
-        </div>
-        <section>
-          <h4>Bidirectional Tables</h4>
-          <p>
-            There are two levels of bidirectionality to consider when displaying tables: the directionality of the table (ie whether the columns should be arranged left-to-right or right-to-left) and the directionality of the content of individual cells.
-          </p>
-          <p>
-            The <a href="#table-direction"><code>table-direction</code> property</a> provides information about the desired display of the table. If <code>table-direction=ltr</code> then the first column SHOULD be displayed on the left and the last column on the right. If <code>table-direction=rtl</code> then the first column SHOULD be displayed on the right and the last column on the left.
-          </p>
-          <p>
-            If <code>table-direction=default</code> then tables SHOULD be displayed with attention to the bidirectionality of the content of the file. Specifically, the values of the cells in the table should be scanned breadth first: from the first cell in the first column through to the last cell in the first column, down to the last cell in the last column. If the first character in the table with a <a href="http://unicode.org/reports/tr9/#Bidirectional_Character_Types">strong type</a> as defined in [[!UNICODE-BIDI]] indicates a <abbr title="right-to-left">RTL</abbr> directionality, the table should be displayed with the first column on the right and the last column on the left. Otherwise, the table should be displayed with the first column on the left and the last column on the right. Characters such as whitespace, quotes, commas and numbers do not have a strong type, and therefore are skipped when identifying the character that determines the directionality of the table.
-          </p>
-          <p>
-            Implementations SHOULD enable user preferences to override the indicated metadata about the directionality of the table.
-          </p>
-          <p>
-            Once the directionality of the table has been determined, each cell within the table should be considered as a separate <a href="http://unicode.org/reports/tr9/#The_Paragraph_Level">paragraph</a>, as defined by the <abbr title="Unicode Bidirectional Algorithm">UBA</abbr> in [[!UNICODE-BIDI]]. The default directionality for the cell is determined by looking at the <a href="#cell-text-direction"><code>text-direction</code> property</a>, which is an <a>inherited property</a>.
-          </p>
-          <p>
-            Thus, as defined by the <abbr title="Unicode Bidirectional Algorithm">UBA</abbr>, if a cell contains no characters with a strong type (if it's a number or date for example) then the way the cell is displayed should be determined by the <a href="#cell-text-direction"><code>text-direction</code> property</a> of the cell. However, when the cell contains characters with a strong type (such as letters) then they MUST be displayed according to the Unicode Bidirectional Algorithm as described in [[!UNICODE-BIDI]].
-          </p>
-        </section>
-      </section>
-      <section>
-        <h3>Validating Tables</h3>
-        <p class="issue">
-          We intend to detail how to validate a CSV file against metadata. This would be normative: compliant validators would have to report the errors and warnings that we define. We invite comment on whether this is a useful thing to specify.
+          <dfn title="direct annotation">Direct annotations</dfn> are properties on the description object for a given table, column, row or cell which map directly to properties on the described table, column, row or cell. The name of the annotation is the same as the name of the property on the annotation. The value of the annotation is the same as the value of the property on the description object.
         </p>
       </section>
       <section>
-        <h3>Converting Tables</h3>
+        <h3>Inherited Properties</h3>
         <p>
-          Conversions of tabular data to other formats operate over a <a href="http://w3c.github.io/csvw/syntax/#dfn-annotated-table">annotated table</a> constructed as defined in <a href="#annotating-tables" class="sectionRef"></a>. The mechanics of these conversions to other formats are defined in other specifications.
+          A cell may be assigned annotations based on properties on the description objects for the group of tables, table, column or row that it appears in. These properties are known as <dfn title="inherited property">inherited properties</dfn> and are listed in <a href="#inherited-properties" class="sectionRef"></a>. To ascertain a value for these annotations, an application MUST identify the relevant property in the descriptions of the table or column.
         </p>
         <p>
-          Conversion specifications MUST define a default mapping from an annotated table that lacks any annotations (ie that is equivalent to an un-annotated table).
+          Applications MUST raise an error if the value of a property in a table description is not <a>compatible with</a> the value of that property on the group of tables. Applications MUST raise an error if the value of a property in a column description is not <a>compatible with</a> the value of that property on the table. Applications MUST raise an error if the value of a property on a cell is not <a>compatible with</a> the values of that property on the column that the cell is associated with.
         </p>
         <p>
-          Conversion specifications MUST use the <a href="#column-name"><code>name</code> of a column</a> as the basis for naming machine-readable fields in the target format, such as the name of the equivalent element or attribute in XML, property in JSON or property URI in RDF.
+          A value for a cell, column or table is <dfn>compatible with</dfn> with a value on a column, table or group of tables if they are the same value or if the first value is a sub-value of the second value. The definitions of individual inherited properties indicate what values count as sub-values of others.
         </p>
-        <p>
-          Conversion specifications MAY use any of the properties defined in this specification to adjust the mapping of an annotated table into another format.
-        </p>
-        <p>
-          Conversion specifications MAY define additional properties, not defined in this specification, which are specifically used when converting to the target format of the conversion. For example, a conversion to XML might specify a <code>element-or-attribute</code> property on columns that determines whether a particular column is represented through an element or an attribute in the data.
-        </p>
-        <p>
-          Conversion specifications SHOULD specify format-specific properties specifying external processing steps to provide more control to people defining conversions. If these are specified, the conversion specification MUST specify at what point in the processing this external processing takes place, and what it takes place on. Examples might be:
-        </p>
-        <ul>
-          <li>the URL of an XSLT file that is used to process XML after it is generated</li>
-          <li>a string containing a SPARQL CONSTRUCT pattern that is executed on RDF after it is generated</li>
-          <li>properties that contain definitions of Javascript callback functions that are used when processing particular columns or individual rows</li>
-        </ul>
       </section>
     </section>
     <section>
@@ -326,13 +251,13 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       <p>
         This section defines a set of properties and permitted values for annotating tabular data, and how these annotations should be interpreted by applications.
       </p>
-      <p class="issue">
-        We intend to support metadata for packages. In this version of this specification, we are scoping to single metadata files defining single CSV files.
+      <p>
+        A metadata document is a JSON document which holds an object at the top level. This object is a <a>description object</a> of either a table group or a single table. A <dfn>description object</dfn> is a JSON object that describes a component of the tabular data model (a table group, a table, a column, a row or a cell) and has one or more properties are mapped into properties on that component. 
       </p>
       <section>
-        <h3>Syntax</h3>
+        <h3>Property Syntax</h3>
         <p>
-          A metadata document is a JSON document which holds an object at the top level. This object is a <a>description object</a> of a table. A <dfn>description object</dfn> is a JSON object that describes a component of a table (a table, a column, a row or a cell) and has one or more properties are mapped into properties on that component. There are different types of properties on description objects:
+          There are different types of properties on description objects:
         </p>
         <dl>
           <dt><dfn title="link property">link properties</dfn></dt>
@@ -343,42 +268,84 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               <li><strong>arrays</strong> &mdash; lists of strings which are resolved as URLs against the <a>base URL</a></li>
             </ul>
             <p>
-              For example, the <code>hasVersion</code> property is a link property. A <a>table description</a> might contain:
+              For example, the <code>dc:hasVersion</code> property is a link property. A <a>table description</a> might contain:
             </p>
             <pre class="example highlight">
-"hasVersion": "example-2014-01-03.csv"
+"dc:hasVersion": "example-2014-01-03.csv"
             </pre>
             <p>
-              in which case the <code>hasVersion</code> property on the table would have a single value, a link to <code>example-2014-01-03.csv</code>, or it might contain:
+              in which case the <code>dc:hasVersion</code> property on the table would have a single value, a link to <code>example-2014-01-03.csv</code>. Alternatively, the metadata document might contain:
             </p>
             <pre class="example highlight">
-"hasVersion": [
+"dc:hasVersion": [
   "example-2014-01-03.csv",
   "example-2014-01-17.csv",
   "example-2014-01-25.csv"
 ]
             </pre>
             <p>
-              in which case the <code>hasVersion</code> property on the table would have three values, links to other versions of the table.
+              in which case the <code>dc:hasVersion</code> property on the table would be an array of three values, links to other versions of the table.
             </p>
           </dd>
-          <dt><dfn title="internal reference property">internal reference properties</dfn></dt>
+          <dt><dfn title="URI template property">URI template properties</dfn></dt>
           <dd>
-            <p>These hold one or more references to other description objects. The referenced description object must have an <code>@id</code> property whose value looks like <code>_:<var>name</var></code>. Internal reference properties can then reference other description objects through values that are:</p>
+            <p>
+              A URI template property contains a [[!URI-TEMPLATE]] which can be used to generate a URI. These URI templates are expanded in the context of each row by combining the template with a set of variables with values. The variables that are set are:
+            </p>
+            <dl>
+              <dt><code>_row</code></dt>
+              <dd><code>_row</code> is set to the row number of the row that is   currently being processed
+                <div class="issue" data-number="32">
+                  Where does row numbering begin?
+                </div>
+              </dd>
+              <dt>column names</dt>
+              <dd>a variable is set for each column within the schema; the name of the variable is the percent-encoded name of the column and the value is the canonical representation of the value of the cell in that column in the row that is currently being processed</dd>
+            </dl>
+            <p>
+              For example, the <code>urlTemplate</code> property holds a URI template that is used to generate a URL identifier for each row, which might look like:
+            </p>
+            <pre class="example highlight">
+"urlTemplate": "http://example.org/example.csv#row={_row}"
+            </pre>
+            <p>
+              The identifiers that are generated for the rows would then look like <code>http://example.org/example.csv#row=1</code>, <code>http://example.org/example.csv#row=2</code> and so on.
+            </p>
+            <p>
+              Alternatively, with the CSV and metadata in the <a href="#introduction" class="sectionRef"></a>, the <code>urlTemplate</code> might look like:
+            </p>
+            <pre class="example highlight">
+"urlTemplate": "http://example.org/tree/{on%2Dstreet}/{GID}"
+            </pre>
+            <p>
+              This would generate URIs such as <code>http://example.org/tree/ADDISON%20AV/1</code> and <code>http://example.org/tree/EMERSON%20ST/2</code>.
+            </p>
+            <p>
+              Once the URI has been generated, it is resolved against the location of the resource (eg the CSV file) to create an absolute URI. For example, given a <code>urlTemplate</code> within a schema such as:
+            </p>
+            <pre>
+"urlTemplate": "#row={_row}"
+            </pre>
+            <p>
+              and given a CSV file at <code>http://example.com/temp.csv</code>, the URL for the first row will be <code>http://example.com/temp.csv#row=1</code>.
+            </p>
+          </dd>
+          <dt><dfn title="column reference property">column reference properties</dfn></dt>
+          <dd>
+            <p>These hold one or more references to other column description objects. The referenced description object must have an <code>name</code> property. Column reference properties can then reference column description objects through values that are:</p>
             <ul>
-              <li><strong>strings</strong> &mdash; in the format <code>_:<var>name</var></code> which MUST match the <code>@id</code> on another description object within the metadata document</li>
+              <li><strong>strings</strong> &mdash; which MUST match the <code>name</code> on a column description object within the metadata document</li>
               <li><strong>arrays</strong> &mdash; lists of strings as above</li>
             </ul>
             <p>
-              For example, the <code>primaryKey</code> property is an internal reference property on the schema. It has to hold references to columns defined elsewhere in the schema, and the descriptions of those columns must have <code>@id</code> properties. It can hold a single reference, like this:
+              For example, the <code>primaryKey</code> property is an column reference property on the schema. It has to hold references to columns defined elsewhere in the schema, and the descriptions of those columns must have <code>name</code> properties. It can hold a single reference, like this:
             </p>
             <pre class="example highlight">
 "schema": {
   "columns": [{
-    "@id": "_:GID",
     "name": "GID"
   }, ... ],
-  "primaryKey": "_:GID"
+  "primaryKey": "GID"
 }
             </pre>
             <p>
@@ -387,13 +354,11 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <pre class="example highlight">
 "schema": {
   "columns": [{
-    "@id": "_:givenName",
     "name": "givenName"
   }, {
-    "@id": "_:familyName",
     "name": "familyName"
   }, ... ],
-  "primaryKey": [ "_:givenName", "_:familyName" ]
+  "primaryKey": [ "givenName", "familyName" ]
 }
             </pre>
           </dd>
@@ -403,23 +368,52 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <ul>
               <li><strong>strings</strong> &mdash; resolved as URLs against the <a>base URL</a></li>
               <li><strong>objects</strong> &mdash; interpreted as structured objects</li>
-              <li><strong>arrays</strong> &mdash; lists of strings and/or objects</li>
+              <li><strong>arrays</strong> &mdash; lists of strings and/or objects, interpreted as URLs or structured objects</li>
             </ul>
             <p>
-              Object properties are often used when the values can be or should be values within controlled vocabularies, or structured information which may be held elsewhere. For example, the <code>creator</code> of a table is an object property. It could be provided as a URL that indicates the creator, like this:
+              Object properties are often used when the values can be or should be values within controlled vocabularies, or structured information which may be held elsewhere. For example, the <code>dc:creator</code> of a table should be an object property. It could be provided as a URL that indicates the creator, like this:
             </p>
             <pre class="example highlight">
-"creator": "http://ons.gov.uk"
+"dc:creator": "http://ons.gov.uk"
             </pre>
             <p>
               or a structured object, like this:
             </p>
             <pre class="example highlight">
-"creator": {
-  "name": "Office of National Statistics",
-  "url": "http://ons.gov.uk",
-  "email": "info@ons.gsi.gov.uk"
+"dc:creator": {
+  "sch:name": "Office of National Statistics",
+  "sch:url": "http://ons.gov.uk",
+  "sch:email": "info@ons.gsi.gov.uk"
 }
+            </pre>
+            <p>
+              or an array of URLs, like this:
+            </p>
+            <pre class="example highlight">
+"dc:creator": [ "http://ons.gov.uk", "https://www.gov.uk/government/organisations/department-for-transport" ]
+            </pre>
+            <p>
+              or an array of structured objects:
+            </p>
+            <pre class="example highlight">
+"dc:creator": [{
+  "sch:name": "Office of National Statistics",
+  "sch:url": "http://ons.gov.uk",
+  "sch:email": "info@ons.gsi.gov.uk"
+}, {
+  "sch:name": "Department for Transport",
+  "sch:url": "https://www.gov.uk/government/organisations/department-for-transport"
+}]
+            </pre>
+            <p>
+              or an array that mixes URLs and objects:
+            </p>
+            <pre class="example highlight">
+"dc:creator": [{
+  "sch:name": "Office of National Statistics",
+  "sch:url": "http://ons.gov.uk",
+  "sch:email": "info@ons.gsi.gov.uk"
+}, "https://www.gov.uk/government/organisations/department-for-transport" ]
             </pre>
           </dd>
           <dt><dfn title="natural language property">natural language properties</dfn></dt>
@@ -454,7 +448,16 @@ GID,On Street,Species,Trim Cycle,Inventory Date
   "fr": "Titre du projet"
 }
             </pre>
-            <p class="issue">
+            <p>
+              and within such an object, the values of the properties can themselves be arrays:
+            </p>
+            <pre class="example highlight">
+"title": {
+  "en": [ "Project title", "Project" ],
+  "fr": "Titre du projet"
+}
+            </pre>
+            <p class="issue" data-number="49">
               We invite comment on whether it would be useful to enable some markup in natural language strings, for example by stating that they are interpreted as HTML or Markdown.
             </p>
           </dd>
@@ -476,16 +479,16 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       <section>
         <h3>Top-Level Properties</h3>
         <p>
-          The top-level object MAY have a <code>@context</code> property. This holds an object that provides metadata for interpreting other properties, namely:
+          The top-level object (whether it is a <a>table group description</a> or a <a>table description</a>) MAY have a <code>@context</code> property. This holds an object that provides metadata for interpreting other properties, namely:
         </p>
         <dl>
           <dt><code>@language</code></dt>
           <dd>
             <p>
-              indicates the default language for the values of properties in the description; if present, its value MUST be a language code [[!RFC3066]] which is the <dfn>default language</dfn> for the values of other properties in the metadata document
+              indicates the default language for the values of properties in the metadata document; if present, its value MUST be a language code [[!BCP47]] which is the <dfn>default language</dfn> for the values of other properties in the metadata document
             </p>
             <p class="note">
-              Note that the <code>@language</code> property of the <code>@context</code> object, which gives the default language used within the metadata file, is distinct from the <code>language</code> property on a <a>description object</a>, which gives the language used in the data within the table.
+              Note that the <code>@language</code> property of the <code>@context</code> object, which gives the default language used within the metadata file, is distinct from the <code>language</code> property on a <a>description object</a>, which gives the language used in the data within a group of tables, table or column.
             </p>
           </dd>
           <dt><code>@base</code></dt>
@@ -494,7 +497,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               indicates the base URL against which other URLs within the description are resolved; if present, its value MUST be a URL which is resolved against the base URL of the metadata document (the location from which it was retrieved) to provide the <dfn>base URL</dfn> for other URLs in the metadata document
             </p>
             <p class="note">
-              Note that the <code>@base</code> property of the <code>@context</code> object provides the base URL used for URLs within the metadata document, not the URLs that appear within the table.
+              Note that the <code>@base</code> property of the <code>@context</code> object provides the base URL used for URLs within the metadata document, not the URLs that appear within the group of tables or table it describes.
             </p>
           </dd>
         </dl>
@@ -502,327 +505,75 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       <section>
         <h3>Common Properties</h3>
         <p>
-          The properties listed here may be applied to any structure within the tabular data model: tables, columns, rows or cells.
+          Descriptions of groups of tables, tables, schemas, columns, rows and cells MAY contain any properties whose names are either absolute URLs or prefixed names. For example, a table description may contain <code>dc:description</code>, <code>dcat:keyword</code> or <code>schema:copyrightHolder</code> properties to provide a description, keywords or the name of the copyright holder, as defined in <a href="http://dublincore.org/documents/2010/10/11/dcmi-terms/#elements-description">Dublin Core Terms</a>, <a href="http://www.w3.org/TR/vocab-dcat/#Property:dataset_keyword">DCAT</a> or <a href="http://schema.org/copyrightHolder">schema.org</a>.
         </p>
-        <p class="issue">
-          We invite comment on whether there are other standard metadata vocabularies that should be reused within this specification.
+        <p>
+          The same prefixes are pre-defined as for [[rdfa-core]] within the <a href="http://www.w3.org/2011/rdfa-context/rdfa-1.1">RDFa 1.1 Initial Context</a> and MUST NOT be overridden. Properties from other vocabularies MUST be defined using full URLs.
         </p>
-        <section>
-          <h4>Dublin Core Terms</h4>
-          <p>
-            Descriptions MAY contain any properties defined by [[!DC-TERMS]] to describe the table. This specification does not define any application behaviour associated with these properties being present, except that validation of metadata files MUST check that, if they are present, they adhere to the syntax defined here.
-          </p>
-          <table>
-            <thead>
-              <tr><th>Property</th><th>Type</th><th>Details</th></tr>
-            </thead>
-            <tr><th><code>abstract</code></th><td><a>natural language property</a></td><td></td></tr>
-            <tr><th><code>accessRights</code></th><td><a>object property</a></td><td></td></tr>
-            <tr><th><code>accrualMethod</code></th><td><a>object property</a></td><td></td></tr>
-            <tr><th><code>accrualPeriodicity</code></th><td><a>object property</a></td><td></td></tr>
-            <tr><th><code>accrualPolicy</code></th><td><a>object property</a></td><td></td></tr>
-            <tr><th><code>alternative</code></th><td><a>natural language property</a></td><td></td></tr>
-            <tr><th><code>audience</code></th><td><a>object property</a></td><td></td></tr>
-            <tr><th><code>available</code></th><td><a>atomic property</a></td><td>dates in the format <code>YYYY-MM-DD</code></td></tr>
-            <tr><th><code>bibliographicCitation</code></th><td><a>natural language property</a></td><td></td></tr>
-            <tr><th><code>conformsTo</code></th><td><a>object property</a></td><td></td></tr>
-            <tr><th><code>contributor</code></th><td><a>object property</a></td><td></td></tr>
-            <tr><th><code>coverage</code></th><td><a>object property</a></td><td></td></tr>
-            <tr><th><code>created</code></th><td><a>atomic property</a></td><td>dates in the format <code>YYYY-MM-DD</code></td></tr>
-            <tr><th><code>creator</code></th><td><a>object property</a></td><td></td></tr>
-            <tr><th><code>date</code></th><td><a>atomic property</a></td><td>dates in the format <code>YYYY-MM-DD</code></td></tr>
-            <tr><th><code>dateAccepted</code></th><td><a>atomic property</a></td><td>dates in the format <code>YYYY-MM-DD</code></td></tr>
-            <tr><th><code>dateCopyrighted</code></th><td><a>atomic property</a></td><td>dates in the format <code>YYYY-MM-DD</code></td></tr>
-            <tr><th><code>dateSubmitted</code></th><td><a>atomic property</a></td><td>dates in the format <code>YYYY-MM-DD</code></td></tr>
-            <tr><th><code>description</code></th><td><a>natural language property</a></td><td></td></tr>
-            <tr><th><code>educationLevel</code></th><td><a>object property</a></td><td></td></tr>
-            <tr><th><code>extent</code></th><td><a>object property</a></td><td></td></tr>
-            <tr><th><code>format</code></th><td><a>object property</a></td><td></td></tr>
-            <tr><th><code>hasFormat</code></th><td><a>object property</a></td><td></td></tr>
-            <tr><th><code>hasPart</code></th><td><a>link property</a></td><td></td></tr>
-            <tr><th><code>hasVersion</code></th><td><a>link property</a></td><td></td></tr>
-            <tr><th><code>identifier</code></th><td><a>atomic property</a></td><td>a URL</td></tr>
-            <tr><th><code>instructionalMethod</code></th><td><a>object property</a></td><td></td></tr>
-            <tr><th><code>isFormatOf</code></th><td><a>link property</a></td><td></td></tr>
-            <tr><th><code>isPartOf</code></th><td><a>link property</a></td><td></td></tr>
-            <tr><th><code>isReferencedBy</code></th><td><a>link property</a></td><td></td></tr>
-            <tr><th><code>isReplacedBy</code></th><td><a>link property</a></td><td></td></tr>
-            <tr><th><code>isRequiredBy</code></th><td><a>link property</a></td><td></td></tr>
-            <tr><th><code>issued</code></th><td><a>atomic property</a></td><td>dates in the format <code>YYYY-MM-DD</code></td></tr>
-            <tr><th><code>isVersionOf</code></th><td><a>link property</a></td><td></td></tr>
-            <tr><th><code>language</code></th><td><a>atomic property</a></td><td>a language code as defined by [[!RFC3066]]; this is an <a>inherited property</a></td></tr>
-            <tr><th><code>license</code></th><td><a>object property</a></td><td></td></tr>
-            <tr><th><code>mediator</code></th><td><a>object property</a></td><td></td></tr>
-            <tr><th><code>medium</code></th><td><a>object property</a></td><td></td></tr>
-            <tr><th><code>modified</code></th><td><a>atomic property</a></td><td>dates in the format <code>YYYY-MM-DD</code></td></tr>
-            <tr><th><code>provenance</code></th><td><a>object property</a></td><td></td></tr>
-            <tr><th><code>publisher</code></th><td><a>object property</a></td><td></td></tr>
-            <tr><th><code>references</code></th><td><a>link property</a></td><td></td></tr>
-            <tr><th><code>relation</code></th><td><a>link property</a></td><td></td></tr>
-            <tr><th><code>replaces</code></th><td><a>link property</a></td><td></td></tr>
-            <tr><th><code>requires</code></th><td><a>link property</a></td><td></td></tr>
-            <tr><th><code>rights</code></th><td><a>object property</a></td><td></td></tr>
-            <tr><th><code>rightsHolder</code></th><td><a>object property</a></td><td></td></tr>
-            <tr><th><code>source</code></th><td><a>link property</a></td><td></td></tr>
-            <tr><th><code>spatial</code></th><td><a>object property</a></td><td></td></tr>
-            <tr><th><code>subject</code></th><td><a>object property</a></td><td></td></tr>
-            <tr><th><code>tableOfContents</code></th><td><a>natural language property</a></td><td></td></tr>
-            <tr><th><code>temporal</code></th><td><a>object property</a></td><td></td></tr>
-            <tr><th><code>title</code></th><td><a>natural language property</a></td><td></td></tr>
-            <tr><th><code>type</code></th><td><a>object property</a></td><td></td></tr>
-            <tr><th><code>valid</code></th><td><a>atomic property</a></td><td>dates in the format <code>YYYY-MM-DD</code></td></tr>
-          </table>
-        </section>
-        <section>
-          <h4>Links</h4>
-          <p>
-            Description MAY include properties for registered <a href="http://www.iana.org/assignments/link-relations/link-relations.xhtml">link relations</a>, prefixed by <code>link:</code>. This specification does not define any application behaviour associated with these properties being present, except that validation of metadata files MUST check that, if they are present, they have values that are URLs or arrays of URLs. The following properties are particularly relevant to tabular data:
-          </p>
-          <ul>
-            <li><code>link:alternate</code></li>
-            <li><code>link:canonical</code></li>
-            <li><code>link:collection</code></li>
-            <li><code>link:duplicate</code></li>
-            <li><code>link:glossary</code></li>
-            <li><code>link:help</code></li>
-            <li><code>link:icon</code></li>
-            <li><code>link:last</code></li>
-            <li><code>link:latest-version</code></li>
-            <li><code>link:next</code></li>
-            <li><code>link:original</code></li>
-            <li><code>link:predecessor-version</code></li>
-            <li><code>link:prev</code> or <code>link:previous</code></li>
-            <li><code>link:preview</code></li>
-            <li><code>link:profile</code></li>
-            <li><code>link:related</code></li>
-            <li><code>link:search</code></li>
-            <li><code>link:self</code></li>
-            <li><code>link:start</code></li>
-            <li><code>link:successor-version</code></li>
-            <li><code>link:terms-of-service</code></li>
-            <li><code>link:up</code></li>
-            <li><code>link:version-history</code></li>
-            <li><code>link:working-copy</code></li>
-            <li><code>link:working-copy-of</code></li>
-          </ul>
-          <p class="note">
-            Unlike the Dublin Core terms, link relations are an ever-expanding list and there may eventually be clashes between link relation terms and those defined above. That's why the above list uses QNames for all link relations, so that they look like <code>link:<var>relation</var></code> rather than plain <code><var>relation</var></code>.
-          </p>
-        </section>
-        <section>
-          <h4>Other Properties</h4>
-          <dl>
-            <dt id="cell-text-direction"><code>text-direction</code></dt>
-            <dd>
-              <p>
-                One of <code>"rtl"</code> or <code>"ltr"</code> (the default). Indicates whether the text within cells should be displayed by default as left-to-right or right-to-left text. See <a href="#bidirectional-tables" class="sectionRef"></a> for more details.
-              </p>
-            </dd>
-          </dl>
-        </section>
+        <p class="note">
+          Forbidding the declaration of new prefixes ensures consistent processing between JSON-LD-aware and non-JSON-LD-aware processors.
+        </p>
       </section>
-      <!--
       <section>
         <h3>Table Groups</h3>
         <p>
-          Groups of tabular data files are often provided within a self-contained package, though they do not have to be.
-        </p>
-        <p class="note">
-          The following is a more-or-less direct copy from <a href="http://dataprotocols.org/data-packages/">Data Package Format</a>, with added issues.
+          A <dfn>table group description</dfn> is a JSON object that describes a group of tables.
         </p>
         <section>
-          <h4>Required Fields</h4>
-          <p>A valid metadata document MUST include the following fields:</p>
-          <ul>
-            <li>
-              <p><code>name</code> (required) - short url-usable (and preferably human-readable) name of
-          the package. This MUST be lower-case and contain only alphanumeric characters
-          along with “.”, “_” or “-“ characters. It will function as a unique
-          identifier and therefore SHOULD be unique in relation to any registry in
-          which this package will be deposited (and preferably globally unique).</p>
-
-              <p>The name SHOULD be invariant, meaning that it SHOULD NOT change when a data
-          package is updated, unless the new package version should be considered a
-          distinct package, e.g. due to significant changes in structure or
-          interpretation. Version distinction SHOULD be left to the version field. As
-          a corollary, the name also SHOULD NOT include an indication of time range
-          covered.</p>
-            </li>
-          </ul>
-          <p class="issue">
-            The requirement for a name seems more like a requirement for metadata used within a package registry than when interpreting CSV files (which might or might not be in a package). Should <code>name</code> be required? Should it have the syntactic constraints described above?
-          </p>
-          <p>In addition to the above fields, it is recommended that the following fields SHOULD 
-        be included in every package descriptor:</p>
-          <p class="issue">
-            There are four levels of requirement here: MUST, SHOULD, MAY ("recommended") and optional. In practice, given that the metadata is completely extensible, there are probably only two practical levels: required (ie if the annotation is absent anything validating the metadata file MUST raise an error) and optional, so probably worth reclassifying in that way. Should anything be required?
-          </p>
-          <ul>
-            <li>
-              <p><code>resources</code> - a JSON array of hashes that describe the contents of 
-          the package. The structure of the resource hash is described in the “Resource Information”
-          section.</p>
-              <p class="issue">
-                This should be reworded not to be reliant as a property, not reliant on JSON.
-              </p>
-            </li>
-            <li>
-              <p><code>license</code> (or <code>licenses</code>) - is a field specifying the license (or licenses)
-          under which the package is provided. You MAY specify either a <code>license</code> field
-          or a <code>licenses</code> field but NOT both.</p>
-              <p class="issue">
-                Suggest having a single annotation (<code>license</code>) and leaving the pluralisation to the JSON serialisation.
-              </p>
-              <p><strong>This property is not legally binding and does not necessarily mean your
-          package is licensed under the terms you define in this property.</strong></p>
-              <p class="issue">
-                Not clear what the point is of providing licence information in the metadata file if it can't be interpreted by receivers of the metadata as indicating the licence that the data is being made available under?
-              </p>
-              <ul>
-                <li>
-                  <p><code>license</code> MUST be a string and its value SHOULD be an <a href="http://licenses.opendefinition.org/">Open Definition license
-          ID</a> (preferably one that is <a href="http://opendefinition.org/licenses/">Open Definition
-          approved</a>.</p>
-
-                  <pre><code>{ "license" : "PDDL-1.0" }
-          </code></pre>
-                  <p class="issue">
-                    Constrain to a URL instead?
-                  </p>
-                </li>
-                <li>
-                  <p><code>licenses</code> MUST be an array. Each entry MUST be a hash with a <code>type</code> and a
-          <code>url</code> property linking to the actual text. The <code>type</code> SHOULD be an [Open
-          Definition license ID][od-license] if an ID exists for the license and
-          otherwise may be the general license name or identifier. Here is an
-          Example:</p>
-
-                  <pre><code>"licenses": [{
-            "type": "PDDL-1.0",
-            "url": "http://opendatacommons.org/licenses/pddl/"
-          }]
-          </code></pre>
-                </li>
-              </ul>
-            </li>
-            <li>
-              <p><code>datapackage_version</code> - the version of the data package specification this
-          datapackage.json conforms to. It should follow the Semantic Versioning
-          requirements (http://semver.org/). The current version of this specification is given at 
-          the top of this document.</p>
-              <p class="issue">
-                This should probably be a serialisation thing rather than a metadata property, as it's about the format of the metadata file rather than of the group of tables.
-              </p>
-            </li>
-          </ul>
+          <h4>Required Properties</h4>
+          <dl>
+            <dt id="table-group-resources"><code>resources</code></dt>
+            <dd>
+              An array of <a title="table description">table descriptions</a> for the tables in the group.
+            </dd>
+          </dl>
         </section>
         <section>
-          <h4>Recommended Fields</h3>
-          <p class="issue">
-            Align these to Dublin Core / DCAT?
+          <h4>Optional Properties</h3>
+          <p>
+            The description of a group of tables MAY also contain:
           </p>
-          <p>Additionally, a package descriptor MAY include the following keys and values:</p>
-          <ul>
-            <li><code>title</code> - a title or one sentence description for this package</li>
-            <li><code>description</code> - a description of the package. The first paragraph (up to the
-          first double line break should be usable as summary information for the package)</li>
-            <li><code>homepage</code> - URL string for the data packages web site</li>
-            <li><code>version</code> - a version string identifying the version of the package. It should conform to the Semantic Versioning requirements
-          (http://semver.org/).</li>
-            <li>
-              <p><code>sources</code> - an array of source hashes. Each source hash may have <code>name</code>, <code>web</code> and <code>email</code> fields. Example:</p>
-
-              <pre><code>"sources": [{
-            "name": "World Bank and OECD",
-            "web": "http://data.worldbank.org/indicator/NY.GDP.MKTP.CD"
-          }]
-          </code></pre>
-            </li>
-            <li><code>keywords</code> - an Array of string keywords to assist users searching for the
-          package in catalogs.</li>
-            <li><code>image</code> - a link to an image to use for this data package</li>
-          </ul>
-        </section>
-        <section>
-          <h4>Optional Fields</h4>
-          <p class="issue">
-            Align these to Dublin Core / DCAT?
-          </p>
-          <ul>
-            <li><code>maintainers</code> - Array of maintainers of the package. Each maintainer is a hash
-          which must have a “name” property and may optionally provide “email” and
-          “web” properties.</li>
-            <li>
-              <p><code>contributors</code> - an Array of hashes each containing the details of a
-          contributor. Must contain a ‘name’ property and MAY contain an email and web
-          property. By convention, the first contributor is the original author of the
-          package. Example:</p>
-
-              <pre><code>"contributors":[ {
-            "name": "Joe Bloggs",
-            "email": "joe@bloggs.com",
-            "web": "http://www.bloggs.com"
-          }]
-          </code></pre>
-            </li>
-            <li><code>publisher</code> - like contributors </li>
-            <li><code>base</code> - a base URI used to resolve <code>resources</code> that specify relative paths in
-          the event that the actual data files specified by those resource paths are not
-          located in the same directory in which the descriptor file (<code>datapackage.json</code>)
-          resides.</li>
-            <li>
-              <p><code>dataDependencies</code> - Hash of prerequisite data packages on which this package
-          depends in order to install. Follows same format as CommonJS Packages spec
-          v1.1.Each dependency defines the lowest compatible MAJOR[.MINOR[.PATCH]]
-          dependency versions (only one per MAJOR version) with which the package has
-          been tested and is assured to work. The version may be a simple version
-          string (see the version property for acceptable forms), or it may be a hash
-          group of dependencies which define a set of options, any one of which
-          satisfies the dependency. The ordering of the group is significant and
-          earlier entries have higher priority. Example:</p>
-
-              <pre><code>"dataDependencies": {
-             "country-codes": "",
-             "unemployment": "2.1",
-             "geo-boundaires": {
-               "acmecorp-geo-boundaries": ["1.0", "2.0"],
-               "othercorp-geo-boundaries": "0.9.8",
-             },
-          }
-          </code></pre>
-              <p class="issue">
-                This is again about package management rather than interpretation of tabular data, so suggest omitting it from this specification.
+          <dl>
+            <dt id="table-group-schema"><code>schema</code></dt>
+            <dd>
+              An <a>object property</a> that provides a <a>schema description</a> as described in <a href="#schemas" class="sectionRef"></a>, for all the tables in the group. This may be provided as an embedded object within the JSON metadata or as a URL reference to a separate JSON schema document.
+            </dd>
+            <dt id="table-group-direction"><code>table-direction</code></dt>
+            <dd>
+              <p>
+                One of <code>"rtl"</code>, <code>"ltr"</code> or <code>"default"</code>. Indicates whether the tables in the group should be displayed with the first column on the right, on the left, or based on the first character in the table that has a specific direction. See <a href="#bidirectional-tables" class="sectionRef"></a> for more details.
               </p>
-            </li>
-          </ul>
-
-          <div class="note">
-            <p>NOTE: A Data Package author MAY add any number of additional fields beyond those
-          listed in the specification here.  For example, suppose you were storing
-          time series data and want to list the temporal coverage of the data in the
-          Data Package you could add a field <code>temporal</code> (cf <a href="http://dublincore.org/documents/usageguide/qualifiers.shtml#temporal">Dublin Core</a>):</p>
-
-            <pre><code>"temporal": {
-            "name": "19th Century",
-            "start": "1800-01-01",
-            "end": "1899-12-31"
-          }
-          </code></pre>
-
-            <p>This flexibility enables specific communities to extend Data Packages as
-          appropriate for the data they manage. As an example, the <a href="/tabular-data-package/">Tabular Data
-          Package</a> specification extends Data Package to the case
-          where all the data is tabular and stored in CSV.</p>
-          </div>
+            </dd>
+            <dt id="table-group-dialect"><code>dialect</code></dt>
+            <dd>
+              If provided, <code>dialect</code> provides hints to processors about how to parse the referenced files for to create tabular data models for the tables in the group. See <a href="#dialect-descriptions" class="sectionRef"></a> for more details.
+            </dd>
+            <dt id="table-group-templates"><code>templates</code></dt>
+            <dd>
+              An array of <a title="template specification">template specifications</a> that provide mechanisms to transform the tabular data into other formats. See <a href="#template-specifications" class="sectionRef"></a> for more details.
+            </dd>
+            <dt id="table-ld-type"><code>@type</code></dt>
+            <dd>
+              If included, <code>@type</code> MUST be set to <code>"TableGroup"</code>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.
+            </dd>
+          </dl>
+          <p>
+            The description MAY contain any common properties as defined in <a href="#common-properties" class="sectionRef"></a> to provide extra metadata about the set of tables as a whole.
+          </p>
+          <p>
+            The description MAY contain any of the properties defined in <a href="#inherited-properties" class="sectionRef"></a> to describe cells within the tables.
+          </p>
+        <p class="issue" data-number="22">
+          This issue relates to the use of type vs datatype as a column property. (This issue seems moot now that neither are included.)
+        </p>
         </section>
       </section>
-    -->
       <section>
         <h3>Tables</h3>
         <p>
           A <dfn>table description</dfn> is a JSON object that describes a table within a CSV file.
         </p>
-        <p class="issue">
+        <p class="issue" data-number="50">
           A CSV file might not be the same as the table that it contains. For example, a given CSV file might contain two tables (in different regions of the CSV file), or might contain a table that isn't positioned at the top left of the CSV file. We invite comment about whether we should assume that pre-processing is used to extract tables where there isn't a 1:1 correspondence between CSV file and table, or not.
         </p>
         <section>
@@ -842,122 +593,216 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             The description of a table MAY also contain:
           </p>
           <dl>
-            <dt id="table-ld-type"><code>@type</code></dt>
-            <dd>
-              If included, <code>@type</code> MUST be set to <code>"Table"</code>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.
-            </dd>
-            <dt id="table-direction"><code>table-direction</code></dt>
-            <dd>
-              <p>
-                One of <code>"rtl"</code>, <code>"ltr"</code> or <code>"default"</code>. Indicates whether the table should be displayed with the first column on the right, on the left, or based on the first character in the table that has a specific direction. See <a href="#bidirectional-tables" class="sectionRef"></a> for more details.
-              </p>
-              <p class="issue">
-                This should be a defined controlled vocabulary in JSON-LD, so that the values map on to URIs in the RDF version rather than strings. We invite comment on how to configure the JSON-LD context to enable these values to be interpreted in this way.
-              </p>
-            </dd>
             <dt id="table-schema"><code>schema</code></dt>
             <dd>
               An <a>object property</a> that provides a <a>schema description</a> as described in <a href="#schemas" class="sectionRef"></a>. This may be provided as an embedded object within the JSON metadata or as a URL reference to a separate JSON schema document.
             </dd>
             <dt id="table-notes"><code>notes</code></dt>
             <dd>
-              An <a>object property</a>, usually an array, of annotation objects. An <dfn>annotation object</dfn> is an object that holds general annotations about a particular column, row, cell or region of the table. Each annotation object MUST have an <code>@id</code> property that references the relevant column, row, cell or region of the table using a fragment identifier. It MAY have any other common properties as described in <a href="#common-properties" class="sectionRef"></a>.
+              <p>
+                An array of objects representing annotations. This specification does not place any constraints on the structure of these objects.
+              </p>
+              <p class="note">
+                The <a href="http://www.w3.org/annotation/">Web Annotation Working Group</a> is developing a vocabulary for expressing annotations. In future versions of this specification, we anticipate referencing that vocabulary.
+              </p>
+              <p class="issue" data-number="70">
+                Should there be column or level notes as well?
+              </p>
+              <p class="issue" data-number="71">
+                The Annotation Model can indeed become very complex.
+              </p>
+            </dd>
+            <dt id="table-direction"><code>table-direction</code></dt>
+            <dd>
+              <p>
+                One of <code>"rtl"</code>, <code>"ltr"</code> or <code>"default"</code>. Indicates whether the table should be displayed with the first column on the right, on the left, or based on the first character in the table that has a specific direction. See <a href="#bidirectional-tables" class="sectionRef"></a> for more details.
+              </p>
+              <p class="issue" data-number="51">
+                This should be a defined controlled vocabulary in JSON-LD, so that the values map on to URIs in the RDF version rather than strings. We invite comment on how to configure the JSON-LD context to enable these values to be interpreted in this way.
+              </p>
+            </dd>
+            <dt id="table-group-templates"><code>templates</code></dt>
+            <dd>
+              An array of <a title="template specification">template specifications</a> that provide mechanisms to transform the tabular data into other formats. See <a href="#template-specifications" class="sectionRef"></a> for more details.
+            </dd>
+            <dt id="table-dialect"><code>dialect</code></dt>
+            <dd>
+              If provided, <code>dialect</code> provides hints to processors about how to parse the referenced file to create a tabular data model. See <a href="#dialect-descriptions" class="sectionRef"></a> for more details.
+            </dd>
+            <dt id="table-ld-type"><code>@type</code></dt>
+            <dd>
+              If included, <code>@type</code> MUST be set to <code>"Table"</code>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.
             </dd>
           </dl>
-          <div class="issue">
-            <p>
-              We intend to add a small subset of properties that indicate how a CSV file should be parsed, specifically those that mirror the existing distinction between the media types for <code>text/csv</code> and <code>text/tab-separated-values</code>, and the media type parameters that they allow, namely:
-            </p>
-            <ul>
-              <li><code>separator</code> to give the character used as the separator in the tabular data file</li>
-              <li><code>encoding</code> to specify the encoding used in the file</li>
-              <li><code>header</code> to specify whether or not a header line is present</li>
-            </ul>
-            <p>
-              We invite comment about whether these are the right properties to specify.
-            </p>
-          </div>
-          <p class="issue">
+          <p class="issue" data-numer="52">
             We invite comment on whether we should include properties that help in checking the integrity of the file: datapackage includes <code>bytes</code> and <code>hash</code>. We could reuse the <a href="http://www.w3.org/TR/SRI/">Subresource Integrity</a> work here.
           </p>
           <p>
-            The description MAY contain any of the properties defined in <a href="#common-properties" class="sectionRef"></a> to describe the table. As well as links to other related tables, the following common properties are particularly suitable for tables:
+            The description MAY contain any common properties as defined in <a href="#common-properties" class="sectionRef"></a> to provide extra metadata about the table as a whole.
           </p>
-          <ul>
-            <li><code>created</code></li>
-            <li><code>creator</code></li>
-            <li><code>description</code></li>
-            <li><code>language</code></li>
-            <li><code>license</code></li>
-            <li><code>modified</code></li>
-            <li><code>provenance</code></li>
-            <li><code>publisher</code></li>
-            <li><code>rights</code></li>
-            <li><code>rightsHolder</code></li>
-            <li><code>source</code></li>
-            <li><code>spatial</code></li>
-            <li><code>subject</code></li>
-            <li><code>temporal</code></li>
-            <li><code>title</code></li>
-          </ul>
+          <p>
+            The description MAY contain any of the properties defined in <a href="#inherited-properties" class="sectionRef"></a> to describe cells within the table.
+          </p>
         </section>
-        <!--
+      </section>
+      <section>
+        <h3>Dialect Descriptions</h3>
+        <p>
+          Much of the tabular data that is published on the web is messy, and CSV parsers frequently need to be configured in order to correctly read in CSV. A dialect description provides hints to parsers about how to parse the file linked to from the <code>@id</code> property. It can have any of the following properties, which relate to the flags described in <a href="http://w3c.github.io/csvw/syntax/#parsing">Section 5 Parsing Tabular Data</a> within [[!tabular-data-model]]:
+        </p>
+        <dl>
+          <dt id="dialect-encoding"><code>encoding</code></dt>
+          <dd>
+            Sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-encoding">encoding</a> flag to the provided value, which MUST be a defined [[!encoding]].
+          </dd>
+          <dt id="dialect-lineTerminator"><code>lineTerminator</code></dt>
+          <dd>
+            Sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-line-terminator">line terminator</a> flag to the provided string value.
+          </dd>
+          <dt id="dialect-quoteChar"><code>quoteChar</code></dt>
+          <dd>
+            Sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-quote-character">quote character</a> flag to the provided value, which MUST be a single character.
+          </dd>
+          <dt id="dialect-doubleQuote"><code>doubleQuote</code></dt>
+          <dd>
+            If <code>true</code>, sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-escape-character">escape character</a> flag to <code>"</code>. If <code>false</code>, to <code>\</code>.
+          </dd>
+          <dt id="dialect-skipRows"><code>skipRows</code></dt>
+          <dd>
+            Sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-skip-rows">skip rows</a> flag to the provided numeric value, which MUST be a non-negative integer.
+          </dd>
+          <dt id="dialect-commentPrefix"><code>commentPrefix</code></dt>
+          <dd>
+            Sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-comment-prefix">comment prefix</a> flag to the provided value, which MUST be a single character string.
+          </dd>
+          <dt id="dialect-header"><code>header</code></dt>
+          <dd>
+            If <code>true</code>, sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-header-row-count">header row count</a> flag to <code>1</code>, and if <code>false</code> to <code>0</code>, unless <a href="#dialect-headerRowCount"><code>headerRowCount</code></a> is provided, in which case the value provided for the <code>header</code> property is ignored.
+          </dd>
+          <dt id="dialect-headerRowCount"><code>headerRowCount</code></dt>
+          <dd>
+            Sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-header-row-count">header row count</a> flag to the provided value, which MUST be a non-negative integer.
+          </dd>
+          <dt id="dialect-delimiter"><code>delimiter</code></dt>
+          <dd>
+            Sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-delimiter">delimiter</a> flag to the provided value, which MUST be a single character string.
+          </dd>
+          <dt id="dialect-skipColumns"><code>skipColumns</code></dt>
+          <dd>
+            Sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-skip-columns">skip columns</a> flag to the provided numeric value, which MUST be a non-negative integer.
+          </dd>
+          <dt id="dialect-headerColumnCount"><code>headerColumnCount</code></dt>
+          <dd>
+            Sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-header-column-count">header column count</a> flag to the provided value, which MUST be non-negative integer.
+          </dd>
+          <dt id="dialect-skipBlankRows"><code>skipBlankRows</code></dt>
+          <dd>
+            Sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-skip-blank-rows">skip blank rows</a> flag to the provided boolean value.
+          </dd>
+          <dt id="dialect-skipInitialSpace"><code>skipInitialSpace</code></dt>
+          <dd>
+            If <code>true</code>, sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-trim">trim</a> flag to <code>"start"</code>. If <code>false</code>, to <code>false</code>. If the <a href="#dialect-trim"><code>trim</code></a> property is provided, the <code>skipInitialSpace</code> property is ignored.
+          </dd>
+          <dt id="dialect-trim"><code>trim</code></dt>
+          <dd>
+            If the boolean <code>true</code>, sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-trim">trim</a> flag to <code>true</code> and if the boolean <code>false</code> to <code>false</code>. If the value provided is a string, sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-trim">trim</a> flag to the provided value, which MUST be one of <code>"true"</code>, <code>"false"</code>, <code>"start"</code> or <code>"end"</code>.
+          </dd>
+          <dt id="dialect-ld-type"><code>@type</code></dt>
+          <dd>
+            If included, <code>@type</code> MUST be set to <code>"Dialect"</code>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.
+          </dd>
+        </dl>
+        <div class="example">
+          <p>
+            The default dialect description for CSV files is:
+          </p>
+          <pre>
+{
+  "encoding": "utf-8",
+  "lineTerminator": "\r\n",
+  "quoteChar": "\"",
+  "doubleQuote": true,
+  "skipRows": 0,
+  "header": true,
+  "headerRowCount": 1,
+  "delimiter": ",",
+  "skipColumns": 0,
+  "headerColumnCount": 0,
+  "skipBlankRows": false,
+  "skipInitialSpace": false,
+  "trim": false
+}
+          </pre>
+        </div>
+      </section>
+      <section>
+        <h3>Template Specifications</h3>
+        <p>
+          A <dfn>template specification</dfn> is a definition of how tabular data can be transformed into another format. It has the following properties:
+        </p>
         <section>
-          <h4>Foreign Keys</h4>
-
-          <div class="alert alert-success">
-          Foreign Keys by necessity must be able to reference other data objects. These
-          data objects require a specific structure for the spec to work. This spec
-          assumes the data objects being referenced are <a href="/data-packages/">Data
-          Packages</a>. Thus, to use Foreign Keys you must be referencing Data Packages.
-          </div>
-
-          <p>A foreign key is a reference where entries in a given field (or fields) on this
-          table (‘resource’ in data package terminology) is a reference to an entry in a
-          field (or fields) on a separate resource.</p>
-
-          <p>The <code>foreignKeys</code> attribute, if present, MUST be an Array. Each entry in the
-          array must be a <code>foreignKey</code>. A <code>foreignKey</code> MUST be a Hash and:</p>
-
-          <ul>
-            <li><code>MUST</code> have an attribute <code>fields</code>. <code>fields</code> is a string or array specifying the 
-          field or fields on this resource that form the source part of the foreign
-          key. The structure of the string or array is as per <code>primaryKey</code> above.</li>
-            <li><code>MUST</code> have an attribute <code>reference</code> which MUST be a Hash. The Hash
-              <ul>
-                <li><code>MAY</code> have an attribute <code>datapackage</code>. This attribute is a string being a url or
-          name to a datapackage. If absent the implication is that this is a
-          reference to a resource within the current data package.</li>
-                <li><code>MUST</code> have an attribute <code>resource</code> which is the name of the resource
-          within the referenced data package</li>
-                <li><code>MUST</code> have an attribute <code>fields</code> which is a string if the outer <code>fields</code> is a
-          string, else an array of the same length as the outer <code>fields</code>, describing the
-          field (or fields) references on the destination resource. The structure of
-          the string or array is as per <code>primaryKey</code> above.</li>
-              </ul>
-            </li>
-          </ul>
-
-          <p>Here’s an example:</p>
-
-          <pre><code>  "fields": [
-              {
-                "name": "state"
-              }
-            ],
-            "foreignKeys": [
-              {
-                "fields": "state"
-                "reference": {
-                  "datapackage": "http://data.okfn.org/data/mydatapackage/",
-                  "resource": "the-resource",
-                  "fields": "state_id"
-                }
-              }
-            ]
-          </code></pre>
+          <h4>Required Properties</h4>
+          <p>
+            Template specifications MUST have the following properties:
+          </p>
+          <dl>
+            <dt id="template-targetFormat"><code>targetFormat</code></dt>
+            <dd>
+              <p>
+                A URL for the format that will be created through the transformation. If one has been defined, this should be a URL for a media type, in the form <code>http://www.iana.org/assignments/media-types/<var>media-type</var></code> such as <code>http://www.iana.org/assignments/media-types/text/calendar</code>. Otherwise, it can be any URL that describes the target format.
+              </p>
+              <p class="note">
+                The <code>targetFormat</code> URL is intended as an informative identifier for the target format, and applications MAY NOT access the URL.
+              </p>
+            </dd>
+            <dt id="template-templateFormat"><code>templateFormat</code></dt>
+            <dd>
+              <p>
+                A URL for the format that is used by the template. If one has been defined, this should be a URL for a media type, in the form <code>http://www.iana.org/assignments/media-types/<var>media-type</var></code> such as <code>http://www.iana.org/assignments/media-types/application/javascript</code>. Otherwise, it can be any URL that describes the template format.
+              </p>
+              <p class="note">
+                The <code>templateFormat</code> URL is intended as an informative identifier for the template format, and applications MAY NOT access the URL. The template formats that an application supports are implementation defined.
+              </p>
+            </dd>
+          </dl>
         </section>
-      -->
+        <section>
+          <h4>Optional Properties</h4>
+          <p>
+            Template specifications MAY have the following properties:
+          </p>
+          <dl>
+            <dt id="template-title"><code>title</code></dt>
+            <dd>
+              A <a>natural language property</a> that describes the format that will be generated from the transformation. This is useful if the target format is a generic format (such as <code>application/json</code>) and the transformation is creating a specific profile of that format.
+            </dd>
+            <dt id="template-source"><code>source</code></dt>
+            <dd>
+              If included, the format to which the tabular data should be transformed prior to the transformation using the template. If the value is <code>"json"</code>, the tabular data should first be transformed first to JSON based on the simple mapping defined in <a href="http://w3c.github.io/csvw/csv2json/">Generating JSON from Tabular Data on the Web</a>. If the value is <code>"rdf"</code>, it should similarly first be transformed to XML based on the simple mapping defined in <a href="http://w3c.github.io/csvw/csv2rdf/">Generating RDF from Tabular Data on the Web</a>. If the <code>source</code> property is missing or <code>null</code> then the source of the transformation is the annotated tabular data model.
+            </dd>
+            <dt id="template-ld-type"><code>@type</code></dt>
+            <dd>
+              If included, <code>@type</code> MUST be set to <code>"Template"</code>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.
+            </dd>
+          </dl>
+          <p>
+            The template specification MAY contain any common properties as defined in <a href="#common-properties" class="sectionRef"></a> to provide extra metadata about the transformation.
+          </p>
+        </section>
+        <section>
+          <h4>Example</h4>
+          <p>
+            The following template specification will enable a processor that supports it to generate an iCalendar document using a <a href="https://mustache.github.io/">Mustache template</a> based on the JSON created from the simple mapping to JSON.
+          </p>
+          <pre class="example">
+{
+  "title": "iCalendar",
+  "targetFormat": "http://www.iana.org/assignments/media-types/text/calendar",
+  "templateFormat": "https://mustache.github.io/",
+  "source": "json"
+} 
+          </pre>
+        </section>
       </section>
       <section>
         <h3>Schemas</h3>
@@ -968,10 +813,6 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           A <dfn>schema description</dfn> is a JSON object that encodes the information about a schema. All the properties of a schema description are optional.
         </p>
         <dl>
-          <dt id="schema-ld-type"><code>@type</code></dt>
-          <dd>
-            If included, <code>@type</code> MUST be set to <code>"Schema"</code>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.
-          </dd>
           <dt id="schema-columns"><code>columns</code></dt>
           <dd>
             <p>
@@ -981,54 +822,251 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               The <a href="#column-name"><code>name</code></a> properties of the column descriptions MUST be unique within a given table description.
             </p>
           </dd>
-          <dt id="table-rows"><code>rows</code></dt>
-          <dd>
-            <p>
-              An array of row descriptions as described in <a href="#rows" class="sectionRef"></a>. These are matched to row by the value of the <code>row</code> in the row description. The values of the <code>row</code> properties MUST be unique within a given table description (ie no row can have more than one description).
-            </p>
-          </dd>
-          <dt id="table-cells"><code>cells</code></dt>
-          <dd>
-            <p>
-              An array of cell descriptions as described in <a href="#cells" class="sectionRef"></a>. These are matched to cell by the value of the <code>row</code> and <code>column</code> properties in the cell description. The combination of values of the <code>row</code> and <code>column</code> properties MUST be unique within a given table description (ie no cell can have more than one description).
-            </p>
-          </dd>
           <dt id="table-primaryKey"><code>primaryKey</code></dt>
           <dd>
             <p>
-              An <a>internal reference property</a> that holds either a single references to a column description object or an array of references.
+              A <a>column reference property</a> that holds either a single reference to a column description object or an array of references.
             </p>
             <p>
-              Validators MUST check that each row has a unique combination of cells in the indicated columns. For example, if <code>primaryKey</code> is set to <code>["_:familyName", "_:givenName"]</code> then every row must have a unique value for the combination of the <code>familyName</code> and <code>givenName</code> columns.
+              Validators MUST check that each row has a unique combination of cells in the indicated columns. For example, if <code>primaryKey</code> is set to <code>["familyName", "givenName"]</code> then every row must have a unique value for the combination of the <code>familyName</code> and <code>givenName</code> columns.
             </p>
-            <p class="issue">
-              When referencing columns for a primary key, it is a lot clearer to reference them by name rather than by number. For JSON-LD compatibility, we have to assign a blank node identifier to each column even though they each have a <code>name</code> property that could be used instead. We invite comment on how to make this easier for people to use while maintaining JSON-LD compatibility.
+            <p class="issue" data-number="66">
+              Composite primary keys and foreign key references.
             </p>
+          </dd>
+          <dt id="table-foreignKeys"><code>foreignKeys</code></dt>
+          <dd>
+            <p>
+              An array of <a title="foreign key definition">foreign key definitions</a> that define how the values from specified columns within this table link to rows within this table or other tables. A <dfn>foreign key definition</dfn> is a JSON object with the properties:
+            </p>
+            <dl>
+              <dt id="foreign-key-columns"><code>columns</code></dt>
+              <dd>
+                A <a>column reference property</a> that holds either a single reference to a column description object within this schema, or an array of references.
+              </dd>
+              <dt id="foreign-key-reference"><code>reference</code></dt>
+              <dd>
+                <p>
+                  An object with the properties:
+                </p>
+                <dl>
+                  <dt id="foreign-key-reference-resource"><code>resource</code></dt>
+                  <dd>
+                    A URL that is the identifier for a specific resource that is being referenced. If this is present then <code>schema</code> MUST NOT be present. The metadata document MUST contain a description of the resource.
+                  </dd>
+                  <dt id="foreign-key-reference-schema"><code>schema</code></dt>
+                  <dd>
+                    A URL that is the identifier for a schema that is being referenced. If this is present then <code>resource</code> MUST NOT be present. The metadata document that forms the basis of processing MUST contain a description of a resource that uses the referenced schema, and there MUST NOT be more than one such resource.
+                  </dd>
+                  <dt id="foreign-key-reference"><code>columns</code></dt>
+                  <dd>
+                    A <a>column reference property</a> that holds either a single reference to a column description object within this schema, or an array of references.
+                  </dd>
+                </dl>
+              </dd>
+            </dl>
+            <p class="note">
+              It is not required for the resource or schema referenced from a <code>foreignKeys</code> property to have a similarly defined <code>primaryKey</code>.
+            </p>
+            <p class="issue" data-number="16">
+              The cross reference between files should be limited to files from one publisher - else they are just web links with no guarantee of whether the target of the link exists which 'foreign key' might imply.
+            </p>
+          </dd>
+          <dt id="schema-urlTemplate"><code>urlTemplate</code></dt>
+          <dd>
+            A <a>URI template property</a> that MAY be used to create a unique identifier for each row when mapping data to other formats.
+          </dd>
+          <dt id="schema-ld-type"><code>@type</code></dt>
+          <dd>
+            If included, <code>@type</code> MUST be set to <code>"Schema"</code>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.
           </dd>
         </dl>
         <p>
-          The description MAY contain any of the properties defined in <a href="#common-properties" class="sectionRef"></a> to describe the schema. As well as links to other related schemas, the following common properties are particularly suitable for schemas:
+          The description MAY contain any common properties as defined in <a href="#common-properties" class="sectionRef"></a> to provide extra metadata about the schema as a whole.
         </p>
-        <ul>
-          <li><code>created</code></li>
-          <li><code>creator</code></li>
-          <li><code>description</code></li>
-          <li><code>license</code></li>
-          <li><code>modified</code></li>
-          <li><code>publisher</code></li>
-          <li><code>rights</code></li>
-          <li><code>rightsHolder</code></li>
-          <li><code>subject</code></li>
-          <li><code>title</code></li>
-        </ul>
         <p>
           The description MAY contain any of the <a title="inherited property">inherited properties</a> defined for cells in <a href="#inherited-properties" class="sectionRef"></a>.
         </p>
+        <section>
+          <h4>Examples</h4>
+          <section>
+            <h5>Foreign Key Reference Between Resources</h5>
+            <p>
+              A list of countries is published at <code>http://example.org/countries.csv</code> with the structure:
+            </p>
+            <pre class="example highlight">
+countryCode,latitude,longitude,name
+AD,42.546245,1.601554,Andorra
+AE,23.424076,53.847818,"United Arab Emirates"
+AF,33.93911,67.709953,Afghanistan
+            </pre>
+            <p>
+              Another file contains information about the population in some countries each year, at <code>http://example.com/country_slice.csv</code> with the structure:
+            </p>
+            <pre class="example highlight">
+countryRef,year,population
+AF,1960,9616353
+AF,1961,9799379
+AF,1962,9989846
+            </pre>
+            <p>
+              The following metadata for the group of tables links the two together by defining a <code>foreignKeys</code> property:
+            </p>
+            <pre class="example highlight">
+{
+  "resources": [{
+    "@id": "https://example.org/countries.csv",
+    "schema": {
+      "columns": [{
+        "name": "countryCode",
+        "datatype": "string"
+      }, {
+        "name": "latitude",
+        "datatype": "number"
+      }, {
+        "name": "longitude",
+        "datatype": "number"
+      }, {
+        "name": "name",
+        "datatype": "string"
+      }],
+      "urlTemplate": "http://example.org/countries.csv{#countryCode}",
+      "primaryKey": "countryCode"
+    }
+  }, {
+    "@id": "http://example.com/country_slice.csv",
+    "schema": {
+      "columns": [{
+        "name": "countryRef",
+        "datatype": "string"
+      }, {
+        "name": "year",
+        "datatype": "gYear"
+      }, {
+        "name": "population",
+        "datatype": "integer"
+      }],
+      "foreignKeys": [{
+        "columns": "countryRef",
+        "reference": {
+          "resource": "http://example.org/countries.csv",
+          "columns": "countryCode"
+        }
+      }]
+    }
+  }]
+}
+            </pre>
+            <p>
+              When the population data in <code>country_slice.csv</code> is processed (displayed or mapped into another format), a link can be made from the content of the <code>countryRef</code> column based on the <code>urlTemplate</code> for <code>country.csv</code>. For example, if the <code>countryRef</code> column (the value of <code>columns</code> in the <code>foreignKeys</code> object) in <code>country_slice.csv</code> contains the value <code>UK</code> then the processor will use that value to populate the <code>countryCode</code> variable (the value of <code>reference.columns</code> in the <code>foreignKeys</code> object) when interpreting the <code>urlTemplate</code> for <code>country.csv</code>, and create the URL <code>http://example.org/countries.csv#UK</code>. The processor does not need to retrieve <code>http://example.org/countries.csv</code> or check that the value <code>UK</code> appears within the <code>countryCode</code> column to create this link: it is created purely based on the <code>urlTemplate</code> in the description of the referenced resource.
+            </p>
+          </section>
+          <section>
+            <h4>Foreign Key Reference Between Schemas</h4>
+            <p>
+              When publishing information about public sector roles and salaries, as in <a href="http://w3c.github.io/csvw/use-cases-and-requirements/#UC-OrganogramData">Use Case 4</a>, the UK government requires departments to publish two files which are interlinked. The first lists senior grades (simplified here) eg at <code>HEFCE_organogram_senior_data_31032011.csv</code>:
+            </p>
+            <pre class="example">
+Post Unique Reference,              Name,Grade,             Job Title,Reports to Senior Post
+                90115,        Steve Egan,SCS1A,Deputy Chief Executive,                 90334
+                90250,     David Sweeney,SCS1A,              Director,                 90334
+                90284,       Heather Fry,SCS1A,              Director,                 90334
+                90334,Sir Alan Langlands, SCS4,       Chief Executive,                    xx
+            </pre>
+            <p>
+              The second provides information about the number of junior positions that report to those individuals (simplified here) eg at <code>HEFCE_organogram_junior_data_31032011.csv</code>:
+            </p>
+            <pre class="example">
+Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic Job Title,Number of Posts in FTE,          Profession
+                90284,    4,               17426,               20002,    Administrator,                     2,Operational Delivery
+                90284,    5,               19546,               22478,    Administrator,                     1,Operational Delivery
+                90115,    4,               17426,               20002,    Administrator,                  8.67,Operational Delivery
+                90115,    5,               19546,               22478,    Administrator,                   0.5,Operational Delivery
+            </pre>
+            <p>
+              The schemas are reused by multiple departments and for multiple pairs of files. The schemas are therefore defined in separate files, and they need to define links between the schemas which are then picked up as applying between tables that use those schemas.
+            </p>
+            <p>
+              The metadata file for the particular publication of the files above is:
+            </p>
+            <pre class="example highlight">
+{
+  "resources": [{
+    "@id": "HEFCE_organogram_senior_data_31032011.csv",
+    "schema": "http://example.org/schema/senior-roles.json"
+  }, {
+    "@id": "HEFCE_organogram_junior_data_31032011.csv",
+    "schema": "http://example.org/schema/junior-roles.json"
+  }]
+}
+            </pre>
+            <p>
+              The schema for the senior role CSV (at <code>http://example.org/schema/senior-roles.json</code>) is as follows; it includes a foreign key reference to itself:
+            </p>
+            <pre class="example highlight">
+{
+  "@id": "http://example.org/schema/senior-roles.json",
+  "columns": [{
+    "name": "ref",
+    "title": "Post Unique Reference"
+  }, {
+    "name": "name",
+    "title": "Name"
+  }, {
+    "name": "grade",
+    "title": "Grade"
+  }, {
+    "name": "job",
+    "title": "Job Title"
+  }, {
+    "name": "reportsTo",
+    "title": "Reports to Senior Post"
+  }],
+  "primaryKey": "ref",
+  "urlTemplate": "#post-{ref}",
+  "foreignKeys": [{
+    "columns": "reportsTo",
+    "reference": {
+      "schema": "http://example.org/schema/senior-roles.json",
+      "columns": "ref"
+    }
+  }]
+}
+            </pre>
+            <p>
+              The schema for the junior role CSV (at <code>http://example.org/schema/junior-roles.json</code>) is as follows; it includes a foreign key reference to the senior roles schema:
+            </p>
+            <pre class="example highlight">
+{
+  "@id": "http://example.org/schema/junior-roles.json",
+  "columns": [{
+    "name": "reportsTo",
+    "title": "Reporting Senior Post"
+  }, 
+  ...
+  ],
+  "foreignKeys": [{
+    "columns": "reportsTo",
+    "reference": {
+      "schema": "http://example.org/schema/senior-roles.json",
+      "columns": "ref"
+    }
+  }]
+}
+            </pre>
+            <p>
+              In the first line of <code>HEFCE_organogram_junior_data_31032011.csv</code>, the <code>reportsTo</code> (<code>Reporting Senior Post</code>) column contains the value <code>90284</code>. When creating a link from that column, the <code>urlTemplate</code> defined within the schema at <code>http://example.org/schema/senior-roles.json</code> is used to generate a URL by expanding the variable reference for <code>ref</code> based on the value from the <code>reportsTo</code> column. This gives the relative URL <code>#post-90284</code> which is then resolved against the base URL of the resource that uses the <code>senior-roles.json</code> schema within the original metadata file, namely <code>HEFCE_organogram_senior_data_31032011.csv</code>.
+            </p>
+          </section>
+        </section>
       </section>
       <section>
         <h3>Columns</h3>
         <p>
           A <dfn>column description</dfn> is a simple JSON object that describes a single column. The description provides additional human-readable documentation for a column, as well as additional information that may be used to validate the cells within the column, create a user interface for data entry, or inform conversion into other formats.
+        </p>
+        <p class="issue" data-number="64">
+          Should there be a way to suppress columns?
         </p>
         <section>
           <h4>Required Properties</h4>
@@ -1038,7 +1076,13 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               <p>
                 An <a>atomic property</a> that gives a canonical name for the column. This MUST be a string. Conversion specifications MUST use this property as the basis for the names of properties/elements/attributes in the results of conversions.
               </p>
-              <p class="issue">
+              <p>
+                For ease of reference within <a title="URI template property">URI template properties</a>, column names SHOULD consist only of alphanumeric characters or underscores (<code>[a-zA-Z0-9_]+</code>). Names beginning with <code>_</code> are reserved by this specification and MUST NOT be used.
+              </p>
+              <p class="issue" data-number="33">
+                What do to with conversion if no column name is given?
+              </p>
+              <p class="issue" data-number="53">
                 We invite comment on what the syntactic limitations should be on column names to make them most useful when used as the basis of conversion into other formats, bearing in mind that different target languages such as JSON, RDF and XML have different syntactic limitations and common naming conventions.
               </p>
               <p>
@@ -1066,384 +1110,367 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               <p>
                 If the column already has a <code>title</code> annotation (because a header row has been included in the original CSV file) then a validator MUST issue a warning if the existing <code>title</code> annotation is not the same as any of the <a>possible column titles</a>.
               </p>
-              <p class="note">
+              <p class="issue" data-number="56">
                 The facility to specify multiple potential titles for a column is important when the same column description is used for multiple CSVs, through a mechanism yet to be defined by this specification.
               </p>
             </dd>
+            <dt id="column-required"><code>required</code></dt>
+            <dd>A boolean value which indicates whether every cell within the column must have a non-null value.</dd>
             <dt id="column-ld-type"><code>@type</code></dt>
             <dd>
               <p>
                 If included, <code>@type</code> MUST be set to <code>"Column"</code>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.
               </p>
             </dd>
-            <dt id="column-required"><code>required</code></dt>
-            <dd>A boolean value which indicates whether every cell within the column must have a non-null value.</dd>
           </dl>
+          <p>
+            The description MAY contain any common properties as defined in <a href="#common-properties" class="sectionRef"></a> to provide extra metadata about the column as a whole, such as a full description.
+          </p>
           <p>
             The description MAY contain any of the <a title="inherited property">inherited properties</a> defined for cells in <a href="#inherited-properties" class="sectionRef"></a>.
           </p>
         </section>
       </section>
       <section>
-        <h3>Rows</h3>
+        <h2>Inherited Properties</h2>
         <p>
-          Rows can be described using row <a title="description object">description objects</a>. A row description object is a JSON object within a metadata file that includes properties that describe an individual row.
+          Cell descriptions may override <a title="inherited property">inherited properties</a>, as described in <a href="#annotating-tables" class="sectionRef"></a>. It is good practice to define these properties on columns, so that all cells within a given column are handled in the same way, or on tables if appropriate. These properties are:
         </p>
-        <section>
-          <h4>Required Properties</h4>
-          <p>
-            The following properties MUST appear on a row description:
-          </p>
-          <dl>
-            <dt><code>row</code></dt>
-            <dd>an integer; the number of the row the description object describes</dd>
-          </dl>
-        </section>
-        <section>
-          <h4>Optional Properties</h4>
-          <dl>
-            <dt id="row-ld-type"><code>@type</code></dt>
-            <dd>
-              <p>
-                If included, <code>@type</code> MUST be set to <code>"Row"</code>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.
-              </p>
-            </dd>
-          </dl>
-          <p>
-            The description MAY contain any of the <a title="inherited property">inherited properties</a> defined for cells in <a href="#inherited-properties" class="sectionRef"></a>.
-          </p>
-        </section>
+        <dl>
+          <dt id="cell-empty-value"><code>null</code></dt>
+          <dd>
+            <p>
+              The string used for null values. If not specified, the default for this is the empty string.
+            </p>
+          </dd>
+          <dt id="cell-language"><code>language</code></dt>
+          <dd>
+            <p>
+              A language code as defined by [[!BCP47]]. Indicates the language of the value within the cell.
+            </p>
+          </dd>
+          <dt id="cell-text-direction"><code>text-direction</code></dt>
+          <dd>
+            <p>
+              One of <code>"rtl"</code> or <code>"ltr"</code> (the default). Indicates whether the text within cells should be displayed by default as left-to-right or right-to-left text. See <a href="#bidirectional-tables" class="sectionRef"></a> for more details.
+            </p>
+          </dd>
+          <dt id="cell-separator"><code>separator</code></dt>
+          <dd>
+            <p>
+              The character used to separate items in the string value of the cell. If <code>null</code> or unspecified, the cell does not contain a list. Otherwise, application MUST split the string value of the cell on the specified separator character and parse each of the resulting strings separately. The cell's value will then be a list. Conversion specifications MUST use the separator to determine the conversion of a cell into the target format. See <a href="#parsing-cells"></a> for more details.
+            </p>
+          </dd>
+          <dt id="cell-format"><code>format</code></dt>
+          <dd>
+            <p>
+              A definition of the format of the cell, used when parsing the cell as described in <a href="#parsing-cells"></a>.
+            </p>
+          </dd>
+          <dt id="cell-datatype"><code>datatype</code></dt>
+          <dd>
+            <p>
+              The main datatype of the values of the cell. If the cell contains a list (ie <code>separator</code> is specified and not <code>null</code>) then this is the datatype of each value within the list. Conversion specifications MUST use the datatype of the value to determine the conversion of a cell into the target format. See <a href="#datatypes"></a> for more details.
+            </p>
+          </dd>
+          <dt id="cell-length"><code>length</code></dt>
+          <dd>
+            <p>
+              The exact length of the value of the cell. See <a href="#length-constraints" class="sectionRef"></a> for details.
+            </p>
+          </dd>
+          <dt id="cell-minLength"><code>minLength</code></dt>
+          <dd>
+            <p>
+              The minimum length of the value of the cell. See <a href="#length-constraints" class="sectionRef"></a> for details.
+            </p>
+          </dd>
+          <dt id="cell-maxLength"><code>maxLength</code></dt>
+          <dd>
+            <p>
+              The maximum length of the value of the cell. See <a href="#length-constraints" class="sectionRef"></a> for details.
+            </p>
+          </dd>
+          <dt id="cell-minimum"><code>minimum</code></dt>
+          <dd>
+            <p>
+              The minimum value for the cell (inclusive); equivalent to <code>minInclusive</code>. See <a href="#value-constraints" class="sectionRef"></a> for details.
+            </p>
+          </dd>
+          <dt id="cell-maximum"><code>maximum</code></dt>
+          <dd>
+            <p>
+              The maximum value for the cell (inclusive); equivalent to <code>maxInclusive</code>. See <a href="#value-constraints" class="sectionRef"></a> for details.
+            </p>
+          </dd>
+          <dt id="cell-minInclusive"><code>minInclusive</code></dt>
+          <dd>
+            <p>
+              The minimum value for the cell (inclusive). See <a href="#value-constraints" class="sectionRef"></a> for details.
+            </p>
+          </dd>
+          <dt id="cell-maxInclusive"><code>maxInclusive</code></dt>
+          <dd>
+            <p>
+              The maximum value for the cell (inclusive). See <a href="#value-constraints" class="sectionRef"></a> for details.
+            </p>
+          </dd>
+          <dt id="cell-minExclusive"><code>minExclusive</code></dt>
+          <dd>
+            <p>
+              The minimum value for the cell (exclusive). See <a href="#value-constraints" class="sectionRef"></a> for details.
+            </p>
+          </dd>
+          <dt id="cell-maxExclusive"><code>maxExclusive</code></dt>
+          <dd>
+            <p>
+              The maximum value for the cell (exclusive). See <a href="#value-constraints" class="sectionRef"></a> for details.
+            </p>
+          </dd>
+        </dl>
       </section>
       <section>
-        <h3>Cells</h3>
+        <h2>Datatypes</h2>
         <p>
-          Cells can be described using cell <a title="description object">description objects</a>. A cell description object is a JSON object within a metadata file that includes properties that describe an individual cell.
+          Cells within tables may be annotated with a <code>datatype</code> which indicates the type of the value obtained by parsing the value of the cell. The format expected in the cell is determined by the <code>format</code> annotation, if there is one, or uses a default format determined by the type.
         </p>
-        <section>
-          <h4>Required Properties</h4>
-          <p>
-            The following properties MUST appear on a cell description:
-          </p>
-          <dl>
-            <dt><code>row</code></dt>
-            <dd>an integer; the number of the row on which the cell appears</dd>
-            <dt><code>column</code></dt>
-            <dd>an integer; the number of the column on which the cell appears</dd>
-          </dl>
-       </section>
-        <section>
-          <h4>Optional Properties</h4>
-          <dl>
-            <dt id="cell-ld-type"><code>@type</code></dt>
-            <dd>
-              <p>
-                If included, <code>@type</code> MUST be set to <code>"Cell"</code>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.
-              </p>
-            </dd>
-          </dl>
-          <p>
-            The description MAY contain any of the <a title="inherited property">inherited properties</a> defined for cells in <a href="#inherited-properties" class="sectionRef"></a>.
-          </p>
-        </section>
-        <section>
-          <h4>Inherited Properties</h4>
-          <p>
-            Cell descriptions may override <a title="inherited property">inherited properties</a>, as described in <a href="#annotating-tables" class="sectionRef"></a>. It is good practice to define these properties on columns, so that all cells within a given column are handled in the same way. These properties are:
-          </p>
-          <dl>
-            <dt id="cell-empty-value"><code>null</code></dt>
-            <dd>
-              <p>
-                The string used for null values. If not specified, the default for this is the empty string.
-              </p>
-            </dd>
-            <dt id="cell-separator"><code>separator</code></dt>
-            <dd>
-              <p>
-                The character used to separate items in the string value of the cell. If <code>null</code>, the cell does not contain a list. Otherwise, application MUST split the string value of the cell on the specified separator character and parse each of the resulting strings separately. The cell's value will then be a list. Conversion specifications MUST use the separator to determine the conversion of a cell into the target format. See <a href="#parsing-cells"></a> for more details.
-              </p>
-            </dd>
-            <dt id="cell-format"><code>format</code></dt>
-            <dd>
-              <p>
-                A definition of the format of the cell, used when parsing the cell as described in <a href="#parsing-cells"></a>.
-              </p>
-            </dd>
-            <dt id="cell-datatype"><code>datatype</code></dt>
-            <dd>
-              <p>
-                The main datatype of the values of the cell. If the cell contains a list (ie <code>separator</code> is not <code>null</code>) then this is the datatype of each value within the list. Conversion specifications MUST use the datatype of the value to determine the conversion of a cell into the target format. See <a href="#datatypes"></a> for more details.
-              </p>
-            </dd>
-            <dt id="cell-length"><code>length</code></dt>
-            <dd>
-              <p>
-                The exact length of the value of the cell. See <a href="#length-constraints" class="sectionRef"></a> for details.
-              </p>
-            </dd>
-            <dt id="cell-minLength"><code>minLength</code></dt>
-            <dd>
-              <p>
-                The minimum length of the value of the cell. See <a href="#length-constraints" class="sectionRef"></a> for details.
-              </p>
-            </dd>
-            <dt id="cell-maxLength"><code>maxLength</code></dt>
-            <dd>
-              <p>
-                The maximum length of the value of the cell. See <a href="#length-constraints" class="sectionRef"></a> for details.
-              </p>
-            </dd>
-            <dt id="cell-minimum"><code>minimum</code></dt>
-            <dd>
-              <p>
-                The minimum value for the cell (inclusive); equivalent to <code>minInclusive</code>. See <a href="#value-constraints" class="sectionRef"></a> for details.
-              </p>
-            </dd>
-            <dt id="cell-maximum"><code>maximum</code></dt>
-            <dd>
-              <p>
-                The maximum value for the cell (inclusive); equivalent to <code>maxInclusive</code>. See <a href="#value-constraints" class="sectionRef"></a> for details.
-              </p>
-            </dd>
-            <dt id="cell-minInclusive"><code>minInclusive</code></dt>
-            <dd>
-              <p>
-                The minimum value for the cell (inclusive). See <a href="#value-constraints" class="sectionRef"></a> for details.
-              </p>
-            </dd>
-            <dt id="cell-maxInclusive"><code>maxInclusive</code></dt>
-            <dd>
-              <p>
-                The maximum value for the cell (inclusive). See <a href="#value-constraints" class="sectionRef"></a> for details.
-              </p>
-            </dd>
-            <dt id="cell-minExclusive"><code>minExclusive</code></dt>
-            <dd>
-              <p>
-                The minimum value for the cell (exclusive). See <a href="#value-constraints" class="sectionRef"></a> for details.
-              </p>
-            </dd>
-            <dt id="cell-maxExclusive"><code>maxExclusive</code></dt>
-            <dd>
-              <p>
-                The maximum value for the cell (exclusive). See <a href="#value-constraints" class="sectionRef"></a> for details.
-              </p>
-            </dd>
-          </dl>
-        </section>
-        <section>
-          <h3>Datatypes</h3>
-          <p>
-            Cells within tables may be annotated with a <code>datatype</code> which indicates the type of the value obtained by parsing the value of the cell. The format expected in the cell is determined by the <code>format</code> annotation, if there is one, or uses a default format determined by the type.
-          </p>
-          <p>
-            The possible datatypes are:
-          </p>
-          <ul>
-            <li>
-              <p>the datatypes defined in [[!xmlschema-2]] with the exception of those that rely on XML mechanisms for definition, namely:</p>
-              <ul>
-                <li><code>anySimpleType</code></li>
-                <li><code>string</code>; a sub-value of <code>anySimpleType</code></li>
-                <li><code>normalizedString</code>; a sub-value of <code>string</code></li>
-                <li><code>token</code>; a sub-value of <code>normalizedString</code></li>
-                <li><code>language</code>; a sub-value of <code>token</code></li>
-                <li><code>Name</code>; a sub-value of <code>token</code></li>
-                <li><code>NCName</code>; a sub-value of <code>Name</code></li>
-                <li><code>boolean</code>; a sub-value of <code>anySimpleType</code></li>
-                <li><code>decimal</code>; a sub-value of <code>anySimpleType</code></li>
-                <li><code>integer</code>; a sub-value of <code>decimal</code></li>
-                <li><code>nonPositiveInteger</code>; a sub-value of <code>integer</code></li>
-                <li><code>negativeInteger</code>; a sub-value of <code>nonPositiveInteger</code></li>
-                <li><code>long</code>; a sub-value of <code>integer</code></li>
-                <li><code>int</code>; a sub-value of <code>long</code></li>
-                <li><code>short</code>; a sub-value of <code>int</code></li>
-                <li><code>byte</code>; a sub-value of <code>short</code></li>
-                <li><code>nonNegativeInteger</code>; a sub-value of <code>integer</code></li>
-                <li><code>unsignedLong</code>; a sub-value of <code>nonNegativeInteger</code></li>
-                <li><code>unsignedInt</code>; a sub-value of <code>unsignedLong</code></li>
-                <li><code>unsignedShort</code>; a sub-value of <code>unsignedInt</code></li>
-                <li><code>unsignedByte</code>; a sub-value of <code>unsignedShort</code></li>
-                <li><code>positiveInteger</code>; a sub-value of <code>nonNegativeInteger</code></li>
-                <li><code>float</code>; a sub-value of <code>anySimpleType</code></li>
-                <li><code>double</code>; a sub-value of <code>anySimpleType</code></li>
-                <li><code>duration</code>; a sub-value of <code>anySimpleType</code></li>
-                <li><code>dateTime</code>; a sub-value of <code>anySimpleType</code></li>
-                <li><code>time</code>; a sub-value of <code>anySimpleType</code></li>
-                <li><code>date</code>; a sub-value of <code>anySimpleType</code></li>
-                <li><code>gYearMonth</code>; a sub-value of <code>anySimpleType</code></li>
-                <li><code>gYear</code>; a sub-value of <code>anySimpleType</code></li>
-                <li><code>gMonthDay</code>; a sub-value of <code>anySimpleType</code></li>
-                <li><code>gDay</code>; a sub-value of <code>anySimpleType</code></li>
-                <li><code>gMonth</code>; a sub-value of <code>anySimpleType</code></li>
-                <li><code>hexBinary</code>; a sub-value of <code>anySimpleType</code></li>
-                <li><code>base64Binary</code>; a sub-value of <code>anySimpleType</code></li>
-                <li><code>anyURI</code>; a sub-value of <code>anySimpleType</code></li>
-              </ul>
-            </li>
-            <li>the datatype <code>number</code> which is exactly equivalent to <code>double</code></li>
-            <li>the datatype <code>binary</code> which is exactly equivalent to <code>base64Binary</code></li>
-            <li>the datatype <code>datetime</code> which is exactly equivalent to <code>dateTime</code></li>
-            <li>
-              <p>
-                the datatype <code>geopoint</code> which indicates a comma-separated longitude and latitude (ie values that after stripping leading and trailing whitespace are in the format <code><var>longitude</var>\s*,\s*<var>latitude</var></code>); a sub-value of <code>anySimpleType</code>
-              </p>
-              <p class="issue">
-                In JSON Table Schema, <code>geopoint</code> permits values in JSON representations of points, namely <code>{ lon: <var>longitude</var>, lat: <code>latitude</code>}</code> and <code>[<var>longitude</var>, <var>latitude</var>]</code>. We invite comment about whether these types are suitable for CSV files. If they are, we suggest that these additional formats for <code>geopoint</code> are supported through the <code>format</code> property.
-              </p>
-            </li>
-            <li>the datatype <code>any</code> which is exactly equivalent to <code>anySimpleType</code></li>
-          </ul>
-          <p class="issue">
-            The JSON Table Schema also includes <code>object</code>, <code>array</code> and <code>geojson</code>. We invite comment on whether we should we support the inclusion of JSON-based structures within CSV files.
-          </p>
-          <p class="issue">
-            We invite comment on whether the <code>any</code> type is useful.
-          </p>
-          <p class="issue">
-            We invite comment on whether there should be types for formats like XML, HTML and markdown which may appear within CSV cells.
-          </p>
-          <section>
-            <h4>Length Constraints</h4>
-            <p>
-              The <code>length</code>, <code>minLength</code> and <code>maxLength</code> properties indicate the exact, minimum and maximum lengths of the values of cells.
-            </p>
-            <p>
-              Applications MUST raise an error if both <code>length</code> and <code>minLength</code> are specified and they do not have the same value. Similarly, applications MUST raise an error if both <code>length</code> and <code>maxLength</code> are specified and they do not have the same value. Applications MUST raise an error if <code>length</code>, <code>maxLength</code> or <code>minLength</code> are specified and the cell value is not a list (ie <code>separator</code> is not specified), a string or one of its subtypes, or a binary value.
-            </p>
-            <p>
-              The length of a value of a cell is determined as follows:
-            </p>
+        <p>
+          The possible datatypes are:
+        </p>
+        <ul>
+          <li>
+            <p>the datatypes defined in [[!xmlschema-2]] with the exception of those that rely on XML mechanisms for definition, namely:</p>
             <ul>
-              <li>if the cell is <code>null</code> its length is zero</li>
-              <li>if the value is a list, its length is the number of items in the list</li>
-              <li>if the value is a string or one of its subtypes, its length is the number of characters in the value</li>
-              <li>if the value is of a binary type, its length is the number of bytes in the binary value</li>
+              <li><code>anySimpleType</code></li>
+              <li><code>string</code>; a sub-value of <code>anySimpleType</code></li>
+              <li><code>normalizedString</code>; a sub-value of <code>string</code></li>
+              <li><code>token</code>; a sub-value of <code>normalizedString</code></li>
+              <li><code>language</code>; a sub-value of <code>token</code></li>
+              <li><code>Name</code>; a sub-value of <code>token</code></li>
+              <li><code>NCName</code>; a sub-value of <code>Name</code></li>
+              <li><code>boolean</code>; a sub-value of <code>anySimpleType</code></li>
+              <li><code>decimal</code>; a sub-value of <code>anySimpleType</code></li>
+              <li><code>integer</code>; a sub-value of <code>decimal</code></li>
+              <li><code>nonPositiveInteger</code>; a sub-value of <code>integer</code></li>
+              <li><code>negativeInteger</code>; a sub-value of <code>nonPositiveInteger</code></li>
+              <li><code>long</code>; a sub-value of <code>integer</code></li>
+              <li><code>int</code>; a sub-value of <code>long</code></li>
+              <li><code>short</code>; a sub-value of <code>int</code></li>
+              <li><code>byte</code>; a sub-value of <code>short</code></li>
+              <li><code>nonNegativeInteger</code>; a sub-value of <code>integer</code></li>
+              <li><code>unsignedLong</code>; a sub-value of <code>nonNegativeInteger</code></li>
+              <li><code>unsignedInt</code>; a sub-value of <code>unsignedLong</code></li>
+              <li><code>unsignedShort</code>; a sub-value of <code>unsignedInt</code></li>
+              <li><code>unsignedByte</code>; a sub-value of <code>unsignedShort</code></li>
+              <li><code>positiveInteger</code>; a sub-value of <code>nonNegativeInteger</code></li>
+              <li><code>float</code>; a sub-value of <code>anySimpleType</code></li>
+              <li><code>double</code>; a sub-value of <code>anySimpleType</code></li>
+              <li><code>duration</code>; a sub-value of <code>anySimpleType</code></li>
+              <li><code>dateTime</code>; a sub-value of <code>anySimpleType</code></li>
+              <li><code>time</code>; a sub-value of <code>anySimpleType</code></li>
+              <li><code>date</code>; a sub-value of <code>anySimpleType</code></li>
+              <li><code>gYearMonth</code>; a sub-value of <code>anySimpleType</code></li>
+              <li><code>gYear</code>; a sub-value of <code>anySimpleType</code></li>
+              <li><code>gMonthDay</code>; a sub-value of <code>anySimpleType</code></li>
+              <li><code>gDay</code>; a sub-value of <code>anySimpleType</code></li>
+              <li><code>gMonth</code>; a sub-value of <code>anySimpleType</code></li>
+              <li><code>hexBinary</code>; a sub-value of <code>anySimpleType</code></li>
+              <li><code>base64Binary</code>; a sub-value of <code>anySimpleType</code></li>
+              <li><code>anyURI</code>; a sub-value of <code>anySimpleType</code></li>
             </ul>
-          </section>
-          <section>
-            <h4>Value Constraints</h4>
-            <p>
-              The <code>minimum</code>, <code>maximum</code>, <code>minInclusive</code>, <code>maxInclusive</code>, <code>minExclusive</code> and <code>maxExclusive</code> properties indicate limits on the values of cells. These apply to numeric and date/time types. The <code>minimum</code> property is equivalent to the <code>minInclusive</code> property and the <code>maximum</code> property is equivalent to the <code>maxInclusive</code> property.
-            </p>
-            <p>
-              Validation against these properties is as defined in [[!xmlschema-2]].
-            </p>
-          </section>
-        </section>
+          </li>
+          <li>the datatype <code>number</code> which is exactly equivalent to <code>double</code></li>
+          <li>the datatype <code>binary</code> which is exactly equivalent to <code>base64Binary</code></li>
+          <li>the datatype <code>datetime</code> which is exactly equivalent to <code>dateTime</code></li>
+          <li>the datatype <code>any</code> which is exactly equivalent to <code>anySimpleType</code></li>
+          <li>the datatype <code>xml</code> which indicates the cell contains an XML fragment</li>
+          <li>the datatype <code>html</code> which indicates the cell contains an HTML fragment</li>
+          <li>the datatype <code>json</code> which indicates the cell contains serialized JSON</li>
+        </ul>
         <section>
-          <h3>Parsing cells</h3>
+          <h3>Length Constraints</h3>
           <p>
-            Unlike many other data formats, tabular data is designed to be read by humans. For that reason, it's common for data to be represented within tabular data in a human-readable way. The <code>separator</code> and <code>format</code> properties indicates the format used to represent data within the table. This is used:
+            The <code>length</code>, <code>minLength</code> and <code>maxLength</code> properties indicate the exact, minimum and maximum lengths of the values of cells.
+          </p>
+          <p>
+            Applications MUST raise an error if both <code>length</code> and <code>minLength</code> are specified and they do not have the same value. Similarly, applications MUST raise an error if both <code>length</code> and <code>maxLength</code> are specified and they do not have the same value. Applications MUST raise an error if <code>length</code>, <code>maxLength</code> or <code>minLength</code> are specified and the cell value is not a list (ie <code>separator</code> is not specified), a string or one of its subtypes, or a binary value.
+          </p>
+          <p>
+            The length of a value of a cell is determined as follows:
           </p>
           <ul>
-            <li>by <strong>validators</strong> to check that the data in the table is in the expected format</li>
-            <li>by <strong>converters</strong> to parse the values before mapping them into values in the target of the conversion</li>
-            <li>when <strong>displaying</strong> data, to map it into formats that are meaningful for those viewing the data (as opposed to those publishing it)</li>
-            <li>when <strong>inputting</strong> data, to turn entered values into representations in a consistent format</li>
+            <li>if the cell is <code>null</code> its length is zero</li>
+            <li>if the value is a list, its length is the number of items in the list</li>
+            <li>if the value is a string or one of its subtypes, its length is the number of characters in the value</li>
+            <li>if the value is of a binary type, its length is the number of bytes in the binary value</li>
           </ul>
-          <p>
-            The process of parsing the string value of a cell into a single value or a list of values is as follows:
-          </p>
-          <ol>
-            <li>unless the <code>datatype</code> is <code>string</code> or <code>anySimpleType</code> or <code>any</code>, strip leading and trailing whitespace from the value</li>
-            <li>if the value is the same as the <code>null</code> value, then the value is <code>null</code></li>
-            <li>if the <code>separator</code> property is not <code>null</code>, create a list of values by splitting the string at the character specified by the <code>separator</code> property</li>
-            <li>validate the value(s) against the <code>format</code>, if one is specified, as described below; raise an error if any of the values do not match the specified format</li>
-            <li>parse the value(s) using the <code>format</code>, as described below</li>
-          </ol>
-          <section>
-            <h4>Formats for strings</h4>
-            <p>
-              If the <code>datatype</code> is a string type, the <code>format</code> property provides a regular expression for the string values, in the syntax defined by [[!ECMASCRIPT]].
-            </p>
-            <p class="issue">
-              We invite comment about which reference to use for regular expression syntax. Other possibilities are to use that defined by XML Schema or XPath.
-            </p>
-          </section>
-          <section>
-            <h4>Formats for numeric types</h4>
-            <p>
-              It is not uncommon for numbers within tabular data to be formatted for human consumption, which may involve using commas for decimal points, grouping digits in the number using commas, or adding currency symbols or percent signs to the number.
-            </p>
-            <p>
-              If the <code>datatype</code> is a numeric type, the <code>format</code> property indicates the expected format for that number. Validators MUST check that the numbers in the column adhere to the specified format. Converters MUST use the <code>format</code> property to parse the number when mapping it into a suitable type in the target language of the conversion.
-            </p>
-            <p>
-              When the <code>datatype</code> is a numeric type, the <code>format</code> property's value MUST be a number format as specified in [[!xslt-21]].
-            </p>
-            <p class="issue">
-              We invite comment on the best format to specify how to parse numbers.
-            </p>
-          </section>
-          <section>
-            <h4>Formats for booleans</h4>
-            <p>
-              Boolean values may be represented in many ways aside from the standard <code>1</code> and <code>0</code> or <code>true</code> and <code>false</code>.
-            </p>
-            <p>
-              If the <code>datatype</code> is <code>boolean</code>, the <code>format</code> property provides the true and false values expected, separated by <code>|</code>. For example if <code>format</code> is <code>Y|N</code> then cells must hold either <code>Y</code> or <code>N</code> with <code>Y</code> meaning <code>true</code> and <code>N</code> meaning <code>false</code>.
-            </p>
-          </section>
-          <section>
-            <h4>Formats for dates and times</h4>
-            <p>
-              Dates and times are commonly represented in tabular data in formats other than those defined in [[!xmlschema-2]].
-            </p>
-            <p>
-              If the <code>datatype</code> is a date or time type, the <code>format</code> property indicates the expected format for that date or time. Validators MUST check that the dates or times in the column adhere to the specified format. Converters MUST use the <code>format</code> property to parse the date or time when mapping it into a suitable type in the target language of the conversion.
-            </p>
-            <p>
-              When the <code>datatype</code> is a date or time type, the <code>format</code> property's value MUST be a date/time format as specified in [[!xslt-21]].
-            </p>
-            <p class="issue">
-              We invite comment on which format to use when parsing dates and times.
-            </p>
-          </section>
-          <section>
-            <h4>Formats for durations</h4>
-            <p class="issue">
-              We invite comment on whether there are standard formats to use when parsing durations.
-            </p>
-          </section>
         </section>
         <section>
-          <h3>Additional Constraints</h3>
-
-          <p>A set of constraints can be associated with a cell. These constraints can be used 
-          to validate data against a JSON Table Schema. The constraints might be used by consumers 
-          to validate, for example, the contents of a data package, or as a means to validate 
-          data being collected or updated via a data entry interface.</p>
-
-          <p>A constraints descriptor is a JSON hash. It <code>MAY</code> contain any of the following 
-          keys.</p>
-
-          <ul>
-            <li><code>minLength</code> – An integer that specifies the minimum number of characters for a value</li>
-            <li><code>maxLength</code> – An integer that specifies the maximum number of characters for a value</li>
-            <li><code>unique</code> – A boolean. If <code>true</code>, then all values for that cell MUST be unique within the 
-          data file in which it is found. This defines a unique key for a row although a row could 
-          potentially have several such keys.</li>
-            <li><code>pattern</code> – A regular expression that can be used to test cell values. If the regular 
-          expression matches then the value is valid. Values will be treated as a string of characters. 
-          It is recommended that values of this cell conform to the standard 
-          <a href="http://www.w3.org/TR/xmlschema-2/#regexs">XML Schema regular expression syntax</a>. See also 
-          <a href="http://www.regular-expressions.info/xml.html">this reference</a>.</li>
-            <li><code>minimum</code> – specifies a minimum value for a cell. This is different to <code>minLength</code> which 
-          checks number of characters. A <code>minimum</code> value constraint checks whether a cell value is greater than 
-          or equal to the specified value. The range checking depends on the <code>type</code> of the cell. E.g. an 
-          integer cell may have a minimum value of 100; a date cell might have a minimum date. If a 
-          <code>minimum</code> value constraint is specified then the cell descriptor <code>MUST</code> contain a <code>type</code> key</li>
-            <li><code>maximum</code> – as above, but specifies a maximum value for a cell.</li>
-          </ul>
-
-          <p>A constraints descriptor may contain multiple constraints, in which case a consumer <code>MUST</code> apply 
-          all the constraints when determining if a cell value is valid.</p>
-
-          <p>A data file, e.g. an entry in a data package, is considered to be valid if all of its cells are valid 
-          according to their declared <code>type</code> and <code>constraints</code>.</p>
-
+          <h3>Value Constraints</h3>
+          <p>
+            The <code>minimum</code>, <code>maximum</code>, <code>minInclusive</code>, <code>maxInclusive</code>, <code>minExclusive</code> and <code>maxExclusive</code> properties indicate limits on the values of cells. These apply to numeric and date/time types. The <code>minimum</code> property is equivalent to the <code>minInclusive</code> property and the <code>maximum</code> property is equivalent to the <code>maxInclusive</code> property.
+          </p>
+          <p>
+            Validation against these properties is as defined in [[!xmlschema-2]].
+          </p>
         </section>
+      </section>
+      <section>
+        <h2>Parsing cells</h2>
+        <p>
+          Unlike many other data formats, tabular data is designed to be read by humans. For that reason, it's common for data to be represented within tabular data in a human-readable way. The <code>separator</code> and <code>format</code> properties indicates the format used to represent data within the table. This is used:
+        </p>
+        <ul>
+          <li>by <strong>validators</strong> to check that the data in the table is in the expected format</li>
+          <li>by <strong>converters</strong> to parse the values before mapping them into values in the target of the conversion</li>
+          <li>when <strong>displaying</strong> data, to map it into formats that are meaningful for those viewing the data (as opposed to those publishing it)</li>
+          <li>when <strong>inputting</strong> data, to turn entered values into representations in a consistent format</li>
+        </ul>
+        <p>
+          The process of parsing the string value of a cell into a single value or a list of values is as follows:
+        </p>
+        <p class="issue" data-number="61">
+          What should be the mapping of an empty cell? 
+        </p>
+        <ol>
+          <li>unless the <code>datatype</code> is <code>string</code> or <code>anySimpleType</code> or <code>any</code>, strip leading and trailing whitespace from the value</li>
+          <li>if the value is the same as the <code>null</code> value, then the value is <code>null</code></li>
+          <li>if the <code>separator</code> property is not <code>null</code>, create a list of values by splitting the string at the character specified by the <code>separator</code> property</li>
+          <li>validate the value(s) against the <code>format</code>, if one is specified, as described below; raise an error if any of the values do not match the specified format</li>
+          <li>parse the value(s) using the <code>format</code>, as described below</li>
+        </ol>
+        <section>
+          <h3>Formats for strings</h3>
+          <p>
+            If the <code>datatype</code> is a string type, the <code>format</code> property provides a regular expression for the string values, in the syntax defined by [[!ECMASCRIPT]].
+          </p>
+          <p class="issue" data-number="55">
+            We invite comment about which reference to use for regular expression syntax. Other possibilities are to use that defined by XML Schema or XPath.
+          </p>
+        </section>
+        <section>
+          <h3>Formats for numeric types</h3>
+          <p>
+            It is not uncommon for numbers within tabular data to be formatted for human consumption, which may involve using commas for decimal points, grouping digits in the number using commas, or adding currency symbols or percent signs to the number.
+          </p>
+          <p>
+            If the <code>datatype</code> is a numeric type, the <code>format</code> property indicates the expected format for that number. Validators MUST check that the numbers in the column adhere to the specified format. Converters MUST use the <code>format</code> property to parse the number when mapping it into a suitable type in the target language of the conversion.
+          </p>
+          <p>
+            When the <code>datatype</code> is a numeric type, the <code>format</code> property's value MUST be a number format as specified in [[!xslt-21]].
+          </p>
+          <p class="issue" data-number="54">
+            We invite comment on the best format to specify how to parse numbers.
+          </p>
+          <p class="issue" data-number="65">
+            Register of recognised date-time picture string formats.
+          </p>
+        </section>
+        <section>
+          <h3>Formats for booleans</h3>
+          <p>
+            Boolean values may be represented in many ways aside from the standard <code>1</code> and <code>0</code> or <code>true</code> and <code>false</code>.
+          </p>
+          <p>
+            If the <code>datatype</code> is <code>boolean</code>, the <code>format</code> property provides the true and false values expected, separated by <code>|</code>. For example if <code>format</code> is <code>Y|N</code> then cells must hold either <code>Y</code> or <code>N</code> with <code>Y</code> meaning <code>true</code> and <code>N</code> meaning <code>false</code>.
+          </p>
+        </section>
+        <section>
+          <h3>Formats for dates and times</h3>
+          <p>
+            Dates and times are commonly represented in tabular data in formats other than those defined in [[!xmlschema-2]].
+          </p>
+          <p>
+            If the <code>datatype</code> is a date or time type, the <code>format</code> property indicates the expected format for that date or time. Validators MUST check that the dates or times in the column adhere to the specified format. Converters MUST use the <code>format</code> property to parse the date or time when mapping it into a suitable type in the target language of the conversion.
+          </p>
+          <p>
+            When the <code>datatype</code> is a date or time type, the <code>format</code> property's value MUST be a date/time format as specified in [[!xslt-21]].
+          </p>
+          <p class="issue" data-number="54">
+            We invite comment on which format to use when parsing dates and times.
+          </p>
+        </section>
+        <section>
+          <h3>Formats for durations</h3>
+          <p class="issue" data-number="54">
+            We invite comment on whether there are standard formats to use when parsing durations.
+          </p>
+        </section>
+      </section>
+    </section>
+    <section>
+      <h2>Processing Tables</h2>
+      <p>
+        This section describes how particular types of applications should use the metadata supplied about a CSV file when they process that CSV file.
+      </p>
+      <section>
+        <h3>Displaying Tables</h3>
+        <div class="issue">
+          <p>
+            We intend to include other sections here about:
+          </p>
+          <ul>
+            <li>displaying metadata about groups of tables, tables, columns, rows, cells and regions</li>
+            <li>what headings to use for columns when displaying tabular content</li>
+            <li>how to format values in cells</li>
+          </ul>
+          <p>
+            Much of this is likely to be non-normative. We invite comment on whether it's useful to provide this kind of guidance.
+          </p>
+        </div>
+        <section>
+          <h4>Bidirectional Tables</h4>
+          <p>
+            There are two levels of bidirectionality to consider when displaying tables: the directionality of the table (ie whether the columns should be arranged left-to-right or right-to-left) and the directionality of the content of individual cells.
+          </p>
+          <p>
+            The <a href="#table-direction"><code>table-direction</code> property</a> provides information about the desired display of the table. If <code>table-direction=ltr</code> then the first column SHOULD be displayed on the left and the last column on the right. If <code>table-direction=rtl</code> then the first column SHOULD be displayed on the right and the last column on the left.
+          </p>
+          <p>
+            If <code>table-direction=default</code> then tables SHOULD be displayed with attention to the bidirectionality of the content of the file. Specifically, the values of the cells in the table should be scanned breadth first: from the first cell in the first column through to the last cell in the first column, down to the last cell in the last column. If the first character in the table with a <a href="http://unicode.org/reports/tr9/#Bidirectional_Character_Types">strong type</a> as defined in [[!UNICODE-BIDI]] indicates a <abbr title="right-to-left">RTL</abbr> directionality, the table should be displayed with the first column on the right and the last column on the left. Otherwise, the table should be displayed with the first column on the left and the last column on the right. Characters such as whitespace, quotes, commas and numbers do not have a strong type, and therefore are skipped when identifying the character that determines the directionality of the table.
+          </p>
+          <p>
+            Implementations SHOULD enable user preferences to override the indicated metadata about the directionality of the table.
+          </p>
+          <p>
+            Once the directionality of the table has been determined, each cell within the table should be considered as a separate <a href="http://unicode.org/reports/tr9/#The_Paragraph_Level">paragraph</a>, as defined by the <abbr title="Unicode Bidirectional Algorithm">UBA</abbr> in [[!UNICODE-BIDI]]. The default directionality for the cell is determined by looking at the <a href="#cell-text-direction"><code>text-direction</code> property</a>, which is an <a>inherited property</a>.
+          </p>
+          <p>
+            Thus, as defined by the <abbr title="Unicode Bidirectional Algorithm">UBA</abbr>, if a cell contains no characters with a strong type (if it's a number or date for example) then the way the cell is displayed should be determined by the <a href="#cell-text-direction"><code>text-direction</code> property</a> of the cell. However, when the cell contains characters with a strong type (such as letters) then they MUST be displayed according to the Unicode Bidirectional Algorithm as described in [[!UNICODE-BIDI]].
+          </p>
+        </section>
+      </section>
+      <section>
+        <h3>Validating Tables</h3>
+        <p class="issue">
+          We intend to detail how to validate groups of tabular data files against metadata. This would be normative: compliant validators would have to report the errors and warnings that we define. We invite comment on whether this is a useful thing to specify.
+        </p>
+      </section>
+      <section>
+        <h3>Converting Tables</h3>
+        <p>
+          Conversions of tabular data to other formats operate over a <a href="http://w3c.github.io/csvw/syntax/#dfn-annotated-table">annotated table</a> constructed as defined in <a href="#annotating-tables" class="sectionRef"></a>. The mechanics of these conversions to other formats are defined in other specifications.
+        </p>
+        <p>
+          Conversion specifications MUST define a default mapping from an annotated table that lacks any annotations (ie that is equivalent to an un-annotated table).
+        </p>
+        <p>
+          Conversion specifications MUST use the <a href="#column-name"><code>name</code> of a column</a> as the basis for naming machine-readable fields in the target format, such as the name of the equivalent element or attribute in XML, property in JSON or property URI in RDF.
+        </p>
+        <p>
+          Conversion specifications MAY use any of the properties defined in this specification to adjust the mapping of an annotated table into another format.
+        </p>
+        <p>
+          Conversion specifications MAY define additional properties, not defined in this specification, which are specifically used when converting to the target format of the conversion. For example, a conversion to XML might specify a <code>element-or-attribute</code> property on columns that determines whether a particular column is represented through an element or an attribute in the data.
+        </p>
+        <p>
+          Conversion specifications SHOULD specify format-specific properties specifying external processing steps to provide more control to people defining conversions. If these are specified, the conversion specification MUST specify at what point in the processing this external processing takes place, and what it takes place on. Examples might be:
+        </p>
+        <ul>
+          <li>the URL of an XSLT file that is used to process XML after it is generated</li>
+          <li>a string containing a SPARQL CONSTRUCT pattern that is executed on RDF after it is generated</li>
+          <li>properties that contain definitions of Javascript callback functions that are used when processing particular columns or individual rows</li>
+        </ul>
       </section>
     </section>
     <section class="appendix">
@@ -1462,12 +1489,18 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       </section>
     </section>
     <section class="appendix">
+      <h2>Security Considerations</h2>
+      <p class="issue" data-number="8">
+        TODO: General CSV security considerations.
+      </p>
+    </section>
+    <section class="appendix">
       <h2>JSON-LD Context</h2>
       <p>
         The following JSON document is the JSON-LD context document that can be used to interpret metadata documents as RDF.
       </p>
       <p class="issue">
-        See <a href="csvm-context.json">csvm-context.json</a>.
+        See <a href="../ns/context.json">context.json</a>.
       </p>
     </section>
   </body>

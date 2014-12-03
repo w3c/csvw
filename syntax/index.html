@@ -90,6 +90,7 @@ var respecConfig = {
       }]
     }],
     inlineCSS: true,
+    issueBase: "https://github.com/w3c/csvw/issues/",
     noIDLIn: true,
     noLegacyStyle: false
     };
@@ -171,10 +172,13 @@ var respecConfig = {
           <li><dfn title="cell column">column</dfn> &mdash; the <a>column</a> that the cell appears in; the cell MUST be in the <a title="column cells">cells</a> for that column</li>
           <li><dfn title="cell row">row</dfn> &mdash; the <a>row</a> that the cell appears in; the cell MUST be in the <a title="row cells">cells</a> for that row</li>
           <li><dfn>string value</dfn> &mdash; a string that is the original syntactic representation of the value of the cell, ie how the cell appears within a CSV file; this may be an empty string</li>
-          <li><dfn title="cell value">value</dfn> &mdash; the semantic value of the cell; within the core tabular data model this is either a string which is the same as the <a>string value</a> of the cell, or <code>null</code>, if the <a>string value</a> is an empty string</li>
+          <li><dfn title="cell value">value</dfn> &mdash; the semantic value of the cell; within the core tabular data model (with no other metadata available) this is either a string which is the same as the <a>string value</a> of the cell, or <code>null</code>, if the <a>string value</a> is an empty string</li>
         </ul>
-        <p class="issue">
-          Should there be a distinction made (in the core tabular data model) between empty cells and cells whose value is an empty string? With a lack of other metadata, the only way to make the distinction would be to say there was a difference between a missing value in a CSV file (eg the second value in <code>a,,z</code>) and a quoted value (eg the second value in <code>a,"",z</code>). This seems dangerous as I don't think many clients will make a distinction between the two, so the semantics will be lost on round-tripping.
+        <p class="issue" data-number="40">
+          Should an empty string value always count as a <code>null</code> semantic value within the core data model (ie when there is no other metadata telling the processor how to interpret that value), or should the semantic value be an empty string?
+        </p>
+        <p class="note">
+          There presence or absence of quotes around a value within a CSV file is a syntactic detail that is not reflected in the tabular data model. In other words, there is no distinction in the model between the second value in <code>a,,z</code> and the second value in <code>a,"",z</code>.
         </p>
       </section>
       <section>
@@ -213,20 +217,9 @@ var respecConfig = {
         <p>
           The <a title="cell value">value</a> of an <a>annotated cell</a> MAY be of a datatype other than a string. For example, annotations might enable a processor to understand the <a>string value</a> of the cell as representing a number or a date.
         </p>
-        <p class="issue">
+        <p class="issue" data-number="41">
           The permitted types of names and values of annotations need to be spelled out here.
         </p>
-        <div class="issue">
-          <p>
-            It might be useful to define annotated regions as follows:
-          </p>
-          <blockquote>
-            An <a>annotated table</a> may also contain a number of <dfn title="annotated region">annotated regions</dfn>. Regions are themselves tabular structures comprised of selected <a title="row">rows</a> and <a title="column">columns</a> and the <a title="cell">cells</a> within those rows for those columns. Annotated regions are regions that have annotations associated with them. <a title="annotated column">Annotated columns</a> and <a title="annotated row">annotated rows</a> are special types of annotated regions where the region is the entirety of a single column or single row.
-          </blockquote>
-          <p>
-            But it's not currently clear that there are use cases or examples that justify it. Input is welcome on this.
-          </p>
-        </div>
       </section>
       <section>
         <h3>Grouped Tabular Data Model</h3>
@@ -253,62 +246,58 @@ var respecConfig = {
         <li>metadata about values in the table, such as notes or type annotations</li>
       </ul>
       <p>
-        When creating a set of annotations from metadata, if the same property is specified in two locations then information "closer" to the document itself should override information "further" from the document. Explicitly, the order of preference is:
+        When creating a set of annotations from metadata, if the same property is specified in two locations then information "closer" to the end user or interpreter of the document should override other information, and information "closer" to the document itself should override information "further" from the document. Explicitly, the order of preference is:
       </p>
       <ol>
+        <li>metadata supplied by the user of the implementation that is processing the tabular data, see <a href="#overriding-metadata" class="sectionRef"></a></li>
         <li>metadata embedded within the tabular data file itself, see <a href="#embedded-metadata" class="sectionRef"></a></li>
-        <li>metadata within a package that the tabular data file belongs to, see <a href="#package" class="sectionRef"></a></li>
-        <li>metadata in a document linked to using a <code>Link</code> header when retrieving the tabular data file, see <a href="#link-header" class="sectionRef"></a></li>
-        <li>metadata in a document located through a standard path from the tabular data file, see <a href="#standard-path" class="sectionRef"></a></li>
+        <li>metadata in a document linked to using a <code>Link</code> header associated with the tabular data file, see <a href="#link-header" class="sectionRef"></a></li>
+        <li>file-specific metadata in a document located based on the location of the tabular data file, see <a href="#standard-file-metadata" class="sectionRef"></a></li>
+        <li>directory-specific metadata in a document located based on the location of the tabular data file, see <a href="#standard-directory-metadata" class="sectionRef"></a></li>
       </ol>
-      <p class="issue">
-        We probably need to add some rules about conflicts as well. For example, if a metadata file says that the CSV should contain certain columns but the names of the columns are different in the CSV file itself, is this an error?
+      <p>
+        Processors MUST attempt to locate a metadata document based on each of these locations in order, and use first metadata document that is successfully located in this way.
+      </p>
+      <p class="issue" data-number="42">
+        What should processors do if they have been passed a metadata file and located a CSV file from that metadata file. Should they still check for metadata files related specifically to the CSV file itself? For example, say that an application has been pointed at a metadata file at <code>http://example.org/metadata.json</code> which references <code>http://example.org/toilets.csv</code> but there is also a metadata file at <code>http://example.org/toilets.csv-metadata.json</code>. If the processor had been originally pointed to <code>http://example.org/toilets.csv</code> then it would have located the file-specific metadata at <code>http://example.org/toilets.csv-metadata.json</code>, but coming via <code>http://example.org/metadata.json</code> means that file-specific metadata is skipped.
       </p>
       <section>
-        <h3>Embedded Metadata</h3>
+        <h3>Overriding Metadata</h3>
         <p>
-          The first line of a CSV+ file MUST be processed as a header line unless the CSV+ file is served with a <code>header=absent</code> parameter on the media type. Each cell in the header line that includes non-whitespace characters provides a <strong>title</strong> annotation on the column in which it appears.
-        </p>
-        <p class="issue">
-          The <strong>title</strong> annotation needs to be linked to the relevant annotation in the metadata vocabulary.
+          Processors SHOULD provide users with the facility to provide their own metadata for tabular data files that they process.
         </p>
       </section>
       <section>
-        <h3>Package</h3>
+        <h3>Embedded Metadata</h3>
         <p>
-          Rather than providing CSV files directly on the web, they can be packaged up with a metadata file that includes annotations, and any other relevant CSV files.
+          Most syntaxes for tabular data provide a facility for embedding some metadata within the tabular data file itself. The definition of a syntax for tabular data SHOULD include a description of how the syntax maps to an annotated data model. See <a href="#parsing-tabular-data" class="sectionRef"></a> for a description of this for CSV files.
         </p>
-        <div class="issue">
-          <p>
-            What should that package look like? Just a zip? A multipart document? How is the metadata file within it identified? If this is allowed we should specify a new media type for the package.
-          </p>
-          <p>
-            See <a href="http://w3ctag.github.io/packaging-on-the-web/">Packaging on the Web Editor's Draft</a> for a proposed generic approach for packaging on the web that could be used for packaging CSV files and metadata, and discovering those packages.
-          </p>
-        </div>
       </section>
       <section>
         <h3>Link Header</h3>
         <p>
-          When retrieving a CSV file via HTTP, the response can include a <code>Link</code> header with <code>rel=describedby</code> that points to a metadata file that describes the CSV file. If, by inspection, the referenced file is not a valid metadata file then it MUST be ignored. If there is more than one valid metadata file linked to through multiple <code>Link</code> headers, then the metadata referenced by <code>Link</code> headers that appear later in the response override that referenced by earlier <code>Link</code> headers.
+          When retrieving a tabular data file via HTTP, the response MAY include a <code>Link</code> header with <code>rel=describedby</code> and <code>type=application/csv-metadata+json</code> that points to a metadata file that describes the tabular data file. If, by inspection, the referenced file is not a valid metadata file then it MUST be ignored. If there is more than one valid metadata file linked to through multiple <code>Link</code> headers, then the metadata referenced by <code>Link</code> headers that appear later in the response are used in preference to those referenced by earlier <code>Link</code> headers.
         </p>
-        <p class="issue">
-          Is <a href="http://www.w3.org/TR/powder-dr/#appD"><code>rel=describedby</code></a> the right link relation to use?
+        <p class="issue" data-number="43">
+          Suggest that we drop the requirement to ignore invalid metadata files, given that the correct metadata file should be identified through the type of the link.
         </p>
       </section>
       <section>
-        <h3>Standard Path</h3>
+        <h3>Standard File Metadata</h3>
         <p>
-          Given a CSV file, the default location for a metadata file that describes that CSV file is set to <code><var>filename</var>.csvm</code> in the same directory. If that file does not exist, then the application should look for a metadata file at <code>metadata.csvm</code> in the same directory. In both cases, if the metadata file does not explicitly point to the relevant CSV file then it MUST be ignored.
+          If no metadata document has been located through higher-priority mechanisms, processors MUST attempt to locate a file-specific metadata document. This method is only used if the URL of the tabular data file does not contain a query component.
         </p>
-        <p class="issue">
-          Used a suffix on filenames to find metadata about them, though we haven't decided what format metadata documents should be in, or even if they should be conneg'd.
+        <p>
+          In this case, the file-specific metadata document should be located at <code><var>location</var>-metadata.json</code>, where <var>location</var> is the base URL of the tabular data file with the fragment component of the URL removed, if applicable. For example, if the tabular data file is at <code>http://example.org/south-west/devon.csv</code> then processors should attempt to locate a metadata document at <code>http://example.org/south-west/devon.csv-metadata.json</code>. If the metadata file found at this location does not explicitly point to the relevant tabular data file then it MUST be ignored.
         </p>
-        <p class="issue">
-          Should there be a default navigational thing of continuing up the path hierarchy until you find a metadata document?
+      </section>
+      <section>
+        <h3>Standard Directory Metadata</h3>
+        <p>
+          If no metadata document has been located through higher-priority mechanisms, processors MUST attempt to locate a directory-level metadata document. This method is only used if the URL of the tabular data file does not contain a query component.
         </p>
-        <p class="issue">
-          We have discussed using a <code>.well-known</code> location or something within a sitemap file to provide the location of a metadata file about a given CSV file, but these are just as unlikely to be editable as a <code>Link</code> header, so probably don't address the use case that the standard path method addresses, of being a really simple way to provide metadata about a CSV file.
+        <p>
+          The common metadata document for a directory can be located by resolving the relative URL <code>metadata.json</code> against the base URL of the tabular data file. For example, if the tabular data file is at <code>http://example.org/south-west/devon.csv</code> then processors should attempt to locate a metadata file at <code>http://example.org/south-west/metadata.json</code>. If the metadata file found at this location does not explicitly point to the relevant tabular data file then it MUST be ignored.
         </p>
       </section>
     </section>
@@ -325,7 +314,7 @@ var respecConfig = {
       </p>
       <div class="note">
         <p>
-          This syntax is not compliant with <code>text/csv</code> as defined in [[!RFC4180]]: it permits characters other than ASCII, and it permits line endings other than <code>CRLF</code>. Supporting the full set of Unicode characters by using UTF-8 and supporting <code>LF</code> line endings are important characteristics for data formats that are used internationally and on non-Windows platforms. However, all files that adhere to [[!RFC4180]]'s definition of CSV are compliant CSV+ files.
+          This syntax is not compliant with <code>text/csv</code> as defined in [[!RFC4180]] in that it permits line endings other than <code>CRLF</code>. Supporting <code>LF</code> line endings are important characteristics for data formats that are used on non-Windows platforms. However, all files that adhere to [[!RFC4180]]'s definition of CSV are compliant CSV+ files.
         </p>
       </div>
       <section id="content-type">
@@ -348,22 +337,13 @@ Content-Type: text/csv
         <pre>
 Content-Type: text/csv;charset=ISO-8859-1
         </pre>
-        <div class="issue">
-          <p>
-            RFC4180 defines the default charset as US-ASCII because that was (at the time RFC4180 was written) the default charset for all <code>text/*</code> media types. This has been superseded with RFC6657.
-            <a href="http://tools.ietf.org/html/rfc6657#section-3">Section 3 of RFC6657</a> states "new subtypes of the "text" media type SHOULD NOT define a default "charset" value.  If there is a strong reason to do so despite this advice, they SHOULD use the "UTF-8" [RFC3629] charset as the default."
-          </p>
-          <p>
-            Do we have a strong reason to specify a default charset? Should we be defining <code>application/csv</code> instead, to avoid doing unrecommended things with a <code>text/*</code> media type.
-          </p>
-        </div>
       </section>
       <section id="line-endings">
         <h3>Line Endings</h3>
         <p>
           The ends of rows in a CSV+ file MUST be either <code>CRLF</code> (<code>U+000D U+000A</code>) or <code>LF</code> (<code>U+000A</code>). Line endings within escaped <a title="cell">cells</a> are not normalised.
         </p>
-        <div class="issue">
+        <div class="issue" data-number="45">
           <p>
             <a href="http://tools.ietf.org/html/rfc2046#section-4.1.1">Section 4.1.1 of RFC2046</a> specifies that "The canonical form of any MIME "text" subtype MUST always represent a line break as a CRLF sequence.  Similarly, any occurrence of CRLF in MIME "text" MUST represent a line break.  Use of CR and LF outside of line break sequences is also forbidden."
           </p>
@@ -534,7 +514,7 @@ Content-Type: text/csv;header=absent
               Note that this display matches that shown <a href="http://referendum2012.elections.eg/results/referendum-results">on the original website</a>.
             </p>
           </div>
-          <div class="issue">
+          <div class="issue" data-number="46">
             <p>
               An alternative approach is for the CSV to be parsed into a table model in which the columns are numbered in the reverse, for tables which are either marked as or detected to be right-to-left tables. For example, we could introduce a <code>bidi=rtl</code> or similar media type parameter, and use this to determine whether the first column in table generated from the CSV is the text before the first comma in each line or the text after the last comma in the line.
             </p>
@@ -624,12 +604,12 @@ Content-Type: text/csv;header=absent
       <dl>
         <dt><dfn>encoding</dfn></dt>
         <dd>The character encoding for the file, one of the encodings listed in [[!encoding]]. The default is <code>utf-8</code>.</dd>
-        <dt><dfn>row terminator</dfn></dt>
+        <dt><dfn>line terminator</dfn></dt>
         <dd>The character that is used at the end of a row. The default is <code>CRLF</code>.</dd>
-        <dt><dfn>enclosure character</dfn></dt>
+        <dt><dfn>quote character</dfn></dt>
         <dd>The character that is used around escaped cells. The default is <code>"</code>.</dd>
         <dt><dfn>escape character</dfn></dt>
-        <dd>The character that is used to escape the <a>enclosure character</a> within escaped cells. The default is <code>"</code>.</dd>
+        <dd>The character that is used to escape the <a>quote character</a> within escaped cells. The default is <code>"</code> (such that <code>""</code> is used to escape <code>"</code> within an escaped cell).</dd>
         <dt><dfn>skip rows</dfn></dt>
         <dd>The number of rows to skip at the beginning of the file, before a header row or tabular data. The default is <code>0</code>.</dd>
         <dt><dfn>comment prefix</dfn></dt>
@@ -645,9 +625,9 @@ Content-Type: text/csv;header=absent
         <dt><dfn>skip blank rows</dfn></dt>
         <dd>Indicates whether to ignore wholly empty rows (ie rows in which all the cells are empty). The default is <code>false</code>.</dd>
         <dt><dfn>trim</dfn></dt>
-        <dd>Indicates whether to trim whitespace around cells.</dd>
+        <dd>Indicates whether to trim whitespace around cells; may be <code>true</code>, <code>false</code>, <code>start</code> or <code>end</code>. The default is <code>false</code>.</dd>
       </dl>
-      <div class="issue">
+      <div class="issue" data-number="47">
         <p>
           When parsing, should we:
         </p>
@@ -661,13 +641,12 @@ Content-Type: text/csv;header=absent
       </p>
       <ol>
         <li>Read the file using the specified <a>encoding</a>.</li>
-        <li>Find the rows. Each row ends with a <a>row terminator</a>, but values that are enclosed within the <a>enclosure character</a> may contain the <a>row terminator</a> without it indicating the end of the row. The <a>enclosure character</a> may be escaped using the <a>escape character</a> where it appears within cells.</li>
-        <li>Skip the number of rows indicated by the <a>skip rows</a> parameter.</li>
-        <li>Within the skipped rows, find rows that start with the <a>comment prefix</a>. These form comment annotations on the table.</li>
+        <li>Find the rows. Each row ends with a <a>line terminator</a>, but values that are enclosed within the <a>quote character</a> may contain the <a>line terminator</a> without it indicating the end of the row. The <a>quote character</a> may be escaped using the <a>escape character</a> where it appears within cells. If the <a>escape character</a> is not the same as the <a>quote character</a> then the <a>escape character</a> is also used to escape the character that immediately follows it.</li>
+        <li>Skip the number of rows indicated by the <a>skip rows</a> parameter. These form comment annotations on the table. If a skipped row begins with the <a>comment prefix</a>, strip that prefix from the beginning of the row to create the content of the comment annotation.</li>
         <li>Gather the number of header rows indicated by the <a>header row count</a> parameter; the remaining rows are data rows.</li>
         <li>
           <p>
-            Split the header and data rows into cells using the <a>delimiter</a>. Values that are enclosed within the <a>enclosure character</a> may contain the <a>delimiter</a>. The <a>enclosure character</a> may be escaped using the <a>escape character</a> where it appears within cells.
+            Split the header and data rows into cells using the <a>delimiter</a>. Values that are enclosed within the <a>quote character</a> may contain the <a>delimiter</a>. The <a>quote character</a> may be escaped using the <a>escape character</a> where it appears within cells. If the <a>escape character</a> is not the same as the <a>quote character</a> then the <a>escape character</a> is also used to escape the character that immediately follows it.
           </p>
           <p>
             If <a>trim</a> is <code>true</code> or <code>start</code> then whitespace from the start of values that are not enclosed must be removed from the value. If <a>trim</a> is <code>true</code> or <code>end</code> then whitespace from the end of values that are not enclosed must be removed from the value.
