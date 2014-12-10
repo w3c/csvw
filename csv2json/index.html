@@ -9,13 +9,25 @@
     <script class="remove">
 var respecConfig = {
     localBiblio: {
-      "tabular-data-model": {
+      "rdf11-concepts": {
+          "authors": [
+              "Richard Cyganiak",
+              "David Wood",
+              "Markus Lanthaler"
+          ],
+          "href": "http://www.w3.org/TR/rdf11-concepts/",
+          "title": "RDF 1.1 Concepts and Abstract Syntax",
+          "rawDate": "2014-02-25",
+          "status": "REC",
+          "publisher": "W3C",
+      },
+        "tabular-data-model": {
           "authors": [
             "Jeni Tennison",
             "Gregg Kellogg"
           ],
           "title": "Model for Tabular Data and Metadata on the Web",
-          "href" : "http://www.w3.org/TR/2014/WD-tabular-data-model-20140710/",
+          "href" : "http://www.w3.org/TR/tabular-data-model/",
           "rawDate": "2014-07-10",
           "status" : "WD",
           "publisher": "W3C"
@@ -26,7 +38,7 @@ var respecConfig = {
             "Jeni Tennison"
           ],
           "title": "Metadata Vocabulary for Tabular Data",
-          "href" : "http://www.w3.org/TR/2014/WD-tabular-metadata-20140710/",
+          "href" : "http://www.w3.org/TR/tabular-metadata/",
           "rawDate": "2014-07-10",
           "status" : "WD",
           "publisher": "W3C"
@@ -42,16 +54,6 @@ var respecConfig = {
         "rawDate" : "2013-09-24",
         "publisher" : "Unicode Consortium",
         "status" : "Report"
-      },
-      "RFC3066" : {
-          "authors" : [
-            "H. Alvestrand"
-          ],
-          "title" : "Tags for the Identification of Languages 1995",
-          "rawDate" : "2001-01",
-          "status": "Internet Best Current Practice",
-          "publisher" : "IETF",
-          "href" : "http://www.ietf.org/rfc/rfc3066.txt"
       },
       "RFC6570" : {
           "authors" : [
@@ -86,7 +88,7 @@ var respecConfig = {
     // publishDate:  "2014-04-01",
     previousPublishDate: "2014-??-??",
     previousMaturity: "unoffical",
-    //previousURI: "http://www.w3.org/TR/2014/WD-csv2rdf-2014????/",
+    //previousURI: "http://www.w3.org/TR/2014/WD-csv2json-2014????/",
     edDraftURI: "http://w3c.github.io/csvw/csv2json/",
     // lcEnd: "3000-01-01",
     // crEnd: "3000-01-01",
@@ -140,35 +142,388 @@ var respecConfig = {
   </head>
   <body>
     <section id="abstract">
-      <p> T.B.D.</p>
+      <p>This document defines the procedures and rules to be applied when mapping 
+        of tabular data into JSON. Tabular data may be complemented with metadata 
+        annotations that describe its structure, the meaning of its content and how 
+        it may form part of a collection of interrelated tabular data. This document 
+        specifies the affect of this metadata on the resulting JSON.</p>
     </section>
     <section id="sotd">
-      <p> <em>Work-in-progress.</em> </p>
+      <p>The CSV on the Web Working Group was chartered to produce Recommendations 
+        for "Access methods for CSV Metadata", "Metadata vocabulary for CSV data" and 
+        "Mapping mechanism to transforming CSV into various Formats (e.g., RDF, JSON, 
+        or XML)". This document aims to satisfy the JSON variant of the mapping 
+        Recommendation.</p>
+      <p>Due to the limited resources available within the CSV on the web Working Group,
+        this document describes only a <em>simple mapping</em> - that is, where a single
+        object is created for each row of tabular data that contains a single property
+        per cell. The Working Group solicits input on the value of mappng a single row
+        of tabular data into multiple inter-related objects.</p>
     </section>
     <section id="intro">
       <h2>Introduction</h2>
-      <p>This document describes the processing of Tabular Data
-        [[!tabular-data-model]] to produce JSON [[!JSON]]. It does not
-        cover any cleaning or transformation processes needed to convert the
-        initial CSV data into Tabular Data form. Tabular Data defines an abstract
-        data model consisting of tables, columns, header rows, and data rows. It
-        requires all rows to have the same number of columns. As such, Tabular
-        Data does not cover all possible CSV files and ths processes described
-        in this document do not apply to all possible CSV files. </p>
+      <p>This document describes the processing of 
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-tabular-data">tabular data</a>
+        to create a set of nested objects referred to as the <dfn title="output graph">
+        output graph</dfn>. The <a title="output graph">output graph</a> SHALL be serialized 
+        as JSON [[!JSON]].</p>
+      <p class="note">The JSON encoding is intended for web developers who need 
+        not care about the complexities of RDF [[!rdf11-concepts]].</p>
+      <p> 
+        The Tabular Data Model [[!tabular-data-model]] defines a 
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-core-tabular-data-model">
+        core tabular data model</a> consisting of 
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table">tables</a>, 
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">columns</a>,
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">rows</a> and 
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell">cells</a>.</p>
+      <p>Tabular data may be enriched with metadata that describes its structure and
+        the meaning of its content. These metadata <em>annotations</em> are described 
+        in [[!tabular-metadata]] and may be embedded within the CSV encoding itself as a
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-header-line">header line</a>
+        or provided within a separate metadata document. The resulting 
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-table">annotated 
+        table</a> conforms to the 
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-tabular-data-model">
+        annotated tabular data model</a>.
+      <p>The metadata annotations may describe how a 
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table">table</a> relates to a 
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-group-of-tables">
+        group of tables</a>. Such collections conform to the 
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-grouped-tabular-data-model">
+        grouped tabular data model</a>.</p>
+      <p>The mapping procedure operates on the <em>abstract</em> tabular data model; 
+        <em>core</em>, <em>annotated</em> or <em>grouped</em>. No discussion is given to 
+        the processes needed to convert CSV-encoded data into tabular data form. Please 
+        refer to [[!tabular-data-model]] for details of 
+        <a href="http://www.w3.org/TR/tabular-data-model/#parsing">parsing tabular data</a>. 
+        Further details on <a href="http://www.w3.org/TR/tabular-metadata/#parsing-cells">
+        parsing cells</a> within tabular data is provided in [[!tabular-metadata]].</p>
+      <div class="note">
+        <p>Adopting terminology from the Data Catalog Vocabulary [[vocab-dcat]], the
+          tabular data is considered to be a <em>dataset</em>, whilst the CSV file within
+          which that tabular data is encoded is considered to be a <em>distribution</em> 
+          of that tabular data.</p>
+      </div>
+      <p class="issue" data-number="93">Are the abstract tabular data and the CSV that 
+        encodes it the same thing? (Is DCAT distribution appropriate?)</p>
+      <p>The mapping procedure is intended to be simple; encouraging the provision of 
+        compliant mapping applications. The limitation of this <dfn title="simple mapping">
+        simple mapping</dfn> is that a single object is created for each 
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">row</a> of tabular 
+        data that contains a single property per 
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell">cell</a>.</p>
+      <div class="note">
+        <p>An 
+          <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-table">annotated 
+          table</a> may include a reference to a
+          <a href="http://www.w3.org/TR/tabular-data-model/#dfn-template-specification">
+          template specification</a> (see [[!tabular-metadata]]) that describes how tabular \
+          data can be transformed into another format using a template-based approach. 
+          <em>Templating</em> facilitates far more sophisticated transformations than are 
+          possible using the <a title="simple mapping">simple mapping</a>.</p>
+        <p>There is no standard template syntax, therefore template specifications may be 
+          written using existing template languages, such as 
+          <a href="http://mustache.github.io">Mustache</a>.</p>
+        <p>The processing of template specifications during the mapping is yet to be 
+          determined by the Working Group and is, at least for the interim, beyond the scope
+          of this document.</p>
+      </div>
+      <p>Finally, note that the mapping procedure is considered to be <em>enirely textual</em>. 
+        There is no requirement on compliant mapping applications to check the semantic
+        consistency of the data during the mapping, nor validate the 
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell values</a> against
+        JSON syntax rules. Where cell values within CSV encoded content are improperly formatted, 
+        the output from the mapping is likely to include syntax errors. Downstream applications 
+        should be aware of this and take appropriate action.</p>
+      <p class="issue" data-number="62">Should the RDF/JSON transformation check the values?</p>
     </section>
     <section id="conformance">
-      <p>This document describes the processing of Tabular Data
-        [[!tabular-data-model]] to produce JSON [[!JSON]]. It does not
-        cover any cleaning or transformation processes needed to convert the
-        initial data into Tabular Data form. Tabular Data defines an abstract
-        data model consisting of <dfn title="table">tables</dfn>, <dfn title="column">columns</dfn>, 
-        possible <dfn title="header row">header rows</dfn> providing <dfn title="name">column names</dfn>,
-        and <dfn title="row">data rows</dfn>. 
-        Each row consists of a number of <dfn title="cell">cells</dfn>. It
-        requires all rows to have the same number of columns. The specification
-        relies on the terms (e.g, header, row, column) as defined
-        in&nbsp;[[!tabular-data-model]].</p>
+      <p><a href="http://www.w3.org/TR/tabular-data-model/#dfn-tabular-data">Tabular data</a> 
+        MUST conform to the description from [[!tabular-data-model]]. In particular note
+        that each row MUST contain the same number of cells (although some of these cells 
+        may be empty). Given this constraint, not all CSV-encoded data can be considered 
+        to be tabular data. As such, the procedures and rules defined in this document  
+        cannot be applied to all CSV files.</p>
+      <p>This document relies on terms (e.g. group, table, column, row, cell) defined in 
+        [[!tabular-data-model]].</p>
     </section>
+    <section id="map-core-tab">
+      <h2>Mapping Core Tabular Data</h2>
+        <p>The procedures and rules for mapping tabular data compliant with the
+          <a href="http://www.w3.org/TR/tabular-data-model/#dfn-core-tabular-data-model">
+          core tabular data model</a> are described below.</p>
+        <p class="note">Core Tabular Data lacks any annotation; neither from the header
+          line within the CSV file nor from a separate metadata document.</p>
+      <section id="map-core-tab-json">
+        <h3>Generating JSON</h3>
+        <section id="map-core-tab-table">
+          <h4>Table-level processing</h4>
+          <ol>
+            <li>
+              <p>The root object of the <a title="output graph">output graph</a> SHALL 
+                correspond with the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table">table</a>.</p>
+            </li>
+            <li>
+              <p>The root object SHALL contain a reference to the CSV-encoded <em>
+                distribution</em> of the tabular data.</p>
+              <p>The <em>distribution</em> SHALL be described using an object with <em>name</em>
+                <code>distribution</code> that contains the <em>name/value pair</em> 
+                <code>"downloadURL": "<em>[CSV-LOCATION]</em>"</code> where <code><em>[CSV-LOCATION]</em></code>
+                is the absolute URL of the source CSV file.</p> 
+              <p class="note">The semantics of properties <code>distribution</code> and 
+                <code>downloadURL</code> correspond with the properties 
+                <code><a href="http://www.w3.org/ns/dcat#distribution">dcat:distribution</a></code> and 
+                <code><a href="http://www.w3.org/ns/dcat#downloadURL">dcat:downloadURL</a></code> as defined 
+                in [[vocab-dcat]].</p>
+              <p class="issue" data-number="93">Are the abstract tabular data and the CSV that 
+                encodes it the same thing? (Is DCAT distribution appropriate?)</p>
+            </li> 
+            <li>
+              <p>Mappng applications SHALL construct a trivial <a title="column description object">
+                column description object</a> for each
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a>, 
+                containing only the metadata property <code>name</code>. As no metadata annotations are 
+                available to inform the mapping, the value assigned to <code>name</code> SHALL be 
+                <code>#col=<em>[N]</em></code> where <code><em>[N]</em></code> is the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column-number">column number</a>.</p>
+              <p class="issue" data-number="33">What do to with conversion if no column name 
+                is given?</p>
+            </li>
+            <li>
+              <p>The root object SHALL contain an array named <code>row</code> containing 
+                one object for each of the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">rows</a> within the 
+                tabular data.</p>
+              <p class="issue" data-number="97">What should the name of the property be that 
+                relates rows to the table? <code>row</code> is one option; <code>hasRow</code>
+                is another.</p>
+              <p>Refer to <strong><a href="#map-core-tab-row">Row-level processing</a></strong>
+                for further details.</p>
+            </li>
+          </ol>
+        </section>
+        <section id="map-core-tab-row">
+          <h4>Row-level processing</h4>
+          <ol>
+            <li>
+              <p>Each object in the <a title="output graph">output graph</a> corresponding to a 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">row</a> in the
+                tabular data SHALL contain one <em>name/value pair</em> for each
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a> 
+                where the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a>
+                is not <em>null</em> (e.g. where the cell does not contain an empty string; 
+                <code>""</code>). The value of <em>name</em> SHALL be provided by the 
+                <code>name</code> metadata property from the associated column description object,
+                whilst the value of <em>value</em> SHALL be provided by the associated
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a>.</p>
+              <p>Where the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a>
+                is <em>null</em>, the <em>name/value pair</em> SHALL be omitted from the 
+                <a title="output graph">output graph</a>.</p>
+              <p>Given the absence of metadata annotations to indicate the type of data present
+               in a given column, all cell values SHALL be treated as strings.</p>  
+            </li>
+          </ol>
+          <p class="issue" data-number="98">Should the mapping output for a given row include 
+            a reference to the CSV source row?</p>
+        </section>
+      </section>
+      <section id="map-core-tab-examples">
+        <h3>Examples</h3>
+        <p>The following example provides a numeric score for four fictional people. A row
+          number is included for convenience. There are four columns and four rows. Given 
+          that no metadata annotations are provided, it is very difficult to ascertain the 
+          subject of the tabular data without additional insight.</p>
+
+        <table border="1" width="60%">
+          <tr>
+            <td>1</td>
+            <td>Jill</td>
+            <td>Smith</td> 
+            <td>50</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Eve</td>
+            <td></td> 
+            <td>94</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>Adam</td>
+            <td>Johnson</td> 
+            <td></td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>John</td>
+            <td>Doe</td> 
+            <td>80</td>
+          </tr>
+        </table>
+
+        <p>The CSV input (published at <code>http://example.org/people-and-points.csv</code>):</p>
+
+        <pre class="example" id="map-core-tab-examples-input" title="CSV input ">
+1,Jill,Smith,50
+2,Eve,,94
+3,Adam,Johnson,
+4,John,Doe,80
+        </pre>
+
+        <p>The resulting JSON output graph:</p>
+
+        <pre class="example" id="map-core-tab-examples-output" title="JSON output">
+{
+  "distribution": {
+    "downloadURL": "http://example.org/people-and-points.csv"
+  },
+  "row": [{
+    "#col=1": "1",
+    "#col=2": "Jill",
+    "#col=3": "Smith",
+    "#col=4": "50"
+  },{
+    "#col=1": "2",
+    "#col=2": "Eve",
+    "#col=4": "94"
+  },{
+    "#col=1": "3",
+    "#col=2": "Adam",
+    "#col=3": "Johnson"
+  },{
+    "#col=1": "4",
+    "#col=2": "John",
+    "#col=3": "Doe",
+    "#col=4": "80"
+  }]
+}
+        </pre>
+
+      </section>
+    </section>
+    <section id="map-annotated-tab">
+      <h2>Mapping Annotated Tabular Data</h2>
+      <section id="map-annotated-tab-json">
+        <p>The procedures and rules for mapping annotated tabular data compliant with the
+          <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-tabular-data-model">
+          annotated tabular data model</a> are described below.</p>
+        <p>The metadata annotation for annotated tabular data MAY be provided by either or both
+          of the following sources:</p>
+        <ul>
+          <li>the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-header-line">
+            header line</a> within the CSV file; and/or</li>
+          <li>the <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">
+            table description</a>, 
+            <a href="http://www.w3.org/TR/tabular-metadata/#dfn-schema">schema</a> and 
+            <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description">
+            column descriptions</a> (as defined in [[!tabular-metadata]]) within the 
+            associated metadata document.</li>
+        </ul>
+        <p>Mapping applications SHALL establish a 
+          <a title="column description object">column description object</a> for each
+          <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a> within
+          the annotated tabular data. The <dfn title="column description object">column 
+          description object</dfn> contains the aggregated set
+          of metadata properties for a given column that affect how the 
+          <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell values</a>
+          within the associated column are expressed in the <a title="output graph">
+          output graph</a>. Metadata properties are sourced from the 
+          <a href="http://www.w3.org/TR/tabular-data-model/#dfn-header-line">header line</a>
+          in the CSV file and <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description">
+          column description</a> in the metadata document and enriched with 
+          <a href="http://www.w3.org/TR/tabular-metadata/#dfn-inherited-property">
+          inherited properties</a> from the 
+          <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">
+          table description</a> and  
+          <a href="http://www.w3.org/TR/tabular-metadata/#dfn-schema">schema</a>.</p>
+        <p>In order to process a annotated tabular data, a mapping application SHALL have
+          access to the full metadata description associated with the tabular data.</p>
+        <p>The <dfn title="baseURL">base URL</dfn> provides the URL against which relative 
+          URLs from annotated tabular data are resolved.</p>
+        <p>Where metadata annotations are <em>only</em> provided by the header line within 
+          the CSV file, the <a title="baseURL">base URL</a> of the annotated tabular data SHALL be 
+          the location of the CSV file. In all other cases the <a title="baseURL">base URL</a>
+          SHALL be that of the associated metadata description.</p>
+        <p class="issue" data-number="91">What is default value if @base is not defined in the 
+          metadata description?</p>
+        <p>URL expansion behaviour of relative URLs against the <a title="baseURL">base URL</a> 
+          SHALL be consistent with
+          <a href="http://www.w3.org/TR/json-ld-api/#iri-expansion">Section 6.3 IRI Expansion</a> 
+          in [[JSON-LD-API]].</p>
+        <h3>Generating JSON</h3>
+        <section id="map-annotated-tab-table">
+          <h4>Table-level processing</h4>
+          <ol>
+            <li>
+              <p>The root object of the <a title="output graph">output graph</a> SHALL 
+                correspond with the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-table">annotated table</a>.</p>
+            </li>
+            <li>
+              <p>The root object SHALL contain a reference to the CSV-encoded <em>
+                distribution</em> of the tabular data.</p>
+              <p>The <em>distribution</em> SHALL be described using an object with <em>name</em>
+                <code>distribution</code> that contains the <em>name/value pair</em> 
+                <code>"downloadURL": "<em>[CSV-LOCATION]</em>"</code> where <code><em>[CSV-LOCATION]</em></code>
+                is the absolute URL of the source CSV file.</p> 
+              <p class="note">The semantics of properties <code>distribution</code> and 
+                <code>downloadURL</code> correspond with the properties 
+                <code><a href="http://www.w3.org/ns/dcat#distribution">dcat:distribution</a></code> and 
+                <code><a href="http://www.w3.org/ns/dcat#downloadURL">dcat:downloadURL</a></code> as defined 
+                in [[vocab-dcat]].</p>
+              <p class="issue" data-number="93">Are the abstract tabular data and the CSV that 
+                encodes it the same thing? (Is DCAT distribution appropriate?)</p>
+            </li>
+            <li>OK: THIS IS WHERE I'VE GOT TO (BUT MOST OF THE REST OF THE DOC IS DRAFTED IN NOTES ELSEWHERE) ... TAKE THE REST WITH A PINCH OF SALT</li>
+            <li>
+              <p>Where defined in the 
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">table description</a></p>
+            </li>
+            <li>
+              <p>Where provided in the 
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">table 
+                description</a> the metadata property <code>@id</code> SHALL be used to identify the 
+                root object.</p>
+              <p>The root object SHALL be identified using the <em>name/value pair</em> 
+              <code>"url": "<em>[@id]</em>"</code> where <code><em>[@id]</em></code> is the value
+              of metadata property <code>@id</code>.</p>
+            </li> 
+            <li>
+              <p>If the source CSV file contains a 
+              <a href="http://www.w3.org/TR/tabular-data-model/#dfn-header-line">header line</a></p>
+            </li>
+          </ol>
+        </section>
+        <section id="map-annotated-tab-row">
+          <h4>Row-level processing</h4>
+        </section>
+        <section id="map-annotated-tab-metadata">
+          <h4>Metadata property effects on row-level mapping behaviour</h4>
+        </section>
+      </section>
+      <section id="map-annotated-tab-examples">
+        <h3>Examples</h3>
+      </section>
+    </section>
+    <section id="map-grouped-tab">
+      <h2>Mapping Grouped Tabular Data</h2>
+      <section id="map-grouped-tab-json">
+        <h3>Generating JSON</h3>
+        <section id="map-grouped-tab-table">
+          <h4>Table-level processing</h4>
+        </section>
+      </section>
+      <section id="map-grouped-tab-examples">
+        <h3>Examples</h3>
+      </section>
+    </section>
+
+    <p>THIS IS IVAN'S ORIGINAL STUFF FROM HERE DOWN - WILL BE MERGED IN WHERE APPROPRIATE</p>
+
     <section id="processing-tabular">
       <h2>Processing Annotated Tabular Data</h2>
 
