@@ -252,7 +252,7 @@ var respecConfig = {
       <h2>Mapping Core Tabular Data</h2>
         <p>The procedures and rules for mapping tabular data compliant with the
           <a href="http://www.w3.org/TR/tabular-data-model/#dfn-core-tabular-data-model">
-          core tabular data model</a> is described below.</p>
+          core tabular data model</a> are described below.</p>
         <p class="note">Core Tabular Data lacks any annotation; neither from the header
           line within the CSV file nor from a separate metadata document.</p>
       <section id="map-core-tab-json">
@@ -260,17 +260,6 @@ var respecConfig = {
         <section id="map-core-tab-table">
           <h4>Table-level processing</h4>
           <ol>
-            <li>
-              <p>A trivial <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description">
-                column description</a> (as defined in [[!tabular-metadata]]) is constructed for
-                each <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a>, 
-                containing only the metadata property <code>name</code>. As no metadata annotations are 
-                available to inform the mapping, the value assigned to <code>name</code> SHALL be 
-                <code>#col=<em>[N]</em></code> where <code><em>[N]</em></code> is the 
-                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column-number">column number</a>.</p>
-              <p class="issue" data-number="33">What do to with conversion if no column name 
-                is given?</p>
-            </li>
             <li>
               <p>The root object of the <a title="output graph">output graph</a> SHALL 
                 correspond with the 
@@ -292,6 +281,17 @@ var respecConfig = {
                 encodes it the same thing? (Is DCAT distribution appropriate?)</p>
             </li> 
             <li>
+              <p>Mappng applications SHALL construct a trivial <a title="column description object">
+                column description object</a> for each
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a>, 
+                containing only the metadata property <code>name</code>. As no metadata annotations are 
+                available to inform the mapping, the value assigned to <code>name</code> SHALL be 
+                <code>#col=<em>[N]</em></code> where <code><em>[N]</em></code> is the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column-number">column number</a>.</p>
+              <p class="issue" data-number="33">What do to with conversion if no column name 
+                is given?</p>
+            </li>
+            <li>
               <p>The root object SHALL contain an array named <code>row</code> containing 
                 one object for each of the 
                 <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">rows</a> within the 
@@ -308,7 +308,7 @@ var respecConfig = {
           <h4>Row-level processing</h4>
           <ol>
             <li>
-              <p>Each object corresponding to a 
+              <p>Each object in the <a title="output graph">output graph</a> corresponding to a 
                 <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">row</a> in the
                 tabular data SHALL contain one <em>name/value pair</em> for each
                 <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a> 
@@ -316,7 +316,7 @@ var respecConfig = {
                 <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a>
                 is not <em>null</em> (e.g. where the cell does not contain an empty string; 
                 <code>""</code>). The value of <em>name</em> SHALL be provided by the 
-                <code>name</code> metadata property from the associated column description,
+                <code>name</code> metadata property from the associated column description object,
                 whilst the value of <em>value</em> SHALL be provided by the associated
                 <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a>.</p>
               <p>Where the 
@@ -381,8 +381,7 @@ var respecConfig = {
   "distribution": {
     "downloadURL": "http://example.org/people-and-points.csv"
   },
-  "row": [
-  {
+  "row": [{
     "#col=1": "1",
     "#col=2": "Jill",
     "#col=3": "Smith",
@@ -409,9 +408,95 @@ var respecConfig = {
     <section id="map-annotated-tab">
       <h2>Mapping Annotated Tabular Data</h2>
       <section id="map-annotated-tab-json">
+        <p>The procedures and rules for mapping annotated tabular data compliant with the
+          <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-tabular-data-model">
+          annotated tabular data model</a> are described below.</p>
+        <p>The metadata annotation for annotated tabular data MAY be provided by either or both
+          of the following sources:</p>
+        <ul>
+          <li>the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-header-line">
+            header line</a> within the CSV file; and/or</li>
+          <li>the <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">
+            table description</a>, 
+            <a href="http://www.w3.org/TR/tabular-metadata/#dfn-schema">schema</a> and 
+            <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description">
+            column descriptions</a> (as defined in [[!tabular-metadata]]) within the 
+            associated metadata document.</li>
+        </ul>
+        <p>Mapping applications SHALL establish a 
+          <a title="column description object">column description object</a> for each
+          <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a> within
+          the annotated tabular data. The <dfn title="column description object">column 
+          description object</dfn> contains the aggregated set
+          of metadata properties for a given column that affect how the 
+          <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell values</a>
+          within the associated column are expressed in the <a title="output graph">
+          output graph</a>. Metadata properties are sourced from the 
+          <a href="http://www.w3.org/TR/tabular-data-model/#dfn-header-line">header line</a>
+          in the CSV file and <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description">
+          column description</a> in the metadata document and enriched with 
+          <a href="http://www.w3.org/TR/tabular-metadata/#dfn-inherited-property">
+          inherited properties</a> from the 
+          <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">
+          table description</a> and  
+          <a href="http://www.w3.org/TR/tabular-metadata/#dfn-schema">schema</a>.</p>
+        <p>In order to process a annotated tabular data, a mapping application SHALL have
+          access to the full metadata description associated with the tabular data.</p>
+        <p>The <dfn title="baseURL">base URL</dfn> provides the URL against which relative 
+          URLs from annotated tabular data are resolved.</p>
+        <p>Where metadata annotations are <em>only</em> provided by the header line within 
+          the CSV file, the <a title="baseURL">base URL</a> of the annotated tabular data SHALL be 
+          the location of the CSV file. In all other cases the <a title="baseURL">base URL</a>
+          SHALL be that of the associated metadata description.</p>
+        <p class="issue" data-number="91">What is default value if @base is not defined in the 
+          metadata description?</p>
+        <p>URL expansion behaviour of relative URLs against the <a title="baseURL">base URL</a> 
+          SHALL be consistent with
+          <a href="http://www.w3.org/TR/json-ld-api/#iri-expansion">Section 6.3 IRI Expansion</a> 
+          in [[JSON-LD-API]].</p>
         <h3>Generating JSON</h3>
         <section id="map-annotated-tab-table">
           <h4>Table-level processing</h4>
+          <ol>
+            <li>
+              <p>The root object of the <a title="output graph">output graph</a> SHALL 
+                correspond with the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-table">annotated table</a>.</p>
+            </li>
+            <li>
+              <p>The root object SHALL contain a reference to the CSV-encoded <em>
+                distribution</em> of the tabular data.</p>
+              <p>The <em>distribution</em> SHALL be described using an object with <em>name</em>
+                <code>distribution</code> that contains the <em>name/value pair</em> 
+                <code>"downloadURL": "<em>[CSV-LOCATION]</em>"</code> where <code><em>[CSV-LOCATION]</em></code>
+                is the absolute URL of the source CSV file.</p> 
+              <p class="note">The semantics of properties <code>distribution</code> and 
+                <code>downloadURL</code> correspond with the properties 
+                <code><a href="http://www.w3.org/ns/dcat#distribution">dcat:distribution</a></code> and 
+                <code><a href="http://www.w3.org/ns/dcat#downloadURL">dcat:downloadURL</a></code> as defined 
+                in [[vocab-dcat]].</p>
+              <p class="issue" data-number="93">Are the abstract tabular data and the CSV that 
+                encodes it the same thing? (Is DCAT distribution appropriate?)</p>
+            </li>
+            <li>OK: THIS IS WHERE I'VE GOT TO (BUT MOST OF THE REST OF THE DOC IS DRAFTED IN NOTES ELSEWHERE) ... TAKE THE REST WITH A PINCH OF SALT</li>
+            <li>
+              <p>Where defined in the 
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">table description</a></p>
+            </li>
+            <li>
+              <p>Where provided in the 
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">table 
+                description</a> the metadata property <code>@id</code> SHALL be used to identify the 
+                root object.</p>
+              <p>The root object SHALL be identified using the <em>name/value pair</em> 
+              <code>"url": "<em>[@id]</em>"</code> where <code><em>[@id]</em></code> is the value
+              of metadata property <code>@id</code>.</p>
+            </li> 
+            <li>
+              <p>If the source CSV file contains a 
+              <a href="http://www.w3.org/TR/tabular-data-model/#dfn-header-line">header line</a></p>
+            </li>
+          </ol>
         </section>
         <section id="map-annotated-tab-row">
           <h4>Row-level processing</h4>
