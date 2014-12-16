@@ -548,7 +548,7 @@ var respecConfig = {
               <p>Any of the <a href="http://www.w3.org/TR/tabular-metadata/#dfn-inherited-property">
                 inherited properties</a> <code>null</code>, <code>text-direction</code>,
                 <code>separator</code>, <code>format</code>, <code>datatype</code>, 
-                <code>predicateUrl</code>, <code>urlTemplate</code> or <code>default</code>
+                or <code>default</code>
                 defined within the 
                 <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">
                 table description</a> and/or 
@@ -583,13 +583,16 @@ var respecConfig = {
                       column description</a> in the metadata document SHALL take precedence.</p>
                   </li>
                   <li>
+                    <p><code>predicateUrl</code>.</p>
+                  </li>
+                  <li>
+                    <p><code>urlTemplate</code>.</p>
+                  </li>
+                  <li>
                     <p><a href="http://www.w3.org/TR/tabular-metadata/#dfn-inherited-property">
                       Inherited properties</a> <code>null</code>, <code>text-direction</code>,
                       <code>separator</code>, <code>format</code>, <code>datatype</code>, 
-                      <code>predicateUrl</code>, <code>urlTemplate</code> and <code>default</code>.</p>
-                    <p class="issue" data-number="101">Properties <code>predicateUrl</code>, 
-                      <code>urlTemplate</code> and <code>default</code> have been identified as
-                      Inherited Properties but they are not yet listed in [[!tabular-metadata]].</p>
+                      and <code>default</code>.</p>
                     <p>Where <a href="http://www.w3.org/TR/tabular-metadata/#dfn-inherited-property">
                       inherited properties</a> are also provided via the 
                       <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">
@@ -603,6 +606,14 @@ var respecConfig = {
               </p>
             </li>
             <li>
+              <p>For each <a title="column description object">column description object</a>
+                where metadata property <code>predicateUrl</code> has <em>not</em> been 
+                assigned within the 
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description">
+                column description</a>, the value of <code>predicateUrl</code> SHALL be
+                set as the value of metadata property <code>name</code>.</p>
+            </li>
+            <li>
               <p>The root object SHALL contain an array named <code>row</code> containing 
                 one object for each of the 
                 <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">rows</a> within the 
@@ -610,8 +621,16 @@ var respecConfig = {
               <p>Refer to <a href="#map-annotated-tab-row">Section 4.1.2 Row-level processing</a>
                 for further details.</p>
             </li>
+            <li>
+              <p>The <a title="output graph">output graph</a> MAY contain information about the 
+                metadata documents that were used when when creating the 
+                <a title="output graph">output graph</a> using the following 
+                <em>name/value pair</em> for each metadata document:</p>
+              <p><code>&nbsp;&nbsp;"describedBy": "<em>[Metadata Location]</em>"</code></p>
+              <p>where <code><em>[Metadata Location]</em></code> is the absolute URL of the
+                metadata document.</p>
+            </li>
           </ol>
-          <p class="issue" data-number="100">Should the output graph include the Schema?</p>
         </section>
         <section id="map-annotated-tab-row">
           <h4>Row-level processing</h4>
@@ -674,7 +693,8 @@ var respecConfig = {
             </li>
             <li>
               <p>The value of <em>name</em> for the <em>name/value pair</em> SHALL be provided by the 
-                <code>name</code> metadata property.</p>
+                <code>predicateUrl</code> metadata property within the <a title="column description object">
+                column description object</a>.</p>
               <p>In accordance with [[!JSON]], all unicode characters may be used. However, the
                 following characters SHALL be <em>escaped</em>:</p>
               <ul>
@@ -858,19 +878,6 @@ var respecConfig = {
               is to be parsed into a list of values), the datatype specified by <code>datatype</code>
               SHALL be inferred to apply to the members of the resulting list.</p>  
           </dd>
-          <dt id="metadata-property-predicateUrl"><code>predicateUrl</code></dt>
-          <dd>
-            <p>If specified, the value of metadata property <code>predicateUrl</code> will be used in place
-              of the value of metadata property <code>name</code> to relate the row object to the 
-              <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a>
-              for the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a> in 
-              that <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">row</a>.</p>
-            <p class="note">Values of <code>predicteUrl</code> are identically constrained as the
-              values of <a title="common property">Common Properties</a>: that prefixed names are only pemitted where prefixes are 
-              pre-defined as for [[rdfa-core]] within the 
-              <a href="http://www.w3.org/2011/rdfa-context/rdfa-1.1">RDFa 1.1 Initial Context</a>, 
-              else an absolute URL MUST be used.</p>
-          </dd>
           <dt id="metadata-property-urlTemplate"><code>urlTemplate</code></dt>
           <dd>
             <p>If metadata property <code>urlTemplate</code> is specified, the value used 
@@ -1018,8 +1025,8 @@ GID,On Street,Species,Trim Cycle,Inventory Date
   "dc:title": "Tree Operations",
   "dc:keywords": ["tree", "street", "maintenance"],
   "dc:publisher": [{
-    "sch:name": "Example Municipality",
-    "sch:web": "http://example.org"
+    "schema:name": "Example Municipality",
+    "schema:web": "http://example.org"
   }],
   "dc:license": "http://opendefinition.org/licenses/cc-by/",
   "dc:modified": "2010-12-31",
@@ -1072,8 +1079,8 @@ GID,On Street,Species,Trim Cycle,Inventory Date
   "dc:title": "Tree Operations",
   "dc:keywords": ["tree", "street", "maintenance"],
   "dc:publisher": [{
-    "sch:name": "Example Municipality",
-    "sch:web": "http://example.org"
+    "schema:name": "Example Municipality",
+    "schema:web": "http://example.org"
   }],
   "dc:license": "http://opendefinition.org/licenses/cc-by/",
   "dc:modified": "2010-12-31",
@@ -1098,7 +1105,8 @@ GID,On Street,Species,Trim Cycle,Inventory Date
     "species": "Liquidambar styraciflua",
     "trim-cycle": "Large Tree Routine Prune",
     "inventory-date": "6/2/2010"
-  }]
+  }],
+  "describedBy": "http://example.org/tree-ops.csv-metadata.json"
 }
         </pre>
 
@@ -1130,7 +1138,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
                 table group description</a>, any <a title="common property">Common Properties</a> 
                 (as defined in 
                 <a href="http://www.w3.org/TR/tabular-metadata/#common-properties">Section 3.3 
-                Common Properties</a> of [[!tabular-metadata]]) following metadata properties SHALL 
+                Common Properties</a> of [[!tabular-metadata]]) SHALL 
                 be included in the <a title="output graph">output graph</a> within the root object.</p>
             </li>
             <li>
@@ -1155,8 +1163,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               <p>Any of the <a href="http://www.w3.org/TR/tabular-metadata/#dfn-inherited-property">
                 inherited properties</a> <code>null</code>, <code>text-direction</code>,
                 <code>separator</code>, <code>format</code>, <code>datatype</code>, 
-                <code>predicateUrl</code>, <code>urlTemplate</code> or <code>default</code>
-                defined within the 
+                or <code>default</code> defined within the 
                 <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-group-description">
                 table group description</a> SHALL be used to pre-populate the 
                 <a title="column description object">column description objects</a> for each 
@@ -1186,7 +1193,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       </section>
       <section id="map-grouped-tab-examples">
         <h3>Examples</h3>
-        <p class="issue" data-number=""><a href="http://www.w3.org/TR/csvw-ucr/#UC-OrganogramData">
+        <p class="TBD"><a href="http://www.w3.org/TR/csvw-ucr/#UC-OrganogramData">
           Use Case 4: Publication of public sector roles and salaries</a> likely provides a good 
           source of material for these examples. To be added.</p>
       </section>
