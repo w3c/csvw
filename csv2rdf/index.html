@@ -295,8 +295,6 @@ var respecConfig = {
         <dd><code>http://purl.org/dc/terms/</code></dd>
         <dt><code>dcat</code>:</dt>
         <dd><code>http://www.w3.org/ns/dcat#</code></dd>
-        <dt><code>rel</code>:</dt>
-        <dd><code>http://www.iana.org/assignments/relation/</code></dd>
         <dt><code>prov</code>:</dt>
         <dd><code>http://www.w3.org/ns/prov#</code></dd>
       </dl>
@@ -375,27 +373,27 @@ var respecConfig = {
 
             <li>
               <p>Optionally, the <a title="output graph">output graph</a> MAY contain information
-                describing how and when the <a title="output graph">output graph</a> was created.
-                If included, this <em>provenance information</em>, a <code>prov:Activity</code>, SHALL be explicitly identified as
-                <code><em>[CSV Location]</em>#provenance</code>, where <code><em>[CSV Location]</em></code>
-                is the absolute URL of the source CSV file, and SHALL include the following triples
-                using terms from the PROV Ontology [[prov-o]]:</p>
-              <p>
-                <p><code>&nbsp;&nbsp;&lt;<em>[CSV Location]</em>#provenance&gt; prov:startedAtTime <em>[Start Time]</em> .</code></p>
-                <p><code>&nbsp;&nbsp;&lt;<em>[CSV Location]</em>#provenance&gt; prov:endedAtTime <em>[End Time]</em> .</code></p>
-                <p><code>&nbsp;&nbsp;&lt;<em>[CSV Location]</em>#provenance&gt; prov:generated &lt;<em>[RDF Output Location]</em>&gt; .</code></p>
-                <p>
-                  <p><code>&nbsp;&nbsp;&lt;<em>[CSV Location]</em>#provenance&gt; prov:qualifiedUsage [</code></p>
-                  <p><code>&nbsp;&nbsp;&nbsp;&nbsp;a prov:Usage ;</code></p>
-                  <p><code>&nbsp;&nbsp;&nbsp;&nbsp;prov:Entity &lt;<em>[CSV Location]</em>&gt; ;</code></p>
-                  <p><code>&nbsp;&nbsp;&nbsp;&nbsp;prov:hadRole csvw:csvEncodedTabularData </code></p>
-                  <p><code>&nbsp;&nbsp;] .</code></p>
-                </p>
-              </p>
-              <p><code><em>[Start Time]</em></code> is the start time of the mapping activity, 
-                <code><em>[End Time]</em></code> is the finish time of the mapping activity (both
-                expressed as <code>xsd:dateTime</code>) and <code><em>[RDF Output Location]</em></code> 
-                is the location of the generated <a title="output graph">output graph</a>.</p>
+                describing how and when the <a title="output graph">output graph</a> was created using terms from the PROV Ontology [[prov-o]].</p>
+              <p>If <em>provenance information</em> is to be included in the <a title="output graph">output graph</a> then the <a title="table entity">table entity</a> SHALL use the <em>predicate</em> <code>prov:activity</code> to refer to an entity of type <code>prov:Activity</code> that describes the mapping activity.</p>
+              <p>The <code>prov:Activity</code> entity SHOULD provide information on the start and end time of the mapping activity and refer to the original CSV file. The <code>prov:Activity</code> entity MAY indicate the location of the generated RDF <a title="output graph">output graph</a> if known.</p>
+              <p>The example below provides an illustration of <em>provenance information</em>, where <code><em>[CSV Location]</em></code> is the absolute URL of the source CSV file, <code><em>[Start Time]</em></code> is the start time of the mapping activity, <code><em>[End Time]</em></code> is the finish time of the mapping activity (both expressed as <code>xsd:dateTime</code>) and <code><em>[RDF Output Location]</em></code> is the location of the generated <a title="output graph">output graph</a>.</p>
+
+              <pre class="example" id="map-core-tab-example-prov" title="Provenance information">
+&lt;&gt; a csvw:Table;
+  prov:activity [
+    a prov:Activity;
+    prov:startedAtTime [Start Time];
+    prov:endedAtTime [End Time];
+    prov:generated &lt;[RDF Output Location]&gt;;
+    prov:qualifiedUsage [
+      a prov:Usage ;
+      prov:Entity &lt;[CSV Location]&gt; ;
+      prov:hadRole csvw:csvEncodedTabularData
+    ]
+  ];
+  ...
+              </pre>
+
             </li>
 
           </ol>
@@ -499,7 +497,7 @@ var respecConfig = {
 4,John,Doe,80
         </pre>
 
-        <p>The resulting RDF output graph (published to <code>http://example.org/people-and-points.ttl</code>):</p>
+        <p>The resulting RDF output graph:</p>
 
         <pre class="example" id="map-core-tab-examples-output" title="RDF output (Turtle syntax)">
 @prefix :     &lt;http://example.org/people-and-points.csv#&gt; .
@@ -517,31 +515,32 @@ var respecConfig = {
     :_col=1 "1" ;
     :_col=2 "Jill" ;
     :_col=3 "Smith" ;
-    :_col=4 "50"
+    :_col=4 "50" ;
   ] , [
     :_col=1 "2" ;
     :_col=2 "Eve" ;
-    :_col=4 "94"
+    :_col=4 "94" ;
   ] , [
     :_col=1 "3" ;
     :_col=2 "Adam" ;
-    :_col=3 "Johnson"
+    :_col=3 "Johnson" ;
   ] , [
     :_col=1 "4" ;
     :_col=2 "John" ;
     :_col=3 "Doe" ;
-    :_col=4 "80"
-  ] .
-
-:provenance a prov:Activity ;
-  prov:startedAtTime "2014-12-15T12:44:42"^^xsd:dateTime ;
-  prov:endedAtTime "2014-12-15T12:44:42"^^xsd:dateTime ;
-  prov:generated &lt;http://example.org/people-and-points.ttl&gt; ;
-  prov:qualifiedUsage [
-    a prov:Usage ;
-    prov:Entity &lt;http://example.org/people-and-points.csv&gt; ;
-    prov:hadRole csvw:csvEncodedTabularData 
-  ] .
+    :_col=4 "80" ;
+  ] ;
+  prov:activity [
+    a prov:Activity ;
+    prov:startedAtTime "2014-12-15T12:44:42"^^xsd:dateTime ;
+    prov:endedAtTime "2014-12-15T12:44:42"^^xsd:dateTime ;
+    prov:qualifiedUsage [
+      a prov:Usage ;
+      prov:Entity &lt;http://example.org/people-and-points.csv&gt; ;
+      prov:hadRole csvw:csvEncodedTabularData ;
+    ] ;
+  ] ;
+  .
         </pre>
 
       </section>
@@ -830,49 +829,33 @@ var respecConfig = {
 
             <li>
               <p>Optionally, the <a title="output graph">output graph</a> MAY contain information
-                describing how and when the <a title="output graph">output graph</a> was created.
-                If included, this <em>provenance information</em>, a <code>prov:Activity</code>, SHALL be explicitly identified as
-                <code><em>[CSV Location]</em>#provenance</code>, where <code><em>[CSV Location]</em></code>
-                is the absolute URL of the source CSV file, and SHALL include the following triples
-                using terms from the PROV Ontology [[prov-o]]:</p>
-              <p>
-                <p><code>&nbsp;&nbsp;&lt;<em>[CSV Location]</em>#provenance&gt; prov:startedAtTime <em>[Start Time]</em> .</code></p>
-                <p><code>&nbsp;&nbsp;&lt;<em>[CSV Location]</em>#provenance&gt; prov:endedAtTime <em>[End Time]</em> .</code></p>
-                <p><code>&nbsp;&nbsp;&lt;<em>[CSV Location]</em>#provenance&gt; prov:generated &lt;<em>[RDF Output Location]</em>&gt; .</code></p>
-                <p>
-                  <p><code>&nbsp;&nbsp;&lt;<em>[CSV Location]</em>#provenance&gt; prov:qualifiedUsage [</code></p>
-                  <p><code>&nbsp;&nbsp;&nbsp;&nbsp;a prov:Usage ;</code></p>
-                  <p><code>&nbsp;&nbsp;&nbsp;&nbsp;prov:Entity &lt;<em>[CSV Location]</em>&gt; ;</code></p>
-                  <p><code>&nbsp;&nbsp;&nbsp;&nbsp;prov:hadRole csvw:csvEncodedTabularData </code></p>
-                  <p><code>&nbsp;&nbsp;] .</code></p>
-                </p>
-              </p>
-              <p><code><em>[Start Time]</em></code> is the start time of the mapping activity, 
-                <code><em>[End Time]</em></code> is the finish time of the mapping activity (both
-                expressed as <code>xsd:dateTime</code>) and <code><em>[RDF Output Location]</em></code> 
-                is the location of the generated <a title="output graph">output graph</a>.</p>
+                describing how and when the <a title="output graph">output graph</a> was created using terms from the PROV Ontology [[prov-o]].</p>
+              <p>If <em>provenance information</em> is to be included in the <a title="output graph">output graph</a> then the <a title="table entity">table entity</a> SHALL use the <em>predicate</em> <code>prov:activity</code> to refer to an entity of type <code>prov:Activity</code> that describes the mapping activity.</p>
+              <p>The <code>prov:Activity</code> entity SHOULD provide information on the start and end time of the mapping activity and refer to the original CSV file. The <code>prov:Activity</code> entity MAY indicate the location of the generated RDF <a title="output graph">output graph</a> if known.</p>
+              <p>Furthermore, if the metadata annotations are provided in one or more metadata documents (e.g. as <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">table description</a>, <a href="http://www.w3.org/TR/tabular-metadata/#dfn-schema">schema</a> and <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description">column descriptions</a>) then the provenance information SHOULD also include information about each of those metadata documents.</p>
+              <p>The example below provides an illustration of <em>provenance information</em>, where <code><em>[CSV Location]</em></code> is the absolute URL of the source CSV file, <code><em>[Metadata Location]</em></code> is the location of the metadata document, <code><em>[Start Time]</em></code> is the start time of the mapping activity, <code><em>[End Time]</em></code> is the finish time of the mapping activity (both expressed as <code>xsd:dateTime</code>) and <code><em>[RDF Output Location]</em></code> is the location of the generated <a title="output graph">output graph</a>.</p>
 
-              <p>Furthermore, if the metadata annotations are provided in one or more 
-                metadata documents (e.g. as 
-                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">
-                table description</a>, 
-                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-schema">schema</a> and 
-                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description">
-                column descriptions</a>) then the provenance information SHALL also include
-                the following triples for each metadata document:</p> 
-              <p>
-                <p>
-                  <p><code>&nbsp;&nbsp;&lt;<em>[CSV Location]</em>#provenance&gt; prov:qualifiedUsage [</code></p>
-                  <p><code>&nbsp;&nbsp;&nbsp;&nbsp;a prov:Usage ;</code></p>
-                  <p><code>&nbsp;&nbsp;&nbsp;&nbsp;prov:Entity &lt;<em>[Metadata Location]</em>&gt; ;</code></p>
-                  <p><code>&nbsp;&nbsp;&nbsp;&nbsp;prov:hadRole csvw:tabularMetadata </code></p>
-                  <p><code>&nbsp;&nbsp;] .</code></p>
-                </p>
-                <p><code>&nbsp;&nbsp;&lt;<em>[Metadata Location]</em>&gt; a csvw:TabularMetadataDocument .</code></p>
-                <p><code>&nbsp;&nbsp;&lt;<em>[CSV Location]</em>&gt; rel:describedBy &lt;<em>[Metadata Location]</em>&gt; .</code></p>
-              </p>
-              <p>Where <code><em>[Metadata Location]</em></code> is the location of the 
-                metadata document.</p>
+              <pre class="example" id="map-core-tab-example-prov" title="Provenance information">
+&lt;&gt; a csvw:Table;
+  prov:activity [
+    a prov:Activity;
+    prov:startedAtTime [Start Time];
+    prov:endedAtTime [End Time];
+    prov:generated &lt;[RDF Output Location]&gt;;
+    prov:qualifiedUsage [
+      a prov:Usage ;
+      prov:Entity &lt;[CSV Location]&gt; ;
+      prov:hadRole csvw:csvEncodedTabularData
+    ];
+    prov:qualifiedUsage [
+      a prov:Usage ;
+      prov:Entity &lt;[Metadata Location]&gt; ;
+      prov:hadRole csvw:tabularMetadata
+    ]
+  ];
+  ...
+              </pre>
+
             </li>
 
           </ol>
@@ -1225,27 +1208,29 @@ AL,Albania
   ] ;
   csvw:row [
     :country "AD" ;
-    :name "Andorra"
+    :name "Andorra" ;
   ] , [
     :country "AF" ;
-    :name "Afghanistan"
+    :name "Afghanistan" ;
   ] , [
     :country "AI" ;
-    :name "Anguilla"
+    :name "Anguilla" ;
   ] , [
     :country "AL" ;
-    :name "Albania"
-  ] .
-
-:provenance a prov:Activity ;
-  prov:startedAtTime "2014-12-16T12:15:06"^^xsd:dateTime ;
-  prov:endedAtTime "2014-12-16T12:15:07"^^xsd:dateTime ;
-  prov:generated &lt;http://example.org/country-codes-and-names.ttl&gt; ;
-  prov:qualifiedUsage [
-    a prov:Usage ;
-    prov:Entity &lt;http://example.org/country-codes-and-names.csv&gt; ;
-    prov:hadRole csvw:csvEncodedTabularData 
-  ] .
+    :name "Albania" ;
+  ] ;
+  prov:activity [
+    a prov:Activity ;
+    prov:startedAtTime "2014-12-16T12:15:06"^^xsd:dateTime ;
+    prov:endedAtTime "2014-12-16T12:15:07"^^xsd:dateTime ;
+    prov:generated &lt;http://example.org/country-codes-and-names.ttl&gt; ;
+    prov:qualifiedUsage [
+      a prov:Usage ;
+      prov:Entity &lt;http://example.org/country-codes-and-names.csv&gt; ;
+      prov:hadRole csvw:csvEncodedTabularData ;
+    ] ;
+  ] ;
+  .
         </pre>
 
         <div class="issue" data-number="">
@@ -1380,7 +1365,6 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 @prefix rdf:    &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt; .
 @prefix rdfs:   &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .
 @prefix schema: &lt;http://schema.org/&gt;
-@prefix rel:    &lt;http://www.iana.org/assignments/relation/&gt; .
 @prefix xsd:    &lt;http://www.w3.org/2001/XMLSchema#&gt; .
 
 :GID a rdf:Property ;
@@ -1416,50 +1400,48 @@ GID,On Street,Species,Trim Cycle,Inventory Date
   ] ;
   dc:license &lt;http://opendefinition.org/licenses/cc-by/&gt; ;
   dc:modified "2010-12-31"^^xsd:date ;
-  csvw:row :gid-1 , :gid-2 , :gid-3 .
-
-  :gid-1
-    :GID "1"^^xsd:string ;
-    :on-street "ADDISON AV"^^xsd:string ;
-    :species "Celtis australis"^^xsd:string ;
-    :trim-cycle "Large Tree Routine Prune"^^xsd:string ;
-    :inventory-date "2010-10-18"^^xsd:date ;
-    .
-
-  :gid-2
-    :GID "2"^^xsd:string ;
-    :on-street "EMERSON ST"^^xsd:string ;
-    :species "Liquidambar styraciflua"^^xsd:string ;
-    :trim-cycle "Large Tree Routine Prune"^^xsd:string ;
-    :inventory-date "2010-06-02"^^xsd:date ;
-    .
-
-  :gid-3
-    :GID "3"^^xsd:string ;
-    :on-street "EMERSON ST"^^xsd:string ;
-    :species "Liquidambar styraciflua"^^xsd:string ;
-    :trim-cycle "Large Tree Routine Prune"^^xsd:string ;
-    :inventory-date "2010-06-02"^^xsd:date ;
-    .
-
-:provenance a prov:Activity ;
-  prov:startedAtTime "2014-12-16T12:15:06"^^xsd:dateTime ;
-  prov:endedAtTime "2014-12-16T12:15:07"^^xsd:dateTime ;
-  prov:generated &lt;http://example.org/tree-ops.ttl&gt; ;
-  prov:qualifiedUsage [
-    a prov:Usage ;
-    prov:Entity &lt;http://example.org/tree-ops.csv&gt; ;
-    prov:hadRole csvw:csvEncodedTabularData 
+  csvw:row :gid-1 , :gid-2 , :gid-3 ;
+  prov:activity [
+    a prov:Activity ;
+    prov:startedAtTime "2014-12-16T12:15:06"^^xsd:dateTime ;
+    prov:endedAtTime "2014-12-16T12:15:07"^^xsd:dateTime ;
+    prov:generated &lt;http://example.org/tree-ops.ttl&gt; ;
+    prov:qualifiedUsage [
+      a prov:Usage ;
+      prov:Entity &lt;http://example.org/tree-ops.csv&gt; ;
+      prov:hadRole csvw:csvEncodedTabularData 
+    ] ;
+    prov:qualifiedUsage [
+      a prov:Usage ;
+      prov:Entity &lt;http://example.org/tree-ops.csv-metadata.json&gt; ;
+      prov:hadRole csvw:tabularMetadata 
+    ] ;
   ] ;
-  prov:qualifiedUsage [
-    a prov:Usage ;
-    prov:Entity &lt;http://example.org/tree-ops.csv-metadata.json&gt; ;
-    prov:hadRole csvw:tabularMetadata 
-  ] .
+  .
 
-&lt;http://example.org/tree-ops.csv-metadata.json&gt; a csvw:TabularMetadataDocument .
+:gid-1
+  :GID "1"^^xsd:string ;
+  :on-street "ADDISON AV"^^xsd:string ;
+  :species "Celtis australis"^^xsd:string ;
+  :trim-cycle "Large Tree Routine Prune"^^xsd:string ;
+  :inventory-date "2010-10-18"^^xsd:date ;
+  .
 
-&lt;http://example.org/tree-ops.csv&gt; rel:describedBy &lt;http://example.org/tree-ops.csv-metadata.json&gt; .
+:gid-2
+  :GID "2"^^xsd:string ;
+  :on-street "EMERSON ST"^^xsd:string ;
+  :species "Liquidambar styraciflua"^^xsd:string ;
+  :trim-cycle "Large Tree Routine Prune"^^xsd:string ;
+  :inventory-date "2010-06-02"^^xsd:date ;
+  .
+
+:gid-3
+  :GID "3"^^xsd:string ;
+  :on-street "EMERSON ST"^^xsd:string ;
+  :species "Liquidambar styraciflua"^^xsd:string ;
+  :trim-cycle "Large Tree Routine Prune"^^xsd:string ;
+  :inventory-date "2010-06-02"^^xsd:date ;
+  .
         </pre>
 
         <p class="note">In the example RDF output note that the value of column <code>Inventory Date</code>
