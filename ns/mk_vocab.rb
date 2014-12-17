@@ -40,7 +40,11 @@ class Vocab
 
   def to_jsonld
     rdfs_context = ::JSON.parse %({
+      "dc:title": {"@container": "@language"},
+      "dc:description": {"@container": "@language"},
+      "rdfs:comment": {"@container": "@language"},
       "rdfs:domain": {"@type": "@id"},
+      "rdfs:label": {"@container": "@language"},
       "rdfs:range": {"@type": "@id"},
       "rdfs:subClassOf": {"@type": "@id"},
       "rdfs:subPropertyOf": {"@type": "@id"},
@@ -57,13 +61,13 @@ class Vocab
 
     nodes << {
       "@id" => prefixes["csvm"][:subClassOf],
-      "dc:title" => "Metadata Vocabulary for Tabular Data",
-      "dc:description" => %(Validation, conversion, display and search of tabular data on the web
+      "dc:title" => {"en" => "Metadata Vocabulary for Tabular Data"},
+      "dc:description" => {"en" => %(Validation, conversion, display and search of tabular data on the web
     requires additional metadata that describes how the data should be
     interpreted. This document defines a vocabulary for metadata that
     annotates tabular data. This can be used to provide metadata at various
     levels, from collections of data from CSV documents and how they relate
-    to each other down to individual cells within a table.)
+    to each other down to individual cells within a table.)}
     }
     prefixes.each do |id, entry|
       context[id] = entry[:subClassOf]
@@ -80,8 +84,8 @@ class Vocab
       node = {
         '@id' => "csvm:#{id}",
         '@type' => 'rdfs:Class',
-        'rdfs:label' => entry[:label],
-        'rdfs:comment' => entry[:comment],
+        'rdfs:label' => {"en" => entry[:label].to_s},
+        'rdfs:comment' => {"en" => entry[:comment].to_s},
       }
       node['rdfs:subClassOf'] = entry[:subClassOf] if entry[:subClassOf]
       nodes << node
@@ -91,20 +95,21 @@ class Vocab
       defn = {"@id" => "csvm:#{id}"}
       case entry[:range]
       when /xsd:/                 then defn['@type'] = entry[:range]
-      when 'Dialect', 'Direction' then defn['@type'] = '@vocab'
       when nil                    then ;
       else                             defn['@type'] = '@id'
       end
 
-      defn['@container'] = entry[:container] if entry[:container]
+      defn['@container'] = entry[:@container] if entry[:@container]
+      defn['@type'] = entry[:@type] if entry[:@type]
+
       context[id] = defn
 
       # Property definition
       node = {
         '@id' => "csvm:#{id}",
         '@type' => 'rdf:Property',
-        'rdfs:label' => entry[:label],
-        'rdfs:comment' => entry[:comment],
+        'rdfs:label' => {"en" => entry[:label].to_s},
+        'rdfs:comment' => {"en" => entry[:comment].to_s},
       }
       node['rdfs:subPropertyOf'] = entry[:subClassOf] if entry[:subClassOf]
 
@@ -132,8 +137,8 @@ class Vocab
       node = {
         '@id' => "csvm:#{id}",
         '@type' => 'rdfs:Datatype',
-        'rdfs:label' => entry[:label],
-        'rdfs:comment' => entry[:comment],
+        'rdfs:label' => {"en" => entry[:label].to_s},
+        'rdfs:comment' => {"en" => entry[:comment].to_s},
       }
       node['rdfs:subClassOf'] = entry[:subClassOf] if entry[:subClassOf]
       nodes << node
@@ -144,8 +149,8 @@ class Vocab
       nodes << {
         '@id' => "csvm:#{id}",
         '@type' => entry[:type],
-        'rdfs:label' => entry[:label],
-        'rdfs:comment' => entry[:comment],
+        'rdfs:label' => {"en" => entry[:label].to_s},
+        'rdfs:comment' => {"en" => entry[:comment].to_s},
       }
     end
 
@@ -162,20 +167,20 @@ class Vocab
 
     output << "\n# CSVM Ontology definition"
     output << "csvm: a owl:Ontology;"
-    output << %(  dc:title "Metadata Vocabulary for Tabular Data";)
+    output << %(  dc:title "Metadata Vocabulary for Tabular Data"@en;)
     output << %(  dc:description """Validation, conversion, display and search of tabular data on the web
     requires additional metadata that describes how the data should be
     interpreted. This document defines a vocabulary for metadata that
     annotates tabular data. This can be used to provide metadata at various
     levels, from collections of data from CSV documents and how they relate
-    to each other down to individual cells within a table.""";)
+    to each other down to individual cells within a table."""@en;)
     output << "  .\n"
 
-    output << "\n# Class definitions"
+    output << "\n# Class definitions"#{
     @classes.each do |id, entry|
       output << "csvm:#{id} a rdfs:Class;"
-      output << %(  rdfs:label "#{entry[:label]}";)
-      output << %(  rdfs:comment """#{entry[:comment]}""";)
+      output << %(  rdfs:label "#{entry[:label]}"@en;)
+      output << %(  rdfs:comment """#{entry[:comment]}"""@en;)
       output << %(  rdfs:subClassOf #{entry[:subClassOf].include?(':') ? entry[:subClassOf] : "csvm:" + entry[:subClassOf]};) if entry[:subClassOf]
       output << "  .\n"
     end
@@ -183,8 +188,8 @@ class Vocab
     output << "\n# Property definitions"
     @properties.each do |id, entry|
       output << "csvm:#{id} a rdf:Property;"
-      output << %(  rdfs:label "#{entry[:label]}";)
-      output << %(  rdfs:comment """#{entry[:comment]}""";)
+      output << %(  rdfs:label "#{entry[:label]}"@en;)
+      output << %(  rdfs:comment """#{entry[:comment]}"""@en;)
       output << %(  rdfs:subPropertyOf #{entry[:subClassOf].include?(':') ? entry[:subClassOf] : "csvm:" + entry[:subClassOf]};) if entry[:subClassOf]
       domains = entry[:domain].to_s.split(',')
       case domains.length
@@ -207,8 +212,8 @@ class Vocab
     output << "\n# Datatype definitions"
     @datatypes.each do |id, entry|
       output << "csvm:#{id} a rdfs:Datatype;"
-      output << %(  rdfs:label "#{entry[:label]}";)
-      output << %(  rdfs:comment """#{entry[:comment]}""";)
+      output << %(  rdfs:label "#{entry[:label]}"@en;)
+      output << %(  rdfs:comment """#{entry[:comment]}"""@en;)
       output << %(  rdfs:subClassOf #{entry[:subClassOf].include?(':') ? entry[:subClassOf] : "csvm:" + entry[:subClassOf]};) if entry[:subClassOf]
       output << "  .\n"
     end
@@ -216,8 +221,8 @@ class Vocab
     output << "\n# Instance definitions"
     @instances.each do |id, entry|
       output << "csvm:#{id} a #{entry[:type].include?(':') ? entry[:type] : "csvm:" + entry[:type]};"
-      output << %(  rdfs:label "#{entry[:label]}";)
-      output << %(  rdfs:comment """#{entry[:comment]}""";)
+      output << %(  rdfs:label "#{entry[:label]}"@en;)
+      output << %(  rdfs:comment """#{entry[:comment]}"""@en;)
       output << "  .\n"
     end
 

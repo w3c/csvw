@@ -74,15 +74,12 @@
     "datatype": {
       "@id": "csvm:datatype"
     },
-    "default": {
-      "@id": "csvm:default"
-    },
     "delimieter": {
       "@id": "csvm:delimieter"
     },
     "dialect": {
       "@id": "csvm:dialect",
-      "@type": "@vocab"
+      "@type": "@id"
     },
     "doubleQuote": {
       "@id": "csvm:doubleQuote",
@@ -148,6 +145,10 @@
     "null": {
       "@id": "csvm:null"
     },
+    "predicateUrl": {
+      "@id": "csvm:predicateUrl",
+      "@type": "xsd:anyURI"
+    },
     "primaryKey": {
       "@id": "csvm:primaryKey"
     },
@@ -160,7 +161,8 @@
     },
     "resources": {
       "@id": "csvm:resources",
-      "@type": "@id"
+      "@type": "@id",
+      "@container": "@set"
     },
     "separator": {
       "@id": "csvm:separator"
@@ -204,7 +206,7 @@
     },
     "title": {
       "@id": "csvm:title",
-      "@container": "@list"
+      "@container": "@language"
     },
     "trim": {
       "@id": "csvm:trim",
@@ -214,8 +216,20 @@
       "@id": "csvm:uriTemplate"
     },
     "json": "csvm:json",
+    "dc:title": {
+      "@container": "@language"
+    },
+    "dc:description": {
+      "@container": "@language"
+    },
+    "rdfs:comment": {
+      "@container": "@language"
+    },
     "rdfs:domain": {
       "@type": "@id"
+    },
+    "rdfs:label": {
+      "@container": "@language"
     },
     "rdfs:range": {
       "@type": "@id"
@@ -253,275 +267,128 @@
   },
   "@graph": [
     {
-      "@id": "http://www.w3.org/ns/csvm#",
-      "dc:title": "Metadata Vocabulary for Tabular Data",
-      "dc:description": "Validation, conversion, display and search of tabular data on the web\n    requires additional metadata that describes how the data should be\n    interpreted. This document defines a vocabulary for metadata that\n    annotates tabular data. This can be used to provide metadata at various\n    levels, from collections of data from CSV documents and how they relate\n    to each other down to individual cells within a table."
-    },
-    {
-      "@id": "csvm:Column",
-      "@type": "rdfs:Class",
-      "rdfs:label": "Column Description",
-      "rdfs:comment": "A Column Description describes a single column."
-    },
-    {
-      "@id": "csvm:Dialect",
-      "@type": "rdfs:Class",
-      "rdfs:label": "Dialect Description",
-      "rdfs:comment": "A Dialect Description provides hints to parsers about how to parse a linked file."
-    },
-    {
-      "@id": "csvm:Direction",
-      "@type": "rdfs:Class",
-      "rdfs:label": "Direction",
-      "rdfs:comment": "The class of table/text directions."
-    },
-    {
-      "@id": "csvm:Schema",
-      "@type": "rdfs:Class",
-      "rdfs:label": "Schema",
-      "rdfs:comment": "A Schema is a definition of a tabular format that may be common to multiple tables."
-    },
-    {
-      "@id": "csvm:Table",
-      "@type": "rdfs:Class",
-      "rdfs:label": "Table Description",
-      "rdfs:comment": "A table description is a JSON object that describes a table within a CSV file."
-    },
-    {
-      "@id": "csvm:TableGroup",
-      "@type": "rdfs:Class",
-      "rdfs:label": "Table Group Description",
-      "rdfs:comment": "A Table Group Description describes a group of Tables."
-    },
-    {
-      "@id": "csvm:Template",
-      "@type": "rdfs:Class",
-      "rdfs:label": "Template Specification",
-      "rdfs:comment": "A Template Specification is a definition of how tabular data can be transformed into another format."
-    },
-    {
-      "@id": "csvm:columns",
-      "@type": "rdf:Property",
-      "rdfs:label": "columns",
-      "rdfs:comment": "An array of Column Descriptions.",
-      "rdfs:domain": "Schema",
-      "rdfs:range": "Column"
-    },
-    {
-      "@id": "csvm:commentPrefix",
-      "@type": "rdf:Property",
-      "rdfs:label": "comment prefix",
-      "rdfs:comment": "A character that, when it appears at the beginning of a skipped row, indicates a comment that should be associated as a comment annotation to the table. The default is \"#\".",
-      "rdfs:domain": "Dialect"
-    },
-    {
-      "@id": "csvm:datatype",
-      "@type": "rdf:Property",
-      "rdfs:label": "datatype",
-      "rdfs:comment": "The main datatype of the values of the cell. If the cell contains a list (ie separator is specified and not null) then this is the datatype of each value within the list.",
-      "rdfs:domain": "Column"
-    },
-    {
-      "@id": "csvm:default",
-      "@type": "rdf:Property",
-      "rdfs:label": "default",
-      "rdfs:comment": null
-    },
-    {
-      "@id": "csvm:delimieter",
-      "@type": "rdf:Property",
-      "rdfs:label": "delimiter",
-      "rdfs:comment": "The separator between cells. The default is \",\".",
-      "rdfs:domain": "Dialect"
-    },
-    {
-      "@id": "csvm:dialect",
-      "@type": "rdf:Property",
-      "rdfs:label": "dialect",
-      "rdfs:comment": "Provides hints to processors about how to parse the referenced files for to create tabular data models for an individual table, or all the tables in a group.",
-      "rdfs:domain": {
-        "owl:unionOf": [
-          "TableGroup",
-          "Table"
-        ]
-      },
-      "rdfs:range": "Dialect"
-    },
-    {
-      "@id": "csvm:doubleQuote",
-      "@type": "rdf:Property",
-      "rdfs:label": "double quote",
-      "rdfs:comment": "If true, sets the escape character flag to \". If false, to \\.",
-      "rdfs:domain": "Dialect",
-      "rdfs:range": "xsd:boolean"
-    },
-    {
-      "@id": "csvm:encoding",
-      "@type": "rdf:Property",
-      "rdfs:label": "encoding",
-      "rdfs:comment": "The character encoding for the file, one of the encodings listed in [encoding]. The default is utf-8.",
-      "rdfs:domain": "Dialect"
-    },
-    {
-      "@id": "csvm:foreignKeys",
-      "@type": "rdf:Property",
-      "rdfs:label": "foreign keys",
-      "rdfs:comment": "An array of foreign key definitions that define how the values from specified columns within this table link to rows within this table or other tables. A foreign key definition is a JSON object with the properties:\n\ncolumns\nA column reference property that holds either a single reference to a column description object within this schema, or an array of references.\nreference\nAn object with the properties:\n\nresource\nA URL that is the identifier for a specific resource that is being referenced. If this is present then schema must not be present. The metadata document must contain a description of the resource.\nschema\nA URL that is the identifier for a schema that is being referenced. If this is present then resource must not be present. The metadata document that forms the basis of processing must contain a description of a resource that uses the referenced schema, and there must not be more than one such resource.\ncolumns\nA column reference property that holds either a single reference to a column description object within this schema, or an array of references.",
-      "rdfs:domain": "Schema"
-    },
-    {
-      "@id": "csvm:format",
-      "@type": "rdf:Property",
-      "rdfs:label": "format",
-      "rdfs:comment": "A definition of the format of the cell, used when parsing the cell.",
-      "rdfs:domain": "Column"
-    },
-    {
-      "@id": "csvm:header",
-      "@type": "rdf:Property",
-      "rdfs:label": "header",
-      "rdfs:comment": null,
-      "rdfs:domain": "Dialect",
-      "rdfs:range": "xsd:boolean"
-    },
-    {
-      "@id": "csvm:headerColumnCount",
-      "@type": "rdf:Property",
-      "rdfs:label": "header column count",
-      "rdfs:comment": "The number of header columns (following the skipped columns) in each row. The default is 0.\n",
-      "rdfs:domain": "Dialect",
-      "rdfs:range": "xsd:nonNegativeInteger"
-    },
-    {
-      "@id": "csvm:headerRowCount",
-      "@type": "rdf:Property",
-      "rdfs:label": "header row count",
-      "rdfs:comment": "The number of header rows (following the skipped rows) in the file. The default is 1.",
-      "rdfs:domain": "Dialect",
-      "rdfs:range": "xsd:nonNegativeInteger"
-    },
-    {
-      "@id": "csvm:language",
-      "@type": "rdf:Property",
-      "rdfs:label": "language",
-      "rdfs:comment": "A language code as defined by [BCP47]. Indicates the language of the value within the cell.",
-      "rdfs:domain": "Column"
-    },
-    {
-      "@id": "csvm:length",
-      "@type": "rdf:Property",
-      "rdfs:label": "length",
-      "rdfs:comment": "The exact length of the value of the cell.",
-      "rdfs:domain": "Column",
-      "rdfs:range": "xsd:nonNegativeInteger"
-    },
-    {
-      "@id": "csvm:lineTerminator",
-      "@type": "rdf:Property",
-      "rdfs:label": "line terminator",
-      "rdfs:comment": "The character that is used at the end of a row. The default is CRLF.",
-      "rdfs:domain": "Dialect"
-    },
-    {
-      "@id": "csvm:maxExclusive",
-      "@type": "rdf:Property",
-      "rdfs:label": "max exclusive",
-      "rdfs:comment": "The maximum value for the cell (exclusive).",
-      "rdfs:domain": "Column"
-    },
-    {
-      "@id": "csvm:maxInclusive",
-      "@type": "rdf:Property",
-      "rdfs:label": "max inclusive",
-      "rdfs:comment": "The maximum value for the cell (inclusive). ",
-      "rdfs:domain": "Column"
-    },
-    {
-      "@id": "csvm:maxLength",
-      "@type": "rdf:Property",
-      "rdfs:label": "max length",
-      "rdfs:comment": "The maximum length of the value of the cell.",
-      "rdfs:domain": "Column",
-      "rdfs:range": "xsd:nonNegativeInteger"
-    },
-    {
-      "@id": "csvm:minExclusive",
-      "@type": "rdf:Property",
-      "rdfs:label": "min exclusive",
-      "rdfs:comment": "The minimum value for the cell (exclusive).",
-      "rdfs:domain": "Column"
-    },
-    {
       "@id": "csvm:minInclusive",
       "@type": "rdf:Property",
-      "rdfs:label": "min inclusive",
-      "rdfs:comment": "The minimum value for the cell (inclusive).",
+      "rdfs:label": {
+        "en": "min inclusive"
+      },
+      "rdfs:comment": {
+        "en": "The minimum value for the cell (inclusive)."
+      },
       "rdfs:domain": "Column"
     },
     {
       "@id": "csvm:minLength",
       "@type": "rdf:Property",
-      "rdfs:label": "min length",
-      "rdfs:comment": "The minimum length of the value of the cell.",
+      "rdfs:label": {
+        "en": "min length"
+      },
+      "rdfs:comment": {
+        "en": "The minimum length of the value of the cell."
+      },
       "rdfs:domain": "Column",
       "rdfs:range": "xsd:nonNegativeInteger"
     },
     {
       "@id": "csvm:name",
       "@type": "rdf:Property",
-      "rdfs:label": "name",
-      "rdfs:comment": "An atomic property that gives a canonical name for the column. This must be a string. Conversion specifications must use this property as the basis for the names of properties/elements/attributes in the results of conversions.",
+      "rdfs:label": {
+        "en": "name"
+      },
+      "rdfs:comment": {
+        "en": "An atomic property that gives a canonical name for the column. This must be a string. Conversion specifications must use this property as the basis for the names of properties/elements/attributes in the results of conversions."
+      },
       "rdfs:domain": "Column"
     },
     {
       "@id": "csvm:notes",
       "@type": "rdf:Property",
-      "rdfs:label": "notes",
-      "rdfs:comment": "An array of objects representing annotations. This specification does not place any constraints on the structure of these objects.",
+      "rdfs:label": {
+        "en": "notes"
+      },
+      "rdfs:comment": {
+        "en": "An array of objects representing annotations. This specification does not place any constraints on the structure of these objects."
+      },
       "rdfs:domain": "Table"
     },
     {
       "@id": "csvm:null",
       "@type": "rdf:Property",
-      "rdfs:label": "null",
-      "rdfs:comment": "The string used for null values. If not specified, the default for this is the empty string.",
+      "rdfs:label": {
+        "en": "null"
+      },
+      "rdfs:comment": {
+        "en": "The string used for null values. If not specified, the default for this is the empty string."
+      },
       "rdfs:domain": "Column"
+    },
+    {
+      "@id": "csvm:predicateUrl",
+      "@type": "rdf:Property",
+      "rdfs:label": {
+        "en": "predicate URL"
+      },
+      "rdfs:comment": {
+        "en": "An atomic property that holds one or more URIs that may be used as URIs for predicates if the table is mapped to another format."
+      },
+      "rdfs:domain": "Column",
+      "rdfs:range": "xsd:anyURI"
     },
     {
       "@id": "csvm:primaryKey",
       "@type": "rdf:Property",
-      "rdfs:label": "primary key",
-      "rdfs:comment": "A column reference property that holds either a single reference to a column description object or an array of references.",
+      "rdfs:label": {
+        "en": "primary key"
+      },
+      "rdfs:comment": {
+        "en": "A column reference property that holds either a single reference to a column description object or an array of references."
+      },
       "rdfs:domain": "Schema"
     },
     {
       "@id": "csvm:quoteChar",
       "@type": "rdf:Property",
-      "rdfs:label": "quote char",
-      "rdfs:comment": "The character that is used around escaped cells.",
+      "rdfs:label": {
+        "en": "quote char"
+      },
+      "rdfs:comment": {
+        "en": "The character that is used around escaped cells."
+      },
       "rdfs:domain": "Dialect"
     },
     {
       "@id": "csvm:required",
       "@type": "rdf:Property",
-      "rdfs:label": "required",
-      "rdfs:comment": "A boolean value which indicates whether every cell within the column must have a non-null value.",
+      "rdfs:label": {
+        "en": "required"
+      },
+      "rdfs:comment": {
+        "en": "A boolean value which indicates whether every cell within the column must have a non-null value."
+      },
       "rdfs:domain": "Column",
       "rdfs:range": "xsd:boolean"
     },
     {
       "@id": "csvm:resources",
       "@type": "rdf:Property",
-      "rdfs:label": "resources",
-      "rdfs:comment": "An array of table descriptions for the tables in the group.",
+      "rdfs:label": {
+        "en": "resources"
+      },
+      "rdfs:comment": {
+        "en": "An array of table descriptions for the tables in the group."
+      },
       "rdfs:domain": "TableGroup",
       "rdfs:range": "Table"
     },
     {
       "@id": "csvm:schema",
       "@type": "rdf:Property",
-      "rdfs:label": "schema",
-      "rdfs:comment": "An object property that provides a schema description for an individual table, or all the tables in a group.",
+      "rdfs:label": {
+        "en": "schema"
+      },
+      "rdfs:comment": {
+        "en": "An object property that provides a schema description for an individual table, or all the tables in a group."
+      },
       "rdfs:domain": {
         "owl:unionOf": [
           "TableGroup",
@@ -533,54 +400,82 @@
     {
       "@id": "csvm:separator",
       "@type": "rdf:Property",
-      "rdfs:label": "separator",
-      "rdfs:comment": "The character used to separate items in the string value of the cell. If null or unspecified, the cell does not contain a list. Otherwise, application must split the string value of the cell on the specified separator character and parse each of the resulting strings separately. The cell's value will then be a list. Conversion specifications must use the separator to determine the conversion of a cell into the target format. See 3.12 Parsing cells for more details.",
+      "rdfs:label": {
+        "en": "separator"
+      },
+      "rdfs:comment": {
+        "en": "The character used to separate items in the string value of the cell. If null or unspecified, the cell does not contain a list. Otherwise, application must split the string value of the cell on the specified separator character and parse each of the resulting strings separately. The cell's value will then be a list. Conversion specifications must use the separator to determine the conversion of a cell into the target format. See 3.12 Parsing cells for more details."
+      },
       "rdfs:domain": "Column"
     },
     {
       "@id": "csvm:skipBlankRows",
       "@type": "rdf:Property",
-      "rdfs:label": "skip blank rows",
-      "rdfs:comment": "Indicates whether to ignore wholly empty rows (ie rows in which all the cells are empty). The default is false.",
+      "rdfs:label": {
+        "en": "skip blank rows"
+      },
+      "rdfs:comment": {
+        "en": "Indicates whether to ignore wholly empty rows (ie rows in which all the cells are empty). The default is false."
+      },
       "rdfs:domain": "Dialect",
       "rdfs:range": "xsd:boolean"
     },
     {
       "@id": "csvm:skipColumns",
       "@type": "rdf:Property",
-      "rdfs:label": "skip columns",
-      "rdfs:comment": "The number of columns to skip at the beginning of each row, before any header columns. The default is 0.",
+      "rdfs:label": {
+        "en": "skip columns"
+      },
+      "rdfs:comment": {
+        "en": "The number of columns to skip at the beginning of each row, before any header columns. The default is 0."
+      },
       "rdfs:domain": "Dialect",
       "rdfs:range": "xsd:nonNegativeInteger"
     },
     {
       "@id": "csvm:skipInitialSpace",
       "@type": "rdf:Property",
-      "rdfs:label": "skip initial space",
-      "rdfs:comment": "If true, sets the trim flag to \"start\". If false, to false.",
+      "rdfs:label": {
+        "en": "skip initial space"
+      },
+      "rdfs:comment": {
+        "en": "If true, sets the trim flag to \"start\". If false, to false."
+      },
       "rdfs:domain": "Dialect",
       "rdfs:range": "xsd:boolean"
     },
     {
       "@id": "csvm:skipRows",
       "@type": "rdf:Property",
-      "rdfs:label": "skip rows",
-      "rdfs:comment": "The number of rows to skip at the beginning of the file, before a header row or tabular data.",
+      "rdfs:label": {
+        "en": "skip rows"
+      },
+      "rdfs:comment": {
+        "en": "The number of rows to skip at the beginning of the file, before a header row or tabular data."
+      },
       "rdfs:domain": "Dialect",
       "rdfs:range": "xsd:nonNegativeInteger"
     },
     {
       "@id": "csvm:source",
       "@type": "rdf:Property",
-      "rdfs:label": "source",
-      "rdfs:comment": "If included, the format to which the tabular data should be transformed prior to the transformation using the template. If the value is \"json\", the tabular data should first be transformed first to JSON based on the simple mapping defined in Generating JSON from Tabular Data on the Web. If the value is \"rdf\", it should similarly first be transformed to XML based on the simple mapping defined in Generating RDF from Tabular Data on the Web. If the source property is missing or null then the source of the transformation is the annotated tabular data model.",
+      "rdfs:label": {
+        "en": "source"
+      },
+      "rdfs:comment": {
+        "en": "If included, the format to which the tabular data should be transformed prior to the transformation using the template. If the value is \"json\", the tabular data should first be transformed first to JSON based on the simple mapping defined in Generating JSON from Tabular Data on the Web. If the value is \"rdf\", it should similarly first be transformed to XML based on the simple mapping defined in Generating RDF from Tabular Data on the Web. If the source property is missing or null then the source of the transformation is the annotated tabular data model."
+      },
       "rdfs:domain": "Template"
     },
     {
       "@id": "csvm:table-direction",
       "@type": "rdf:Property",
-      "rdfs:label": "table direction",
-      "rdfs:comment": "One of csvm:rtl csvm:ltr or csvm:default. Indicates whether the tables in the group should be displayed with the first column on the right, on the left, or based on the first character in the table that has a specific direction. ",
+      "rdfs:label": {
+        "en": "table direction"
+      },
+      "rdfs:comment": {
+        "en": "One of csvm:rtl csvm:ltr or csvm:default. Indicates whether the tables in the group should be displayed with the first column on the right, on the left, or based on the first character in the table that has a specific direction. "
+      },
       "rdfs:domain": {
         "owl:unionOf": [
           "TableGroup",
@@ -592,22 +487,34 @@
     {
       "@id": "csvm:targetFormat",
       "@type": "rdf:Property",
-      "rdfs:label": "target format",
-      "rdfs:comment": "A URL for the format that will be created through the transformation. If one has been defined, this should be a URL for a media type, in the form http://www.iana.org/assignments/media-types/media-type such as http://www.iana.org/assignments/media-types/text/calendar. Otherwise, it can be any URL that describes the target format.",
+      "rdfs:label": {
+        "en": "target format"
+      },
+      "rdfs:comment": {
+        "en": "A URL for the format that will be created through the transformation. If one has been defined, this should be a URL for a media type, in the form http://www.iana.org/assignments/media-types/media-type such as http://www.iana.org/assignments/media-types/text/calendar. Otherwise, it can be any URL that describes the target format."
+      },
       "rdfs:domain": "Template"
     },
     {
       "@id": "csvm:templateFormat",
       "@type": "rdf:Property",
-      "rdfs:label": "template format",
-      "rdfs:comment": "A URL for the format that is used by the template. If one has been defined, this should be a URL for a media type, in the form http://www.iana.org/assignments/media-types/media-type such as http://www.iana.org/assignments/media-types/application/javascript. Otherwise, it can be any URL that describes the template format.",
+      "rdfs:label": {
+        "en": "template format"
+      },
+      "rdfs:comment": {
+        "en": "A URL for the format that is used by the template. If one has been defined, this should be a URL for a media type, in the form http://www.iana.org/assignments/media-types/media-type such as http://www.iana.org/assignments/media-types/application/javascript. Otherwise, it can be any URL that describes the template format."
+      },
       "rdfs:domain": "Template"
     },
     {
       "@id": "csvm:templates",
       "@type": "rdf:Property",
-      "rdfs:label": "templates",
-      "rdfs:comment": "An array of template specifications that provide mechanisms to transform the tabular data into other formats. ",
+      "rdfs:label": {
+        "en": "templates"
+      },
+      "rdfs:comment": {
+        "en": "An array of template specifications that provide mechanisms to transform the tabular data into other formats. "
+      },
       "rdfs:domain": {
         "owl:unionOf": [
           "TableGroup",
@@ -619,16 +526,24 @@
     {
       "@id": "csvm:text-direction",
       "@type": "rdf:Property",
-      "rdfs:label": "text direction",
-      "rdfs:comment": "One of csvm:rtl or csvm:ltr. Indicates whether the text within cells should be displayed by default as left-to-right or right-to-left text. ",
+      "rdfs:label": {
+        "en": "text direction"
+      },
+      "rdfs:comment": {
+        "en": "One of csvm:rtl or csvm:ltr. Indicates whether the text within cells should be displayed by default as left-to-right or right-to-left text. "
+      },
       "rdfs:domain": "Column",
       "rdfs:range": "Direction"
     },
     {
       "@id": "csvm:title",
       "@type": "rdf:Property",
-      "rdfs:label": "title",
-      "rdfs:comment": "For a Template: A natural language property that describes the format that will be generated from the transformation. This is useful if the target format is a generic format (such as application/json) and the transformation is creating a specific profile of that format.\n\nFor a Column: A natural language property that provides possible alternative names for the column.",
+      "rdfs:label": {
+        "en": "title"
+      },
+      "rdfs:comment": {
+        "en": "For a Template: A natural language property that describes the format that will be generated from the transformation. This is useful if the target format is a generic format (such as application/json) and the transformation is creating a specific profile of that format.\n\nFor a Column: A natural language property that provides possible alternative names for the column."
+      },
       "rdfs:domain": {
         "owl:unionOf": [
           "Template",
@@ -639,42 +554,66 @@
     {
       "@id": "csvm:trim",
       "@type": "rdf:Property",
-      "rdfs:label": "trim",
-      "rdfs:comment": "Indicates whether to trim whitespace around cells; may be true, false, start or end. The default is false.",
+      "rdfs:label": {
+        "en": "trim"
+      },
+      "rdfs:comment": {
+        "en": "Indicates whether to trim whitespace around cells; may be true, false, start or end. The default is false."
+      },
       "rdfs:domain": "Dialect",
       "rdfs:range": "xsd:boolean"
     },
     {
       "@id": "csvm:uriTemplate",
       "@type": "rdf:Property",
-      "rdfs:label": "uri template",
-      "rdfs:comment": "A URI template property that may be used to create a unique identifier for each row when mapping data to other formats.",
+      "rdfs:label": {
+        "en": "uri template"
+      },
+      "rdfs:comment": {
+        "en": "A URI template property that may be used to create a unique identifier for each row when mapping data to other formats."
+      },
       "rdfs:domain": "Schema"
     },
     {
       "@id": "csvm:json",
       "@type": "rdfs:Datatype",
-      "rdfs:label": "json",
-      "rdfs:comment": "A literal containing JSON.",
+      "rdfs:label": {
+        "en": "json"
+      },
+      "rdfs:comment": {
+        "en": "A literal containing JSON."
+      },
       "rdfs:subClassOf": "rdfs:Literal"
     },
     {
       "@id": "csvm:default",
       "@type": "Direction",
-      "rdfs:label": "default direction",
-      "rdfs:comment": "Indicates to use the default text direction."
+      "rdfs:label": {
+        "en": "default direction"
+      },
+      "rdfs:comment": {
+        "en": "Indicates to use the default text direction."
+      }
     },
     {
       "@id": "csvm:ltr",
       "@type": "Direction",
-      "rdfs:label": "left to right",
-      "rdfs:comment": "Indicates text should be processed left to right."
+      "rdfs:label": {
+        "en": "left to right"
+      },
+      "rdfs:comment": {
+        "en": "Indicates text should be processed left to right."
+      }
     },
     {
       "@id": "csvm:rtl",
       "@type": "Direction",
-      "rdfs:label": "right to left",
-      "rdfs:comment": "Indiects text should be processed right to left"
+      "rdfs:label": {
+        "en": "right to left"
+      },
+      "rdfs:comment": {
+        "en": "Indiects text should be processed right to left"
+      }
     }
   ]
 }
