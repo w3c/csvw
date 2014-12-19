@@ -4,6 +4,7 @@
 require 'getoptlong'
 require 'csv'
 require 'json'
+require 'erubis'
 
 class Vocab
   JSON_STATE = JSON::State.new(
@@ -120,20 +121,20 @@ class Vocab
         'rdfs:label' => {"en" => entry[:label].to_s},
         'rdfs:comment' => {"en" => entry[:comment].to_s},
       }
-      node['rdfs:subPropertyOf'] = entry[:subClassOf] if entry[:subClassOf]
+      node['rdfs:subPropertyOf'] = "csvm:#{entry[:subClassOf]}" if entry[:subClassOf]
 
       domains = entry[:domain].to_s.split(',')
       case domains.length
       when 0  then ;
-      when 1  then node['rdfs:domain'] = domains.first
-      else         node['rdfs:domain'] = {'owl:unionOf' => domains}
+      when 1  then node['rdfs:domain'] = "csvm:#{domains.first}"
+      else         node['rdfs:domain'] = {'owl:unionOf' => domains.map {|d| "csvm:#{d}"}}
       end
 
       ranges = entry[:range].to_s.split(',')
       case ranges.length
       when 0  then ;
-      when 1  then node['rdfs:range'] = ranges.first
-      else         node['rdfs:range'] = {'owl:unionOf' => ranges}
+      when 1  then node['rdfs:range'] = "csvm:#{ranges.first}"
+      else         node['rdfs:range'] = {'owl:unionOf' => ranges.map {|r| "csvm:#{r}"}}
       end
 
       rdfs_properties << node
@@ -149,7 +150,7 @@ class Vocab
         'rdfs:label' => {"en" => entry[:label].to_s},
         'rdfs:comment' => {"en" => entry[:comment].to_s},
       }
-      node['rdfs:subClassOf'] = entry[:subClassOf] if entry[:subClassOf]
+      node['rdfs:subClassOf'] = "csvm:#{entry[:subClassOf]}" if entry[:subClassOf]
       rdfs_datatypes << node
     end
 
@@ -165,6 +166,12 @@ class Vocab
 
     # Add ontology to context
     {"@context" => context}.merge!(ontology).to_json(JSON_STATE)
+  end
+
+  def to_html
+    json = JSON.parse(to_jsonld)
+    eruby = Erubis::Eruby.new(File.read("template.html"))
+    eruby.result(ont: json)
   end
 
   def to_ttl
@@ -279,5 +286,6 @@ vocab = Vocab.new(ARGV[0])
 case options[:format]
 when :jsonld  then options[:output].puts(vocab.to_jsonld)
 when :ttl     then options[:output].puts(vocab.to_ttl)
+when :html    then options[:output].puts(vocab.to_html)
 else  STDERR.puts "Unknown format #{options[:format].inspect}"
 end
