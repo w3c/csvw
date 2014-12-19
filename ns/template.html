@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns='http://www.w3.org/1999/xhtml' lang="en" resource="http://www.w3.org/ns/csvw#" typeof="owl:Ontology">
+  <head>
+    <meta charset='utf-8'/>
+    <title property="dc:title"><%= defn["dc:title"]["en"] %></title>
+    <script src='http://w3.dev/2009/dap/ReSpec.js/js/respec.js' class='remove'></script>
+    <script class='remove'>
+      var respecConfig = {
+        localBiblio: {
+          "tabular-data-model": {
+              "authors": [
+                "Jeni Tennison",
+                "Gregg Kellogg"
+              ],
+              "title": "Model for Tabular Data and Metadata on the Web",
+              "href" : "http://www.w3.org/TR/2014/WD-tabular-data-model-20140710/",
+              "rawDate": "2014-07-10",
+              "status" : "WD",
+              "publisher": "W3C"
+          },
+          "UNICODE-BIDI" : {
+            "authors" : [
+              "Mark Davis",
+              "Aharon Lanin",
+              "Andrew Glass"
+            ],
+            "title": "TR9, Unicode Bidirectional Algorithm",
+            "href": "http://unicode.org/reports/tr9/",
+            "rawDate" : "2013-09-24",
+            "publisher" : "Unicode Consortium",
+            "status" : "Report"
+          }
+        },
+    ,   specStatus:   "ED"
+    ,   shortName:    "tabular-ns"
+    ,   editors:      [{
+            name:     "Gregg Kellogg"
+          , url:      "http://greggkellogg.net/foaf#me"
+          , company:  "Kellogg Associates"
+        }]
+    ,   wg:           "CSV on the Web Working Group"
+    ,   wgURI:        "http://www.w3.org/2013/csvw/"
+    ,   wgPublicList: "public-csv-wg"
+    ,   wgPatentURI:  "http://www.w3.org/2004/01/pp-impl/68238/status"
+    ,   edDraftURI:   "http://w3c.github.io/csvw/ns/"
+    ,   otherLinks: [{
+          key: "Repository"
+        , data: [{value: "We are on Github", href: "https://github.com/w3c/csvw"
+              }, {value: "File a bug", href: "https://github.com/w3c/csvw"}]
+        }, {
+          key: "Changes",
+        , data: [
+          //  {  value: "Diff to previous version", href: "diff-20140327.html"}
+           {  value: "Commit history", href: "https://github.com/w3c/csvw/commits/gh-pages"}
+          ]
+        }],
+        inlineCSS: true,
+        issueBase: "https://github.com/w3c/csvw/issues/",
+        doRDFa: false   // We'll take care of that
+        };
+    </script>
+  </head>
+  <body>
+    <section id='abstract'>
+      <p>
+        This document describes the CSVW Vocabulary and Term definitions used
+        for creating Metadata descriptions for Tabular Data. See [[!tabular-meta-data]]
+        for further information.
+      </p>
+    </section>
+    <section id='sotd'>
+      <p>
+        The CSV on the Web Working Group was chartered to produce a Recommendation "Access methods for CSV Metadata" as well as Recommendations for "Metadata vocabulary for CSV data" and "Mapping mechanism to transforming CSV into various Formats (e.g., RDF, JSON, or XML)". This document describes the <code>http://www.w3.org/TR/ns/csvw#</code> namespace used in these definitions.
+      </p>
+    </section>
+    <section>
+      <h2>Introduction</h2>
+      <p property="dc:description"><%= defn["dc:description"]["en"] %></p>
+      <p>This specification makes use of the following namespaces:</p>
+      <dl>
+        <dt><code>csvw</code>:</dt>
+        <dd><code>http://www.w3.org/ns/csvw#</code></dd>
+        <dt><code>rdf</code>:</dt>
+        <dd><code>http://www.w3.org/1999/02/22-rdf-syntax-ns#</code></dd>
+        <dt><code>rdfs</code>:</dt>
+        <dd><code>http://www.w3.org/2000/01/rdf-schema#</code></dd>
+        <dt><code>xsd</code>:</dt>
+        <dd><code>http://www.w3.org/2001/XMLSchema#</code></dd>
+        <dt><code>dc</code>:</dt>
+        <dd><code>http://purl.org/dc/terms/</code></dd>
+        <dt><code>dcat</code>:</dt>
+        <dd><code>http://www.w3.org/ns/dcat#</code></dd>
+        <dt><code>prov</code>:</dt>
+        <dd><code>http://www.w3.org/ns/prov#</code></dd>
+      </dl>
+    </section>
+    <section>
+      <h2>Class Definitions</h2>
+      <p>The following are class definitions in the <code>csvw</code> namespace:</p>
+      <dl class="rdfs-definition">>
+        <% defn["rdfs_classes"].each do |cls_defn| -%>
+          <dt resource="<%= cls_defn['@id'] %>" typeof="<% Array(cls_defn['@type']).join(" ") %>">
+            <span property="rdfs:label"><%= cls_defn['rdfs:label']['en'] %></span>
+          </dt>
+          <dd resource="<%= cls_defn['@id'] %>">
+            <p property="rdfs:comment"><%= cls_defn['rdfs:comment']['en'] %></p>
+            <span property="rdfs:isDefinedBy" resource="csvm:"></span>
+            <% if %w(rdfs:subClassOf).any? { |p| cls_defn.has_key?(p)} %>
+              <dl>
+                <% %w(rdfs:subClassOf).each do |p| %>
+                  <dt><%= p %></dt>
+                  <% Array(cls_defn[p]).each do |v| %>
+                    <dd property="<%= p %>" resource="<%= v %>"><%= v %></dd>
+                  <% end %>
+                <% end %>
+              </dl>
+            <% end %>
+          </dd>
+        <% end -%>
+      </dl>
+    </section>
+    <section>
+      <h2>Property Definitions</h2>
+      <p>The following are property definitions in the <code>csvw</code> namespace:</p>
+      <dl class="rdfs-definition">>
+        <% defn["rdfs_properties"].each do |prop_defn| -%>
+          <dt resource="<%= prop_defn['@id'] %>" typeof="<% Array(prop_defn['@type']).join(" ") %>">
+            <span property="rdfs:label"><%= prop_defn['rdfs:label']['en'] %></span>
+          </dt>
+          <dd resource="<%= prop_defn['@id'] %>">
+            <p property="rdfs:comment"><%= prop_defn['rdfs:comment']['en'] %></p>
+            <span property="rdfs:isDefinedBy" resource="csvm:"></span>
+            <% if %w(rdfs:subPropertyOf rdfs:range rdfs:domain).any? { |p| prop_defn.has_key?(p)} %>
+              <dl>
+                <% %w(rdfs:subPropertyOf rdfs:range rdfs:domain).each do |p| %>
+                  <dt><%= p %></dt>
+                  <% Array(prop_defn[p]).each do |v| %>
+                    <dd property="<%= p %>" resource="<%= v %>"><%= v %></dd>
+                  <% end %>
+                <% end %>
+              </dl>
+            <% end %>
+          </dd>
+        <% end -%>
+      </dl>
+    </section>
+    <section>
+      <h2>Datatype Definitions</h2>
+      <p>The following are datatype definitions in the <code>csvw</code> namespace:</p>
+      <dl class="rdfs-definition">>
+        <% defn["rdfs_datatypes"].each do |dt_defn| -%>
+          <dt resource="<%= dt_defn['@id'] %>" typeof="<% Array(dt_defn['@type']).join(" ") %>">
+            <span property="rdfs:label"><%= dt_defn['rdfs:label']['en'] %></span>
+          </dt>
+          <dd resource="<%= dt_defn['@id'] %>">
+            <p property="rdfs:comment"><%= dt_defn['rdfs:comment']['en'] %></p>
+            <span property="rdfs:isDefinedBy" resource="csvm:"></span>
+            <% if %w(rdfs:subClassOf).any? { |p| dt_defn.has_key?(p)} %>
+              <dl>
+                <% %w(rdfs:subClassOf).each do |p| %>
+                  <dt><%= p %></dt>
+                  <% Array(dt_defn[p]).each do |v| %>
+                    <dd property="<%= p %>" resource="<%= v %>"><%= v %></dd>
+                  <% end %>
+                <% end %>
+              </dl>
+            <% end %>
+          </dd>
+        <% end -%>
+      </dl>
+    </section>
+    <section>
+      <h2>Instance Definitions</h2>
+      <p>The following are instance definitions in the <code>csvw</code> namespace:</p>
+      <dl class="rdfs-definition">>
+        <% defn["rdfs_datatypes"].each do |inst_defn| -%>
+          <dt resource="<%= inst_defn['@id'] %>" typeof="<% Array(inst_defn['@type']).join(" ") %>">
+            <span property="rdfs:label"><%= inst_defn['rdfs:label']['en'] %></span>
+          </dt>
+          <dd resource="<%= inst_defn['@id'] %>">
+            <p property="rdfs:comment"><%= inst_defn['rdfs:comment']['en'] %></p>
+            <span property="rdfs:isDefinedBy" resource="csvm:"></span>
+          </dd>
+        <% end -%>
+      </dl>
+    </section>
+  </body>
+</html>
