@@ -191,13 +191,13 @@ def _merge(A, B, default_language = "und") :
 		else :
 			# The type of merge depends on the type of the value
 			if isinstance(A[key], DictType) and isinstance(B[key], DictType) :
-				_merge_values(A[key], B[key], key, PropertyTypes.OBJECT_SINGLE, default_language)
+				return _merge_values(A[key], B[key], key, PropertyTypes.OBJECT_SINGLE, default_language)
 			elif (isinstance(A[key], DictType) and isinstance(B[key], ListType)) or (isinstance(A[key], ListType) and isinstance(B[key], DictType)) :
-				_merge_values(A[key], B[key], key, PropertyTypes.OBJECT_ARRAY, default_language)
+				return _merge_values(A[key], B[key], key, PropertyTypes.OBJECT_ARRAY, default_language)
 			elif isinstance(A[key], basestring) and isinstance(B[key], basestring) :
-				_merge_values(A[key], B[key], key, PropertyTypes.ATOMIC_SINGLE, default_language)
+				return _merge_values(A[key], B[key], key, PropertyTypes.ATOMIC_SINGLE, default_language)
 			elif (isinstance(A[key], basestring) and isinstance(B[key], ListType)) or (isinstance(A[key], ListType) and isinstance(B[key], basestring)) :
-				_merge_values(A[key], B[key], key, PropertyTypes.ATOMIC_ARRAY, default_language)
+				return _merge_values(A[key], B[key], key, PropertyTypes.ATOMIC_ARRAY, default_language)
 
 	# That is it!
 	return A
