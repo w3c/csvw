@@ -54,21 +54,30 @@ class Vocab
       "owl:imports": {"@type": "@id"},
       "owl:versionInfo": {"@type": "xsd:string", "@language": null},
       "owl:inverseOf": {"@type": "@vocab"},
-      "owl:unionOf": {"@type": "@vocab", "@container": "@list"}
+      "owl:unionOf": {"@type": "@vocab", "@container": "@list"},
+      "rdfs_classes": {"@reverse": "rdfs:isDefinedBy", "@type": "@id"},
+      "rdfs_properties": {"@reverse": "rdfs:isDefinedBy", "@type": "@id"},
+      "rdfs_datatypes": {"@reverse": "rdfs:isDefinedBy", "@type": "@id"},
+      "rdfs_instances": {"@reverse": "rdfs:isDefinedBy", "@type": "@id"}
     })
     context = {'id' => '@id', 'type' => '@type'}
-    nodes = []
-
-    nodes << {
+    rdfs_classes, rdfs_properties, rdfs_datatypes, rdfs_instances = [], [], [], []
+    ontology = {
       "@id" => prefixes["csvm"][:subClassOf],
+      "@type" => "owl:Ontology",
       "dc:title" => {"en" => "Metadata Vocabulary for Tabular Data"},
       "dc:description" => {"en" => %(Validation, conversion, display and search of tabular data on the web
     requires additional metadata that describes how the data should be
     interpreted. This document defines a vocabulary for metadata that
     annotates tabular data. This can be used to provide metadata at various
     levels, from collections of data from CSV documents and how they relate
-    to each other down to individual cells within a table.)}
+    to each other down to individual cells within a table.)},
+      "rdfs_classes" => rdfs_classes,
+      "rdfs_properties" => rdfs_properties,
+      "rdfs_datatypes" => rdfs_datatypes,
+      "rdfs_instances" => rdfs_instances
     }
+
     prefixes.each do |id, entry|
       context[id] = entry[:subClassOf]
     end
@@ -88,7 +97,7 @@ class Vocab
         'rdfs:comment' => {"en" => entry[:comment].to_s},
       }
       node['rdfs:subClassOf'] = entry[:subClassOf] if entry[:subClassOf]
-      nodes << node
+      rdfs_classes << node
     end
 
     properties.each do |id, entry|
@@ -127,7 +136,7 @@ class Vocab
       else         node['rdfs:range'] = {'owl:unionOf' => ranges}
       end
 
-      nodes << node
+      rdfs_properties << node
     end
 
     datatypes.each  do |id, entry|
@@ -141,12 +150,12 @@ class Vocab
         'rdfs:comment' => {"en" => entry[:comment].to_s},
       }
       node['rdfs:subClassOf'] = entry[:subClassOf] if entry[:subClassOf]
-      nodes << node
+      rdfs_datatypes << node
     end
 
     instances.each do |id, entry|
       # Instance definition
-      nodes << {
+      rdfs_instances << {
         '@id' => "csvm:#{id}",
         '@type' => entry[:type],
         'rdfs:label' => {"en" => entry[:label].to_s},
@@ -154,10 +163,8 @@ class Vocab
       }
     end
 
-    # Add on stuff useful for serializing the vocabulary
-    context.merge!(rdfs_context)
-
-    return {'@context' => context, '@graph' => nodes}.to_json(JSON_STATE)
+    # Add ontology to context
+    {"@context" => context}.merge!(ontology).to_json(JSON_STATE)
   end
 
   def to_ttl
@@ -182,7 +189,7 @@ class Vocab
       output << %(  rdfs:label "#{entry[:label]}"@en;)
       output << %(  rdfs:comment """#{entry[:comment]}"""@en;)
       output << %(  rdfs:subClassOf #{entry[:subClassOf].include?(':') ? entry[:subClassOf] : "csvm:" + entry[:subClassOf]};) if entry[:subClassOf]
-      output << "  .\n"
+      output << %(  rdfs:isDefinedBy csvm: .)
     end
 
     output << "\n# Property definitions"
@@ -206,7 +213,7 @@ class Vocab
       else
         output << %(  rdfs:range [ owl:unionOf (#{ranges.map {|d| d.include?(':') ? d : 'csvm:' + d}.join(' ')})];)
       end
-      output << "  .\n"
+      output << %(  rdfs:isDefinedBy csvm: .)
     end
 
     output << "\n# Datatype definitions"
@@ -215,7 +222,7 @@ class Vocab
       output << %(  rdfs:label "#{entry[:label]}"@en;)
       output << %(  rdfs:comment """#{entry[:comment]}"""@en;)
       output << %(  rdfs:subClassOf #{entry[:subClassOf].include?(':') ? entry[:subClassOf] : "csvm:" + entry[:subClassOf]};) if entry[:subClassOf]
-      output << "  .\n"
+      output << %(  rdfs:isDefinedBy csvm: .)
     end
 
     output << "\n# Instance definitions"
@@ -223,7 +230,7 @@ class Vocab
       output << "csvm:#{id} a #{entry[:type].include?(':') ? entry[:type] : "csvm:" + entry[:type]};"
       output << %(  rdfs:label "#{entry[:label]}"@en;)
       output << %(  rdfs:comment """#{entry[:comment]}"""@en;)
-      output << "  .\n"
+      output << %(  rdfs:isDefinedBy csvm: .)
     end
 
     output.join("\n")
