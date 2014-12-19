@@ -40,7 +40,9 @@ class Vocab
   end
 
   def to_jsonld
-    rdfs_context = ::JSON.parse %({
+    context = ::JSON.parse %({
+      "id": "@id",
+      "type": "@type",
       "dc:title": {"@container": "@language"},
       "dc:description": {"@container": "@language"},
       "rdfs:comment": {"@container": "@language"},
@@ -61,7 +63,6 @@ class Vocab
       "rdfs_datatypes": {"@reverse": "rdfs:isDefinedBy", "@type": "@id"},
       "rdfs_instances": {"@reverse": "rdfs:isDefinedBy", "@type": "@id"}
     })
-    context = {'id' => '@id', 'type' => '@type'}
     rdfs_classes, rdfs_properties, rdfs_datatypes, rdfs_instances = [], [], [], []
     ontology = {
       "@id" => prefixes["csvw"][:subClassOf],

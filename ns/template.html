@@ -114,9 +114,24 @@
       <dl>
         <% ont['@context'].keys.sort.each do |term|%>
         <% defn = ont['@context'][term] %>
-        <% next unless defn.is_a?(String) %>
         <dt><%= term %></dt>
-        <dd><%= defn %></dd>
+        <dd>
+          <% if defn.is_a?(String) %>
+            <%= defn %>
+          <% elsif defn['@id'] %>
+            <%= defn['@id'] %>
+          <% elsif defn['@reverse'] %>
+            reverse of <%= defn['@reverse'] %>
+          <% else %>
+            <%= term %>
+          <% end %>
+          <% if defn.is_a?(Hash) && defn['@type'] %>
+            with string values interpreted as <%= defn['@type'] %>
+          <% end%>
+          <% if defn.is_a?(Hash) && defn['@container'] %>
+            with array values interpreted as <%= defn['@container'] %>
+          <% end%>
+        </dd>
         <% end %>
       </dl>
     </section>
