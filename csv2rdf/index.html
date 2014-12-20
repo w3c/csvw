@@ -134,6 +134,7 @@ var respecConfig = {
       .grammar-literal { color: gray;}
       .TBD { font-style: italic; background: yellow;}
       .steps li { margin-bottom: 0.5em;}
+      table, td, th { border: 1px solid gray }
     </style>
   </head>
   <body>
@@ -449,7 +450,7 @@ var respecConfig = {
           that no metadata annotations are provided, it is very difficult to ascertain the 
           subject of the tabular data without additional insight.</p>
 
-        <table border="1" width="60%">
+        <table style="width:60%">
           <tr>
             <td>1</td>
             <td>Jill</td>
@@ -941,190 +942,191 @@ var respecConfig = {
           <p>The following metadata properties modify the way that 
             <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell values</a>
             are incorporated into the <a title="output graph">output graph</a>:</p>
-          
-          <dt id="metadata-property-null"><code>null</code></dt>
-          <dd>
-            <p>By default, a
-              <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a>
-              is deemed to be <em>null</em> if it contains an empty string. If specified, the 
-              metadata property <code>null</code> provides a token (string) that can be used to 
-              identify <em>null</em> values.</p>
-          </dd>
-          
-          <dt id="metadata-property-language"><code>language</code></dt>
-          <dd>
-            <P>Where metadata property <code>language</code> is specified, the value of that
-              property SHALL be used as a 
-              <a href="http://www.w3.org/TR/rdf11-concepts/#dfn-language-tag">language tag</a>
-              (as specified in [[!rdf11-concepts]]) for simple literal values (e.g. those values
-              whose datatype is <code>http://www.w3.org/2001/XMLSchema#string</code>).</P>
-          </dd>
-          
-          <dt id="metadata-property-separator"><code>separator</code></dt>
-          <dd>
-            <p>Where metadata property <code>separator</code> is defined, the 
-              <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a> SHALL be
-              parsed into an ordered list of values, using the value of <code>separator</code> as the 
-              delimiter.</p>
-            <p>Given that RDF has does not provide any implicit ordering of triples, the list of 
-              values shall be expressed in the <a title="output graph">output graph</a> as an RDF List (as described in 
-              <a href="http://www.w3.org/TR/rdf-schema/#ch_list">Section 5.2.1 rdf:List</a> 
-              of [[rdf-schema]]).</p>
-            <p class="issue" data-number="107">Should there be an option for unordered lists
-             in RDF mapping?</p>
-          </dd>
-          
-          <dt id="metadata-property-datatype-and-format"><code>datatype</code> and <code>format</code></dt>
-          <dd>
-            <p>Where metadata property <code>datatype</code> is defined, the triple included
-              in the <a title="output graph">output graph</a> for this 
-              <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell">cell</a> SHALL assert 
-              the datatype of the 
-              <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a>
-              using the value of the <code>datatype</code> property.</p>
-          
-            <p>Where metadata property <code>datatype</code> is undefined, the 
-              <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a> SHALL be 
-              inferred to hold values of datatype <code>string</code>.</p>
-          
-            <p class="note">Where the metadata property <code>separator</code> is specified (e.g.
-              to indicate that a 
-              <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a> 
-              is to be parsed into a list of values), the datatype specified by <code>datatype</code>
-              SHALL be inferred to apply to the members of the resulting list.</p>  
-          
-            <p>The following datatypes are given special attention:</p>
-          
-            <ul>
-          
-              <li>
-                <p>Datatypes with embedded syntax: <code>xml</code>, <code>json</code> and <code>html</code>.</p>
-                <p>These datatypes are treated as literal values; no attempt SHOULD be made to
-                    'unpack' the structured syntax to create sub-objects within the <a title="output graph">
-                    output graph</a>.</p>
-              </li>
-          
-              <li>
-                <p>Booleans: <code>boolean</code>.</p>
-                <p>Metadata property <code>format</code> MAY be provided for a boolean-typed 
-                  <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a>; 
-                  providing non-standard tokens for <em>true</em> and <em>false</em> (e.g. 
-                  <code>Y|N</code>. <a href="http://w3c.github.io/csvw/metadata/#formats-for-booleans">
-                  Section 3.12.3 Formats for booleans</a> from [[!tabular-metadata]] refers.</p>
-                <p>If a boolean type is declared, the 
-                  <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a>
-                  SHALL be processed as follows:</p>
-                <ol>
-                  <li>if the value is <code>true</code>, <code>1</code> or, if the <code>format</code> 
-                    property is defined, the value of <em>true</em>, then the <a title="output graph">output graph</a>
-                    SHALL include the value <code>true</code>;</li>
-                  <li>else if the value is <code>false</code>, <code>0</code> or, if the <code>format</code> 
-                    property is defined, the value of <em>false</em>, then the <a title="output graph">output graph</a>
-                    SHALL include the value <code>false</code>;</li>
-                  <li>else the <a title="output graph">output graph</a> SHALL include the
-                    <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a> verbatim.</li>
-                </ol>
-              </li>
-          
-              <li>
-                <p>Numbers: <code>number</code>, <code>decimal</code>, <code>integer</code>, 
-                  <code>nonPositiveInteger</code>, <code>negativeInteger</code>, <code>long</code>, 
-                  <code>int</code>, <code>short</code>, <code>nonNegativeInteger</code>, 
-                  <code>unsignedLong</code>, <code>unsignedInt</code>, <code>unsignedShort</code>,
-                  <code>positiveInteger</code>, <code>float</code> and <code>double</code>.</p>
-                <p><a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">Cell values</a> 
-                  that are asserted to be numeric shall be expressed in the <a title="output graph">
-                  output graph</a> as numbers.</p>
-                <p>It is not uncommon for numbers within tabular data to be formatted for human consumption, 
-                  which may involve using commas for decimal points, grouping digits in the number using commas, 
-                  or adding currency symbols or percent signs to the number.</p>
-                <p>Metadata property <code>format</code> MAY be provided to describe the formatting of the
-                  <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell values</a> 
-                  to assist the mapping application convert the 
-                  <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a> 
-                  to a number format readily consumable by downstream applications.</p>
-                <div class="issue" data-number="54">
-                  <p>Describing the formatting of numbers is currently 
-                    unresolved and is likely to require information on decimal separator characters, 
-                    grouping characters and possibly others such as Infinity, Nan, currency tokens, 
-                    negative numbers appearing in parentheses etc.</p> 
-                  <p>In the interim, mapping applications are not required to undertake any reformatting 
-                    and may simply pass the cell value to the output graph verbatim.</p>
-                </div>
-              </li>
-          
-              <li>
-                <p>Dates, times and durations: <code>date</code>, <code>time</code>, 
-                  <code>datetime</code>, <code>dateTime</code> and <code>duration</code>.</p>
-                <p>A standard syntax for dates and times is defined by [[!iso8601]]. This format can be 
-                  readily consumed by software applications. However, dates and times are often provided 
-                  in a locale-specific format, or use alternate calendars and/or eras.</p>
-                <p>Metadata property <code>format</code> MAY be provided to describe the formatting of 
-                  <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell values</a> 
-                  and assist the mapping application convert the 
-                  <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a> 
-                  to a date, time, date-time or duration format readily consumable by downstream 
-                  applications.</p>
-                <p class="note">Where possible, data publishers SHOULD provide dates and times in 
-                  the [[!iso8601]] format. However, where data publishers choose to use locale-specific 
-                  date and time formatting, they SHOULD also provide equivalent values in [[!iso8601]] 
-                  format (e.g. in a complementary column).</p>
-                <div class="issue" data-number="54">
-                  <p>Describing the formatting of dates and times is currently unresolved. The favoured 
-                    option is to defer the parsing of dates and times to implementations based a picture 
-                    string provided in the metadata. Unfortunately, there is no standard syntax for 
-                    picture strings, therefore an array of picture strings relating to common implementations 
-                    seems like the best option. For example:</p>
-                  <p><code>"datatype": "date",</code></p>
-                  <p><code>"format": {</code></p>
-                  <p><code>&nbsp;&nbsp;"picture-strings": [</code></p>
-                  <p><code>&nbsp;&nbsp;&nbsp;&nbsp;"unicode": "dd MMM yyyy",</code></p>
-                  <p><code>&nbsp;&nbsp;&nbsp;&nbsp;"xpath": "[D01] [MN,*-3] [Y0001]"</code></p>
-                  <p><code>&nbsp;&nbsp;]</code></p>
-                  <p><code>}</code></p>
-                  <p>Where an implementation is able to interpret one of the provided picture strings, 
-                    the date-time value reformatted in [[!iso8601]] format shall be included in the output graph, 
-                    else the original cell value shall be included verbatim.</p>
-                  <p>In the interim, mapping applications are not required to undertake any reformatting 
-                    and may simply pass the cell value to the output graph verbatim.</p>
-                </div>
-                <div class="issue" data-number="65">
-                  <p>A list of potential date-time formatting implementations needs to be defined.</p>
-                </div>
-              </li>
-          
-              <li>
-                <p>Uniform Resource Identifiers: <code>anyURI</code>.</p>
-                <p>Where the datatype is specified as <code>anyURI</code>, the 
+          <dl>
+            <dt id="metadata-property-null"><code>null</code></dt>
+            <dd>
+              <p>By default, a
                 <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a>
-                is inferred to provide a URI (as described in [[rfc3986]]) rather than a literal value.</p>
-          
-              </li>
-          
-            </ul>
-          </dd>
-      
-          <dt id="metadata-property-urlTemplate"><code>urlTemplate</code></dt>
-          <dd>
-            <p>If metadata property <code>urlTemplate</code> is specified, the value used 
-              in the <a title="output graph">output graph</a> SHALL be 
-              the result of the URI Template expansion, as defined in 
-              <a href="http://w3c.github.io/csvw/metadata/#property-syntax">Section 3.1 Property Syntax</a> 
-              of [[!tabular-metadata]].</p>
-            <p>Once the URL has been generated via the template expansion, relative URLs are
-              resolved against the <a title="baseURL">base URL</a> to create an absolute
-              URL.</p>
-            <p class="issue" data-number="96">Should the cell-value URL Template be treated as a 
-              datatype?</p>
-          </dd>
-      
-          <dt id="metadata-property-default"><code>default</code></dt>
-          <dd>
-            <p>If metadata property <code>default</code> is specified and the 
-              <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a> 
-              is deemed to be <em>null</em>, then the value of <code>default</code> SHALL be used 
-              in the <a title="output graph">output graph</a>.</p>
-          </dd>
+                is deemed to be <em>null</em> if it contains an empty string. If specified, the 
+                metadata property <code>null</code> provides a token (string) that can be used to 
+                identify <em>null</em> values.</p>
+            </dd>
+            
+            <dt id="metadata-property-language"><code>language</code></dt>
+            <dd>
+              <P>Where metadata property <code>language</code> is specified, the value of that
+                property SHALL be used as a 
+                <a href="http://www.w3.org/TR/rdf11-concepts/#dfn-language-tag">language tag</a>
+                (as specified in [[!rdf11-concepts]]) for simple literal values (e.g. those values
+                whose datatype is <code>http://www.w3.org/2001/XMLSchema#string</code>).</P>
+            </dd>
+            
+            <dt id="metadata-property-separator"><code>separator</code></dt>
+            <dd>
+              <p>Where metadata property <code>separator</code> is defined, the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a> SHALL be
+                parsed into an ordered list of values, using the value of <code>separator</code> as the 
+                delimiter.</p>
+              <p>Given that RDF has does not provide any implicit ordering of triples, the list of 
+                values shall be expressed in the <a title="output graph">output graph</a> as an RDF List (as described in 
+                <a href="http://www.w3.org/TR/rdf-schema/#ch_list">Section 5.2.1 rdf:List</a> 
+                of [[rdf-schema]]).</p>
+              <p class="issue" data-number="107">Should there be an option for unordered lists
+               in RDF mapping?</p>
+            </dd>
+            
+            <dt id="metadata-property-datatype-and-format"><code>datatype</code> and <code>format</code></dt>
+            <dd>
+              <p>Where metadata property <code>datatype</code> is defined, the triple included
+                in the <a title="output graph">output graph</a> for this 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell">cell</a> SHALL assert 
+                the datatype of the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a>
+                using the value of the <code>datatype</code> property.</p>
+            
+              <p>Where metadata property <code>datatype</code> is undefined, the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a> SHALL be 
+                inferred to hold values of datatype <code>string</code>.</p>
+            
+              <p class="note">Where the metadata property <code>separator</code> is specified (e.g.
+                to indicate that a 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a> 
+                is to be parsed into a list of values), the datatype specified by <code>datatype</code>
+                SHALL be inferred to apply to the members of the resulting list.</p>  
+            
+              <p>The following datatypes are given special attention:</p>
+            
+              <ul>
+            
+                <li>
+                  <p>Datatypes with embedded syntax: <code>xml</code>, <code>json</code> and <code>html</code>.</p>
+                  <p>These datatypes are treated as literal values; no attempt SHOULD be made to
+                      'unpack' the structured syntax to create sub-objects within the <a title="output graph">
+                      output graph</a>.</p>
+                </li>
+            
+                <li>
+                  <p>Booleans: <code>boolean</code>.</p>
+                  <p>Metadata property <code>format</code> MAY be provided for a boolean-typed 
+                    <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a>; 
+                    providing non-standard tokens for <em>true</em> and <em>false</em> (e.g. 
+                    <code>Y|N</code>. <a href="http://w3c.github.io/csvw/metadata/#formats-for-booleans">
+                    Section 3.12.3 Formats for booleans</a> from [[!tabular-metadata]] refers.</p>
+                  <p>If a boolean type is declared, the 
+                    <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a>
+                    SHALL be processed as follows:</p>
+                  <ol>
+                    <li>if the value is <code>true</code>, <code>1</code> or, if the <code>format</code> 
+                      property is defined, the value of <em>true</em>, then the <a title="output graph">output graph</a>
+                      SHALL include the value <code>true</code>;</li>
+                    <li>else if the value is <code>false</code>, <code>0</code> or, if the <code>format</code> 
+                      property is defined, the value of <em>false</em>, then the <a title="output graph">output graph</a>
+                      SHALL include the value <code>false</code>;</li>
+                    <li>else the <a title="output graph">output graph</a> SHALL include the
+                      <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a> verbatim.</li>
+                  </ol>
+                </li>
+            
+                <li>
+                  <p>Numbers: <code>number</code>, <code>decimal</code>, <code>integer</code>, 
+                    <code>nonPositiveInteger</code>, <code>negativeInteger</code>, <code>long</code>, 
+                    <code>int</code>, <code>short</code>, <code>nonNegativeInteger</code>, 
+                    <code>unsignedLong</code>, <code>unsignedInt</code>, <code>unsignedShort</code>,
+                    <code>positiveInteger</code>, <code>float</code> and <code>double</code>.</p>
+                  <p><a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">Cell values</a> 
+                    that are asserted to be numeric shall be expressed in the <a title="output graph">
+                    output graph</a> as numbers.</p>
+                  <p>It is not uncommon for numbers within tabular data to be formatted for human consumption, 
+                    which may involve using commas for decimal points, grouping digits in the number using commas, 
+                    or adding currency symbols or percent signs to the number.</p>
+                  <p>Metadata property <code>format</code> MAY be provided to describe the formatting of the
+                    <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell values</a> 
+                    to assist the mapping application convert the 
+                    <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a> 
+                    to a number format readily consumable by downstream applications.</p>
+                  <div class="issue" data-number="54">
+                    <p>Describing the formatting of numbers is currently 
+                      unresolved and is likely to require information on decimal separator characters, 
+                      grouping characters and possibly others such as Infinity, Nan, currency tokens, 
+                      negative numbers appearing in parentheses etc.</p> 
+                    <p>In the interim, mapping applications are not required to undertake any reformatting 
+                      and may simply pass the cell value to the output graph verbatim.</p>
+                  </div>
+                </li>
+            
+                <li>
+                  <p>Dates, times and durations: <code>date</code>, <code>time</code>, 
+                    <code>datetime</code>, <code>dateTime</code> and <code>duration</code>.</p>
+                  <p>A standard syntax for dates and times is defined by [[!iso8601]]. This format can be 
+                    readily consumed by software applications. However, dates and times are often provided 
+                    in a locale-specific format, or use alternate calendars and/or eras.</p>
+                  <p>Metadata property <code>format</code> MAY be provided to describe the formatting of 
+                    <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell values</a> 
+                    and assist the mapping application convert the 
+                    <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a> 
+                    to a date, time, date-time or duration format readily consumable by downstream 
+                    applications.</p>
+                  <p class="note">Where possible, data publishers SHOULD provide dates and times in 
+                    the [[!iso8601]] format. However, where data publishers choose to use locale-specific 
+                    date and time formatting, they SHOULD also provide equivalent values in [[!iso8601]] 
+                    format (e.g. in a complementary column).</p>
+                  <div class="issue" data-number="54">
+                    <p>Describing the formatting of dates and times is currently unresolved. The favoured 
+                      option is to defer the parsing of dates and times to implementations based a picture 
+                      string provided in the metadata. Unfortunately, there is no standard syntax for 
+                      picture strings, therefore an array of picture strings relating to common implementations 
+                      seems like the best option. For example:</p>
+                    <p><code>"datatype": "date",</code></p>
+                    <p><code>"format": {</code></p>
+                    <p><code>&nbsp;&nbsp;"picture-strings": [</code></p>
+                    <p><code>&nbsp;&nbsp;&nbsp;&nbsp;"unicode": "dd MMM yyyy",</code></p>
+                    <p><code>&nbsp;&nbsp;&nbsp;&nbsp;"xpath": "[D01] [MN,*-3] [Y0001]"</code></p>
+                    <p><code>&nbsp;&nbsp;]</code></p>
+                    <p><code>}</code></p>
+                    <p>Where an implementation is able to interpret one of the provided picture strings, 
+                      the date-time value reformatted in [[!iso8601]] format shall be included in the output graph, 
+                      else the original cell value shall be included verbatim.</p>
+                    <p>In the interim, mapping applications are not required to undertake any reformatting 
+                      and may simply pass the cell value to the output graph verbatim.</p>
+                  </div>
+                  <div class="issue" data-number="65">
+                    <p>A list of potential date-time formatting implementations needs to be defined.</p>
+                  </div>
+                </li>
+            
+                <li>
+                  <p>Uniform Resource Identifiers: <code>anyURI</code>.</p>
+                  <p>Where the datatype is specified as <code>anyURI</code>, the 
+                  <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a>
+                  is inferred to provide a URI (as described in [[rfc3986]]) rather than a literal value.</p>
+            
+                </li>
+            
+              </ul>
+            </dd>
+        
+            <dt id="metadata-property-urlTemplate"><code>urlTemplate</code></dt>
+            <dd>
+              <p>If metadata property <code>urlTemplate</code> is specified, the value used 
+                in the <a title="output graph">output graph</a> SHALL be 
+                the result of the URI Template expansion, as defined in 
+                <a href="http://w3c.github.io/csvw/metadata/#property-syntax">Section 3.1 Property Syntax</a> 
+                of [[!tabular-metadata]].</p>
+              <p>Once the URL has been generated via the template expansion, relative URLs are
+                resolved against the <a title="baseURL">base URL</a> to create an absolute
+                URL.</p>
+              <p class="issue" data-number="96">Should the cell-value URL Template be treated as a 
+                datatype?</p>
+            </dd>
+        
+            <dt id="metadata-property-default"><code>default</code></dt>
+            <dd>
+              <p>If metadata property <code>default</code> is specified and the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a> 
+                is deemed to be <em>null</em>, then the value of <code>default</code> SHALL be used 
+                in the <a title="output graph">output graph</a>.</p>
+            </dd>
+          </dl>
       
         </section>
       
@@ -1139,7 +1141,7 @@ var respecConfig = {
           processed. The tabular data describes lists countries, giving their country code and name.
           There are two columns, named <code>country</code> and <code>name</code>, and four rows.</p>
 
-        <table border="1" width="30%">
+        <table style="width: 30%">
           <tr>
             <th>country </th>
             <th>name</th>
@@ -1237,7 +1239,7 @@ AL,Albania
           <code>GID</code>, <code>On Street</code>, <code>Species</code>, <code>Trim Cycle</code> 
           and <code>Inventory Date</code>, and three rows.</p>
 
-        <table border="1" width="80%">
+        <table style="width:80%">
           <tr>
             <th>GID</th>
             <th>On Street</th>
