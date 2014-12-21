@@ -39,6 +39,10 @@ class Vocab
     end
   end
 
+  def namespaced(term)
+    term.include?(":") ? term : "csvw:#{term}"
+  end
+
   def to_jsonld
     context = ::JSON.parse %({
       "id": "@id",
@@ -89,21 +93,21 @@ class Vocab
     end
 
     classes.each  do |id, entry|
-      context[id] = "csvw:#{id}"
+      context[id] = namespaced(id)
 
       # Class definition
       node = {
-        '@id' => "csvw:#{id}",
+        '@id' => namespaced(id),
         '@type' => 'rdfs:Class',
         'rdfs:label' => {"en" => entry[:label].to_s},
         'rdfs:comment' => {"en" => entry[:comment].to_s},
       }
-      node['rdfs:subClassOf'] = entry[:subClassOf] if entry[:subClassOf]
+      node['rdfs:subClassOf'] = namespaced(entry[:subClassOf]) if entry[:subClassOf]
       rdfs_classes << node
     end
 
     properties.each do |id, entry|
-      defn = {"@id" => "csvw:#{id}"}
+      defn = {"@id" => namespaced(id)}
       case entry[:range]
       when /xsd:/                 then defn['@type'] = entry[:range]
       when nil                    then ;
@@ -117,48 +121,48 @@ class Vocab
 
       # Property definition
       node = {
-        '@id' => "csvw:#{id}",
+        '@id' => namespaced(id),
         '@type' => 'rdf:Property',
         'rdfs:label' => {"en" => entry[:label].to_s},
         'rdfs:comment' => {"en" => entry[:comment].to_s},
       }
-      node['rdfs:subPropertyOf'] = "csvw:#{entry[:subClassOf]}" if entry[:subClassOf]
+      node['rdfs:subPropertyOf'] = namespaced(entry[:subClassOf]) if entry[:subClassOf]
 
       domains = entry[:domain].to_s.split(',')
       case domains.length
       when 0  then ;
-      when 1  then node['rdfs:domain'] = "csvw:#{domains.first}"
-      else         node['rdfs:domain'] = {'owl:unionOf' => domains.map {|d| "csvw:#{d}"}}
+      when 1  then node['rdfs:domain'] = namespaced(domains.first)
+      else         node['rdfs:domain'] = {'owl:unionOf' => domains.map {|d| namespaced(d)}}
       end
 
       ranges = entry[:range].to_s.split(',')
       case ranges.length
       when 0  then ;
-      when 1  then node['rdfs:range'] = "csvw:#{ranges.first}"
-      else         node['rdfs:range'] = {'owl:unionOf' => ranges.map {|r| "csvw:#{r}"}}
+      when 1  then node['rdfs:range'] = namespaced(ranges.first)
+      else         node['rdfs:range'] = {'owl:unionOf' => ranges.map {|r| namespaced(r)}}
       end
 
       rdfs_properties << node
     end
 
     datatypes.each  do |id, entry|
-      context[id] = "csvw:#{id}"
+      context[id] = namespaced(id)
 
       # Datatype definition
       node = {
-        '@id' => "csvw:#{id}",
+        '@id' => namespaced(id),
         '@type' => 'rdfs:Datatype',
         'rdfs:label' => {"en" => entry[:label].to_s},
         'rdfs:comment' => {"en" => entry[:comment].to_s},
       }
-      node['rdfs:subClassOf'] = "csvw:#{entry[:subClassOf]}" if entry[:subClassOf]
+      node['rdfs:subClassOf'] = namespaced(entry[:subClassOf]) if entry[:subClassOf]
       rdfs_datatypes << node
     end
 
     instances.each do |id, entry|
       # Instance definition
       rdfs_instances << {
-        '@id' => "csvw:#{id}",
+        '@id' => namespaced(id),
         '@type' => entry[:type],
         'rdfs:label' => {"en" => entry[:label].to_s},
         'rdfs:comment' => {"en" => entry[:comment].to_s},
@@ -196,7 +200,7 @@ class Vocab
       output << "csvw:#{id} a rdfs:Class;"
       output << %(  rdfs:label "#{entry[:label]}"@en;)
       output << %(  rdfs:comment """#{entry[:comment]}"""@en;)
-      output << %(  rdfs:subClassOf #{entry[:subClassOf].include?(':') ? entry[:subClassOf] : "csvw:" + entry[:subClassOf]};) if entry[:subClassOf]
+      output << %(  rdfs:subClassOf #{namespaced(entry[:subClassOf])};) if entry[:subClassOf]
       output << %(  rdfs:isDefinedBy csvw: .)
     end
 
@@ -205,21 +209,21 @@ class Vocab
       output << "csvw:#{id} a rdf:Property;"
       output << %(  rdfs:label "#{entry[:label]}"@en;)
       output << %(  rdfs:comment """#{entry[:comment]}"""@en;)
-      output << %(  rdfs:subPropertyOf #{entry[:subClassOf].include?(':') ? entry[:subClassOf] : "csvw:" + entry[:subClassOf]};) if entry[:subClassOf]
+      output << %(  rdfs:subPropertyOf #{namespaced(entry[:subClassOf])};) if entry[:subClassOf]
       domains = entry[:domain].to_s.split(',')
       case domains.length
       when 0  then ;
-      when 1  then output << %(  rdfs:domain #{entry[:domain].include?(':') ? entry[:domain] : "csvw:" + entry[:domain]};)
+      when 1  then output << %(  rdfs:domain #{namespaced(entry[:domain])};)
       else
-        output << %(  rdfs:domain [ owl:unionOf (#{domains.map {|d| d.include?(':') ? d : 'csvw:' + d}.join(' ')})];)
+        output << %(  rdfs:domain [ owl:unionOf (#{domains.map {|d| namespaced(d)}.join(' ')})];)
       end
 
       ranges = entry[:range].to_s.split(',')
       case ranges.length
       when 0  then ;
-      when 1  then output << %(  rdfs:range #{entry[:range].include?(':') ? entry[:range] : "csvw:" + entry[:range]};)
+      when 1  then output << %(  rdfs:range #{namespaced(entry[:range])};)
       else
-        output << %(  rdfs:range [ owl:unionOf (#{ranges.map {|d| d.include?(':') ? d : 'csvw:' + d}.join(' ')})];)
+        output << %(  rdfs:range [ owl:unionOf (#{ranges.map {|d| namespaced(d)}.join(' ')})];)
       end
       output << %(  rdfs:isDefinedBy csvw: .)
     end
@@ -229,13 +233,13 @@ class Vocab
       output << "csvw:#{id} a rdfs:Datatype;"
       output << %(  rdfs:label "#{entry[:label]}"@en;)
       output << %(  rdfs:comment """#{entry[:comment]}"""@en;)
-      output << %(  rdfs:subClassOf #{entry[:subClassOf].include?(':') ? entry[:subClassOf] : "csvw:" + entry[:subClassOf]};) if entry[:subClassOf]
+      output << %(  rdfs:subClassOf #{namespaced(entry[:subClassOf])};) if entry[:subClassOf]
       output << %(  rdfs:isDefinedBy csvw: .)
     end
 
     output << "\n# Instance definitions"
     @instances.each do |id, entry|
-      output << "csvw:#{id} a #{entry[:type].include?(':') ? entry[:type] : "csvw:" + entry[:type]};"
+      output << "csvw:#{id} a #{namespaced(entry[:type])};"
       output << %(  rdfs:label "#{entry[:label]}"@en;)
       output << %(  rdfs:comment """#{entry[:comment]}"""@en;)
       output << %(  rdfs:isDefinedBy csvw: .)
