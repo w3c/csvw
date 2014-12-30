@@ -183,8 +183,11 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       <p>
         This document defines the format and structure of metadata documents, and how these are interpreted to create an Annotated Tabular Data Model. It also defines how to validate tabular data based on some of these annotations. This metadata can be expressed as an RDF graph. However, all applications that conform to this specification (including validators and applications that read or convert tabular data) MUST read the JSON-based format described in this document.
       </p>
-      <p class="issue" data-number="48">
-        We are aiming for the JSON format to be interpretable as JSON-LD, but without any requirement to include context within the JSON itself (to save people from having to do boilerplate). We invite comments on the utility of this approach: is it useful for CSV metadata to be interpretable as JSON-LD? Is it helpful to be able to map it to RDF? Would it be better to rename some of the JSON-LD keywords, such as <code>@id</code> and <code>@type</code>?
+      <p class="issue" data-number="80">
+        Metadata documents are [[JSON-LD]] documents, however the aim is for the documents to be useable without any extra processing. To be valid, a metadata document MUST use a <cite><a href="http://www.w3.org/TR/json-ld/#the-context">JSON-LD Context</a></cite>, either explicitly via the <code>@context</code> entry, or through the use of an HTTP Link header (see <cite><a href="http://www.w3.org/TR/json-ld/#interpreting-json-as-json-ld">Interpreting JSON as JSON-LD</a></cite> in [[JSON-LD]]). The default location for this context is <code>http://www.w3.org/ns/csvw</code>. CSVW aware processors SHOULD assume a context at this location if one is not provided with the metadata document. We invite comments on the utility of this approach: is it useful for CSV metadata to be interpretable as JSON-LD?
+      </p>
+      <p class="issue" data-number="81">
+        Should JSON-LD keywords be aliased? The sense is to alias <code>@id</code> as <code>url</code> and not alias the others. We invite comments on the utility of this approach.
       </p>
     </section>
     <section>
@@ -909,6 +912,7 @@ AF,1962,9989846
             </p>
             <pre class="example highlight">
 {
+  "@context": "http://www.w3.org/ns/csvw",
   "resources": [{
     "@id": "https://example.org/countries.csv",
     "schema": {
@@ -986,6 +990,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             </p>
             <pre class="example highlight">
 {
+  "@context": "http://www.w3.org/ns/csvw",
   "resources": [{
     "@id": "HEFCE_organogram_senior_data_31032011.csv",
     "schema": "http://example.org/schema/senior-roles.json"
@@ -1000,6 +1005,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             </p>
             <pre class="example highlight">
 {
+  "@context": "http://www.w3.org/ns/csvw",
   "@id": "http://example.org/schema/senior-roles.json",
   "columns": [{
     "name": "ref",
@@ -1033,6 +1039,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             </p>
             <pre class="example highlight">
 {
+  "@context": "http://www.w3.org/ns/csvw",
   "@id": "http://example.org/schema/junior-roles.json",
   "columns": [{
     "name": "reportsTo",
