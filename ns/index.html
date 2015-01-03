@@ -349,7 +349,7 @@ var respecConfig = {
         <tr><td class="bold">doubleQuote</td>
           <td resource="csvw:doubleQuote" typeof="rdf:Property">
             <em property="rdfs:label">double quote</em>
-            <p property="rdfs:comment">If true, sets the escape character flag to ". If false, to \.</p>
+            <p property="rdfs:comment">If true, sets the escape character flag to ". If false, to \\.</p>
             <span property="rdfs:isDefinedBy" resource="csvw:"></span>
               <dl class="terms">
                   <dt>rdfs:range</dt>
@@ -373,19 +373,7 @@ var respecConfig = {
         <tr><td class="bold">foreignKeys</td>
           <td resource="csvw:foreignKeys" typeof="rdf:Property">
             <em property="rdfs:label">foreign keys</em>
-            <p property="rdfs:comment">An array of foreign key definitions that define how the values from specified columns within this table link to rows within this table or other tables. A foreign key definition is a JSON object with the properties:
-
-columns
-A column reference property that holds either a single reference to a column description object within this schema, or an array of references.
-reference
-An object with the properties:
-
-resource
-A URL that is the identifier for a specific resource that is being referenced. If this is present then schema must not be present. The metadata document must contain a description of the resource.
-schema
-A URL that is the identifier for a schema that is being referenced. If this is present then resource must not be present. The metadata document that forms the basis of processing must contain a description of a resource that uses the referenced schema, and there must not be more than one such resource.
-columns
-A column reference property that holds either a single reference to a column description object within this schema, or an array of references.</p>
+            <p property="rdfs:comment">An array of foreign key definitions that define how the values from specified columns within this table link to rows within this table or other tables.</p>
             <span property="rdfs:isDefinedBy" resource="csvw:"></span>
               <dl class="terms">
                   <dt>rdfs:domain</dt>
@@ -703,6 +691,19 @@ A column reference property that holds either a single reference to a column des
               </dl>
           </td>
         </tr>
+        <tr><td class="bold">row</td>
+          <td resource="csvw:row" typeof="rdf:Property">
+            <em property="rdfs:label">row</em>
+            <p property="rdfs:comment">Relates a Table to each Row output.</p>
+            <span property="rdfs:isDefinedBy" resource="csvw:"></span>
+              <dl class="terms">
+                  <dt>rdfs:subPropertyOf</dt>
+                      <dd property="rdfs:subPropertyOf" resource="rdfs:member">rdfs:member</dd>
+                  <dt>rdfs:domain</dt>
+                      <dd property="rdfs:domain" resource="csvw:Table">csvw:Table</dd>
+              </dl>
+          </td>
+        </tr>
         <tr><td class="bold">schema</td>
           <td resource="csvw:schema" typeof="rdf:Property">
             <em property="rdfs:label">schema</em>
@@ -723,7 +724,7 @@ A column reference property that holds either a single reference to a column des
         <tr><td class="bold">separator</td>
           <td resource="csvw:separator" typeof="rdf:Property">
             <em property="rdfs:label">separator</em>
-            <p property="rdfs:comment">The character used to separate items in the string value of the cell. If null or unspecified, the cell does not contain a list. Otherwise, application must split the string value of the cell on the specified separator character and parse each of the resulting strings separately. The cell's value will then be a list. Conversion specifications must use the separator to determine the conversion of a cell into the target format. See 3.12 Parsing cells for more details.</p>
+            <p property="rdfs:comment">The character used to separate items in the string value of the cell.</p>
             <span property="rdfs:isDefinedBy" resource="csvw:"></span>
               <dl class="terms">
                   <dt>rdfs:domain</dt>
@@ -792,11 +793,26 @@ A column reference property that holds either a single reference to a column des
         <tr><td class="bold">source</td>
           <td resource="csvw:source" typeof="rdf:Property">
             <em property="rdfs:label">source</em>
-            <p property="rdfs:comment">If included, the format to which the tabular data should be transformed prior to the transformation using the template. If the value is "json", the tabular data should first be transformed first to JSON based on the simple mapping defined in Generating JSON from Tabular Data on the Web. If the value is "rdf", it should similarly first be transformed to XML based on the simple mapping defined in Generating RDF from Tabular Data on the Web. If the source property is missing or null then the source of the transformation is the annotated tabular data model.</p>
+            <p property="rdfs:comment">The format to which the tabular data should be transformed prior to the transformation using the template. If the value is "json", the tabular data should first be transformed first to JSON based on the simple mapping defined in Generating JSON from Tabular Data on the Web. If the value is "rdf", it should similarly first be transformed to XML based on the simple mapping defined in Generating RDF from Tabular Data on the Web.</p>
             <span property="rdfs:isDefinedBy" resource="csvw:"></span>
               <dl class="terms">
                   <dt>rdfs:domain</dt>
                       <dd property="rdfs:domain" resource="csvw:Template">csvw:Template</dd>
+              </dl>
+          </td>
+        </tr>
+        <tr><td class="bold">table</td>
+          <td resource="csvw:table" typeof="rdf:Property">
+            <em property="rdfs:label">table</em>
+            <p property="rdfs:comment">Relates an Table group to annotated tables. (Note, this is different from csvw:resources, which relates metadata, rather than resulting annotated table descriptions.</p>
+            <span property="rdfs:isDefinedBy" resource="csvw:"></span>
+              <dl class="terms">
+                  <dt>rdfs:subPropertyOf</dt>
+                      <dd property="rdfs:subPropertyOf" resource="rdfs:member">rdfs:member</dd>
+                  <dt>rdfs:range</dt>
+                      <dd property="rdfs:range" resource="csvw:Table">csvw:Table</dd>
+                  <dt>rdfs:domain</dt>
+                      <dd property="rdfs:domain" resource="csvw:TableGroup">csvw:TableGroup</dd>
               </dl>
           </td>
         </tr>
@@ -1373,6 +1389,11 @@ For a Column: A natural language property that provides possible alternative nam
         <dd>
             xhv:role
         </dd>
+        <dt>row</dt>
+        <dd>
+            csvw:row
+              with array values interpreted as @set
+        </dd>
         <dt>rr</dt>
         <dd>
             http://www.w3.org/ns/r2rml#
@@ -1425,6 +1446,12 @@ For a Column: A natural language property that provides possible alternative nam
         <dt>source</dt>
         <dd>
             csvw:source
+        </dd>
+        <dt>table</dt>
+        <dd>
+            csvw:table
+            with string values interpreted as @id
+              with array values interpreted as @set
         </dd>
         <dt>table-direction</dt>
         <dd>
