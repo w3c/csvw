@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" typeof="bibo:Document " prefix="bibo: http://purl.org/ontology/bibo/ w3p: http://www.w3.org/2001/02pd/rec54#">
+<head><meta property="dc:language" content="en" lang="">
+    <meta content="text/html; charset=utf-8" http-equiv="content-type">
+    <meta content="width=device-width,initial-scale=1" name="viewport">
+    <title>Generating JSON from Tabular Data on the Web</title>
+    
+    
+    <style type="text/css">
+      .grammar td { font-family: monospace; vertical-align: top; }
+      .grammar-literal { color: gray;}
+      .TBD { font-style: italic; background: yellow;}
+      .steps li { margin-bottom: 0.5em;}
+      table, td, th { border: 1px solid gray }
+    </style>
+  <style>/*****************************************************************
+ * ReSpec 3 CSS
+ * Robin Berjon - http://berjon.com/
+ *****************************************************************/
+
+/* --- INLINES --- */
+em.rfc2119 { 
+    text-transform:     lowercase;
+    font-variant:       small-caps;
+    font-style:         normal;
+    color:              #900;
+}
+
+h1 acronym, h2 acronym, h3 acronym, h4 acronym, h5 acronym, h6 acronym, a acronym,
+h1 abbr, h2 abbr, h3 abbr, h4 abbr, h5 abbr, h6 abbr, a abbr {
+    border: none;
+}
+
+dfn {
+    font-weight:    bold;
+}
+
+a.internalDFN {
+    color:  inherit;
+    border-bottom:  1px solid #99c;
+    text-decoration:    none;
+}
+
+a.externalDFN {
+    color:  inherit;
+    border-bottom:  1px dotted #ccc;
+    text-decoration:    none;
+}
+
+a.bibref {
+    text-decoration:    none;
+}
+
+cite .bibref {
+    font-style: normal;
+}
+
+code {
+    color:  #C83500;
+}
+
+/* --- TOC --- */
+.toc a, .tof a {
+    text-decoration:    none;
+}
+
+a .secno, a .figno {
+    color:  #000;
+}
+
+ul.tof, ol.tof {
+    list-style: none outside none;
+}
+
+.caption {
+    margin-top: 0.5em;
+    font-style:   italic;
+}
+
+/* --- TABLE --- */
+table.simple {
+    border-spacing: 0;
+    border-collapse:    collapse;
+    border-bottom:  3px solid #005a9c;
+}
+
+.simple th {
+    background: #005a9c;
+    color:  #fff;
+    padding:    3px 5px;
+    text-align: left;
+}
+
+.simple th[scope="row"] {
+    background: inherit;
+    color:  inherit;
+    border-top: 1px solid #ddd;
+}
+
+.simple td {
+    padding:    3px 10px;
+    border-top: 1px solid #ddd;
+}
+
+.simple tr:nth-child(even) {
+    background: #f0f6ff;
+}
+
+/* --- DL --- */
+.section dd > p:first-child {
+    margin-top: 0;
+}
+
+.section dd > p:last-child {
+    margin-bottom: 0;
+}
+
+.section dd {
+    margin-bottom:  1em;
+}
+
+.section dl.attrs dd, .section dl.eldef dd {
+    margin-bottom:  0;
+}
+
+@media print {
+    .removeOnSave {
+        display: none;
+    }
+}
+</style><style>/* --- EXAMPLES --- */
+div.example-title {
+    min-width: 7.5em;
+    color: #b9ab2d;
+}
+div.example-title span {
+    text-transform: uppercase;   
+}
+aside.example, div.example, div.illegal-example {
+    padding: 0.5em;
+    margin: 1em 0;
+    position: relative;
+    clear: both;
+}
+div.illegal-example { color: red }
+div.illegal-example p { color: black }
+aside.example, div.example {
+    padding: .5em;
+    border-left-width: .5em;
+    border-left-style: solid;
+    border-color: #e0cb52;
+    background: #fcfaee;    
+}
+
+aside.example div.example {
+    border-left-width: .1em;
+    border-color: #999;
+    background: #fff;
+}
+aside.example div.example div.example-title {
+    color: #999;
+}
+</style><style>/* --- ISSUES/NOTES --- */
+div.issue-title, div.note-title {
+    padding-right:  1em;
+    min-width: 7.5em;
+    color: #b9ab2d;
+}
+div.issue-title { color: #e05252; }
+div.note-title { color: #2b2; }
+div.issue-title span, div.note-title span {
+    text-transform: uppercase;
+}
+div.note, div.issue {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+.note > p:first-child, .issue > p:first-child { margin-top: 0 }
+.issue, .note {
+    padding: .5em;
+    border-left-width: .5em;
+    border-left-style: solid;
+}
+div.issue, div.note {
+    padding: 1em 1.2em 0.5em;
+    margin: 1em 0;
+    position: relative;
+    clear: both;
+}
+span.note, span.issue { padding: .1em .5em .15em; }
+
+.issue {
+    border-color: #e05252;
+    background: #fbe9e9;
+}
+.note {
+    border-color: #52e052;
+    background: #e9fbe9;
+}
+
+
+</style><link href="https://www.w3.org/StyleSheets/TR/W3C-WD" rel="stylesheet"><!--[if lt IE 9]><script src='https://www.w3.org/2008/site/js/html5shiv.js'></script><![endif]--></head>
+  <body id="respecDocument" role="document" class="h-entry"><div id="respecHeader" role="contentinfo" class="head">
+  <p>
+      
+        
+            <a href="http://www.w3.org/"><img src="https://www.w3.org/Icons/w3c_home" alt="W3C" height="48" width="72"></a>
+        
+      
+  </p>
+  <h1 class="title p-name" id="title" property="dcterms:title">Generating JSON from Tabular Data on the Web</h1>
+  
+  <h2 id="w3c-first-public-working-draft-08-january-2015"><abbr title="World Wide Web Consortium">W3C</abbr> First Public Working Draft <time property="dcterms:issued" class="dt-published" datetime="2015-01-08">08 January 2015</time></h2>
+  <dl>
+    
+      <dt>This version:</dt>
+      <dd><a class="u-url" href="http://www.w3.org/TR/2015/WD-csv2json-20150108/">http://www.w3.org/TR/2015/WD-csv2json-20150108/</a></dd>
+      <dt>Latest published version:</dt>
+      <dd><a href="http://www.w3.org/TR/csv2json/">http://www.w3.org/TR/csv2json/</a></dd>
+    
+    
+      <dt>Latest editor's draft:</dt>
+      <dd><a href="http://w3c.github.io/csvw/csv2json/">http://w3c.github.io/csvw/csv2json/</a></dd>
+    
+    
+    
+    
+    
+    
+    
+    <dt>Editors:</dt>
+    <dd class="p-author h-card vcard" property="bibo:editor" resource="_:editor0"><span property="rdf:first" typeof="foaf:Person"><span property="foaf:name" class="p-name fn">Jeremy Tandy</span>, <a property="foaf:workplaceHomepage" class="p-org org h-org h-card" href="http://www.metoffice.gov.uk/">Met Office</a></span>
+<span property="rdf:rest" resource="_:editor1"></span>
+</dd>
+<dd class="p-author h-card vcard" resource="_:editor1"><span property="rdf:first" typeof="foaf:Person"><meta property="foaf:name" content="Ivan Herman"><a class="u-url url p-name fn" property="foaf:homepage" href="http://www.w3.org/People/Ivan">Ivan Herman</a>, <a property="foaf:workplaceHomepage" class="p-org org h-org h-card" href="http://www.w3.org"><abbr title="World Wide Web Consortium">W3C</abbr></a></span>
+<span property="rdf:rest" resource="rdf:nil"></span>
+</dd>
+
+    
+    
+      
+        
+          <dt>Repository:</dt>
+          
+             
+                
+                  <dd>
+                    <a href="https://github.com/w3c/csvw/">
+                      We are on Github
+                    </a>
+                  </dd>
+                
+             
+                
+                  <dd>
+                    <a href="https://github.com/w3c/csvw/issues">
+                      File a bug
+                    </a>
+                  </dd>
+                
+             
+          
+        
+      
+        
+          <dt>Changes:</dt>
+          
+             
+                
+                  <dd>
+                    <a href="https://github.com/w3c/csvw/commits/gh-pages">
+                      Commit history
+                    </a>
+                  </dd>
+                
+             
+          
+        
+      
+    
+  </dl>
+  
+  
+  
+  
+    
+      <p class="copyright">
+        <a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> ©
+        2015
+        
+        <a href="http://www.w3.org/"><abbr title="World Wide Web Consortium">W3C</abbr></a><sup>®</sup>
+        (<a href="http://www.csail.mit.edu/"><abbr title="Massachusetts Institute of Technology">MIT</abbr></a>,
+        <a href="http://www.ercim.eu/"><abbr title="European Research Consortium for Informatics and Mathematics">ERCIM</abbr></a>,
+        <a href="http://www.keio.ac.jp/">Keio</a>, <a href="http://ev.buaa.edu.cn/">Beihang</a>), 
+        
+        All Rights Reserved.
+        
+        <abbr title="World Wide Web Consortium">W3C</abbr> <a href="http://www.w3.org/Consortium/Legal/ipr-notice#Legal_Disclaimer">liability</a>,
+        <a href="http://www.w3.org/Consortium/Legal/ipr-notice#W3C_Trademarks">trademark</a> and
+        
+          <a href="http://www.w3.org/Consortium/Legal/copyright-documents">document use</a>
+        
+        rules apply.
+      </p>
+    
+  
+  <hr>
+</div>
+    <section property="dc:abstract" class="introductory" id="abstract"><h2 resource="#h-abstract" id="h-abstract"><span property="xhv:role" resource="xhv:heading">Abstract</span></h2>
+      <p>This document defines the procedures and rules to be applied when mapping 
+        tabular data into JSON. Tabular data may be complemented with metadata 
+        annotations that describe its structure, the meaning of its content and how 
+        it may form part of a collection of interrelated tabular data. This document 
+        specifies the effect of this metadata on the resulting JSON.</p>
+    </section><section id="sotd" class="introductory"><h2 resource="#h-sotd" id="h-sotd"><span property="xhv:role" resource="xhv:heading">Status of This Document</span></h2>
+  
+    
+      
+        <p>
+          <em>This section describes the status of this document at the time of its publication.
+          Other documents may supersede this document. A list of current <abbr title="World Wide Web Consortium">W3C</abbr> publications and the
+          latest revision of this technical report can be found in the <a href="http://www.w3.org/TR/"><abbr title="World Wide Web Consortium">W3C</abbr> technical reports index</a> at
+          http://www.w3.org/TR/.</em>
+        </p>
+        
+        
+      <p>The CSV on the Web Working Group was chartered to produce Recommendations 
+        for "Access methods for CSV Metadata", "Metadata vocabulary for CSV data" and 
+        "Mapping mechanism to transforming CSV into various Formats (e.g., RDF, JSON, 
+        or XML)". This document aims to satisfy the JSON variant of the mapping 
+        Recommendation.</p>
+      <p>Due to the limited resources available within the CSV on the Web Working Group,
+        this document describes only a <em>simple mapping</em>—that is, where a single
+        object is created for each row of tabular data that contains a single property
+        per cell. The Working Group solicits input on the value of mapping a single row
+        of tabular data into multiple inter-related objects.</p>
+    
+        
+        <p>
+          This document was published by the <a href="http://www.w3.org/2013/csvw/">CSV on the Web Working Group</a> as a First Public Working Draft.
+          
+            This document is intended to become a <abbr title="World Wide Web Consortium">W3C</abbr> Recommendation.
+          
+          
+            If you wish to make comments regarding this document, please send them to 
+            <a href="mailto:public-csv-wg@w3.org">public-csv-wg@w3.org</a> 
+            (<a href="mailto:public-csv-wg-request@w3.org?subject=subscribe">subscribe</a>,
+            <a href="http://lists.w3.org/Archives/Public/public-csv-wg/">archives</a>).
+          
+          
+          
+          
+          
+            
+            All comments are welcome.
+            
+          
+        </p>
+        
+        
+        
+          <p>
+            Publication as a First Public Working Draft does not imply endorsement by the <abbr title="World Wide Web Consortium">W3C</abbr>
+            Membership. This is a draft document and may be updated, replaced or obsoleted by other
+            documents at any time. It is inappropriate to cite this document as other than work in
+            progress.
+          </p>
+        
+        
+        
+        <p>
+          
+            This document was produced by a group operating under the 
+            <a id="sotd_patent" property="w3p:patentRules" href="http://www.w3.org/Consortium/Patent-Policy-20040205/">5 February 2004 <abbr title="World Wide Web Consortium">W3C</abbr> Patent
+            Policy</a>.
+          
+          
+          
+            
+              <abbr title="World Wide Web Consortium">W3C</abbr> maintains a <a href="http://www.w3.org/2004/01/pp-impl/68238/status" rel="disclosure">public list of any patent
+              disclosures</a> 
+            
+            made in connection with the deliverables of the group; that page also includes
+            instructions for disclosing a patent. An individual who has actual knowledge of a patent
+            which the individual believes contains
+            <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/#def-essential">Essential
+            Claim(s)</a> must disclose the information in accordance with
+            <a href="http://www.w3.org/Consortium/Patent-Policy-20040205/#sec-Disclosure">section
+            6 of the <abbr title="World Wide Web Consortium">W3C</abbr> Patent Policy</a>.
+          
+          
+        </p>
+        
+          <p>This document is governed by the <a id="w3c_process_revision" href="http://www.w3.org/2014/Process-20140801/">1 August 2014 <abbr title="World Wide Web Consortium">W3C</abbr> Process Document</a>.
+          </p>
+        
+        
+      
+    
+  
+</section><section id="toc"><h2 resource="#h-toc" id="h-toc" class="introductory"><span property="xhv:role" resource="xhv:heading">Table of Contents</span></h2><ul id="respecContents" role="directory" class="toc"><li class="tocline"><a class="tocxref" href="#intro"><span class="secno">1. </span>Introduction</a></li><li class="tocline"><a class="tocxref" href="#conformance"><span class="secno">2. </span>Conformance</a></li><li class="tocline"><a class="tocxref" href="#map-core-tab"><span class="secno">3. </span>Mapping Core Tabular Data</a><ul class="toc"><li class="tocline"><a class="tocxref" href="#map-core-tab-json"><span class="secno">3.1 </span>Generating JSON</a><ul class="toc"><li class="tocline"><a class="tocxref" href="#map-core-tab-table"><span class="secno">3.1.1 </span>Table-level processing</a></li><li class="tocline"><a class="tocxref" href="#map-core-tab-row"><span class="secno">3.1.2 </span>Row-level processing</a></li></ul></li><li class="tocline"><a class="tocxref" href="#map-core-tab-examples"><span class="secno">3.2 </span>Examples</a></li></ul></li><li class="tocline"><a class="tocxref" href="#map-annotated-tab"><span class="secno">4. </span>Mapping Annotated Tabular Data</a><ul class="toc"><li class="tocline"><a class="tocxref" href="#map-annotated-tab-json"><span class="secno">4.1 </span>Generating JSON</a><ul class="toc"><li class="tocline"><a class="tocxref" href="#map-annotated-tab-table"><span class="secno">4.1.1 </span>Table-level processing</a></li><li class="tocline"><a class="tocxref" href="#map-annotated-tab-row"><span class="secno">4.1.2 </span>Row-level processing</a></li><li class="tocline"><a class="tocxref" href="#map-annotated-tab-metadata"><span class="secno">4.1.3 </span>Metadata property effects on row-level mapping behaviour</a></li></ul></li><li class="tocline"><a class="tocxref" href="#map-annotated-tab-examples"><span class="secno">4.2 </span>Examples</a></li></ul></li><li class="tocline"><a class="tocxref" href="#map-grouped-tab"><span class="secno">5. </span>Mapping Grouped Tabular Data</a><ul class="toc"><li class="tocline"><a class="tocxref" href="#map-grouped-tab-json"><span class="secno">5.1 </span>Generating JSON</a><ul class="toc"><li class="tocline"><a class="tocxref" href="#map-grouped-tab-table"><span class="secno">5.1.1 </span>Group-level processing</a></li></ul></li><li class="tocline"><a class="tocxref" href="#map-grouped-tab-examples"><span class="secno">5.2 </span>Examples</a></li></ul></li><li class="tocline"><a class="tocxref" href="#references"><span class="secno">A. </span>References</a><ul class="toc"><li class="tocline"><a class="tocxref" href="#normative-references"><span class="secno">A.1 </span>Normative references</a></li><li class="tocline"><a class="tocxref" href="#informative-references"><span class="secno">A.2 </span>Informative references</a></li></ul></li></ul></section>
+    
+    <section property="bibo:hasPart" resource="#intro" typeof="bibo:Chapter" id="intro">
+      <!--OddPage--><h2 resource="#h-intro" id="h-intro"><span property="xhv:role" resource="xhv:heading"><span class="secno">1. </span>Introduction</span></h2>
+      <p>This document describes the processing of 
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-tabular-data">tabular data</a>
+        to create a set of nested objects referred to as the <dfn id="dfn-output-graph" title="output graph">
+        output graph</dfn>. The <a class="internalDFN" href="#dfn-output-graph" title="output graph">output graph</a> <em title="SHALL" class="rfc2119">SHALL</em> be serialized 
+        as JSON [<cite><a href="#bib-json" class="bibref">json</a></cite>].</p>
+      <div class="note"><div id="h-note1" role="heading" aria-level="3" class="note-title"><span>Note</span></div><p class="">The JSON encoding is intended for web developers who need 
+        not care about the complexities of RDF [<cite><a href="#bib-rdf11-concepts" class="bibref">rdf11-concepts</a></cite>].</p></div>
+      <p> 
+        The Tabular Data Model [<cite><a href="#bib-tabular-data-model" class="bibref">tabular-data-model</a></cite>] defines a 
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-core-tabular-data-model">
+        core tabular data model</a> consisting of 
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table">tables</a>, 
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">columns</a>,
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">rows</a> and 
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell">cells</a>.</p>
+      <p>Tabular data may be enriched with metadata that describes its structure and
+        the meaning of its content. These metadata <em>annotations</em> are described 
+        in [<cite><a href="#bib-tabular-metadata" class="bibref">tabular-metadata</a></cite>] and may be embedded within the CSV encoding itself as a
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-header-line">header line</a>
+        or provided within a separate metadata document. The resulting 
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-table">annotated 
+        table</a> conforms to the 
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-tabular-data-model">
+        annotated tabular data model</a>.
+      </p><p>The metadata annotations may describe how a 
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table">table</a> relates to a 
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-group-of-tables">
+        group of tables</a>. Such collections conform to the 
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-grouped-tabular-data-model">
+        grouped tabular data model</a>.</p>
+      <p>The mapping procedure operates on the <em>abstract</em> tabular data model; 
+        <em>core</em>, <em>annotated</em> or <em>grouped</em>. No discussion is given to 
+        the processes needed to convert CSV-encoded data into tabular data form. Please 
+        refer to [<cite><a href="#bib-tabular-data-model" class="bibref">tabular-data-model</a></cite>] for details of 
+        <a href="http://www.w3.org/TR/tabular-data-model/#parsing">parsing tabular data</a>. 
+        Further details on <a href="http://www.w3.org/TR/tabular-metadata/#parsing-cells">
+        parsing cells</a> within tabular data is provided in [<cite><a href="#bib-tabular-metadata" class="bibref">tabular-metadata</a></cite>].</p>
+      <div class="note"><div id="h-note2" role="heading" aria-level="3" class="note-title"><span>Note</span></div><div class="">
+        <p>Adopting terminology from the Data Catalog Vocabulary [<cite><a href="#bib-vocab-dcat" class="bibref">vocab-dcat</a></cite>], the
+          tabular data is considered to be a <em>dataset</em>, whilst the CSV file within
+          which that tabular data is encoded is considered to be a <em>distribution</em> 
+          of that tabular data.</p>
+      </div></div>
+      <div class="issue"><div id="h-issue1" role="heading" aria-level="3" class="issue-title"><a href="https://github.com/w3c/csvw/issues/93"><span>Issue 93</span></a></div><p class="">Are the abstract tabular data and the CSV that 
+        encodes it the same thing? (Is DCAT distribution appropriate?)</p></div>
+      <p>The mapping procedure is intended to be simple; encouraging the provision of 
+        compliant mapping applications. The limitation of this <dfn id="dfn-simple-mapping" title="simple mapping">
+        simple mapping</dfn> is that a single object is created for each 
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">row</a> of tabular 
+        data that contains a single property per 
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell">cell</a>.</p>
+      <div class="note"><div id="h-note3" role="heading" aria-level="3" class="note-title"><span>Note</span></div><div class="">
+        <p>An 
+          <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-table">annotated 
+          table</a> may include a reference to a
+          <a href="http://www.w3.org/TR/tabular-data-model/#dfn-template-specification">
+          template specification</a> (see [<cite><a href="#bib-tabular-metadata" class="bibref">tabular-metadata</a></cite>]) that describes how tabular
+          data can be transformed into another format using a template-based approach. 
+          <em>Templating</em> facilitates far more sophisticated transformations than are 
+          possible using the <a class="internalDFN" href="#dfn-simple-mapping" title="simple mapping">simple mapping</a>.</p>
+        <p>There is no standard template syntax, therefore template specifications may be 
+          written using existing template languages, such as 
+          <a href="http://mustache.github.io">Mustache</a>.</p>
+        <p>The processing of template specifications during the mapping is yet to be 
+          determined by the Working Group and is, at least for the interim, beyond the scope
+          of this document.</p>
+      </div></div>
+      <p>Finally, note that the mapping procedure is considered to be <em>entirely textual</em>. 
+        There is no requirement on compliant mapping applications to check the semantic
+        consistency of the data during the mapping, nor validate the 
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell values</a> against
+        JSON syntax rules. Where cell values within CSV encoded content are improperly formatted, 
+        the output from the mapping is likely to include syntax errors. Downstream applications 
+        should be aware of this and take appropriate action.</p>
+      <div class="issue"><div id="h-issue2" role="heading" aria-level="3" class="issue-title"><a href="https://github.com/w3c/csvw/issues/62"><span>Issue 62</span></a></div><p class="">Should the RDF/JSON transformation check the values?</p></div>
+    </section>
+    <section property="bibo:hasPart" resource="#conformance" typeof="bibo:Chapter" id="conformance"><!--OddPage--><h2 resource="#h-conformance" id="h-conformance"><span property="xhv:role" resource="xhv:heading"><span class="secno">2. </span>Conformance</span></h2>
+<p>
+  As well as sections marked as non-normative, all authoring guidelines, diagrams, examples,
+  and notes in this specification are non-normative. Everything else in this specification is
+  normative.
+</p>
+<p id="respecRFC2119">The key words <em class="rfc2119" title="MAY">MAY</em>, <em class="rfc2119" title="MUST">MUST</em>, <em class="rfc2119" title="SHALL">SHALL</em>, and <em class="rfc2119" title="SHOULD">SHOULD</em> are 
+  to be interpreted as described in [<cite><a href="#bib-RFC2119" class="bibref">RFC2119</a></cite>].
+</p>
+
+      <p><a href="http://www.w3.org/TR/tabular-data-model/#dfn-tabular-data">Tabular data</a> 
+        <em title="MUST" class="rfc2119">MUST</em> conform to the description from [<cite><a href="#bib-tabular-data-model" class="bibref">tabular-data-model</a></cite>]. In particular note
+        that each row <em title="MUST" class="rfc2119">MUST</em> contain the same number of cells (although some of these cells 
+        may be empty). Given this constraint, not all CSV-encoded data can be considered 
+        to be tabular data. As such, the procedures and rules defined in this document  
+        cannot be applied to all CSV files.</p>
+      <p>This document relies on terms (e.g. group, table, column, row, cell) defined in 
+        [<cite><a href="#bib-tabular-data-model" class="bibref">tabular-data-model</a></cite>].</p>
+    </section>
+    <section property="bibo:hasPart" resource="#map-core-tab" typeof="bibo:Chapter" id="map-core-tab">
+      <!--OddPage--><h2 resource="#h-map-core-tab" id="h-map-core-tab"><span property="xhv:role" resource="xhv:heading"><span class="secno">3. </span>Mapping Core Tabular Data</span></h2>
+        <p>The procedures and rules for mapping tabular data compliant with the
+          <a href="http://www.w3.org/TR/tabular-data-model/#dfn-core-tabular-data-model">
+          core tabular data model</a> are described below.</p>
+        <div class="note"><div id="h-note4" role="heading" aria-level="3" class="note-title"><span>Note</span></div><p class="">Core Tabular Data lacks any annotation; neither from the header
+          line within the CSV file nor from a separate metadata document.</p></div>
+      <section property="bibo:hasPart" resource="#map-core-tab-json" typeof="bibo:Chapter" id="map-core-tab-json">
+        <h3 resource="#h-map-core-tab-json" id="h-map-core-tab-json"><span property="xhv:role" resource="xhv:heading"><span class="secno">3.1 </span>Generating JSON</span></h3>
+        <section property="bibo:hasPart" resource="#map-core-tab-table" typeof="bibo:Chapter" id="map-core-tab-table">
+          <h4 resource="#h-map-core-tab-table" id="h-map-core-tab-table"><span property="xhv:role" resource="xhv:heading"><span class="secno">3.1.1 </span>Table-level processing</span></h4>
+          <ol>
+            <li>
+              <p>The root object of the <a class="internalDFN" href="#dfn-output-graph" title="output graph">output graph</a> <em title="SHALL" class="rfc2119">SHALL</em> 
+                describe the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table">table</a>.</p>
+            </li>
+            <li>
+              <p>The root object <em title="SHALL" class="rfc2119">SHALL</em> contain a reference to the CSV-encoded <em>
+                distribution</em> of the tabular data.</p>
+              <p>The <em>distribution</em> <em title="SHALL" class="rfc2119">SHALL</em> be described using an object with <em>name</em>
+                <code>distribution</code> that contains the <em>name/value pair</em> 
+                <code>"downloadURL": "<em>[CSV-LOCATION]</em>"</code> where <code><em>[CSV-LOCATION]</em></code>
+                is the absolute URL of the source CSV file.</p> 
+              <div class="note"><div id="h-note5" role="heading" aria-level="5" class="note-title"><span>Note</span></div><p class="">The semantics of properties <code>distribution</code> and 
+                <code>downloadURL</code> correspond with the properties 
+                <code><a href="http://www.w3.org/ns/dcat#distribution">dcat:distribution</a></code> and 
+                <code><a href="http://www.w3.org/ns/dcat#downloadURL">dcat:downloadURL</a></code> as defined 
+                in [<cite><a href="#bib-vocab-dcat" class="bibref">vocab-dcat</a></cite>].</p></div>
+              <div class="issue"><div id="h-issue3" role="heading" aria-level="5" class="issue-title"><a href="https://github.com/w3c/csvw/issues/93"><span>Issue 93</span></a></div><p class="">Are the abstract tabular data and the CSV that 
+                encodes it the same thing? (Is DCAT distribution appropriate?)</p></div>
+            </li> 
+            <li>
+              <p>The root object <em title="SHALL" class="rfc2119">SHALL</em> contain an array named <code>row</code> containing 
+                one object for each of the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">rows</a> within the 
+                tabular data.</p>
+              <div class="issue"><div id="h-issue4" role="heading" aria-level="5" class="issue-title"><a href="https://github.com/w3c/csvw/issues/97"><span>Issue 97</span></a></div><p class="">What should the name of the property be that 
+                relates rows to the table? <code>row</code> is one option; <code>hasRow</code>
+                is another.</p></div>
+              <p>Refer to <a href="#map-core-tab-row">Section 3.1.2 Row-level processing</a>
+                for further details.</p>
+            </li>
+          </ol>
+        </section>
+        <section property="bibo:hasPart" resource="#map-core-tab-row" typeof="bibo:Chapter" id="map-core-tab-row">
+          <h4 resource="#h-map-core-tab-row" id="h-map-core-tab-row"><span property="xhv:role" resource="xhv:heading"><span class="secno">3.1.2 </span>Row-level processing</span></h4>
+          <p>Each <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">row</a>
+            in the tabular data is processed sequentially.</p>
+          <ol>
+            <li>
+              <p>Each object in the <a class="internalDFN" href="#dfn-output-graph" title="output graph">output graph</a> corresponding to a 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">row</a> in the
+                tabular data <em title="SHALL" class="rfc2119">SHALL</em> contain one <em>name/value pair</em> for each
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a> 
+                where the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a>
+                is not <em>null</em> (e.g. where the cell does not contain an empty string; 
+                <code>""</code>).</p>
+            </li>
+            <li>
+              <p>The value of <em>name</em> <em title="SHALL" class="rfc2119">SHALL</em> be <code>_col=<em>[N]</em></code> 
+                where <code><em>[N]</em></code> is the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column-number">column number</a>,
+                whilst the value of <em>value</em> <em title="SHALL" class="rfc2119">SHALL</em> be provided by the associated
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a>.</p>
+              <div class="issue"><div id="h-issue5" role="heading" aria-level="5" class="issue-title"><a href="https://github.com/w3c/csvw/issues/33"><span>Issue 33</span></a></div><p class="">What do to with conversion if no column name 
+                is given?</p></div>
+            </li>
+            <li>
+              <p>Where the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a>
+                is <em>null</em>, the <em>name/value pair</em> <em title="SHALL" class="rfc2119">SHALL</em> be omitted from the 
+                <a class="internalDFN" href="#dfn-output-graph" title="output graph">output graph</a>.</p>
+            </li>
+            <li>
+              <p>Given the absence of metadata annotations to indicate the type of data present
+               in a given column, all 
+               <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell values</a> 
+               <em title="SHALL" class="rfc2119">SHALL</em> be treated as strings.</p>  
+            </li>
+          </ol>
+          <div class="issue"><div id="h-issue6" role="heading" aria-level="5" class="issue-title"><a href="https://github.com/w3c/csvw/issues/98"><span>Issue 98</span></a></div><p class="">Should the mapping output for a given row include 
+            a reference to the CSV source row?</p></div>
+        </section>
+      </section>
+      <section property="bibo:hasPart" resource="#map-core-tab-examples" typeof="bibo:Chapter" id="map-core-tab-examples">
+        <h3 resource="#h-map-core-tab-examples" id="h-map-core-tab-examples"><span property="xhv:role" resource="xhv:heading"><span class="secno">3.2 </span>Examples</span></h3>
+        <p>The following example provides a numeric score for four fictional people. A row
+          number is included for convenience. There are four columns and four rows. Given 
+          that no metadata annotations are provided, it is very difficult to ascertain the 
+          subject of the tabular data without additional insight.</p>
+
+        <table style="width: 60%">
+          <tbody><tr>
+            <td>1</td>
+            <td>Jill</td>
+            <td>Smith</td> 
+            <td>50</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Eve</td>
+            <td></td> 
+            <td>94</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>Adam</td>
+            <td>Johnson</td> 
+            <td></td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>John</td>
+            <td>Doe</td> 
+            <td>80</td>
+          </tr>
+        </tbody></table>
+
+        <p>The CSV input (published at <code>http://example.org/people-and-points.csv</code>):</p>
+
+        <div class="example"><div class="example-title"><span>Example 1</span>: CSV input </div><pre class="example" id="map-core-tab-examples-input">1,Jill,Smith,50
+2,Eve,,94
+3,Adam,Johnson,
+4,John,Doe,80</pre></div>
+
+        <p>The resulting JSON output graph:</p>
+
+        <div class="example"><div class="example-title"><span>Example 2</span>: JSON output</div><pre class="example" id="map-core-tab-examples-output">{
+  "distribution": {
+    "downloadURL": "http://example.org/people-and-points.csv"
+  },
+  "row": [{
+    "_col=1": "1",
+    "_col=2": "Jill",
+    "_col=3": "Smith",
+    "_col=4": "50"
+  },{
+    "_col=1": "2",
+    "_col=2": "Eve",
+    "_col=4": "94"
+  },{
+    "_col=1": "3",
+    "_col=2": "Adam",
+    "_col=3": "Johnson"
+  },{
+    "_col=1": "4",
+    "_col=2": "John",
+    "_col=3": "Doe",
+    "_col=4": "80"
+  }]
+}</pre></div>
+
+      </section>
+    </section>
+    <section property="bibo:hasPart" resource="#map-annotated-tab" typeof="bibo:Chapter" id="map-annotated-tab">
+      <!--OddPage--><h2 resource="#h-map-annotated-tab" id="h-map-annotated-tab"><span property="xhv:role" resource="xhv:heading"><span class="secno">4. </span>Mapping Annotated Tabular Data</span></h2>
+      <p>The procedures and rules for mapping annotated tabular data compliant with the
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-tabular-data-model">
+        annotated tabular data model</a> are described below.</p>
+      <p>The metadata for annotated tabular data <em title="MAY" class="rfc2119">MAY</em> be provided by either or both
+        of the following sources:</p>
+      <ul>
+        <li>the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-header-line">
+          header line</a> within the CSV file; and/or</li>
+        <li>the <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">
+          table description</a>, 
+          <a href="http://www.w3.org/TR/tabular-metadata/#dfn-schema">schema</a> and 
+          <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description">
+          column descriptions</a> (as defined in [<cite><a href="#bib-tabular-metadata" class="bibref">tabular-metadata</a></cite>]) within the 
+          associated metadata document.</li>
+      </ul>
+      <p>Mapping applications <em title="SHALL" class="rfc2119">SHALL</em> establish a 
+        <a class="internalDFN" href="#dfn-column-description-object" title="column description object">column description object</a> for each
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a> within
+        the annotated tabular data. The <dfn id="dfn-column-description-object" title="column description object">column 
+        description object</dfn> contains the aggregated set
+        of metadata properties for a given column that affect how the 
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell values</a>
+        within the associated column are expressed in the <a class="internalDFN" href="#dfn-output-graph" title="output graph">
+        output graph</a>. Metadata properties are sourced from the 
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-header-line">header line</a>
+        in the CSV file and <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description">
+        column description</a> in the metadata document and enriched with 
+        <a href="http://www.w3.org/TR/tabular-metadata/#dfn-inherited-property">
+        inherited properties</a> from the 
+        <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">
+        table description</a> and  
+        <a href="http://www.w3.org/TR/tabular-metadata/#dfn-schema">schema</a>.</p>
+      <p>The <a class="internalDFN" href="#dfn-output-graph" title="output graph">output graph</a> <em title="MAY" class="rfc2119">MAY</em> include some 
+        <a href="http://www.w3.org/TR/tabular-metadata/#dfn-direct-annotation">Direct Annotations</a>
+        sourced from the metadata document. Where these are 
+        <a href="http://www.w3.org/TR/tabular-metadata/#dfn-natural-language-property">
+        natural language properties</a>, no locale information can be provided given the
+        lack of multi-lingual support in JSON. Where an array of values
+        for a property are provided using a 
+        <a href="http://www.w3.org/TR/json-ld/#dfn-language-map">language map</a> (as
+        defined in [<cite><a href="#bib-json-ld" class="bibref">json-ld</a></cite>]) the array of locale-specific values <em title="SHALL" class="rfc2119">SHALL</em> be
+        included in the <a class="internalDFN" href="#dfn-output-graph" title="output graph">output graph</a> - albeit
+        without the inferred semantics about language codes.</p>
+      <p>Clearly, in order to process annotated tabular data, a mapping application <em title="MUST" class="rfc2119">MUST</em> have
+        access to the full metadata description associated with the tabular data.</p>
+      <p>URL expansion behaviour of relative URLs <em title="SHALL" class="rfc2119">SHALL</em> be consistent with
+        <a href="http://www.w3.org/TR/json-ld-api/#iri-expansion">Section 6.3 IRI Expansion</a> 
+        in [<cite><a href="#bib-json-ld-api" class="bibref">json-ld-api</a></cite>]. The <dfn id="dfn-baseurl" title="baseURL">base URL</dfn> provides the URL against 
+        which relative URLs from annotated tabular data are resolved. The 
+        <a class="internalDFN" href="#dfn-baseurl" title="baseURL">base URL</a> <em title="SHALL" class="rfc2119">SHALL</em> be that of the source CSV file.</p>  
+      <div class="issue"><div id="h-issue7" role="heading" aria-level="3" class="issue-title"><a href="https://github.com/w3c/csvw/issues/91"><span>Issue 91</span></a></div><p class="">What is default value if @base is not defined in the 
+        metadata description?</p></div>
+      <section property="bibo:hasPart" resource="#map-annotated-tab-json" typeof="bibo:Chapter" id="map-annotated-tab-json">
+        <h3 resource="#h-map-annotated-tab-json" id="h-map-annotated-tab-json"><span property="xhv:role" resource="xhv:heading"><span class="secno">4.1 </span>Generating JSON</span></h3>
+        <section property="bibo:hasPart" resource="#map-annotated-tab-table" typeof="bibo:Chapter" id="map-annotated-tab-table">
+          <h4 resource="#h-map-annotated-tab-table" id="h-map-annotated-tab-table"><span property="xhv:role" resource="xhv:heading"><span class="secno">4.1.1 </span>Table-level processing</span></h4>
+          <ol>
+            <li>
+              <p>The root object of the <a class="internalDFN" href="#dfn-output-graph" title="output graph">output graph</a> <em title="SHALL" class="rfc2119">SHALL</em> 
+                describe the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-table">annotated table</a>.</p>
+            </li>
+            <li>
+              <p>Where provided in the 
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">table 
+                description</a>, the metadata property <code>@id</code> <em title="SHALL" class="rfc2119">SHALL</em> be used to identify the 
+                root object.</p>
+              <p>The root object <em title="SHALL" class="rfc2119">SHALL</em> be identified using the <em>name/value pair</em> 
+                <code>"url": "<em>[@id]</em>"</code> where <code><em>[@id]</em></code> is the value
+                of metadata property <code>@id</code>.</p>
+            </li>
+            <li>
+              <p>The root object <em title="SHALL" class="rfc2119">SHALL</em> contain a reference to the CSV-encoded <em>
+                distribution</em> of the tabular data.</p>
+              <p>The <em>distribution</em> <em title="SHALL" class="rfc2119">SHALL</em> be described using an object with <em>name</em>
+                <code>distribution</code> that contains the <em>name/value pair</em> 
+                <code>"downloadURL": "<em>[CSV-LOCATION]</em>"</code> where <code><em>[CSV-LOCATION]</em></code>
+                is the absolute URL of the source CSV file.</p> 
+              <div class="note"><div id="h-note6" role="heading" aria-level="5" class="note-title"><span>Note</span></div><p class="">The semantics of properties <code>distribution</code> and 
+                <code>downloadURL</code> correspond with the properties 
+                <code><a href="http://www.w3.org/ns/dcat#distribution">dcat:distribution</a></code> and 
+                <code><a href="http://www.w3.org/ns/dcat#downloadURL">dcat:downloadURL</a></code> as defined 
+                in [<cite><a href="#bib-vocab-dcat" class="bibref">vocab-dcat</a></cite>].</p></div>
+              <div class="issue"><div id="h-issue8" role="heading" aria-level="5" class="issue-title"><a href="https://github.com/w3c/csvw/issues/93"><span>Issue 93</span></a></div><p class="">Are the abstract tabular data and the CSV that 
+                encodes it the same thing? (Is DCAT distribution appropriate?)</p></div>
+            </li>
+            <li>
+              <p>Where a 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-header-line">header line</a>
+                is present in the CSV file then, for each 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a>, the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a>
+                from the column header <em title="SHALL" class="rfc2119">SHALL</em> be assigned to metadata property <code>name</code>
+                within the <a class="internalDFN" href="#dfn-column-description-object" title="column description object">column description object</a> for
+                that <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a>.</p>
+              <p>Where the column header is <em>null</em>, the value assigned to <code>name</code> <em title="SHALL" class="rfc2119">SHALL</em> be 
+                <code>_col=<em>[N]</em></code> where <code><em>[N]</em></code> is the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column-number">column number</a>.</p>
+            </li>
+            <li>
+              <p>Where present in the 
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">
+                table description</a>, the following metadata properties <em title="SHALL" class="rfc2119">SHALL</em> be included in the
+                <a class="internalDFN" href="#dfn-output-graph" title="output graph">output graph</a> within the root object:</p>
+                <ul>
+                  <li>
+                    <p><code>notes</code> - the array of objects representing structured annotations 
+                      on the tabular data <em title="SHALL" class="rfc2119">SHALL</em> be included verbatim.</p>
+                    <div class="note"><div id="h-note7" role="heading" aria-level="5" class="note-title"><span>Note</span></div><p class="">The <a href="http://www.w3.org/annotation/">Web Annotation Working 
+                      Group</a> is developing a vocabulary for expressing annotations which we anticipate 
+                      referencing from this specification. Issues likely to be covered therein include: 
+                      how to anchor the annotation to a target in the tabular data and/or CSV file, 
+                      what form the annotations themselves may take (e.g. a simple literal annotation 
+                      body, or whether additional formatting properties are required to indicate that 
+                      the annotation is expressed in, say, Markdown or HTML).</p></div>
+                    <div class="issue"><div id="h-issue9" role="heading" aria-level="5" class="issue-title"><a href="https://github.com/w3c/csvw/issues/71"><span>Issue 71</span></a></div><div class="">
+                      <p>Exact handling of annotations.</p> 
+                      <p>Additionally, the mechanism to reference the annotation target (within tabular
+                        data) is still unclear - especially given the confusion on identifying row
+                        numbers (<a href="https://github.com/w3c/csvw/issues/68">ISSUE #68</a> refers).</p>
+                    </div></div>
+                  </li>
+                  <li>
+                    <p>Any <dfn id="dfn-common-property" title="common property">Common Properties</dfn> (as defined in 
+                      <a href="http://www.w3.org/TR/tabular-metadata/#common-properties">Section 3.3 
+                      Common Properties</a> of [<cite><a href="#bib-tabular-metadata" class="bibref">tabular-metadata</a></cite>]).</p>
+                  </li>
+                </ul>  
+            </li>
+            <li>
+              <p>Any of the <a href="http://www.w3.org/TR/tabular-metadata/#dfn-inherited-property">
+                inherited properties</a> <code>null</code>,
+                <code>separator</code>, <code>format</code>, <code>datatype</code>, 
+                or <code>default</code>
+                defined within the 
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">
+                table description</a> and/or 
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-schema">schema</a>
+                <em title="SHALL" class="rfc2119">SHALL</em> be added to the <a class="internalDFN" href="#dfn-column-description-object" title="column description object">column description 
+                object</a> for each 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a>.</p>
+              <p>Where the same property is defined in both the
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">
+                table description</a> and the
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-schema">schema</a>, the 
+                value from the <a href="http://www.w3.org/TR/tabular-metadata/#dfn-schema">schema</a>
+                <em title="SHALL" class="rfc2119">SHALL</em> take precedence.</p>
+            </li>
+            <li>
+              <p>Each <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description">
+                column description</a> <em title="SHALL" class="rfc2119">SHALL</em> be matched to a 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a> in
+                the tabular data based on the order that the description is listed in the <code>columns</code>
+                array of the <a href="http://www.w3.org/TR/tabular-metadata/#dfn-schema">schema</a>.</p>
+              <p>For each <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description">
+                column description</a> in the metadata document, the following metadata properties
+                <em title="SHALL" class="rfc2119">SHALL</em> be added to the relevant <a class="internalDFN" href="#dfn-column-description-object" title="column description object">column description
+                object</a> established by the mapping application:
+                </p><ul>
+                  <li>
+                    <p><code>name</code>.</p>
+                    <p>Where metadata property <code>name</code> is also provided via the
+                      <a href="http://www.w3.org/TR/tabular-data-model/#dfn-header-line">header line</a>
+                      the value from the 
+                      <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description">
+                      column description</a> in the metadata document <em title="SHALL" class="rfc2119">SHALL</em> take precedence.</p>
+                  </li>
+                  <li>
+                    <p><code>predicateUrl</code>.</p>
+                  </li>
+                  <li>
+                    <p><code>urlTemplate</code>.</p>
+                  </li>
+                  <li>
+                    <p><a href="http://www.w3.org/TR/tabular-metadata/#dfn-inherited-property">
+                      Inherited properties</a> <code>null</code>, 
+                      <code>separator</code>, <code>format</code>, <code>datatype</code>, 
+                      and <code>default</code> are added to the <a class="internalDFN" href="#dfn-column-description-object" title="column description object">
+                      column description object</a>, overwriting values added in the previous step
+                      where properties are duplicated.</p>
+                  </li>
+                </ul>
+              <p></p>
+            </li>
+            <li>
+              <p>For each <a class="internalDFN" href="#dfn-column-description-object" title="column description object">column description object</a>
+                where metadata property <code>predicateUrl</code> has <em>not</em> been 
+                assigned within the 
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description">
+                column description</a>, the value of <code>predicateUrl</code> <em title="SHALL" class="rfc2119">SHALL</em> be
+                set as the value of metadata property <code>name</code>.</p>
+            </li>
+            <li>
+              <p>The root object <em title="SHALL" class="rfc2119">SHALL</em> contain an array named <code>row</code> containing 
+                one object for each of the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">rows</a> within the 
+                tabular data.</p>
+              <p>Refer to <a href="#map-annotated-tab-row">Section 4.1.2 Row-level processing</a>
+                for further details.</p>
+            </li>
+            <li>
+              <p>The <a class="internalDFN" href="#dfn-output-graph" title="output graph">output graph</a> <em title="MAY" class="rfc2119">MAY</em> contain information about the 
+                metadata documents that were used when when creating the 
+                <a class="internalDFN" href="#dfn-output-graph" title="output graph">output graph</a> using the following 
+                <em>name/value pair</em> for each metadata document:</p>
+              <p><code>&nbsp;&nbsp;"describedBy": "<em>[Metadata Location]</em>"</code></p>
+              <p>where <code><em>[Metadata Location]</em></code> is the absolute URL of the
+                metadata document.</p>
+            </li>
+          </ol>
+        </section>
+        <section property="bibo:hasPart" resource="#map-annotated-tab-row" typeof="bibo:Chapter" id="map-annotated-tab-row">
+          <h4 resource="#h-map-annotated-tab-row" id="h-map-annotated-tab-row"><span property="xhv:role" resource="xhv:heading"><span class="secno">4.1.2 </span>Row-level processing</span></h4>
+          <p>Each <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">row</a>
+            in the tabular data is processed sequentially. The behaviour exhibited when
+            processing a given 
+            <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell">cell</a> within the 
+            current <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">row</a> is 
+            dependent on the metadata properties of the 
+            <a class="internalDFN" href="#dfn-column-description-object" title="column description object">column description object</a> for the 
+            <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a> that
+            that <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell">cell</a> resides
+            in. The effect of each metadata property is defined in 
+            <a href="#map-annotated-tab-metadata">Section 4.1.3 Metadata property effects on row-level 
+            mapping behaviour</a></p>
+          <ol>
+            <li>
+              <p>Each object in the <a class="internalDFN" href="#dfn-output-graph" title="output graph">output graph</a> corresponding to a 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">row</a> in the
+                tabular data <em title="SHALL" class="rfc2119">SHALL</em> contain one <em>name/value pair</em> for each
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a> 
+                where the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a>
+                is not <em>null</em>.</p>
+            </li>
+            <li>
+              <p>Where the metadata property <code>urlTemplate</code> is provided in the 
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-schema">schema</a>, 
+                each object in the <a class="internalDFN" href="#dfn-output-graph" title="output graph">output graph</a> corresponding to a 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">row</a> in the
+                tabular data <em title="SHALL" class="rfc2119">SHALL</em> be explicitly identified using the <em>name/value pair</em> 
+                <code>"url": "<em>[EXPANDED-URI-TEMPLATE]</em>"</code> where 
+                <code><em>[EXPANDED-URI-TEMPLATE]</em></code> is the value resulting from 
+                the expansion of the [<cite><a href="#bib-uri-template" class="bibref">uri-template</a></cite>] specified in the <code>urlTemplate</code>
+                property.</p>
+              <div class="note"><div id="h-note8" role="heading" aria-level="5" class="note-title"><span>Note</span></div><div class="">
+                <p>The <em>variables</em> in the URI Template expression relate to
+                  the <code>name</code> property specified for each
+                  <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a>. 
+                  During template expansion, the <em>variables</em> evaluate to the 
+                  <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a>
+                  within the 
+                  <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">row</a>
+                  being processed that is associated with the named 
+                  <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a>.</p>
+                <p>The <em>variable</em> <code>_row</code> evaluates to the number of the row being
+                  processed.</p>
+                <p>Once the URL has been generated via the template expansion, relative URLs are
+                  resolved against the <a class="internalDFN" href="#dfn-baseurl" title="baseURL">base URL</a> to create an absolute
+                  URL.</p>
+              </div></div>
+            </li>
+            <li>
+              <p>Where the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a>
+                is <em>null</em>, the <em>name/value pair</em> <em title="SHALL" class="rfc2119">SHALL</em> be omitted from the 
+                <a class="internalDFN" href="#dfn-output-graph" title="output graph">output graph</a> unless a <em>default value</em> is
+                specified for that <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a>
+                (see metadata properties <code>null</code> and <code>default</code>).</p>  
+            </li>
+            <li>
+              <p>The value of <em>name</em> for the <em>name/value pair</em> <em title="SHALL" class="rfc2119">SHALL</em> be provided by the 
+                <code>predicateUrl</code> metadata property within the <a class="internalDFN" href="#dfn-column-description-object" title="column description object">
+                column description object</a>.</p>
+              <p>In accordance with [<cite><a href="#bib-json" class="bibref">json</a></cite>], all unicode characters may be used. However, the
+                following characters <em title="SHALL" class="rfc2119">SHALL</em> be <em>escaped</em>:</p>
+              <ul>
+                <li>quotation mark; <code>"</code> (<code>U+0022</code>)</li>
+                <li>reverse solidus; <code>\</code> (<code>U+005C</code>)</li>
+                <li>control characters; (<code>U+0000</code> through <code>U+001F</code>)</li>
+              </ul>
+            </li>
+            <li>
+              <p>The value of <em>value</em> <em title="SHALL" class="rfc2119">SHALL</em> be provided by the associated
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a>
+                subject to the effect of the metadata properties for that 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a>
+                (if any are specified).</p>
+              <div class="note"><div id="h-note9" role="heading" aria-level="5" class="note-title"><span>Note</span></div><div class="">
+                <p>Given the lack of multi-lingual support in JSON, internationalized strings 
+                  are simply copied verbatim into the <a class="internalDFN" href="#dfn-output-graph" title="output graph">output graph</a> 
+                  without any additional locale information.</p>
+                <p>Also note that values of metadata property <code>name</code> must be unique 
+                  within a <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table">table</a>. 
+                  Therefore if, say, English and French versions of the same property are provided 
+                  as complementary columns in a CSV file then their <code>name</code> properties 
+                  must be different; e.g. <code>title_en</code> and <code>titre_fr</code>. It may 
+                  be possible for applications to infer a language from the name of a
+                  <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a> - 
+                  but this is entirely dependant on the syntax used by the metadata author when 
+                  defining values of the <code>name</code> property.</p>
+              </div></div>
+            </li>
+          </ol>
+        </section>
+        <section property="bibo:hasPart" resource="#map-annotated-tab-metadata" typeof="bibo:Chapter" id="map-annotated-tab-metadata">
+          <h4 resource="#h-map-annotated-tab-metadata" id="h-map-annotated-tab-metadata"><span property="xhv:role" resource="xhv:heading"><span class="secno">4.1.3 </span>Metadata property effects on row-level mapping behaviour</span></h4>
+          <p>The following metadata properties modify the way that 
+            <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell values</a>
+            are incorporated into the <a class="internalDFN" href="#dfn-output-graph" title="output graph">output graph</a>:</p>
+          <dl>
+            <dt id="metadata-property-null"><code>null</code></dt>
+            <dd>
+              <p>By default, a
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a>
+                is deemed to be <em>null</em> if it contains an empty string. If specified, the 
+                metadata property <code>null</code> provides a token (string) that can be used to 
+                identify <em>null</em> values.</p>
+            </dd>
+            <dt id="metadata-property-separator"><code>separator</code></dt>
+            <dd>
+              <p>Where metadata property <code>separator</code> is defined, the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a> <em title="SHALL" class="rfc2119">SHALL</em> be
+                parsed into an ordered list of values, using the value of <code>separator</code> as the 
+                delimiter.</p>
+              <p>The list of values <em title="SHALL" class="rfc2119">SHALL</em> be expressed in the <a class="internalDFN" href="#dfn-output-graph" title="output graph">output graph</a> as an array.</p>
+            </dd>
+            <dt id="metadata-property-datatype-and-format"><code>datatype</code> and <code>format</code></dt>
+            <dd>
+              <p>Where metadata property <code>datatype</code> is undefined, the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a> <em title="SHALL" class="rfc2119">SHALL</em> be 
+                inferred to hold values of datatype <code>string</code>.</p>
+              <p>The following datatypes are given special attention:</p>
+              <ul>
+                <li>
+                  <p>Datatypes with embedded syntax: <code>xml</code>, <code>json</code> and <code>html</code>.</p>
+                  <p>These datatypes are treated as literal values; no attempt <em title="SHOULD" class="rfc2119">SHOULD</em> be made to
+                      'unpack' the structured syntax to create sub-objects within the <a class="internalDFN" href="#dfn-output-graph" title="output graph">
+                      output graph</a></p>
+                </li>
+                <li>
+                  <p>Booleans: <code>boolean</code>.</p>
+                  <p>Metadata property <code>format</code> <em title="MAY" class="rfc2119">MAY</em> be provided for a boolean-typed 
+                    <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a>; 
+                    providing non-standard tokens for <em>true</em> and <em>false</em> (e.g. 
+                    <code>Y|N</code>. <a href="http://w3c.github.io/csvw/metadata/#formats-for-booleans">
+                    Section 3.12.3 Formats for booleans</a> from [<cite><a href="#bib-tabular-metadata" class="bibref">tabular-metadata</a></cite>] refers.</p>
+                  <p>If a boolean type is declared, the 
+                    <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a>
+                    <em title="SHALL" class="rfc2119">SHALL</em> be processed as follows:</p>
+                  <ol>
+                    <li>if the value is <code>true</code>, <code>1</code> or, if the <code>format</code> 
+                      property is defined, the value of <em>true</em>, then the <a class="internalDFN" href="#dfn-output-graph" title="output graph">output graph</a>
+                      <em title="SHALL" class="rfc2119">SHALL</em> include the value <code>true</code>;</li>
+                    <li>else if the value is <code>false</code>, <code>0</code> or, if the <code>format</code> 
+                      property is defined, the value of <em>false</em>, then the <a class="internalDFN" href="#dfn-output-graph" title="output graph">output graph</a>
+                      <em title="SHALL" class="rfc2119">SHALL</em> include the value <code>false</code>;</li>
+                    <li>else the <a class="internalDFN" href="#dfn-output-graph" title="output graph">output graph</a> <em title="SHALL" class="rfc2119">SHALL</em> include the
+                      <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a> verbatim.</li>
+                  </ol>
+                </li>
+                <li>
+                  <p>Numbers: <code>number</code>, <code>decimal</code>, <code>integer</code>, 
+                    <code>nonPositiveInteger</code>, <code>negativeInteger</code>, <code>long</code>, 
+                    <code>int</code>, <code>short</code>, <code>nonNegativeInteger</code>, 
+                    <code>unsignedLong</code>, <code>unsignedInt</code>, <code>unsignedShort</code>,
+                    <code>positiveInteger</code>, <code>float</code> and <code>double</code>.</p>
+                  <p><a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">Cell values</a> 
+                    that are asserted to be numeric shall be expressed in the <a class="internalDFN" href="#dfn-output-graph" title="output graph">
+                    output graph</a> as numbers; double quotes will be omitted.</p>
+                  <p>It is not uncommon for numbers within tabular data to be formatted for human consumption, 
+                    which may involve using commas for decimal points, grouping digits in the number using commas, 
+                    or adding currency symbols or percent signs to the number.</p>
+                  <p>Metadata property <code>format</code> <em title="MAY" class="rfc2119">MAY</em> be provided to describe the formatting of the
+                    <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell values</a> 
+                    to assist the mapping application convert the 
+                    <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a> 
+                    to a number format readily consumable by downstream applications.</p>
+                  <div class="issue"><div id="h-issue10" role="heading" aria-level="5" class="issue-title"><a href="https://github.com/w3c/csvw/issues/54"><span>Issue 54</span></a></div><div class="">
+                    <p>Describing the formatting of numbers is currently 
+                      unresolved and is likely to require information on decimal separator characters, 
+                      grouping characters and possibly others such as Infinity, Nan, currency tokens, 
+                      negative numbers appearing in parentheses etc.</p> 
+                    <p>In the interim, mapping applications are not required to undertake any reformatting 
+                      and may simply pass the cell value to the output graph verbatim.</p>
+                  </div></div>
+                </li>
+                <li>
+                  <p>Dates, times and durations: <code>date</code>, <code>time</code>, 
+                    <code>datetime</code>, <code>dateTime</code> and <code>duration</code>.</p>
+                  <p>A standard syntax for dates and times is defined by [<cite><a href="#bib-iso8601" class="bibref">iso8601</a></cite>]. This format can be 
+                    readily consumed by software applications. However, dates and times are often provided 
+                    in a locale-specific format, or use alternate calendars and/or eras.</p>
+                  <p>Metadata property <code>format</code> <em title="MAY" class="rfc2119">MAY</em> be provided to describe the formatting of 
+                    <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell values</a> 
+                    and assist the mapping application convert the 
+                    <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a> 
+                    to a date, time, date-time or duration format readily consumable by downstream 
+                    applications.</p>
+                  <div class="note"><div id="h-note10" role="heading" aria-level="5" class="note-title"><span>Note</span></div><p class="">Where possible, data publishers <em title="SHOULD" class="rfc2119">SHOULD</em> provide dates and times in 
+                    the [<cite><a href="#bib-iso8601" class="bibref">iso8601</a></cite>] format. However, where data publishers choose to use locale-specific 
+                    date and time formatting, they <em title="SHOULD" class="rfc2119">SHOULD</em> also provide equivalent values in [<cite><a href="#bib-iso8601" class="bibref">iso8601</a></cite>] 
+                    format (e.g. in a complementary column).</p></div>
+                  <div class="issue"><div id="h-issue11" role="heading" aria-level="5" class="issue-title"><a href="https://github.com/w3c/csvw/issues/54"><span>Issue 54</span></a></div><div class="">
+                    <p>Describing the formatting of dates and times is currently unresolved. The favoured 
+                      option is to defer the parsing of dates and times to implementations based a picture 
+                      string provided in the metadata. Unfortunately, there is no standard syntax for 
+                      picture strings, therefore an array of picture strings relating to common implementations 
+                      seems like the best option. For example:</p>
+                    <p><code>"datatype": "date",</code></p>
+                    <p><code>"format": {</code></p>
+                    <p><code>&nbsp;&nbsp;"picture-strings": [</code></p>
+                    <p><code>&nbsp;&nbsp;&nbsp;&nbsp;"unicode": "dd MMM yyyy",</code></p>
+                    <p><code>&nbsp;&nbsp;&nbsp;&nbsp;"xpath": "[D01] [MN,*-3] [Y0001]"</code></p>
+                    <p><code>&nbsp;&nbsp;]</code></p>
+                    <p><code>}</code></p>
+                    <p>Where an implementation is able to interpret one of the provided picture strings, 
+                      the date-time value reformatted in [<cite><a href="#bib-iso8601" class="bibref">iso8601</a></cite>] format shall be included in the output graph, 
+                      else the original cell value shall be included verbatim.</p>
+                    <p>In the interim, mapping applications are not required to undertake any reformatting 
+                      and may simply pass the cell value to the output graph verbatim.</p>
+                  </div></div>
+                  <div class="issue"><div id="h-issue12" role="heading" aria-level="5" class="issue-title"><a href="https://github.com/w3c/csvw/issues/65"><span>Issue 65</span></a></div><div class="">
+                    <p>A list of potential date-time formatting implementations needs to be defined.</p>
+                  </div></div>
+                </li>
+              </ul>
+              <div class="note"><div id="h-note11" role="heading" aria-level="5" class="note-title"><span>Note</span></div><p class="">Where the metadata property <code>separator</code> is specified (e.g.
+                to indicate that a 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a> 
+                is to be parsed into a list of values), the datatype specified by <code>datatype</code>
+                <em title="SHALL" class="rfc2119">SHALL</em> be inferred to apply to the members of the resulting list.</p></div>  
+            </dd>
+            <dt id="metadata-property-urlTemplate"><code>urlTemplate</code></dt>
+            <dd>
+              <p>If metadata property <code>urlTemplate</code> is specified, the value used 
+                in the <a class="internalDFN" href="#dfn-output-graph" title="output graph">output graph</a> <em title="SHALL" class="rfc2119">SHALL</em> be 
+                the result of the URI Template expansion, as defined in 
+                <a href="http://w3c.github.io/csvw/metadata/#property-syntax">Section 3.1 Property Syntax</a> 
+                of [<cite><a href="#bib-tabular-metadata" class="bibref">tabular-metadata</a></cite>].</p>
+              <p>Once the URL has been generated via the template expansion, relative URLs are
+                resolved against the <a class="internalDFN" href="#dfn-baseurl" title="baseURL">base URL</a> to create an absolute
+                URL.</p>
+            </dd>
+            <dt id="metadata-property-default"><code>default</code></dt>
+            <dd>
+              <p>If metadata property <code>default</code> is specified and the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a> 
+                is deemed to be <em>null</em>, then the value of <code>default</code> <em title="SHALL" class="rfc2119">SHALL</em> be used 
+                in the <a class="internalDFN" href="#dfn-output-graph" title="output graph">output graph</a>.</p>
+            </dd>
+          </dl>
+        </section>
+      </section>
+      <section property="bibo:hasPart" resource="#map-annotated-tab-examples" typeof="bibo:Chapter" id="map-annotated-tab-examples">
+        <h3 resource="#h-map-annotated-tab-examples" id="h-map-annotated-tab-examples"><span property="xhv:role" resource="xhv:heading"><span class="secno">4.2 </span>Examples</span></h3>
+        <div class="issue"><div id="h-issue13" role="heading" aria-level="4" class="issue-title"><span>Issue</span></div><p class="">These examples don't really show the edge cases - 
+          probably need to rework them</p></div>
+        <p>The first example illustrates how a CSV file with metadata annotations drawn <em>only</em> 
+          from a <a href="http://www.w3.org/TR/tabular-data-model/#dfn-header-line">header line</a> is 
+          processed. The tabular data describes lists countries, giving their country code and name.
+          There are two columns, named <code>country</code> and <code>name</code>, and four rows.</p>
+
+        <table style="width: 30%">
+          <tbody><tr>
+            <th>country </th>
+            <th>name</th>
+          </tr>
+          <tr>
+            <td>AD</td>
+            <td>Andorra</td>
+          </tr>
+          <tr>
+            <td>AF</td>
+            <td>Afghanistan</td>
+          </tr>
+          <tr>
+            <td>AI</td>
+            <td>Anguilla</td>
+          </tr>
+          <tr>
+            <td>AL</td>
+            <td>Albania</td>
+          </tr>
+        </tbody></table>
+
+        <p>The CSV input (published at <code>http://example.org/country-codes-and-names.csv</code>):</p>
+
+        <div class="example"><div class="example-title"><span>Example 3</span>: CSV input </div><pre class="example" id="map-annotated-tab-examples-1-input">country,name
+AD,Andorra
+AF,Afghanistan
+AI,Anguilla
+AL,Albania</pre></div>
+
+        <p>The resulting JSON output graph:</p>
+
+        <div class="example"><div class="example-title"><span>Example 4</span>: JSON output</div><pre class="example" id="map-annotated-tab-examples-1-output">{
+  "distribution": {
+    "downloadURL": "http://example.org/country-codes-and-names.csv"
+  },
+  "row": [{
+    "country": "AD",
+    "name": "Andorra"
+  },{
+    "country": "AF",
+    "name": "Afghanistan"
+  },{
+    "country": "AI",
+    "name": "Anguilla"
+  },{
+    "country": "AL",
+    "name": "Albania"
+  }]
+}</pre></div>
+
+
+        <p>The second example illustrates how the mapping is modified with the addition of metadata
+          annotations in a metadata document. The CSV file is a small extract from a much larger
+          Tree Inventory dataset from the City of Palo Alto which supports the maintaining and 
+          tracking the city's public trees and urban forest. There are five columns, named 
+          <code>GID</code>, <code>On Street</code>, <code>Species</code>, <code>Trim Cycle</code> 
+          and <code>Inventory Date</code>, and three rows.</p>
+
+        <table style="width:80%">
+          <tbody><tr>
+            <th>GID</th>
+            <th>On Street</th>
+            <th>Species</th>
+            <th>Trim Cycle</th>
+            <th>Inventory Date</th>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>ADDISON AV</td>
+            <td>Celtis australis</td>
+            <td>Large Tree Routine Prune</td>
+            <td>10/18/2010</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>EMERSON ST</td>
+            <td>Liquidambar styraciflua</td>
+            <td>Large Tree Routine Prune</td>
+            <td>6/2/2010</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>EMERSON ST</td>
+            <td>Liquidambar styraciflua</td>
+            <td>Large Tree Routine Prune</td>
+            <td>6/2/2010</td>
+          </tr>
+        </tbody></table>
+
+        <p>The CSV input (published at <code>http://example.org/tree-ops.csv</code>):</p>
+
+        <div class="example"><div class="example-title"><span>Example 5</span>: CSV input </div><pre class="example" id="map-annotated-tab-examples-2-input">GID,On Street,Species,Trim Cycle,Inventory Date
+1,ADDISON AV,Celtis australis,Large Tree Routine Prune,10/18/2010
+2,EMERSON ST,Liquidambar styraciflua,Large Tree Routine Prune,6/2/2010
+3,EMERSON ST,Liquidambar styraciflua,Large Tree Routine Prune,6/2/2010</pre></div>
+
+        <p>The metadata description (published at <code>http://example.org/tree-ops.csv-metadata.json</code>):</p>
+
+        <div class="example"><div class="example-title"><span>Example 6</span>: Metadata description</div><pre class="example" id="map-annotated-tab-examples-2-metadata">{
+  "@id": "tree-ops",
+  "@context": {
+    "@language": "en"
+  }
+  "dcat:distribution": {
+    "dcat:downloadURL": "tree-ops.csv"
+  }
+  "dc:title": "Tree Operations",
+  "dc:keywords": ["tree", "street", "maintenance"],
+  "dc:publisher": [{
+    "schema:name": "Example Municipality",
+    "schema:web": "http://example.org"
+  }],
+  "dc:license": "http://opendefinition.org/licenses/cc-by/",
+  "dc:modified": "2010-12-31",
+  "schema": {
+    "columns": [{
+      "name": "GID",
+      "title": [
+        "GID",
+        "Generic Identifier"
+      ],
+      "dc:description": "An identifier for the operation on a tree.",
+      "datatype": "string",
+      "required": true,
+      "unique": true
+    }, {
+      "name": "on-street",
+      "title": "On Street",
+      "dc:description": "The street that the tree is on.",
+      "datatype": "string"
+    }, {
+      "name": "species",
+      "title": "Species",
+      "dc:description": "The species of the tree.",
+      "datatype": "string"
+    }, {
+      "name": "trim-cycle",
+      "title": "Trim Cycle",
+      "dc:description": "The operation performed on the tree.",
+      "datatype": "string"
+    }, {
+      "name": "inventory-date",
+      "title": "Inventory Date",
+      "dc:description": "The date of the operation that was performed.",
+      "datatype": "date"
+    }]
+    "primaryKey": "GID",  
+    "urlTemplate": "#gid-{GID}"
+  }
+}</pre></div>
+
+        <p>The resulting JSON output graph:</p>
+
+        <div class="example"><div class="example-title"><span>Example 7</span>: JSON output</div><pre class="example" id="map-annotated-tab-examples-2-output">{
+  "url": "tree-ops"
+  "distribution": {
+    "downloadURL": "http://example.org/tree-ops.csv"
+  },
+  "dc:title": "Tree Operations",
+  "dc:keywords": ["tree", "street", "maintenance"],
+  "dc:publisher": [{
+    "schema:name": "Example Municipality",
+    "schema:web": "http://example.org"
+  }],
+  "dc:license": "http://opendefinition.org/licenses/cc-by/",
+  "dc:modified": "2010-12-31",
+  "row": [{
+    "url": "http://example.org/tree-ops.csv#gid-1",
+    "GID": "1",
+    "on-street": "ADDISON AV",
+    "species": "Celtis australis",
+    "trim-cycle": "Large Tree Routine Prune",
+    "inventory-date": "10/18/2010"
+  },{
+    "url": "http://example.org/tree-ops.csv#gid-2",
+    "GID": "2",
+    "on-street": "EMERSON ST",
+    "species": "Liquidambar styraciflua",
+    "trim-cycle": "Large Tree Routine Prune",
+    "inventory-date": "6/2/2010"
+  },{
+    "url": "http://example.org/tree-ops.csv#gid-3",
+    "GID": "3",
+    "on-street": "EMERSON ST",
+    "species": "Liquidambar styraciflua",
+    "trim-cycle": "Large Tree Routine Prune",
+    "inventory-date": "6/2/2010"
+  }],
+  "describedBy": "http://example.org/tree-ops.csv-metadata.json"
+}</pre></div>
+
+      </section>
+    </section>
+    <section property="bibo:hasPart" resource="#map-grouped-tab" typeof="bibo:Chapter" id="map-grouped-tab">
+      <!--OddPage--><h2 resource="#h-map-grouped-tab" id="h-map-grouped-tab"><span property="xhv:role" resource="xhv:heading"><span class="secno">5. </span>Mapping Grouped Tabular Data</span></h2>
+        <p>The procedures and rules for mapping a collection of tabular data compliant with the
+          <a href="http://www.w3.org/TR/tabular-data-model/#dfn-grouped-tabular-data-model">
+          grouped tabular data model</a> are described below.</p>
+        <p>The metadata for a <a href="http://www.w3.org/TR/tabular-data-model/#dfn-group-of-tables">
+          group of tables</a> <em title="SHALL" class="rfc2119">SHALL</em> be provided by a
+            <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-group-description">
+            table group description</a> (as defined in [<cite><a href="#bib-tabular-metadata" class="bibref">tabular-metadata</a></cite>]) within the 
+            associated metadata document.</p>
+      <section property="bibo:hasPart" resource="#map-grouped-tab-json" typeof="bibo:Chapter" id="map-grouped-tab-json">
+        <h3 resource="#h-map-grouped-tab-json" id="h-map-grouped-tab-json"><span property="xhv:role" resource="xhv:heading"><span class="secno">5.1 </span>Generating JSON</span></h3>
+        <section property="bibo:hasPart" resource="#map-grouped-tab-table" typeof="bibo:Chapter" id="map-grouped-tab-table">
+          <h4 resource="#h-map-grouped-tab-table" id="h-map-grouped-tab-table"><span property="xhv:role" resource="xhv:heading"><span class="secno">5.1.1 </span>Group-level processing</span></h4>
+          <ol>
+            <li>
+              <p>The root object of the <a class="internalDFN" href="#dfn-output-graph" title="output graph">output graph</a> <em title="SHALL" class="rfc2119">SHALL</em> 
+                describe the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-group-of-tables">table group</a>.</p>
+            </li>
+            <li>
+              <p>Where present in the 
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-group-description">
+                table group description</a>, any <a class="internalDFN" href="#dfn-common-property" title="common property">Common Properties</a> 
+                (as defined in 
+                <a href="http://www.w3.org/TR/tabular-metadata/#common-properties">Section 3.3 
+                Common Properties</a> of [<cite><a href="#bib-tabular-metadata" class="bibref">tabular-metadata</a></cite>]) <em title="SHALL" class="rfc2119">SHALL</em> 
+                be included in the <a class="internalDFN" href="#dfn-output-graph" title="output graph">output graph</a> within the root object.</p>
+            </li>
+            <li>
+              <p>The root object <em title="SHALL" class="rfc2119">SHALL</em> contain an array named <code>table</code> containing 
+                one object for each of the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table">tables</a> listed in 
+                the <code>resources</code> array of the 
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-group-description">
+                table group description</a>.</p>
+              <p>Each <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table">table</a> <em title="SHALL" class="rfc2119">SHALL</em> be 
+                processed sequentially according to the appropriate set of rules for mapping core
+                or annotated <a href="http://www.w3.org/TR/tabular-data-model/#dfn-tabular-data">
+                tabular data</a>. Refer to <a href="#map-core-tab">Section 3 Mapping Core Tabular
+                Data</a> and <a href="#map-annotated-tab">Section 4 Mapping Annotated Tabular Data</a>
+                for further details.</p>
+              <p>The JSON generated from processing the
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table">tables</a> <em title="SHALL" class="rfc2119">SHALL</em> be
+                incorporated into the <a class="internalDFN" href="#dfn-output-graph" title="output graph">output graph</a> as objects within
+                the <code>table</code> array.</p>
+            </li>
+            <li>
+              <p>Any of the <a href="http://www.w3.org/TR/tabular-metadata/#dfn-inherited-property">
+                inherited properties</a> <code>null</code>,
+                <code>separator</code>, <code>format</code>, <code>datatype</code>, 
+                or <code>default</code> defined within the 
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-group-description">
+                table group description</a> <em title="SHALL" class="rfc2119">SHALL</em> be used to pre-populate the 
+                <a class="internalDFN" href="#dfn-column-description-object" title="column description object">column description objects</a> for each 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table">table</a> in the
+                group.</p>
+              <p>Where the same property is defined in the
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-group-description">
+                table group description</a>, 
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">
+                table description</a>,
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-schema">schema</a> or 
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description">
+                column description</a> the order of precedence <em title="SHALL" class="rfc2119">SHALL</em> be:</p>
+              <ol>
+                <li>column description</li>
+                <li>schema description</li>
+                <li>table description</li>
+                <li>table group description</li>
+              </ol>
+            </li>
+          </ol>
+          <div class="issue"><div id="h-issue14" role="heading" aria-level="5" class="issue-title"><span>Issue</span></div><p class="">The presence of foreign-key references within the table 
+            descriptions may affect the way the data is packaged in the output graph. Reviewers are 
+            invited to comment on how grouped tabular data with foreign-key references might best be 
+            organised.</p></div>
+        </section>
+      </section>
+      <section property="bibo:hasPart" resource="#map-grouped-tab-examples" typeof="bibo:Chapter" id="map-grouped-tab-examples">
+        <h3 resource="#h-map-grouped-tab-examples" id="h-map-grouped-tab-examples"><span property="xhv:role" resource="xhv:heading"><span class="secno">5.2 </span>Examples</span></h3>
+        <p class="TBD"><a href="http://www.w3.org/TR/csvw-ucr/#UC-OrganogramData">
+          Use Case 4: Publication of public sector roles and salaries</a> likely provides a good 
+          source of material for these examples. To be added.</p>
+      </section>
+    </section>
+  
+
+<section property="bibo:hasPart" resource="#references" typeof="bibo:Chapter" id="references" class="appendix"><!--OddPage--><h2 resource="#h-references" id="h-references"><span property="xhv:role" resource="xhv:heading"><span class="secno">A. </span>References</span></h2><section property="bibo:hasPart" resource="#normative-references" typeof="bibo:Chapter" id="normative-references"><h3 resource="#h-normative-references" id="h-normative-references"><span property="xhv:role" resource="xhv:heading"><span class="secno">A.1 </span>Normative references</span></h3><dl resource="" class="bibliography"><dt id="bib-RFC2119">[RFC2119]</dt><dd>S. Bradner. <a property="dc:requires" href="https://tools.ietf.org/html/rfc2119"><cite>Key words for use in RFCs to Indicate Requirement Levels</cite></a>. March 1997. Best Current Practice. URL: <a property="dc:requires" href="https://tools.ietf.org/html/rfc2119">https://tools.ietf.org/html/rfc2119</a>
+</dd><dt id="bib-iso8601">[iso8601]</dt><dd><cite>ISO 8601:2004 Representation of dates and times</cite>. International Standard (IS). 
+</dd><dt id="bib-json">[json]</dt><dd>D. Crockford. <a property="dc:requires" href="http://www.ietf.org/rfc/rfc4627.txt"><cite>The application/json Media Type for JavaScript Object Notation (JSON)</cite></a>. Informational RFC. URL: <a property="dc:requires" href="http://www.ietf.org/rfc/rfc4627.txt">http://www.ietf.org/rfc/rfc4627.txt</a>
+</dd><dt id="bib-rdf11-concepts">[rdf11-concepts]</dt><dd>Richard Cyganiak; David Wood; Markus Lanthaler. <a property="dc:requires" href="http://www.w3.org/TR/rdf11-concepts/"><cite>RDF 1.1 Concepts and Abstract Syntax</cite></a>. 25 February 2014. W3C Recommendation. URL: <a property="dc:requires" href="http://www.w3.org/TR/rdf11-concepts/">http://www.w3.org/TR/rdf11-concepts/</a>
+</dd><dt id="bib-tabular-data-model">[tabular-data-model]</dt><dd>Jeni Tennison; Gregg Kellogg. <a property="dc:requires" href="http://www.w3.org/TR/tabular-data-model/"><cite>Model for Tabular Data and Metadata on the Web</cite></a>. W3C Working Draft. URL: <a property="dc:requires" href="http://www.w3.org/TR/tabular-data-model/">http://www.w3.org/TR/tabular-data-model/</a>
+</dd><dt id="bib-tabular-metadata">[tabular-metadata]</dt><dd>Rufus Pollock; Jeni Tennison. <a property="dc:requires" href="http://www.w3.org/TR/tabular-metadata/"><cite>Metadata Vocabulary for Tabular Data</cite></a>. W3C Working Draft. URL: <a property="dc:requires" href="http://www.w3.org/TR/tabular-metadata/">http://www.w3.org/TR/tabular-metadata/</a>
+</dd><dt id="bib-uri-template">[uri-template]</dt><dd>Joe Gregorio; Roy T. Fielding; Marc Hadley; Mark Nottingham; David Orchard. <a property="dc:requires" href="http://www.rfc-editor.org/rfc/rfc6570.txt"><cite>URI Template</cite></a>. March 2012. RFC 6570. URL: <a property="dc:requires" href="http://www.rfc-editor.org/rfc/rfc6570.txt">http://www.rfc-editor.org/rfc/rfc6570.txt</a>
+</dd></dl></section><section property="bibo:hasPart" resource="#informative-references" typeof="bibo:Chapter" id="informative-references"><h3 resource="#h-informative-references" id="h-informative-references"><span property="xhv:role" resource="xhv:heading"><span class="secno">A.2 </span>Informative references</span></h3><dl resource="" class="bibliography"><dt id="bib-json-ld">[json-ld]</dt><dd>Manu Sporny; Gregg Kellogg; Markus Lanthaler. <a property="dc:references" href="http://www.w3.org/TR/json-ld/"><cite>JSON-LD 1.0</cite></a>. 16 January 2014. W3C Recommendation. URL: <a property="dc:references" href="http://www.w3.org/TR/json-ld/">http://www.w3.org/TR/json-ld/</a>
+</dd><dt id="bib-json-ld-api">[json-ld-api]</dt><dd>Markus Lanthaler; Gregg Kellogg; Manu Sporny. <a property="dc:references" href="http://www.w3.org/TR/json-ld-api/"><cite>JSON-LD 1.0 Processing Algorithms and API</cite></a>. 16 January 2014. W3C Recommendation. URL: <a property="dc:references" href="http://www.w3.org/TR/json-ld-api/">http://www.w3.org/TR/json-ld-api/</a>
+</dd><dt id="bib-vocab-dcat">[vocab-dcat]</dt><dd>Fadi Maali; John Erickson. <a property="dc:references" href="http://www.w3.org/TR/vocab-dcat/"><cite>Data Catalog Vocabulary (DCAT)</cite></a>. 16 January 2014. W3C Recommendation. URL: <a property="dc:references" href="http://www.w3.org/TR/vocab-dcat/">http://www.w3.org/TR/vocab-dcat/</a>
+</dd></dl></section></section></body></html>

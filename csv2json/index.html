@@ -9,26 +9,14 @@
     <script class="remove">
 var respecConfig = {
     localBiblio: {
-      "rdf11-concepts": {
-          "authors": [
-              "Richard Cyganiak",
-              "David Wood",
-              "Markus Lanthaler"
-          ],
-          "href": "http://www.w3.org/TR/rdf11-concepts/",
-          "title": "RDF 1.1 Concepts and Abstract Syntax",
-          "rawDate": "2014-02-25",
-          "status": "REC",
-          "publisher": "W3C",
-      },
-        "tabular-data-model": {
+      "tabular-data-model": {
           "authors": [
             "Jeni Tennison",
             "Gregg Kellogg"
           ],
           "title": "Model for Tabular Data and Metadata on the Web",
           "href" : "http://www.w3.org/TR/tabular-data-model/",
-          "rawDate": "2014-07-10",
+          "rawDate": "2015-01-08",
           "status" : "WD",
           "publisher": "W3C"
       },
@@ -39,7 +27,7 @@ var respecConfig = {
           ],
           "title": "Metadata Vocabulary for Tabular Data",
           "href" : "http://www.w3.org/TR/tabular-metadata/",
-          "rawDate": "2014-07-10",
+          "rawDate": "2015-01-08",
           "status" : "WD",
           "publisher": "W3C"
       },
@@ -69,7 +57,7 @@ var respecConfig = {
           "publisher" : "IETF",
           "href" : "http://www.ietf.org/rfc/rfc6570.txt"
       },
-      "JSON" : {
+      "json" : {
           "authors" : [
             "D. Crockford",
           ],
@@ -79,16 +67,19 @@ var respecConfig = {
           "publisher" : "IETF",
           "href" : "http://www.ietf.org/rfc/rfc4627.txt"
       }, 
-
-
-
+      "iso8601" : {
+          "title" : "ISO 8601:2004 Representation of dates and times",
+          "rawDate" : "2004",
+          "status": "International Standard (IS)",
+          "publisher" : "ISO (International Organization for Standardization)"
+      }
     },
     specStatus: "ED",
     shortName: "csv2json",
     // publishDate:  "2014-04-01",
-    previousPublishDate: "2014-??-??",
-    previousMaturity: "unoffical",
-    //previousURI: "http://www.w3.org/TR/2014/WD-csv2json-2014????/",
+    previousPublishDate: "2015-01-08",
+    previousMaturity: "FPWD",
+    previousURI: "http://www.w3.org/TR/2015/WD-csv2json-20150108/",
     edDraftURI: "http://w3c.github.io/csvw/csv2json/",
     // lcEnd: "3000-01-01",
     // crEnd: "3000-01-01",
@@ -138,15 +129,16 @@ var respecConfig = {
       .grammar-literal { color: gray;}
       .TBD { font-style: italic; background: yellow;}
       .steps li { margin-bottom: 0.5em;}
+      table, td, th { border: 1px solid gray }
     </style>
   </head>
   <body>
     <section id="abstract">
       <p>This document defines the procedures and rules to be applied when mapping 
-        of tabular data into JSON. Tabular data may be complemented with metadata 
+        tabular data into JSON. Tabular data may be complemented with metadata 
         annotations that describe its structure, the meaning of its content and how 
         it may form part of a collection of interrelated tabular data. This document 
-        specifies the affect of this metadata on the resulting JSON.</p>
+        specifies the effect of this metadata on the resulting JSON.</p>
     </section>
     <section id="sotd">
       <p>The CSV on the Web Working Group was chartered to produce Recommendations 
@@ -154,10 +146,10 @@ var respecConfig = {
         "Mapping mechanism to transforming CSV into various Formats (e.g., RDF, JSON, 
         or XML)". This document aims to satisfy the JSON variant of the mapping 
         Recommendation.</p>
-      <p>Due to the limited resources available within the CSV on the web Working Group,
-        this document describes only a <em>simple mapping</em> - that is, where a single
+      <p>Due to the limited resources available within the CSV on the Web Working Group,
+        this document describes only a <em>simple mapping</em>—that is, where a single
         object is created for each row of tabular data that contains a single property
-        per cell. The Working Group solicits input on the value of mappng a single row
+        per cell. The Working Group solicits input on the value of mapping a single row
         of tabular data into multiple inter-related objects.</p>
     </section>
     <section id="intro">
@@ -166,7 +158,7 @@ var respecConfig = {
         <a href="http://www.w3.org/TR/tabular-data-model/#dfn-tabular-data">tabular data</a>
         to create a set of nested objects referred to as the <dfn title="output graph">
         output graph</dfn>. The <a title="output graph">output graph</a> SHALL be serialized 
-        as JSON [[!JSON]].</p>
+        as JSON [[!json]].</p>
       <p class="note">The JSON encoding is intended for web developers who need 
         not care about the complexities of RDF [[!rdf11-concepts]].</p>
       <p> 
@@ -218,7 +210,7 @@ var respecConfig = {
           <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-table">annotated 
           table</a> may include a reference to a
           <a href="http://www.w3.org/TR/tabular-data-model/#dfn-template-specification">
-          template specification</a> (see [[!tabular-metadata]]) that describes how tabular \
+          template specification</a> (see [[!tabular-metadata]]) that describes how tabular
           data can be transformed into another format using a template-based approach. 
           <em>Templating</em> facilitates far more sophisticated transformations than are 
           possible using the <a title="simple mapping">simple mapping</a>.</p>
@@ -229,7 +221,7 @@ var respecConfig = {
           determined by the Working Group and is, at least for the interim, beyond the scope
           of this document.</p>
       </div>
-      <p>Finally, note that the mapping procedure is considered to be <em>enirely textual</em>. 
+      <p>Finally, note that the mapping procedure is considered to be <em>entirely textual</em>. 
         There is no requirement on compliant mapping applications to check the semantic
         consistency of the data during the mapping, nor validate the 
         <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell values</a> against
@@ -262,7 +254,7 @@ var respecConfig = {
           <ol>
             <li>
               <p>The root object of the <a title="output graph">output graph</a> SHALL 
-                correspond with the 
+                describe the 
                 <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table">table</a>.</p>
             </li>
             <li>
@@ -281,17 +273,6 @@ var respecConfig = {
                 encodes it the same thing? (Is DCAT distribution appropriate?)</p>
             </li> 
             <li>
-              <p>Mappng applications SHALL construct a trivial <a title="column description object">
-                column description object</a> for each
-                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a>, 
-                containing only the metadata property <code>name</code>. As no metadata annotations are 
-                available to inform the mapping, the value assigned to <code>name</code> SHALL be 
-                <code>#col=<em>[N]</em></code> where <code><em>[N]</em></code> is the 
-                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column-number">column number</a>.</p>
-              <p class="issue" data-number="33">What do to with conversion if no column name 
-                is given?</p>
-            </li>
-            <li>
               <p>The root object SHALL contain an array named <code>row</code> containing 
                 one object for each of the 
                 <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">rows</a> within the 
@@ -299,13 +280,15 @@ var respecConfig = {
               <p class="issue" data-number="97">What should the name of the property be that 
                 relates rows to the table? <code>row</code> is one option; <code>hasRow</code>
                 is another.</p>
-              <p>Refer to <strong><a href="#map-core-tab-row">Row-level processing</a></strong>
+              <p>Refer to <a href="#map-core-tab-row">Section 3.1.2 Row-level processing</a>
                 for further details.</p>
             </li>
           </ol>
         </section>
         <section id="map-core-tab-row">
           <h4>Row-level processing</h4>
+          <p>Each <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">row</a>
+            in the tabular data is processed sequentially.</p>
           <ol>
             <li>
               <p>Each object in the <a title="output graph">output graph</a> corresponding to a 
@@ -315,16 +298,28 @@ var respecConfig = {
                 where the 
                 <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a>
                 is not <em>null</em> (e.g. where the cell does not contain an empty string; 
-                <code>""</code>). The value of <em>name</em> SHALL be provided by the 
-                <code>name</code> metadata property from the associated column description object,
+                <code>""</code>).</p>
+            </li>
+            <li>
+              <p>The value of <em>name</em> SHALL be <code>_col=<em>[N]</em></code> 
+                where <code><em>[N]</em></code> is the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column-number">column number</a>,
                 whilst the value of <em>value</em> SHALL be provided by the associated
                 <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a>.</p>
+              <p class="issue" data-number="33">What do to with conversion if no column name 
+                is given?</p>
+            </li>
+            <li>
               <p>Where the 
                 <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a>
                 is <em>null</em>, the <em>name/value pair</em> SHALL be omitted from the 
                 <a title="output graph">output graph</a>.</p>
+            </li>
+            <li>
               <p>Given the absence of metadata annotations to indicate the type of data present
-               in a given column, all cell values SHALL be treated as strings.</p>  
+               in a given column, all 
+               <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell values</a> 
+               SHALL be treated as strings.</p>  
             </li>
           </ol>
           <p class="issue" data-number="98">Should the mapping output for a given row include 
@@ -338,7 +333,7 @@ var respecConfig = {
           that no metadata annotations are provided, it is very difficult to ascertain the 
           subject of the tabular data without additional insight.</p>
 
-        <table border="1" width="60%">
+        <table style="width: 60%">
           <tr>
             <td>1</td>
             <td>Jill</td>
@@ -382,23 +377,23 @@ var respecConfig = {
     "downloadURL": "http://example.org/people-and-points.csv"
   },
   "row": [{
-    "#col=1": "1",
-    "#col=2": "Jill",
-    "#col=3": "Smith",
-    "#col=4": "50"
+    "_col=1": "1",
+    "_col=2": "Jill",
+    "_col=3": "Smith",
+    "_col=4": "50"
   },{
-    "#col=1": "2",
-    "#col=2": "Eve",
-    "#col=4": "94"
+    "_col=1": "2",
+    "_col=2": "Eve",
+    "_col=4": "94"
   },{
-    "#col=1": "3",
-    "#col=2": "Adam",
-    "#col=3": "Johnson"
+    "_col=1": "3",
+    "_col=2": "Adam",
+    "_col=3": "Johnson"
   },{
-    "#col=1": "4",
-    "#col=2": "John",
-    "#col=3": "Doe",
-    "#col=4": "80"
+    "_col=1": "4",
+    "_col=2": "John",
+    "_col=3": "Doe",
+    "_col=4": "80"
   }]
 }
         </pre>
@@ -407,61 +402,76 @@ var respecConfig = {
     </section>
     <section id="map-annotated-tab">
       <h2>Mapping Annotated Tabular Data</h2>
+      <p>The procedures and rules for mapping annotated tabular data compliant with the
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-tabular-data-model">
+        annotated tabular data model</a> are described below.</p>
+      <p>The metadata for annotated tabular data MAY be provided by either or both
+        of the following sources:</p>
+      <ul>
+        <li>the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-header-line">
+          header line</a> within the CSV file; and/or</li>
+        <li>the <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">
+          table description</a>, 
+          <a href="http://www.w3.org/TR/tabular-metadata/#dfn-schema">schema</a> and 
+          <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description">
+          column descriptions</a> (as defined in [[!tabular-metadata]]) within the 
+          associated metadata document.</li>
+      </ul>
+      <p>Mapping applications SHALL establish a 
+        <a title="column description object">column description object</a> for each
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a> within
+        the annotated tabular data. The <dfn title="column description object">column 
+        description object</dfn> contains the aggregated set
+        of metadata properties for a given column that affect how the 
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell values</a>
+        within the associated column are expressed in the <a title="output graph">
+        output graph</a>. Metadata properties are sourced from the 
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-header-line">header line</a>
+        in the CSV file and <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description">
+        column description</a> in the metadata document and enriched with 
+        <a href="http://www.w3.org/TR/tabular-metadata/#dfn-inherited-property">
+        inherited properties</a> from the 
+        <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">
+        table description</a> and  
+        <a href="http://www.w3.org/TR/tabular-metadata/#dfn-schema">schema</a>.</p>
+      <p>The <a title="output graph">output graph</a> MAY include some 
+        <a href="http://www.w3.org/TR/tabular-metadata/#dfn-direct-annotation">Direct Annotations</a>
+        sourced from the metadata document. Where these are 
+        <a href="http://www.w3.org/TR/tabular-metadata/#dfn-natural-language-property">
+        natural language properties</a>, no locale information can be provided given the
+        lack of multi-lingual support in JSON. Where an array of values
+        for a property are provided using a 
+        <a href="http://www.w3.org/TR/json-ld/#dfn-language-map">language map</a> (as
+        defined in [[json-ld]]) the array of locale-specific values SHALL be
+        included in the <a title="output graph">output graph</a> - albeit
+        without the inferred semantics about language codes.</p>
+      <p>Clearly, in order to process annotated tabular data, a mapping application MUST have
+        access to the full metadata description associated with the tabular data.</p>
+      <p>URL expansion behaviour of relative URLs SHALL be consistent with
+        <a href="http://www.w3.org/TR/json-ld-api/#iri-expansion">Section 6.3 IRI Expansion</a> 
+        in [[json-ld-api]]. The <dfn title="baseURL">base URL</dfn> provides the URL against 
+        which relative URLs from annotated tabular data are resolved. The 
+        <a title="baseURL">base URL</a> SHALL be that of the source CSV file.</p>  
+      <p class="issue" data-number="91">What is default value if @base is not defined in the 
+        metadata description?</p>
       <section id="map-annotated-tab-json">
-        <p>The procedures and rules for mapping annotated tabular data compliant with the
-          <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-tabular-data-model">
-          annotated tabular data model</a> are described below.</p>
-        <p>The metadata annotation for annotated tabular data MAY be provided by either or both
-          of the following sources:</p>
-        <ul>
-          <li>the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-header-line">
-            header line</a> within the CSV file; and/or</li>
-          <li>the <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">
-            table description</a>, 
-            <a href="http://www.w3.org/TR/tabular-metadata/#dfn-schema">schema</a> and 
-            <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description">
-            column descriptions</a> (as defined in [[!tabular-metadata]]) within the 
-            associated metadata document.</li>
-        </ul>
-        <p>Mapping applications SHALL establish a 
-          <a title="column description object">column description object</a> for each
-          <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a> within
-          the annotated tabular data. The <dfn title="column description object">column 
-          description object</dfn> contains the aggregated set
-          of metadata properties for a given column that affect how the 
-          <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell values</a>
-          within the associated column are expressed in the <a title="output graph">
-          output graph</a>. Metadata properties are sourced from the 
-          <a href="http://www.w3.org/TR/tabular-data-model/#dfn-header-line">header line</a>
-          in the CSV file and <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description">
-          column description</a> in the metadata document and enriched with 
-          <a href="http://www.w3.org/TR/tabular-metadata/#dfn-inherited-property">
-          inherited properties</a> from the 
-          <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">
-          table description</a> and  
-          <a href="http://www.w3.org/TR/tabular-metadata/#dfn-schema">schema</a>.</p>
-        <p>In order to process a annotated tabular data, a mapping application SHALL have
-          access to the full metadata description associated with the tabular data.</p>
-        <p>The <dfn title="baseURL">base URL</dfn> provides the URL against which relative 
-          URLs from annotated tabular data are resolved.</p>
-        <p>Where metadata annotations are <em>only</em> provided by the header line within 
-          the CSV file, the <a title="baseURL">base URL</a> of the annotated tabular data SHALL be 
-          the location of the CSV file. In all other cases the <a title="baseURL">base URL</a>
-          SHALL be that of the associated metadata description.</p>
-        <p class="issue" data-number="91">What is default value if @base is not defined in the 
-          metadata description?</p>
-        <p>URL expansion behaviour of relative URLs against the <a title="baseURL">base URL</a> 
-          SHALL be consistent with
-          <a href="http://www.w3.org/TR/json-ld-api/#iri-expansion">Section 6.3 IRI Expansion</a> 
-          in [[JSON-LD-API]].</p>
         <h3>Generating JSON</h3>
         <section id="map-annotated-tab-table">
           <h4>Table-level processing</h4>
           <ol>
             <li>
               <p>The root object of the <a title="output graph">output graph</a> SHALL 
-                correspond with the 
+                describe the 
                 <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-table">annotated table</a>.</p>
+            </li>
+            <li>
+              <p>Where provided in the 
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">table 
+                description</a>, the metadata property <code>@id</code> SHALL be used to identify the 
+                root object.</p>
+              <p>The root object SHALL be identified using the <em>name/value pair</em> 
+                <code>"url": "<em>[@id]</em>"</code> where <code><em>[@id]</em></code> is the value
+                of metadata property <code>@id</code>.</p>
             </li>
             <li>
               <p>The root object SHALL contain a reference to the CSV-encoded <em>
@@ -478,322 +488,673 @@ var respecConfig = {
               <p class="issue" data-number="93">Are the abstract tabular data and the CSV that 
                 encodes it the same thing? (Is DCAT distribution appropriate?)</p>
             </li>
-            <li>OK: THIS IS WHERE I'VE GOT TO (BUT MOST OF THE REST OF THE DOC IS DRAFTED IN NOTES ELSEWHERE) ... TAKE THE REST WITH A PINCH OF SALT</li>
             <li>
-              <p>Where defined in the 
-                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">table description</a></p>
+              <p>Where a 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-header-line">header line</a>
+                is present in the CSV file then, for each 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a>, the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a>
+                from the column header SHALL be assigned to metadata property <code>name</code>
+                within the <a title="column description object">column description object</a> for
+                that <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a>.</p>
+              <p>Where the column header is <em>null</em>, the value assigned to <code>name</code> SHALL be 
+                <code>_col=<em>[N]</em></code> where <code><em>[N]</em></code> is the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column-number">column number</a>.</p>
             </li>
             <li>
-              <p>Where provided in the 
-                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">table 
-                description</a> the metadata property <code>@id</code> SHALL be used to identify the 
-                root object.</p>
-              <p>The root object SHALL be identified using the <em>name/value pair</em> 
-              <code>"url": "<em>[@id]</em>"</code> where <code><em>[@id]</em></code> is the value
-              of metadata property <code>@id</code>.</p>
-            </li> 
+              <p>Where present in the 
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">
+                table description</a>, the following metadata properties SHALL be included in the
+                <a title="output graph">output graph</a> within the root object:</p>
+                <ul>
+                  <li>
+                    <p><code>notes</code> - the array of objects representing structured annotations 
+                      on the tabular data SHALL be included verbatim.</p>
+                    <p class="note">The <a href="http://www.w3.org/annotation/">Web Annotation Working 
+                      Group</a> is developing a vocabulary for expressing annotations which we anticipate 
+                      referencing from this specification. Issues likely to be covered therein include: 
+                      how to anchor the annotation to a target in the tabular data and/or CSV file, 
+                      what form the annotations themselves may take (e.g. a simple literal annotation 
+                      body, or whether additional formatting properties are required to indicate that 
+                      the annotation is expressed in, say, Markdown or HTML).</p>
+                    <div class="issue" data-number="71">
+                      <p>Exact handling of annotations.</p> 
+                      <p>Additionally, the mechanism to reference the annotation target (within tabular
+                        data) is still unclear - especially given the confusion on identifying row
+                        numbers (<a href="https://github.com/w3c/csvw/issues/68">ISSUE #68</a> refers).</p>
+                    </div>
+                  </li>
+                  <li>
+                    <p>Any <dfn title="common property">Common Properties</dfn> (as defined in 
+                      <a href="http://www.w3.org/TR/tabular-metadata/#common-properties">Section 3.3 
+                      Common Properties</a> of [[!tabular-metadata]]).</p>
+                  </li>
+                </ul>  
+            </li>
             <li>
-              <p>If the source CSV file contains a 
-              <a href="http://www.w3.org/TR/tabular-data-model/#dfn-header-line">header line</a></p>
+              <p>Any of the <a href="http://www.w3.org/TR/tabular-metadata/#dfn-inherited-property">
+                inherited properties</a> <code>null</code>,
+                <code>separator</code>, <code>format</code>, <code>datatype</code>, 
+                or <code>default</code>
+                defined within the 
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">
+                table description</a> and/or 
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-schema">schema</a>
+                SHALL be added to the <a title="column description object">column description 
+                object</a> for each 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a>.</p>
+              <p>Where the same property is defined in both the
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">
+                table description</a> and the
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-schema">schema</a>, the 
+                value from the <a href="http://www.w3.org/TR/tabular-metadata/#dfn-schema">schema</a>
+                SHALL take precedence.</p>
+            </li>
+            <li>
+              <p>Each <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description">
+                column description</a> SHALL be matched to a 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a> in
+                the tabular data based on the order that the description is listed in the <code>columns</code>
+                array of the <a href="http://www.w3.org/TR/tabular-metadata/#dfn-schema">schema</a>.</p>
+              <p>For each <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description">
+                column description</a> in the metadata document, the following metadata properties
+                SHALL be added to the relevant <a title="column description object">column description
+                object</a> established by the mapping application:
+                <ul>
+                  <li>
+                    <p><code>name</code>.</p>
+                    <p>Where metadata property <code>name</code> is also provided via the
+                      <a href="http://www.w3.org/TR/tabular-data-model/#dfn-header-line">header line</a>
+                      the value from the 
+                      <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description">
+                      column description</a> in the metadata document SHALL take precedence.</p>
+                  </li>
+                  <li>
+                    <p><code>predicateUrl</code>.</p>
+                  </li>
+                  <li>
+                    <p><code>urlTemplate</code>.</p>
+                  </li>
+                  <li>
+                    <p><a href="http://www.w3.org/TR/tabular-metadata/#dfn-inherited-property">
+                      Inherited properties</a> <code>null</code>, 
+                      <code>separator</code>, <code>format</code>, <code>datatype</code>, 
+                      and <code>default</code> are added to the <a title="column description object">
+                      column description object</a>, overwriting values added in the previous step
+                      where properties are duplicated.</p>
+                  </li>
+                </ul>
+              </p>
+            </li>
+            <li>
+              <p>For each <a title="column description object">column description object</a>
+                where metadata property <code>predicateUrl</code> has <em>not</em> been 
+                assigned within the 
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description">
+                column description</a>, the value of <code>predicateUrl</code> SHALL be
+                set as the value of metadata property <code>name</code>.</p>
+            </li>
+            <li>
+              <p>The root object SHALL contain an array named <code>row</code> containing 
+                one object for each of the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">rows</a> within the 
+                tabular data.</p>
+              <p>Refer to <a href="#map-annotated-tab-row">Section 4.1.2 Row-level processing</a>
+                for further details.</p>
+            </li>
+            <li>
+              <p>The <a title="output graph">output graph</a> MAY contain information about the 
+                metadata documents that were used when when creating the 
+                <a title="output graph">output graph</a> using the following 
+                <em>name/value pair</em> for each metadata document:</p>
+              <p><code>&nbsp;&nbsp;"describedBy": "<em>[Metadata Location]</em>"</code></p>
+              <p>where <code><em>[Metadata Location]</em></code> is the absolute URL of the
+                metadata document.</p>
             </li>
           </ol>
         </section>
         <section id="map-annotated-tab-row">
           <h4>Row-level processing</h4>
+          <p>Each <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">row</a>
+            in the tabular data is processed sequentially. The behaviour exhibited when
+            processing a given 
+            <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell">cell</a> within the 
+            current <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">row</a> is 
+            dependent on the metadata properties of the 
+            <a title="column description object">column description object</a> for the 
+            <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a> that
+            that <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell">cell</a> resides
+            in. The effect of each metadata property is defined in 
+            <a href="#map-annotated-tab-metadata">Section 4.1.3 Metadata property effects on row-level 
+            mapping behaviour</a></p>
+          <ol>
+            <li>
+              <p>Each object in the <a title="output graph">output graph</a> corresponding to a 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">row</a> in the
+                tabular data SHALL contain one <em>name/value pair</em> for each
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a> 
+                where the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a>
+                is not <em>null</em>.</p>
+            </li>
+            <li>
+              <p>Where the metadata property <code>urlTemplate</code> is provided in the 
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-schema">schema</a>, 
+                each object in the <a title="output graph">output graph</a> corresponding to a 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">row</a> in the
+                tabular data SHALL be explicitly identified using the <em>name/value pair</em> 
+                <code>"url": "<em>[EXPANDED-URI-TEMPLATE]</em>"</code> where 
+                <code><em>[EXPANDED-URI-TEMPLATE]</em></code> is the value resulting from 
+                the expansion of the [[!uri-template]] specified in the <code>urlTemplate</code>
+                property.</p>
+              <div class="note">
+                <p>The <em>variables</em> in the URI Template expression relate to
+                  the <code>name</code> property specified for each
+                  <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a>. 
+                  During template expansion, the <em>variables</em> evaluate to the 
+                  <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a>
+                  within the 
+                  <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">row</a>
+                  being processed that is associated with the named 
+                  <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a>.</p>
+                <p>The <em>variable</em> <code>_row</code> evaluates to the number of the row being
+                  processed.</p>
+                <p>Once the URL has been generated via the template expansion, relative URLs are
+                  resolved against the <a title="baseURL">base URL</a> to create an absolute
+                  URL.</p>
+              </div>
+            </li>
+            <li>
+              <p>Where the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a>
+                is <em>null</em>, the <em>name/value pair</em> SHALL be omitted from the 
+                <a title="output graph">output graph</a> unless a <em>default value</em> is
+                specified for that <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a>
+                (see metadata properties <code>null</code> and <code>default</code>).</p>  
+            </li>
+            <li>
+              <p>The value of <em>name</em> for the <em>name/value pair</em> SHALL be provided by the 
+                <code>predicateUrl</code> metadata property within the <a title="column description object">
+                column description object</a>.</p>
+              <p>In accordance with [[!json]], all unicode characters may be used. However, the
+                following characters SHALL be <em>escaped</em>:</p>
+              <ul>
+                <li>quotation mark; <code>"</code> (<code>U+0022</code>)</li>
+                <li>reverse solidus; <code>\</code> (<code>U+005C</code>)</li>
+                <li>control characters; (<code>U+0000</code> through <code>U+001F</code>)</li>
+              </ul>
+            </li>
+            <li>
+              <p>The value of <em>value</em> SHALL be provided by the associated
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a>
+                subject to the effect of the metadata properties for that 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a>
+                (if any are specified).</p>
+              <div class="note">
+                <p>Given the lack of multi-lingual support in JSON, internationalized strings 
+                  are simply copied verbatim into the <a title="output graph">output graph</a> 
+                  without any additional locale information.</p>
+                <p>Also note that values of metadata property <code>name</code> must be unique 
+                  within a <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table">table</a>. 
+                  Therefore if, say, English and French versions of the same property are provided 
+                  as complementary columns in a CSV file then their <code>name</code> properties 
+                  must be different; e.g. <code>title_en</code> and <code>titre_fr</code>. It may 
+                  be possible for applications to infer a language from the name of a
+                  <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a> - 
+                  but this is entirely dependant on the syntax used by the metadata author when 
+                  defining values of the <code>name</code> property.</p>
+              </div>
+            </li>
+          </ol>
         </section>
         <section id="map-annotated-tab-metadata">
           <h4>Metadata property effects on row-level mapping behaviour</h4>
+          <p>The following metadata properties modify the way that 
+            <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell values</a>
+            are incorporated into the <a title="output graph">output graph</a>:</p>
+          <dl>
+            <dt id="metadata-property-null"><code>null</code></dt>
+            <dd>
+              <p>By default, a
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a>
+                is deemed to be <em>null</em> if it contains an empty string. If specified, the 
+                metadata property <code>null</code> provides a token (string) that can be used to 
+                identify <em>null</em> values.</p>
+            </dd>
+            <dt id="metadata-property-separator"><code>separator</code></dt>
+            <dd>
+              <p>Where metadata property <code>separator</code> is defined, the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a> SHALL be
+                parsed into an ordered list of values, using the value of <code>separator</code> as the 
+                delimiter.</p>
+              <p>The list of values SHALL be expressed in the <a title="output graph">output graph</a> as an array.</p>
+            </dd>
+            <dt id="metadata-property-datatype-and-format"><code>datatype</code> and <code>format</code></dt>
+            <dd>
+              <p>Where metadata property <code>datatype</code> is undefined, the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a> SHALL be 
+                inferred to hold values of datatype <code>string</code>.</p>
+              <p>The following datatypes are given special attention:</p>
+              <ul>
+                <li>
+                  <p>Datatypes with embedded syntax: <code>xml</code>, <code>json</code> and <code>html</code>.</p>
+                  <p>These datatypes are treated as literal values; no attempt SHOULD be made to
+                      'unpack' the structured syntax to create sub-objects within the <a title="output graph">
+                      output graph</a></p>
+                </li>
+                <li>
+                  <p>Booleans: <code>boolean</code>.</p>
+                  <p>Metadata property <code>format</code> MAY be provided for a boolean-typed 
+                    <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a>; 
+                    providing non-standard tokens for <em>true</em> and <em>false</em> (e.g. 
+                    <code>Y|N</code>. <a href="http://w3c.github.io/csvw/metadata/#formats-for-booleans">
+                    Section 3.12.3 Formats for booleans</a> from [[!tabular-metadata]] refers.</p>
+                  <p>If a boolean type is declared, the 
+                    <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a>
+                    SHALL be processed as follows:</p>
+                  <ol>
+                    <li>if the value is <code>true</code>, <code>1</code> or, if the <code>format</code> 
+                      property is defined, the value of <em>true</em>, then the <a title="output graph">output graph</a>
+                      SHALL include the value <code>true</code>;</li>
+                    <li>else if the value is <code>false</code>, <code>0</code> or, if the <code>format</code> 
+                      property is defined, the value of <em>false</em>, then the <a title="output graph">output graph</a>
+                      SHALL include the value <code>false</code>;</li>
+                    <li>else the <a title="output graph">output graph</a> SHALL include the
+                      <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a> verbatim.</li>
+                  </ol>
+                </li>
+                <li>
+                  <p>Numbers: <code>number</code>, <code>decimal</code>, <code>integer</code>, 
+                    <code>nonPositiveInteger</code>, <code>negativeInteger</code>, <code>long</code>, 
+                    <code>int</code>, <code>short</code>, <code>nonNegativeInteger</code>, 
+                    <code>unsignedLong</code>, <code>unsignedInt</code>, <code>unsignedShort</code>,
+                    <code>positiveInteger</code>, <code>float</code> and <code>double</code>.</p>
+                  <p><a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">Cell values</a> 
+                    that are asserted to be numeric shall be expressed in the <a title="output graph">
+                    output graph</a> as numbers; double quotes will be omitted.</p>
+                  <p>It is not uncommon for numbers within tabular data to be formatted for human consumption, 
+                    which may involve using commas for decimal points, grouping digits in the number using commas, 
+                    or adding currency symbols or percent signs to the number.</p>
+                  <p>Metadata property <code>format</code> MAY be provided to describe the formatting of the
+                    <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell values</a> 
+                    to assist the mapping application convert the 
+                    <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a> 
+                    to a number format readily consumable by downstream applications.</p>
+                  <div class="issue" data-number="54">
+                    <p>Describing the formatting of numbers is currently 
+                      unresolved and is likely to require information on decimal separator characters, 
+                      grouping characters and possibly others such as Infinity, Nan, currency tokens, 
+                      negative numbers appearing in parentheses etc.</p> 
+                    <p>In the interim, mapping applications are not required to undertake any reformatting 
+                      and may simply pass the cell value to the output graph verbatim.</p>
+                  </div>
+                </li>
+                <li>
+                  <p>Dates, times and durations: <code>date</code>, <code>time</code>, 
+                    <code>datetime</code>, <code>dateTime</code> and <code>duration</code>.</p>
+                  <p>A standard syntax for dates and times is defined by [[!iso8601]]. This format can be 
+                    readily consumed by software applications. However, dates and times are often provided 
+                    in a locale-specific format, or use alternate calendars and/or eras.</p>
+                  <p>Metadata property <code>format</code> MAY be provided to describe the formatting of 
+                    <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell values</a> 
+                    and assist the mapping application convert the 
+                    <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a> 
+                    to a date, time, date-time or duration format readily consumable by downstream 
+                    applications.</p>
+                  <p class="note">Where possible, data publishers SHOULD provide dates and times in 
+                    the [[!iso8601]] format. However, where data publishers choose to use locale-specific 
+                    date and time formatting, they SHOULD also provide equivalent values in [[!iso8601]] 
+                    format (e.g. in a complementary column).</p>
+                  <div class="issue" data-number="54">
+                    <p>Describing the formatting of dates and times is currently unresolved. The favoured 
+                      option is to defer the parsing of dates and times to implementations based a picture 
+                      string provided in the metadata. Unfortunately, there is no standard syntax for 
+                      picture strings, therefore an array of picture strings relating to common implementations 
+                      seems like the best option. For example:</p>
+                    <p><code>"datatype": "date",</code></p>
+                    <p><code>"format": {</code></p>
+                    <p><code>&nbsp;&nbsp;"picture-strings": [</code></p>
+                    <p><code>&nbsp;&nbsp;&nbsp;&nbsp;"unicode": "dd MMM yyyy",</code></p>
+                    <p><code>&nbsp;&nbsp;&nbsp;&nbsp;"xpath": "[D01] [MN,*-3] [Y0001]"</code></p>
+                    <p><code>&nbsp;&nbsp;]</code></p>
+                    <p><code>}</code></p>
+                    <p>Where an implementation is able to interpret one of the provided picture strings, 
+                      the date-time value reformatted in [[!iso8601]] format shall be included in the output graph, 
+                      else the original cell value shall be included verbatim.</p>
+                    <p>In the interim, mapping applications are not required to undertake any reformatting 
+                      and may simply pass the cell value to the output graph verbatim.</p>
+                  </div>
+                  <div class="issue" data-number="65">
+                    <p>A list of potential date-time formatting implementations needs to be defined.</p>
+                  </div>
+                </li>
+              </ul>
+              <p class="note">Where the metadata property <code>separator</code> is specified (e.g.
+                to indicate that a 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a> 
+                is to be parsed into a list of values), the datatype specified by <code>datatype</code>
+                SHALL be inferred to apply to the members of the resulting list.</p>  
+            </dd>
+            <dt id="metadata-property-urlTemplate"><code>urlTemplate</code></dt>
+            <dd>
+              <p>If metadata property <code>urlTemplate</code> is specified, the value used 
+                in the <a title="output graph">output graph</a> SHALL be 
+                the result of the URI Template expansion, as defined in 
+                <a href="http://w3c.github.io/csvw/metadata/#property-syntax">Section 3.1 Property Syntax</a> 
+                of [[!tabular-metadata]].</p>
+              <p>Once the URL has been generated via the template expansion, relative URLs are
+                resolved against the <a title="baseURL">base URL</a> to create an absolute
+                URL.</p>
+            </dd>
+            <dt id="metadata-property-default"><code>default</code></dt>
+            <dd>
+              <p>If metadata property <code>default</code> is specified and the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a> 
+                is deemed to be <em>null</em>, then the value of <code>default</code> SHALL be used 
+                in the <a title="output graph">output graph</a>.</p>
+            </dd>
+          </dl>
         </section>
       </section>
       <section id="map-annotated-tab-examples">
         <h3>Examples</h3>
-      </section>
-    </section>
-    <section id="map-grouped-tab">
-      <h2>Mapping Grouped Tabular Data</h2>
-      <section id="map-grouped-tab-json">
-        <h3>Generating JSON</h3>
-        <section id="map-grouped-tab-table">
-          <h4>Table-level processing</h4>
-        </section>
-      </section>
-      <section id="map-grouped-tab-examples">
-        <h3>Examples</h3>
-      </section>
-    </section>
+        <p class="issue" data-number="">These examples don't really show the edge cases - 
+          probably need to rework them</p>
+        <p>The first example illustrates how a CSV file with metadata annotations drawn <em>only</em> 
+          from a <a href="http://www.w3.org/TR/tabular-data-model/#dfn-header-line">header line</a> is 
+          processed. The tabular data describes lists countries, giving their country code and name.
+          There are two columns, named <code>country</code> and <code>name</code>, and four rows.</p>
 
-    <p>THIS IS IVAN'S ORIGINAL STUFF FROM HERE DOWN - WILL BE MERGED IN WHERE APPROPRIATE</p>
+        <table style="width: 30%">
+          <tr>
+            <th>country </th>
+            <th>name</th>
+          </tr>
+          <tr>
+            <td>AD</td>
+            <td>Andorra</td>
+          </tr>
+          <tr>
+            <td>AF</td>
+            <td>Afghanistan</td>
+          </tr>
+          <tr>
+            <td>AI</td>
+            <td>Anguilla</td>
+          </tr>
+          <tr>
+            <td>AL</td>
+            <td>Albania</td>
+          </tr>
+        </table>
 
-    <section id="processing-tabular">
-      <h2>Processing Annotated Tabular Data</h2>
+        <p>The CSV input (published at <code>http://example.org/country-codes-and-names.csv</code>):</p>
 
-      <p>The processing of tabular data is based on the abstract <a href="http://www.w3.org/TR/tabular-data-model/#annotated-model"><em>Annotated Tabular Data</em></a> format as defined in&nbsp;[[!tabular-data-model]]. It does not cover any details on how the initial data (i.e., a CSV file) is parsed into one of those abstract Data formats. The processing steps below define the generated JSON [[!JSON]] as a single JSON object with name/value pairs.</p>
- 
-      <p>Processing makes use of the metadata associated with the tabular data, and defined in the "Metadata Vocabulary for Tabular Data" [[!tabular-metadata]] document. In this section the term <dfn>property</dfn> refers to the properties defined in that document.</p>
+        <pre class="example" id="map-annotated-tab-examples-1-input" title="CSV input ">
+country,name
+AD,Andorra
+AF,Afghanistan
+AI,Anguilla
+AL,Albania
+        </pre>
 
-      <p>The metadata for the tabular data may originate from <a href="http://www.w3.org/TR/tabular-data-model/#embedded-metadata">embedded metadata</a> only. In practice this means that the <a title="name">column names</a> MAY be provided by a <a title="header row">header row</a>, but no other metadata is provided in the format described in [[!tabular-metadata]]. In that case, for the purpose of this section, processing begins by (conceptually) establishing the metadata as:</p>
+        <p>The resulting JSON output graph:</p>
 
-     <pre>[{
-  "@id": "<em>URI of the CSV file</em>",
-  "schema": {
-    "columns": [{
-       "name": "<em>name<sub>1</sub></em>",
-    }, 
-    {
-       "name": "<em>name<sub>2</sub></em>",
-    }, 
-    .
-    .
-    .
-    {
-        "name": "<em>name<sub>k</sub></em>",
-    }]
-  }
-}]</pre>
-      <p>where <code>name<sub>1</sub></code>, <code>name<sub>1</sub></code>,…,<code>name<sub>k</sub></code> are the names of the columns.</p> 
-
-
-    <section>
-        <h4>Generating JSON</h4>
-        <p>The processing steps are separated in the generation of table-level name/value pairs, and name/value pairs; these steps add RDF triples to the final JSON object.</p>
-
-        <section id="table-level-JSON">
-          <h4>Processing Steps for Table-Level Name/Value Pairs</h4>
-          <p>The following pairs are added as table level name/value pairs (in what follows, <code>@id</code> (resp. <code>@base</code>) stands for the value of the corresponding table <code>@id</code> (resp. <code>@base</code>) <a>property</a>):</p>
-          <ul class="steps">
-            <li>Add the identification pair:<br>
-                <code>"@id": @id</code>
-            </li>
-            <li>If the metadata has a <code>@context</code> property: copy the corresponding name/value pair to the output verbatim</li>
-            <li>If the <code>@type</code> <a>property</a> is set, add:<br>
-                <code>"@type": "Table"</code>
-            </li>
-            <!--
-            <li>If the <code>notes</code> <a>property</a> is set, its value is either an array of annotation objects, or a single annotation object, each with its own (required) <code>@id</code> <a>property</a>. For each of those annotation objects add the following name/value pair (where <code>@id<sub>i</sub></code> is the <code>@id</code> value for the i<sup>th</sup> annotation object):<br>
-              <code>"note": "@id<sub>i</sub>"</code>
-            </li>
-             -->
-            <li> For each (optional) <a>property</a> <code>prop<sub>i</sub></code> with <code>value<sub>i</sub></code> corresponding to a term defined in [[!DC-TERMS]], add the name/value pair: 
-              <br><code>"prop<sub>i</sub>": "value<sub>i</sub>"</code>
-            </li>
-          </ul>
-          <div class="issue" data-number="29">
-            “Default attributes - schema.org vs dc terms vs...” 
-          </div>
-          <div class="issue" data-number="30">
-            “How to interpret fixed string type values ("Table", "Row",...)”
-          </div>
-
-          <div class="issue" data-number="58">
-            “How should class level qualified properties be transformed to JSON”
-          </div>
+        <pre class="example" id="map-annotated-tab-examples-1-output" title="JSON output">
+{
+  "distribution": {
+    "downloadURL": "http://example.org/country-codes-and-names.csv"
+  },
+  "row": [{
+    "country": "AD",
+    "name": "Andorra"
+  },{
+    "country": "AF",
+    "name": "Afghanistan"
+  },{
+    "country": "AI",
+    "name": "Anguilla"
+  },{
+    "country": "AL",
+    "name": "Albania"
+  }]
+}
+        </pre>
 
 
-        </section>
+        <p>The second example illustrates how the mapping is modified with the addition of metadata
+          annotations in a metadata document. The CSV file is a small extract from a much larger
+          Tree Inventory dataset from the City of Palo Alto which supports the maintaining and 
+          tracking the city's public trees and urban forest. There are five columns, named 
+          <code>GID</code>, <code>On Street</code>, <code>Species</code>, <code>Trim Cycle</code> 
+          and <code>Inventory Date</code>, and three rows.</p>
 
-        <section id="cell-level-JSON">
-          <h4>Processing Steps for Cell-Level Name/Value triples</h4>
-          <p class="note">The metadata specification&nbsp;[[!tabular-metadata]] has an inheritence structure whereby the metadata for a cell (e.g., <code>datatype</code>) may be derived from values specified for a column, a row, or indeed the specific cell itself. This specification considers the result of this derivation for each <a>property</a>.</p>
-          <p>The steps below define a new JSON object for each row. These objects are added as an array as a table-level name/value pair as follows:<br>
-            <code>"@rows": [{<em>object for first row</em>},{<em>object for second row</em>},…,{<em>object for last row</em>}]</code>
-          </p>
-          <p>The objects themselves are generates through the following steps:</p>
-          <ul class="steps">
-            <li> The metadata&nbsp;[[!tabular-metadata]] defines the <code>name</code> <a>property</a> for each <a>column</a> (as part of the <code>schema</code> array). For each of those names, a corresponding IRI (referred to hereafter as <code>C<sub>i</sub></code>) is defined as follows:
-              <ul>
-                <li>If the i<sup>th</sup> column descriptor metadata includes the <code>column-template</code> <a>property</a> then the corresponding template rules are used to generate <code>C<sub>i</sub></code>.</li>
-                <li>Otherwise, <code>C<sub>i</sub></code> is set to the value of <code>name</code></li>
-              </ul>
-            </li>
-            <li> For the j<sup>th</sup> <a>row</a> a <code>subject<sub>j</sub></code> is established as follows:
-              <ul>
-                <li> If the metadata specifies a primary key via a <code>primaryKey</code> property, then:
-                  <ul>
-                    <li>if the primary key refers to a single column with the <code>name</code> property set, then <code>subject<sub>j</sub></code> is set to the <a>normalized version</a> value of <code>name</code></li>
+        <table style="width:80%">
+          <tr>
+            <th>GID</th>
+            <th>On Street</th>
+            <th>Species</th>
+            <th>Trim Cycle</th>
+            <th>Inventory Date</th>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>ADDISON AV</td>
+            <td>Celtis australis</td>
+            <td>Large Tree Routine Prune</td>
+            <td>10/18/2010</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>EMERSON ST</td>
+            <td>Liquidambar styraciflua</td>
+            <td>Large Tree Routine Prune</td>
+            <td>6/2/2010</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>EMERSON ST</td>
+            <td>Liquidambar styraciflua</td>
+            <td>Large Tree Routine Prune</td>
+            <td>6/2/2010</td>
+          </tr>
+        </table>
 
-                    <li>otherwise, <code>subject<sub>j</sub></code> is set to the <a>normalized version</a> of <code>name<sub>1</sub>-name<sub>2</sub>-…-name<sub>k</sub></code>, where <code>name<sub>1</sub></code>, <code>name<sub>2</sub></code>,…, <code>name<sub>k</sub></code> are the column names of the columns referred to by the primary keys.</li>
-                  </ul>
-                  Add then the name/value pair<br>
-                    <code>"@id": "subject<sub>j</sub>"</code>
-                </li>
-              </ul>
-            </li>
-            <li>For the j<sup>th</sup> <a>row</a>, the following name/value pair is added: <br>
-              <code>"row": j</code></li>
-            <li>If the <code>@type</code> property is specified for the j<sup>th</sup> <a>row</a>, the following RDF triple is added:<br>
-              <code>"@type" "Row"</code></li>              
-            <li> For the i<sup>th</sup> <a>cell</a> of the j<sup>th</sup> <a>row</a>, the value of <code>object<sub>i,j</sub></code> is established as follows:
-              <ul>
-                <li>If the cell’s metadata includes the <code>datatype</code> property, then:
-                    <ul>
-                      <li>if the datatype value is a number or a boolean then <code>object<sub>i,j</sub></code> is the cell’s value converted to that format;</li>
-                      <li>otherwise <code>object<sub>i,j</sub></code> is a JSON object of the form<br>
-                        <code>{ "@value": "<em>cell value</em>", "@type": "<em>value of datatype property</em>"}</code>
-                      </li>
-                    </ul>
-                </li>
-                <li>Otherwise, if the cell’s metadata includes the <code>language</code> property, then <code>object<sub>i,j</sub></code> is a JSON object of the form<br>
-                    <code>{ "@value": "<em>cell value</em>", "@language": "<em>value of language property</em>"}</code>
-                <li>Otherwise, <code>object<sub>i,j</sub></code> is the string value of the cell.</li>
-              </ul>
-              Once the value of <code>object<sub>i,j</sub></code> established, the following name/value pair is added: <br>
-              <code>"C<sub>j</sub>": object<sub>i,j</sub></code>
-            </li>
-          </ul>
-          <div class="issue">The specification refers to the <code>column-template</code> property, though that is not part of the metadata specification at this moment. This is in anticipation of a minimal URI-transformation for the predicate. Similar predicates may have to be used for each row to influence the row’s URI.</div>
-          
-          <div class="issue" data-number="31">
-            “Should primary keys be skipped from cell level triple (or k/v pairs) generation?”
-          </div>
-          <div class="issue" data-number="32">“Where does row numbering begin?”</div>
+        <p>The CSV input (published at <code>http://example.org/tree-ops.csv</code>):</p>
 
-          <div class="issue" data-number="33">
-            “What do to with conversion if no column name is given?”
-          </div>
-          <div class="issue" data-number="35">
-            “Should the "@type" information be optional?”
-          </div>
-           <div class="issue" data-number="60">
-            “How should ``language`` be used in JSON mapping?”
-          </div>
-
-           <div class="issue" data-number="61">
-            “What should be the mapping of an empty cell (both RDF and JSON)?”
-          </div>
-
-           <div class="issue" data-number="62">
-            “Should the RDF/JSON transformation check the values?”
-          </div>
-
-        </section>
-      </section>
-    </section>
-    <section id="examples-1" class="informative">
-      <h2>Examples</h2>
-
-     <p>Let us consider the following example (first row established the column names):</p>
-
-    <pre class="example" id="csv-example" title="CSV input">GID,On Street,Species,Trim Cycle,Inventory Date
+        <pre class="example" id="map-annotated-tab-examples-2-input" title="CSV input ">
+GID,On Street,Species,Trim Cycle,Inventory Date
 1,ADDISON AV,Celtis australis,Large Tree Routine Prune,10/18/2010
 2,EMERSON ST,Liquidambar styraciflua,Large Tree Routine Prune,6/2/2010
 3,EMERSON ST,Liquidambar styraciflua,Large Tree Routine Prune,6/2/2010
         </pre>
 
-    <p>yielding the following JSON:</p>
-    <pre class="example" title="JSON output">{
-  "@rows" : [
-    {
-      "row": 1,
-      "GID":              "1",
-      "On%20Street":      "ADDISON AV",
-      "Species":          "Celtis australis",
-      "Trim%20Cycle":     "Large Tree Routine Prune",
-      "Inventory%20Date": "10/18/2010"
-    },
-    {
-      "row": 2,
-      "GID":              "2",
-      "On%20Street":      "EMERSON ST",
-      "Species":          "Liquidambar styraciflua",
-      "Trim%20Cycle":     "Large Tree Routine Prune",
-      "Inventory%20Date": "6/2/2010"
-    },
-    {
-      "row": 3,
-      "GID":              "3",
-      "On%20Street":      "ADDISON AV",
-      "Species":          "Celtis australis",
-      "Trim%20Cycle":     "Large Tree Routine Prune",
-      "Inventory%20Date": "6/2/2010"
-    }]
-}
-</pre>
+        <p>The metadata description (published at <code>http://example.org/tree-ops.csv-metadata.json</code>):</p>
 
-
-  <p>The CSV Data may also have the following associated metadata:</p>
-
-    <pre class="example" title="CSV metadata">[{
-  "@id": "http://www.example.org/tree-ops.csv",
-  "@type": "Table",
-  "title": "Tree Operations",
-  "keywords": ["tree", "street", "maintenance"],
-  "license": "http://opendefinition.org/licenses/cc-by/",
-  "modified": "2010-12-31",
-  "columns": [{
-    "@id": "_:GID",
-    "name": "GID",
-    "datatype": "integer"
-   }, {
-    "name": "On Street",
-    "description": "The street that the tree is on.",
-    "datatype": "string"
-  }, {
-    "name": "Species",
-    "description": "The species of the tree.",
-    "datatype": "string"
-  }, {
-    "name": "Trim Cycle",
-    "description": "The operation performed on the tree.",
-    "datatype": "string"
-  }, {
-    "name": "Inventory Date",
-    "description": "The date of the operation that was performed.",
-    "datatype": "date",
-    "format": "M/D/YYYY"
-  }]
-  "primaryKey": "_:GID"  
-}]</pre>
-
-  <p>The generated JSON is then:</p>
-  <pre class="example" title="JSON output">{
-  "@id": "http://www.example.org/tree-ops.csv",
-  "@type": "Table",
-  "title": "Tree Operations",
+        <pre class="example" id="map-annotated-tab-examples-2-metadata" title="Metadata description">
+{
+  "@id": "tree-ops",
+  "@context": {
+    "@language": "en"
+  }
+  "dcat:distribution": {
+    "dcat:downloadURL": "tree-ops.csv"
+  }
+  "dc:title": "Tree Operations",
+  "dc:keywords": ["tree", "street", "maintenance"],
+  "dc:publisher": [{
+    "schema:name": "Example Municipality",
+    "schema:web": "http://example.org"
+  }],
   "dc:license": "http://opendefinition.org/licenses/cc-by/",
   "dc:modified": "2010-12-31",
-  "@rows" : [
-    {
-      "@id":              "1",
-      "row":              1,
-      "GID":              1,
-      "On%20Street":      "ADDISON AV",
-      "Species":          "Celtis australis",
-      "Trim%20Cycle":     "Large Tree Routine Prune",
-      "Inventory%20Date": { 
-                             "@value" :  "10/18/2010",
-                             "datatype": "date"
-                          }
-    },
-    {
-      "@id":              "2",
-      "row":              2,
-      "GID":              2,
-      "On%20Street":      "EMERSON ST",
-      "Species":          "Liquidambar styraciflua",
-      "Trim%20Cycle":     "Large Tree Routine Prune",
-      "Inventory%20Date": { 
-                             "@value" :  "6/2/2010",
-                             "datatype": "date"
-                          }
-    },
-    {
-      "@id":              "3",
-      "row":              3,
-      "GID":              3,
-      "On%20Street":      "ADDISON AV",
-      "Species":          "Celtis australis",
-      "Trim%20Cycle":     "Large Tree Routine Prune",
-      "Inventory%20Date": { 
-                             "@value" :  "6/2/2010",
-                             "datatype": "date"
-                          }
+  "schema": {
+    "columns": [{
+      "name": "GID",
+      "title": [
+        "GID",
+        "Generic Identifier"
+      ],
+      "dc:description": "An identifier for the operation on a tree.",
+      "datatype": "string",
+      "required": true,
+      "unique": true
+    }, {
+      "name": "on-street",
+      "title": "On Street",
+      "dc:description": "The street that the tree is on.",
+      "datatype": "string"
+    }, {
+      "name": "species",
+      "title": "Species",
+      "dc:description": "The species of the tree.",
+      "datatype": "string"
+    }, {
+      "name": "trim-cycle",
+      "title": "Trim Cycle",
+      "dc:description": "The operation performed on the tree.",
+      "datatype": "string"
+    }, {
+      "name": "inventory-date",
+      "title": "Inventory Date",
+      "dc:description": "The date of the operation that was performed.",
+      "datatype": "date"
     }]
+    "primaryKey": "GID",  
+    "urlTemplate": "#gid-{GID}"
+  }
 }
-</pre>
-    <p>Note the value for <code>:GID</code> is now an integer, and the value for <code>:Inventory%20Date</code> is a proper date.</p>
+        </pre>
 
-    <p class="TBD">More examples should be added here</p>
+        <p>The resulting JSON output graph:</p>
 
+        <pre class="example" id="map-annotated-tab-examples-2-output" title="JSON output">
+{
+  "url": "tree-ops"
+  "distribution": {
+    "downloadURL": "http://example.org/tree-ops.csv"
+  },
+  "dc:title": "Tree Operations",
+  "dc:keywords": ["tree", "street", "maintenance"],
+  "dc:publisher": [{
+    "schema:name": "Example Municipality",
+    "schema:web": "http://example.org"
+  }],
+  "dc:license": "http://opendefinition.org/licenses/cc-by/",
+  "dc:modified": "2010-12-31",
+  "row": [{
+    "url": "http://example.org/tree-ops.csv#gid-1",
+    "GID": "1",
+    "on-street": "ADDISON AV",
+    "species": "Celtis australis",
+    "trim-cycle": "Large Tree Routine Prune",
+    "inventory-date": "10/18/2010"
+  },{
+    "url": "http://example.org/tree-ops.csv#gid-2",
+    "GID": "2",
+    "on-street": "EMERSON ST",
+    "species": "Liquidambar styraciflua",
+    "trim-cycle": "Large Tree Routine Prune",
+    "inventory-date": "6/2/2010"
+  },{
+    "url": "http://example.org/tree-ops.csv#gid-3",
+    "GID": "3",
+    "on-street": "EMERSON ST",
+    "species": "Liquidambar styraciflua",
+    "trim-cycle": "Large Tree Routine Prune",
+    "inventory-date": "6/2/2010"
+  }],
+  "describedBy": "http://example.org/tree-ops.csv-metadata.json"
+}
+        </pre>
+
+      </section>
+    </section>
+    <section id="map-grouped-tab">
+      <h2>Mapping Grouped Tabular Data</h2>
+        <p>The procedures and rules for mapping a collection of tabular data compliant with the
+          <a href="http://www.w3.org/TR/tabular-data-model/#dfn-grouped-tabular-data-model">
+          grouped tabular data model</a> are described below.</p>
+        <p>The metadata for a <a href="http://www.w3.org/TR/tabular-data-model/#dfn-group-of-tables">
+          group of tables</a> SHALL be provided by a
+            <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-group-description">
+            table group description</a> (as defined in [[!tabular-metadata]]) within the 
+            associated metadata document.</p>
+      <section id="map-grouped-tab-json">
+        <h3>Generating JSON</h3>
+        <section id="map-grouped-tab-table">
+          <h4>Group-level processing</h4>
+          <ol>
+            <li>
+              <p>The root object of the <a title="output graph">output graph</a> SHALL 
+                describe the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-group-of-tables">table group</a>.</p>
+            </li>
+            <li>
+              <p>Where present in the 
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-group-description">
+                table group description</a>, any <a title="common property">Common Properties</a> 
+                (as defined in 
+                <a href="http://www.w3.org/TR/tabular-metadata/#common-properties">Section 3.3 
+                Common Properties</a> of [[!tabular-metadata]]) SHALL 
+                be included in the <a title="output graph">output graph</a> within the root object.</p>
+            </li>
+            <li>
+              <p>The root object SHALL contain an array named <code>table</code> containing 
+                one object for each of the 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table">tables</a> listed in 
+                the <code>resources</code> array of the 
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-group-description">
+                table group description</a>.</p>
+              <p>Each <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table">table</a> SHALL be 
+                processed sequentially according to the appropriate set of rules for mapping core
+                or annotated <a href="http://www.w3.org/TR/tabular-data-model/#dfn-tabular-data">
+                tabular data</a>. Refer to <a href="#map-core-tab">Section 3 Mapping Core Tabular
+                Data</a> and <a href="#map-annotated-tab">Section 4 Mapping Annotated Tabular Data</a>
+                for further details.</p>
+              <p>The JSON generated from processing the
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table">tables</a> SHALL be
+                incorporated into the <a title="output graph">output graph</a> as objects within
+                the <code>table</code> array.</p>
+            </li>
+            <li>
+              <p>Any of the <a href="http://www.w3.org/TR/tabular-metadata/#dfn-inherited-property">
+                inherited properties</a> <code>null</code>,
+                <code>separator</code>, <code>format</code>, <code>datatype</code>, 
+                or <code>default</code> defined within the 
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-group-description">
+                table group description</a> SHALL be used to pre-populate the 
+                <a title="column description object">column description objects</a> for each 
+                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table">table</a> in the
+                group.</p>
+              <p>Where the same property is defined in the
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-group-description">
+                table group description</a>, 
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">
+                table description</a>,
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-schema">schema</a> or 
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description">
+                column description</a> the order of precedence SHALL be:</p>
+              <ol>
+                <li>column description</li>
+                <li>schema description</li>
+                <li>table description</li>
+                <li>table group description</li>
+              </ol>
+            </li>
+          </ol>
+          <p class="issue" data-number="">The presence of foreign-key references within the table 
+            descriptions may affect the way the data is packaged in the output graph. Reviewers are 
+            invited to comment on how grouped tabular data with foreign-key references might best be 
+            organised.</p>
+        </section>
+      </section>
+      <section id="map-grouped-tab-examples">
+        <h3>Examples</h3>
+        <p class="TBD"><a href="http://www.w3.org/TR/csvw-ucr/#UC-OrganogramData">
+          Use Case 4: Publication of public sector roles and salaries</a> likely provides a good 
+          source of material for these examples. To be added.</p>
+      </section>
     </section>
   </body>
 </html>
