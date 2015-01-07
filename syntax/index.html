@@ -195,7 +195,7 @@ var respecConfig = {
           The <a title="column">columns</a> within an <a>annotated table</a> are all <dfn title="annotated column">annotated columns</dfn>: columns which MAY have any number of <a title="property">properties</a> in addition to those provided in the core tabular data model described in <a href="#core-tabular-data-model" class="sectionRef"></a>. The annotations on a column might provide information about how to interpret the <a title="cell">cells</a> in the column or information about the column as a whole. Examples of annotations might be:
         </p>
         <ul>
-          <li>a name or label for the column</li>
+          <li>a name or title for the column</li>
           <li>the expected type of values in that column</li>
           <li>an indication of whether the column contains unique values</li>
         </ul>
@@ -241,7 +241,7 @@ var respecConfig = {
       </p>
       <ul>
         <li>metadata about the table, such as titles, descriptions, provenance, and links to other tables</li>
-        <li>metadata about columns in the table, such as labels, data types and other constraints, or flags to indicate values in the column are unique</li>
+        <li>metadata about columns in the table, such as titles, data types and other constraints, or flags to indicate values in the column are unique</li>
         <li>metadata about rows in the table, such as certainty or provenance</li>
         <li>metadata about values in the table, such as notes or type annotations</li>
       </ul>
@@ -599,7 +599,7 @@ Content-Type: text/csv;header=absent
         Standardising the parsing of CSV is outside the chartered scope of the Working Group. This non-normative section is intended to help the creators of parsers handle the wide variety of CSV-based formats that they may encounter due to the current lack of standardisation of the format.
       </p>
       <p>
-        This section describes an algorithm for parsing formats other than the plain CSV+ format specified in <a href="#syntax" class="sectionRef"></a>. It is impossible to do this in a fully automated manner, so this algorithm depends on the following flags being set externally (eg through user input):
+        This section describes an algorithm for parsing formats other than the plain CSV+ format specified in <a href="#syntax" class="sectionRef"></a>. It is impossible to do this in a fully automated manner, so this algorithm depends on the following flags being set externally (eg through user input or through the inclusion of a <a href="http://www.w3.org/TR/tabular-metadata/#dialect-descriptions">dialect description</a> within a metadata file):
       </p>
       <dl>
         <dt><dfn>encoding</dfn></dt>
@@ -642,7 +642,7 @@ Content-Type: text/csv;header=absent
       <ol>
         <li>Read the file using the specified <a>encoding</a>.</li>
         <li>Find the rows. Each row ends with a <a>line terminator</a>, but values that are enclosed within the <a>quote character</a> may contain the <a>line terminator</a> without it indicating the end of the row. The <a>quote character</a> may be escaped using the <a>escape character</a> where it appears within cells. If the <a>escape character</a> is not the same as the <a>quote character</a> then the <a>escape character</a> is also used to escape the character that immediately follows it.</li>
-        <li>Skip the number of rows indicated by the <a>skip rows</a> parameter. These form comment annotations on the table. If a skipped row begins with the <a>comment prefix</a>, strip that prefix from the beginning of the row to create the content of the comment annotation.</li>
+        <li>Skip the number of rows indicated by the <a>skip rows</a> parameter. These form <code>rdfs:comment</code> annotations on the table. If a skipped row begins with the <a>comment prefix</a>, strip that prefix from the beginning of the row to create the content of the <code>rdfs:comment</code> annotation.</li>
         <li>Gather the number of header rows indicated by the <a>header row count</a> parameter; the remaining rows are data rows.</li>
         <li>
           <p>
@@ -654,24 +654,441 @@ Content-Type: text/csv;header=absent
         </li>
         <li>In each row, ignore the number of columns indicated by the <a>skip columns</a> parameter. Always start from the first character in the row when counting columns (see <a href="#bidirectionality-in-csv-files" class="sectionRef"></a>).</li>
         <li>Gather the number of header columns indicated by the <a>header column count</a> parameter. Always start from the first character in the row when counting columns (see <a href="#bidirectionality-in-csv-files" class="sectionRef"></a>).</li>
-        <li>Each cell within a header row that is not in a skipped or header column is a label annotation on that column.</li>
-        <li>Each cell within a header column is an annotation on the row it appears in; if there is a header row then that provides the type of the annotation for the row, otherwise it is a label annotation.</li>
+        <li>Each cell within a header row that is not in a skipped or header column is a <code>title</code> annotation on that column.</li>
+        <li>Each cell within a header column is an annotation on the row it appears in; if there is a header row then that provides the type of the annotation for the row, otherwise it is a <code>title</code> annotation.</li>
         <li>If <a>skip blank rows</a> is <code>true</code> then ignore any rows in which all the cell values are empty strings.</li>
       </ol>
-      <!-- alternative, more procedural appraoch would be something like this:
-      <p>
-        To <dfn>read a row</dfn>:
-      </p>
-      <ol>
-        <li>set <var>cells</var> to an empty list</li>
-        <li>set <var>skipped rows</var> to <code>0</code></li>
-        <li>set <var>header rows</var> to an empty list</li>
-        <li><a>read a cell</a> and add that value to the <var>cells</var> list</li>
-        <li>if the next character is whitespace, then if <a>trim</a> is <code>true</code> or <code>end</code> then ignore the next whitespace characters, otherwise raise an error.</li>
-        <li>otherwise, if the next character is the <a>delimiter</a> then go back to step 2.</li>
-        <li>otherwise, if the next character is the <a>row terminator</a> then return the list of <var>cells</var> as the content of the row.</li>
-      </ol>
-    -->
+      <section>
+        <h3>Examples</h3>
+        <section>
+          <h4>Simple Example</h4>
+          <p>
+            A simple CSV+ file might look like:
+          </p>
+          <pre class="example">
+GID,On Street,Species,Trim Cycle,Inventory Date
+1,ADDISON AV,Celtis australis,Large Tree Routine Prune,10/18/2010
+2,EMERSON ST,Liquidambar styraciflua,Large Tree Routine Prune,6/2/2010
+          </pre>
+          <p>
+            Parsing this file results in an <a>annotated tabular data model</a> of a single <a>table</a> <var>T</var> with five columns and two rows. The columns have the properties shown in the following table:
+          </p>
+          <table style="width: 100%; text-align: left">
+            <thead>
+              <tr><th rowspan="2">id</th><th colspan="3">core properties</th><th>annotations</th></tr>
+              <tr><th>table</th><th>number</th><th>cells</th><th><code>title</code></th></tr>
+            </thead>
+            <tbody>
+              <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td><var>C1.1</var>, <var>C2.1</var></td><td><code>GID</code></td></tr>
+              <tr><td><var>C2</var></td><td><var>T</var></td><td>2</td><td><var>C1.2</var>, <var>C2.2</var></td><td><code>On Street</code></td></tr>
+              <tr><td><var>C3</var></td><td><var>T</var></td><td>3</td><td><var>C1.3</var>, <var>C2.3</var></td><td><code>Species</code></td></tr>
+              <tr><td><var>C4</var></td><td><var>T</var></td><td>4</td><td><var>C1.4</var>, <var>C2.4</var></td><td><code>Trim Cycle</code></td></tr>
+              <tr><td><var>C5</var></td><td><var>T</var></td><td>5</td><td><var>C1.5</var>, <var>C2.5</var></td><td><code>Inventory Date</code></td></tr>
+            </tbody>
+          </table>
+          <p>
+            The rows have the properties shown in the following table:
+          </p>
+          <table style="width: 100%; text-align: left">
+            <thead>
+              <tr><th rowspan="2">id</th><th colspan="3">core properties</th></tr>
+              <tr><th>table</th><th>number</th><th>cells</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><var>R1</var></td><td><var>T</var></td><td>1</td><td><var>C1.1</var>, <var>C1.2</var>, <var>C1.3</var>, <var>C1.4</var>, <var>C1.5</var></td></tr>
+              <tr><td><var>R2</var></td><td><var>T</var></td><td>2</td><td><var>C2.1</var>, <var>C2.2</var>, <var>C2.3</var>, <var>C2.4</var>, <var>C2.5</var></td></tr>
+            </tbody>
+          </table>
+          <p>
+            The cells have the properties shown in the following table (note that the <a title="cell value">values</a> of all the cells in the table are strings, denoted by the double quotes in the table below):
+          </p>
+          <table style="width: 100%; text-align: left">
+            <thead>
+              <tr><th rowspan="2">id</th><th colspan="3">core properties</th></tr>
+              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"1"</code></td><td><code>"1"</code></td></tr>
+              <tr><td><var>C1.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R1</var></td><td><code>"ADDISON AV"</code></td><td><code>"ADDISON AV"</code></td></tr>
+              <tr><td><var>C1.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R1</var></td><td><code>"Celtis australis"</code></td><td><code>"Celtis australis"</code></td></tr>
+              <tr><td><var>C1.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R1</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td></tr>
+              <tr><td><var>C1.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R1</var></td><td><code>"10/18/2010"</code></td><td><code>"10/18/2010"</code></td></tr>
+              <tr><td><var>C2.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R2</var></td><td><code>"2"</code></td><td><code>"2"</code></td></tr>
+              <tr><td><var>C2.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R2</var></td><td><code>"EMERSON ST"</code></td><td><code>"EMERSON ST"</code></td></tr>
+              <tr><td><var>C2.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R2</var></td><td><code>"Liquidambar styraciflua"</code></td><td><code>"Liquidambar styraciflua"</code></td></tr>
+              <tr><td><var>C2.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R2</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td></tr>
+              <tr><td><var>C2.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R2</var></td><td><code>"6/2/2010"</code></td><td><code>"6/2/2010"</code></td></tr>
+            </tbody>
+          </table>
+          <section>
+          	<h5>Using Overriding Metadata</h5>
+          	<p>
+          		The tools that the consumer of this data uses may provide a mechanism for overriding the metadata that has been provided within the file itself. For example, they might enable the consumer to add machine-readable names to the columns, or to mark the fifth column as holding a date in the format <code>M/D/YYYY</code>. These facilities are implementation defined; the code for a Javascript-based parser might look like:
+          	</p>
+          	<pre class="highlight example">
+data.parse({
+  "column-names": ["GID", "on-street", "species", "trim-cycle", "inventory-date"],
+  "datatypes": ["string", "string", "string", "string", "date"],
+  "formats": [null,null,null,null,"M/D/YYYY"]
+});
+          	</pre>
+          	<p>
+          		The parser could then create an <a>annotated tabular data model</a> that included <code>name</code> annotations on the columns, <code>datatype</code> and <code>format</code> annotations on the cells, and created cells whose <a title="cell value">values</a> were of appropriate types (in the case of this Javascript implementation, the cells in the last column would be <code>Date</code> objects, for example).
+          	</p>
+						<p>
+							Assuming this kind of implementation-defined parsing, the columns would then have the properties shown in the following table:
+	          </p>
+	          <table style="width: 100%; text-align: left">
+	            <thead>
+	              <tr><th rowspan="2">id</th><th colspan="3">core properties</th><th colspan="2">annotations</th></tr>
+	              <tr><th>table</th><th>number</th><th>cells</th><th><code>name</code></th><th><code>title</code></th></tr>
+	            </thead>
+	            <tbody>
+	              <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td><var>C1.1</var>, <var>C2.1</var></td><td><code>GID</code></td><td><code>GID</code></td></tr>
+	              <tr><td><var>C2</var></td><td><var>T</var></td><td>2</td><td><var>C1.2</var>, <var>C2.2</var></td><td><code>on-street</code></td><td><code>On Street</code></td></tr>
+	              <tr><td><var>C3</var></td><td><var>T</var></td><td>3</td><td><var>C1.3</var>, <var>C2.3</var></td><td><code>species</code></td><td><code>Species</code></td></tr>
+	              <tr><td><var>C4</var></td><td><var>T</var></td><td>4</td><td><var>C1.4</var>, <var>C2.4</var></td><td><code>trim-cycle</code></td><td><code>Trim Cycle</code></td></tr>
+	              <tr><td><var>C5</var></td><td><var>T</var></td><td>5</td><td><var>C1.5</var>, <var>C2.5</var></td><td><code>inventory-date</code></td><td><code>Inventory Date</code></td></tr>
+	            </tbody>
+	          </table>
+	          <p>
+	            The cells have the properties shown in the following table. Because of the overrides provided by the consumer to guide the parsing, and the way the parser works, these include additional annotations but also, for the <code>Inventory Date</code> column (cells <var>C1.5</var> and <var>C2.5</var>), have a <a title="cell value">value</a> that is a parsed date rather than an unparsed string.
+	          </p>
+	          <table style="width: 100%; text-align: left">
+	            <thead>
+	              <tr><th rowspan="2">id</th><th colspan="3">core properties</th><th colspan="2">annotations</th></tr>
+	              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th><th>datatype</th><th>format</th></tr>
+	            </thead>
+	            <tbody>
+	              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"1"</code></td><td><code>"1"</code></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C1.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R1</var></td><td><code>"ADDISON AV"</code></td><td><code>"ADDISON AV"</code></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C1.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R1</var></td><td><code>"Celtis australis"</code></td><td><code>"Celtis australis"</code></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C1.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R1</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C1.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R1</var></td><td><code>"10/18/2010"</code></td><td><code>2010-10-18</code></td><td><code>date</code></td><td><code>M/D/YYYY</code></td></tr>
+	              <tr><td><var>C2.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R2</var></td><td><code>"2"</code></td><td><code>"2"</code></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C2.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R2</var></td><td><code>"EMERSON ST"</code></td><td><code>"EMERSON ST"</code></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C2.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R2</var></td><td><code>"Liquidambar styraciflua"</code></td><td><code>"Liquidambar styraciflua"</code></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C2.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R2</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C2.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R2</var></td><td><code>"6/2/2010"</code></td><td><code>2010-06-02</code></td><td><code>date</code></td><td><code>M/D/YYYY</code></td></tr>
+	            </tbody>
+	          </table>
+          </section>
+          <section>
+          	<h5>Using a Metadata File</h5>
+          	<p>
+          		A similar set of annotations could be provided through a metadata file, located as discussed in <a href="#locating-metadata" class="sectionRef"></a> and defined in [[!tabular-metadata]]. For example, this might look like:
+          	</p>
+      			<pre class="example highlight">
+{
+  "@id": "tree-ops.csv",
+  "@context": ["http://www.w3.org/ns/csvw", {"@language": "en"}],
+  "dc:title": "Tree Operations",
+  "dc:keywords": ["tree", "street", "maintenance"],
+  "dc:publisher": [{
+    "sch:name": "Example Municipality",
+    "sch:web": "http://example.org"
+  }],
+  "dc:license": "http://opendefinition.org/licenses/cc-by/",
+  "dc:modified": "2010-12-31",
+  "schema": {
+    "columns": [{
+      "name": "GID",
+      "title": [
+        "GID",
+        "Generic Identifier"
+      ],
+      "dc:description": "An identifier for the operation on a tree.",
+      "datatype": "string",
+      "required": true
+    }, {
+      "name": "on-street",
+      "title": "On Street",
+      "dc:description": "The street that the tree is on.",
+      "datatype": "string"
+    }, {
+      "name": "species",
+      "title": "Species",
+      "dc:description": "The species of the tree.",
+      "datatype": "string"
+    }, {
+      "name": "trim-cycle",
+      "title": "Trim Cycle",
+      "dc:description": "The operation performed on the tree.",
+      "datatype": "string"
+    }, {
+      "name": "inventory-date",
+      "title": "Inventory Date",
+      "dc:description": "The date of the operation that was performed.",
+      "datatype": "date",
+      "format": "M/D/YYYY"
+    }],
+    "primaryKey": "GID"
+  }
+}
+			      </pre>
+          	<p>
+          		The <a>annotated tabular data model</a> generated from this would be more sophisticated again. The <a>table</a> itself would have the following annotations:
+          	</p>
+          	<dl>
+          		<dt><code>dc:title</code></dt>
+          		<dd><code>"Tree Operations"</code></dd>
+          		<dt><code>dc:keywords</code></dt>
+          		<dd><code>["tree", "street", "maintenance"]</code></dd>
+          		<dt><code>dc:publisher</code></dt>
+          		<dd><code>[{ "sch:name": "Example Municipality", "sch:web": "http://example.org" }]</code></dd>
+          		<dt><code>dc:license</code></dt>
+          		<dd><code>"http://opendefinition.org/licenses/cc-by/"</code></dd>
+          		<dt><code>dc:modified</code></dt>
+          		<dd><code>"2010-12-31"</code></dd>
+          		<dt><code>primaryKey</code></dt>
+          		<dd><var>C1</var></dd>
+          	</dl>
+          	<p>
+          		Note that the value of the <code>primaryKey</code> annotation is a pointer to the <a>column</a> <var>C1</var> within the annotated tabular data model.
+          	</p>
+						<p>
+							The columns would have the properties shown in the following table:
+	          </p>
+	          <table style="width: 100%; text-align: left">
+	            <thead>
+	              <tr><th rowspan="2">id</th><th colspan="3">core properties</th><th colspan="3">annotations</th></tr>
+	              <tr><th>table</th><th>number</th><th>cells</th><th><code>name</code></th><th><code>title</code></th><th><code>dc:description</code></th></tr>
+	            </thead>
+	            <tbody>
+	              <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td><var>C1.1</var>, <var>C2.1</var></td><td><code>GID</code></td><td><code>GID</code>, <code>Generic Identifier</code></td><td><code>An identifier for the operation on a tree.</code></td></tr>
+	              <tr><td><var>C2</var></td><td><var>T</var></td><td>2</td><td><var>C1.2</var>, <var>C2.2</var></td><td><code>on-street</code></td><td><code>On Street</code></td><td><code>The street that the tree is on.</code></td></tr>
+	              <tr><td><var>C3</var></td><td><var>T</var></td><td>3</td><td><var>C1.3</var>, <var>C2.3</var></td><td><code>species</code></td><td><code>Species</code></td><td><code>The species of the tree.</code></td></tr>
+	              <tr><td><var>C4</var></td><td><var>T</var></td><td>4</td><td><var>C1.4</var>, <var>C2.4</var></td><td><code>trim-cycle</code></td><td><code>Trim Cycle</code></td><td><code>The operation performed on the tree.</code></td></tr>
+	              <tr><td><var>C5</var></td><td><var>T</var></td><td>5</td><td><var>C1.5</var>, <var>C2.5</var></td><td><code>inventory-date</code></td><td><code>Inventory Date</code></td><td><code>The date of the operation that was performed.</code></td></tr>
+	            </tbody>
+	          </table>
+	          <p>
+	            Thanks to the provided metadata, the cells again have the properties shown in the following table. The metadata file has provided the information to supplement the model with additional annotations but also, for the <code>Inventory Date</code> column (cells <var>C1.5</var> and <var>C2.5</var>), have a <a title="cell value">value</a> that is a parsed date rather than an unparsed string.
+	          </p>
+	          <table style="width: 100%; text-align: left">
+	            <thead>
+	              <tr><th rowspan="2">id</th><th colspan="3">core properties</th><th colspan="2">annotations</th></tr>
+	              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th><th>datatype</th><th>format</th></tr>
+	            </thead>
+	            <tbody>
+	              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"1"</code></td><td><code>"1"</code></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C1.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R1</var></td><td><code>"ADDISON AV"</code></td><td><code>"ADDISON AV"</code></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C1.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R1</var></td><td><code>"Celtis australis"</code></td><td><code>"Celtis australis"</code></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C1.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R1</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C1.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R1</var></td><td><code>"10/18/2010"</code></td><td><code>2010-10-18</code></td><td><code>date</code></td><td><code>M/D/YYYY</code></td></tr>
+	              <tr><td><var>C2.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R2</var></td><td><code>"2"</code></td><td><code>"2"</code></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C2.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R2</var></td><td><code>"EMERSON ST"</code></td><td><code>"EMERSON ST"</code></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C2.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R2</var></td><td><code>"Liquidambar styraciflua"</code></td><td><code>"Liquidambar styraciflua"</code></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C2.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R2</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C2.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R2</var></td><td><code>"6/2/2010"</code></td><td><code>2010-06-02</code></td><td><code>date</code></td><td><code>M/D/YYYY</code></td></tr>
+	            </tbody>
+	          </table>
+          </section>
+        </section>
+        <section>
+          <h4>Empty and Quoted Cells</h4>
+          <p>
+            The following slightly amended CSV file contains quoted and missing cell values:
+          </p>
+          <pre class="example">
+GID,On Street,Species,Trim Cycle,Inventory Date
+1,ADDISON AV,"Celtis australis","Large Tree Routine Prune",10/18/2010
+2,,"Liquidambar styraciflua","Large Tree Routine Prune",
+          </pre>
+          <p>
+            Parsing this file similarly results in an <a>annotated tabular data model</a> of a single <a>table</a> <var>T</var> with five columns and two rows. The columns and rows have exactly the same properties as previously, but there are two <code>null</code> cell values for <var>C2.2</var> and <var>C2.5</var>. Note that the quoting of values within the CSV makes no difference to either the <a>string value</a> or <a title="cell value">value</a> of the cell.
+          </p>
+          <table style="width: 100%; text-align: left">
+            <thead>
+              <tr><th rowspan="2">id</th><th colspan="3">core properties</th></tr>
+              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"1"</code></td><td><code>"1"</code></td></tr>
+              <tr><td><var>C1.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R1</var></td><td><code>"ADDISON AV"</code></td><td><code>"ADDISON AV"</code></td></tr>
+              <tr><td><var>C1.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R1</var></td><td><code>"Celtis australis"</code></td><td><code>"Celtis australis"</code></td></tr>
+              <tr><td><var>C1.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R1</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td></tr>
+              <tr><td><var>C1.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R1</var></td><td><code>"10/18/2010"</code></td><td><code>"10/18/2010"</code></td></tr>
+              <tr><td><var>C2.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R2</var></td><td><code>"2"</code></td><td><code>"2"</code></td></tr>
+              <tr><td><var>C2.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R2</var></td><td><code>""</code></td><td><code>null</code></td></tr>
+              <tr><td><var>C2.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R2</var></td><td><code>"Liquidambar styraciflua"</code></td><td><code>"Liquidambar styraciflua"</code></td></tr>
+              <tr><td><var>C2.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R2</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td></tr>
+              <tr><td><var>C2.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R2</var></td><td><code>""</code></td><td><code>null</code></td></tr>
+            </tbody>
+          </table>
+        </section>
+	      <section>
+	        <h4>Tabular Data Embedding Annotations</h4>
+	        <p>
+	          The following example illustrates some of the complexities that can be involved in parsing tabular data, how the flags described above can be used, and how new tabular data formats could be defined that embed additional annotations into the tabular data model.
+	        </p>
+	        <p>
+	          In this example, the publishers of the data are using an internal convention to supply additional metadata about the tabular data embedded within the file itself. They are also using a tab as a separator rather than a comma.
+	        </p>
+	        <pre class="example">
+#	publisher	City of Palo Alto
+#	updated	12/31/2010
+#name	GID	on-street	species	trim-cycle	inventory-date
+#datatype	string	string	string	string	date:M/D/YYYY
+	GID	On Street	Species	Trim Cycle	Inventory Date
+	1	ADDISON AV	Celtis australis	Large Tree Routine Prune	10/18/2010
+	2	EMERSON ST	Liquidambar styraciflua	Large Tree Routine Prune	6/2/2010
+	        </pre>
+	        <section>
+	          <h5>Naive Parsing</h5>
+	          <p>
+	            Naive parsing of the above data will assume a comma separator and thus results in a single <a>table</a> <var>T</var> with a single column and six rows. The column has the properties shown in the following table:
+	          </p>
+	          <table style="width: 100%; text-align: left">
+	            <thead>
+	              <tr><th rowspan="2">id</th><th colspan="3">core properties</th><th>annotations</th></tr>
+	              <tr><th>table</th><th>number</th><th>cells</th><th><code>title</code></th></tr>
+	            </thead>
+	            <tbody>
+	              <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td><var>C1.1</var>, <var>C2.1</var>, <var>C3.1</var>, <var>C4.1</var>, <var>C5.1</var></td><td><code># publisher City of Palo Alto</code></td></tr>
+	            </tbody>
+	          </table>
+	          <p>
+	            The rows have the properties shown in the following table:
+	          </p>
+	          <table style="width: 100%; text-align: left">
+	            <thead>
+	              <tr><th rowspan="2">id</th><th colspan="3">core properties</th></tr>
+	              <tr><th>table</th><th>number</th><th>cells</th></tr>
+	            </thead>
+	            <tbody>
+	              <tr><td><var>R1</var></td><td><var>T</var></td><td>1</td><td><var>C1.1</var></td></tr>
+	              <tr><td><var>R2</var></td><td><var>T</var></td><td>2</td><td><var>C2.1</var></td></tr>
+	              <tr><td><var>R3</var></td><td><var>T</var></td><td>3</td><td><var>C3.1</var></td></tr>
+	              <tr><td><var>R4</var></td><td><var>T</var></td><td>4</td><td><var>C4.1</var></td></tr>
+	              <tr><td><var>R5</var></td><td><var>T</var></td><td>5</td><td><var>C5.1</var></td></tr>
+	              <tr><td><var>R6</var></td><td><var>T</var></td><td>6</td><td><var>C6.1</var></td></tr>
+	            </tbody>
+	          </table>
+	          <p>
+	            The cells have the properties shown in the following table (note that the <a title="cell value">values</a> of all the cells in the table are strings, denoted by the double quotes in the table below):
+	          </p>
+	          <table style="width: 100%; text-align: left">
+	            <thead>
+	              <tr><th rowspan="2">id</th><th colspan="3">core properties</th></tr>
+	              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th></tr>
+	            </thead>
+	            <tbody>
+	              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"# updated 12/31/2010"</code></td><td><code>"# updated 12/31/2010"</code></td></tr>
+	              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"#name	GID	on-street	species	trim-cycle	inventory-date"</code></td><td><code>"#name	GID	on-street	species	trim-cycle	inventory-date"</code></td></tr>
+	              <tr><td><var>C2.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R2</var></td><td><code>"#datatype	string	string	string	string	date:M/D/YYYY"</code></td><td><code>"#datatype	string	string	string	string	date:M/D/YYYY"</code></td></tr>
+	              <tr><td><var>C3.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R3</var></td><td><code>"	GID	On Street	Species	Trim Cycle	Inventory Date"</code></td><td><code>"	GID	On Street	Species	Trim Cycle	Inventory Date"</code></td></tr>
+	              <tr><td><var>C4.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R4</var></td><td><code>"	1 ADDISON AV	Celtis australis	Large Tree Routine Prune	10/18/2010"</code></td><td><code>"	1 ADDISON AV	Celtis australis	Large Tree Routine Prune	10/18/2010"</code></td></tr>
+	              <tr><td><var>C5.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R5</var></td><td><code>"	2 EMERSON ST	Liquidambar styraciflua Large Tree Routine Prune	6/2/2010"</code></td><td><code>"	2 EMERSON ST	Liquidambar styraciflua Large Tree Routine Prune	6/2/2010"</code></td></tr>
+	            </tbody>
+	          </table>
+	        </section>
+	        <section>
+	          <h5>Parsing with Flags</h5>
+	          <p>
+	            The consumer of the data may use the flags described above to create a more useful set of data from this file. Specifically, they could set:
+	          </p>
+	          <ul>
+	            <li><a>delimiter</a> to a tab character</li>
+	            <li><a>skip rows</a> to 4</li>
+	            <li><a>skip columns</a> to 1</li>
+	          </ul>
+	          <p>
+	            Setting these is done in an implementation-defined way. It could be done, for example, by sniffing the contents of the file itself, through command-line options, or by embedding a dialect description into a metadata file associated with the tabular data, which would look like:
+	          </p>
+	          <pre class="example highlight">
+{
+  "delimiter": "\t",
+  "skipRows": 4,
+  "skipColumns": 1
+}
+	          </pre>
+	          <p>
+	            With these flags in operation, parsing this file results in an <a>annotated tabular data model</a> of a single <a>table</a> <var>T</var> with five columns and two rows which is largely the same as that created from the original simple example described in <a href="#simple-example" class="sectionRef"></a>. The only difference is that because the four skipped rows began with the default <a>comment prefix</a>, the table itself now has four <code>rdfs:comment</code> annotations, with the values:
+	          </p>
+	          <ol>
+	            <li><code> publisher	City of Palo Alto</code></li>
+	            <li><code> updated	12/31/2010</code></li>
+	            <li><code>name	GID	on-street	species	trim-cycle	inventory-date</code></li>
+	            <li><code>datatype	string	string	string	string	date:M/D/YYYY</code></li>
+	          </ol>
+	        </section>
+	        <section>
+	        	<h5>Recognising Tabular Data Formats</h5>
+	        	<p>
+	        		The conventions used in this data (invented for the purpose of this example) are in fact intended to create an <a>annotated tabular data model</a> which includes named annotations on the table itself, on the columns and on the cells. The creator of these conventions could create a specification for this particular tabular data syntax and register a media type for it. The specification would include things statements like:
+	        	</p>
+	        	<ul>
+	        		<li>A tab delimiter is always used.</li>
+	        		<li>The first column is always ignored.</li>
+	        		<li>When the first column of a row has the value <code>"#"</code>, the second column is the name of an annotation on the table and the values of the remaining columns are concatenated to create the value of that annotation.</li>
+	        		<li>When the first column of a row has the value <code>#name</code>, the remaining cells in the row provide a <code>name</code> annotation for each column in the table.</li>
+	        		<li>When the first column of a row has the value <code>#datatype</code>, the remaining cells in the row provide <code>datatype</code> and <code>format</code> annotations for the cells within the relevant column, and these are interpreted to create the <a title="cell value">value</a> for each cell in that column.</li>
+	        		<li>The first row where the first column is empty is a row of headers; these provide <code>title</code> annotations on the columns in the table.</li>
+	        		<li>The remaining rows make up the data of the table.</li>
+	        	</ul>
+	        	<p>
+							Parsers that recognised the format could then build a more sophisticated annotated tabular data model using only the embedded information in the tabular data file. As before, the result would be a single <a>table</a> <var>T</var> with five columns and two rows. The table itself would have two annotations:
+						</p>
+						<dl>
+							<dt><code>publisher</code></dt>
+							<dd><code>City of Palo Alto</code></dd>
+							<dt><code>updated</code></dt>
+							<dd><code>12/31/2010</code></dd>
+						</dl>
+						<p>
+							The columns have the properties shown in the following table:
+	          </p>
+	          <table style="width: 100%; text-align: left">
+	            <thead>
+	              <tr><th rowspan="2">id</th><th colspan="3">core properties</th><th colspan="2">annotations</th></tr>
+	              <tr><th>table</th><th>number</th><th>cells</th><th><code>name</code></th><th><code>title</code></th></tr>
+	            </thead>
+	            <tbody>
+	              <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td><var>C1.1</var>, <var>C2.1</var></td><td><code>GID</code></td><td><code>GID</code></td></tr>
+	              <tr><td><var>C2</var></td><td><var>T</var></td><td>2</td><td><var>C1.2</var>, <var>C2.2</var></td><td><code>on-street</code></td><td><code>On Street</code></td></tr>
+	              <tr><td><var>C3</var></td><td><var>T</var></td><td>3</td><td><var>C1.3</var>, <var>C2.3</var></td><td><code>species</code></td><td><code>Species</code></td></tr>
+	              <tr><td><var>C4</var></td><td><var>T</var></td><td>4</td><td><var>C1.4</var>, <var>C2.4</var></td><td><code>trim-cycle</code></td><td><code>Trim Cycle</code></td></tr>
+	              <tr><td><var>C5</var></td><td><var>T</var></td><td>5</td><td><var>C1.5</var>, <var>C2.5</var></td><td><code>inventory-date</code></td><td><code>Inventory Date</code></td></tr>
+	            </tbody>
+	          </table>
+	          <p>
+	            The rows have the properties shown in the following table, exactly as in previous examples:
+	          </p>
+	          <table style="width: 100%; text-align: left">
+	            <thead>
+	              <tr><th rowspan="2">id</th><th colspan="3">core properties</th></tr>
+	              <tr><th>table</th><th>number</th><th>cells</th></tr>
+	            </thead>
+	            <tbody>
+	              <tr><td><var>R1</var></td><td><var>T</var></td><td>1</td><td><var>C1.1</var>, <var>C1.2</var>, <var>C1.3</var>, <var>C1.4</var>, <var>C1.5</var></td></tr>
+	              <tr><td><var>R2</var></td><td><var>T</var></td><td>2</td><td><var>C2.1</var>, <var>C2.2</var>, <var>C2.3</var>, <var>C2.4</var>, <var>C2.5</var></td></tr>
+	            </tbody>
+	          </table>
+	          <p>
+	            The cells have the properties shown in the following table. Because of the way the particular tabular data format has been specified, these include additional annotations but also, for the <code>Inventory Date</code> column (cells <var>C1.5</var> and <var>C2.5</var>), have a <a title="cell value">value</a> that is a parsed date rather than an unparsed string.
+	          </p>
+	          <table style="width: 100%; text-align: left">
+	            <thead>
+	              <tr><th rowspan="2">id</th><th colspan="3">core properties</th><th colspan="2">annotations</th></tr>
+	              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th><th>datatype</th><th>format</th></tr>
+	            </thead>
+	            <tbody>
+	              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"1"</code></td><td><code>"1"</code></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C1.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R1</var></td><td><code>"ADDISON AV"</code></td><td><code>"ADDISON AV"</code></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C1.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R1</var></td><td><code>"Celtis australis"</code></td><td><code>"Celtis australis"</code></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C1.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R1</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C1.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R1</var></td><td><code>"10/18/2010"</code></td><td><code>2010-10-18</code></td><td><code>date</code></td><td><code>M/D/YYYY</code></td></tr>
+	              <tr><td><var>C2.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R2</var></td><td><code>"2"</code></td><td><code>"2"</code></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C2.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R2</var></td><td><code>"EMERSON ST"</code></td><td><code>"EMERSON ST"</code></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C2.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R2</var></td><td><code>"Liquidambar styraciflua"</code></td><td><code>"Liquidambar styraciflua"</code></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C2.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R2</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C2.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R2</var></td><td><code>"6/2/2010"</code></td><td><code>2010-06-02</code></td><td><code>date</code></td><td><code>M/D/YYYY</code></td></tr>
+	            </tbody>
+	          </table>
+	        </section>
+	      </section>
+      </section>
     </section>
     <section class="appendix" id="standards">
       <h2>Existing Standards</h2>
