@@ -508,7 +508,15 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       <section>
         <h3>Top-Level Properties</h3>
         <p>
-          The top-level object (whether it is a <a>table group description</a> or a <a>table description</a>) MAY have a <code>@context</code> property, as defined in <cite><a href="http://www.w3.org/TR/json-ld/#context-definitions">Section 8.7</a></cite> of [[!JSON-LD]]. This holds a reference to an external context definition, a local context definition, or an array composed of either. The default location for interpreting Tabular Metaata is <code>http://www.w3.org/ns/csvw</code>. The use of a local context definition may be used to provide metadata for interpreting other properties, namely:
+          The top-level object (whether it is a <a>table group description</a> or a <a>table description</a>) MAY have a <code>@context</code> property, as defined in <cite><a href="http://www.w3.org/TR/json-ld/#context-definitions">Section 8.7</a></cite> of [[!JSON-LD]]. If present, <code>@context</code> may contain any of the following:</p>
+          <ul>
+            <li>a URL referencing an external context definition,</li>
+            <li>An object containing a local context as described below, or</li>
+            <li>An array consisting of one or more URLs followed by an optional object as described above.</li>
+          </li>
+        </ul>
+        <p>The default location for interpreting Tabular Metadata is <code>http://www.w3.org/ns/csvw</code>.</p>
+        <p>The use of a local context definition may be used to provide metadata for interpreting other properties, namely:
         </p>
         <dl>
           <dt><code>@language</code></dt>
@@ -557,6 +565,9 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               If the property accepts arrays, the result is an array of objects or strings: those from A followed by those from B that were not already a value in A.</li>
             <li>If the property is a <a>natural language property</a>, the result is an object whose properties are language codes and where the values of those properties are arrays. The suitable language code for the values is either explicit within the existing value or determined through the <a>default language</a> in the metadata document; if it can't be determined the language code <code>und</code> should be used. The arrays should provide the values from A followed by those from B that were not already a value in A.</li>
             <li>If the property is an <a>atomic property</a>, then if the property only accepts single values, the value from A overrides that from B; otherwise the result is an array of values: those from A followed by those from B that were not already a value in A.</li>
+            <li>If the property is <code>@context</code>, then the result is an array consisting of the URLs from A followed by the URLs from B not already in A followed by the merge of any object values of A and B.
+              If the resulting array contains only a single value, the result is that value.
+            </li>
           </ul>
           <p>
             If the type of the property cannot be determined, because it is not defined in this specification (ie because it is an extension property), the type of the property is determined based on its values in A and B, as follows, and merged accordingly:
@@ -825,7 +836,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
                 A <a>link property</a> giving the single URL for the format that will be created through the transformation. If one has been defined, this should be a URL for a media type, in the form <code>http://www.iana.org/assignments/media-types/<var>media-type</var></code> such as <code>http://www.iana.org/assignments/media-types/text/calendar</code>. Otherwise, it can be any URL that describes the target format.
               </p>
               <p class="note">
-                The <code>targetFormat</code> URL is intended as an informative identifier for the target format, and applications MAY NOT access the URL.
+                The <code>targetFormat</code> URL is intended as an informative identifier for the target format, and applications SHOULD NOT access the URL.
               </p>
             </dd>
             <dt id="template-templateFormat"><code>templateFormat</code></dt>
@@ -834,7 +845,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
                 A <a>link property</a> giving the single URL for the format that is used by the template. If one has been defined, this should be a URL for a media type, in the form <code>http://www.iana.org/assignments/media-types/<var>media-type</var></code> such as <code>http://www.iana.org/assignments/media-types/application/javascript</code>. Otherwise, it can be any URL that describes the template format.
               </p>
               <p class="note">
-                The <code>templateFormat</code> URL is intended as an informative identifier for the template format, and applications MAY NOT access the URL. The template formats that an application supports are implementation defined.
+                The <code>templateFormat</code> URL is intended as an informative identifier for the template format, and applications SHOULD NOT access the URL. The template formats that an application supports are implementation defined.
               </p>
             </dd>
           </dl>
