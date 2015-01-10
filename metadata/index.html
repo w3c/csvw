@@ -591,6 +591,20 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         <p class="note">
           Forbidding the declaration of new prefixes ensures consistent processing between JSON-LD-aware and non-JSON-LD-aware processors.
         </p>
+        <div class="issue" data-number="142">
+          <p>The values of common properties may be represented as a string, native JSON type, <cite><a href="">JSON-LD Value Object</a></cite> [[!JSON-LD]], or an array of any of these. Otherwise, if used as strings, when represented as RDF, values will take on the result of <cite><a href="http://www.w3.org/TR/rdf11-concepts/#dfn-simple-literal">simple literal</a></cite> or <cite><a href="http://www.w3.org/TR/rdf11-concepts/#dfn-language-tagged-string">language-tagged string</a></cite> [[rdf-concepts]]. For example:</p>
+<pre><code>{
+  "dc:title": "String value with possible language from `@context`",
+  "dc:description": {"@value": "String value with no language"},
+  "schema:name": {"@value": "String value with explicit language", "@language": "en"},
+  "schema:url": {"@id": "http://example.com/"},
+  "schema:valueRequired": true,
+  "foaf:age": 18.5,
+  "schema:description": ["first value", "second value"]
+}</code></pre>
+          <p>Alternatively, value expansion may be determined through custom JSON-LD Context mappings, or by pre-defining specific mappings in the default context. This also has merge considerations, where the <a>object property</a> allowing arrays is not appropriate.</p>
+          <p>Merge should be that of <a>atomic property</a> allowing arrays, not presently defined; i.e., coerce values to array, and concatenate unique values in order.</p>
+        </div>
       </section>
       <section>
         <h3>Table Groups</h3>
