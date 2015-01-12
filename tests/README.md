@@ -1,15 +1,15 @@
 This README is for the W3C CSV Working Group's test suite.
 This test suite contains xxx kinds of tests:
 
-* JSON Direct Mapping (csvt:JsonDirectMappingTest) - the result of processing
-  a CSV without external metadata to JSON-LD.
+* JSON Direct Mapping (csvt:JsonToRdfTest) - the result of processing
+  a CSV to JSON.
 
-* RDF Direct Mapping (csvt:JsonDirectMappingTest) - the result of processing
-  a CSV without external metadata to RDF (Turtle).
+* RDF Direct Mapping (csvt:CsvToRdfTest) - the result of processing
+  a CSV to RDF (Turtle).
 
 The manifest.ttl file in this directory lists all of the tests in the
 CSV WG's test suite. Each test is one of the above tests. All
-tests have a name (mf:name) and an input (mf:action). The Mapping
+tests have a name (mf:name) and an input (mf:action). Evaluation
 tests have an expected result (mf:result).
 
 • An implementation passes a Mapping test if it parses the input

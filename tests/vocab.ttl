@@ -1,0 +1,203 @@
+# W3C CSVW Test Vocabulary
+# This vocabulary defines classes an properties which extend
+# the test-manifest vocabulary at <http://www.w3.org/2001/sw/DataAccess/tests/test-manifest>.
+
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix dc:     <http://purl.org/dc/elements/1.1/> .
+@prefix mf:     <http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix :       <http://w3c.github.io/csvw/tests/vocab#> .
+
+: rdfs:comment     "Manifest vocabulary for CSVW test cases" ;
+  dc:creator       "Gregg Kellogg" ;
+  dc:publisher     "W3C Data on the Web Working Group" ;
+  dc:title         "Test case manifest vocabulary extensions" ;
+  dc:description   "Test case manifest vocabulary extensions" ;
+  dc:date          "2015-01-05" ;
+  dc:identifier    : .
+
+## ---- Test Case Classes ---
+
+:Test a rdfs:Class ;
+  rdfs:subClassOf mf:ManifestEntry;
+  rdfs:label "Superclass of all CSVW tests" ;
+  rdfs:comment """
+    All CSVW tests have an input file referenced using `mf:action`. Positive
+    and Negative Evaluation Tests also have a result file referenced using
+    `mf:result` . Other tests may take different inputs and options as defined
+    for each test class.
+  """ .
+
+:PositiveEvaluationTest a rdfs:Class ;
+  rdfs:label "Positive Evaluation Test" ;
+  rdfs:subClassOf :Test ;
+  rdfs:comment """
+    A Positive Evaluation test is successful when the result of processing the
+    input file specified as `mf:action` exactly matches the output file
+    specified as `mf:result` using the comparison defined in another class. The
+    specifics of invoking test, including the interpretation of options and
+    other input files are specified through a sub-class.
+  """ .
+
+:NegativeEvaluationTest a rdfs:Class ;
+  rdfs:label "Positive Evaluation Test" ;
+  rdfs:subClassOf :Test ;
+  rdfs:comment """
+    A Negative Evaluation test is successful when the result of processing the
+    input file specified as `mf:action` results in the error identified by the
+    literal value of `mf:result`. The specifics of invoking test, including the
+    interpretation of options (and other input files are specified through
+    sub-class.
+  """ .
+
+:PositiveSyntaxTest a rdfs:Class ;
+  rdfs:subClassOf :Test ;
+  rdfs:label "Positive Syntax Test" ;
+  rdfs:comment """
+    A type of test specifically for syntax testing.
+    Syntax tests are not required to have an associated result, only an action.
+  """ .
+
+:NegativeSyntaxTest a rdfs:Class ;
+  rdfs:subClassOf :Test ;
+  rdfs:label "Negative Syntax Test" ;
+  rdfs:comment """
+    A type of test specifically for syntax testing.
+    Syntax tests are not required to have an associated result, only an action.
+    Negative syntax tests are tests of which the result should be a parser error.
+  """ .
+
+:CsvToRdfTest a rdfs:Class ;
+  rdfs:label "CSV to RDF Test" ;
+  rdfs:subClassOf :PositiveEvaluationTest;
+  rdfs:comment """
+    A `CsvToRdfTest` takes an input file (`mf:accept`) in text/csv format to produce
+    a an RDF graph which is [isomorphic](http://www.w3.org/TR/rdf11-concepts/#graph-isomorphism) to the graph generated from the result file (`mf:result`)
+    (see [[RDF-CONCEPTS]]). The test entry MAY use `:implicit` files, have user-specified `:metadata`,
+    and have a `:httpLink` header defining a `describedBy` relationship. Test Processors SHOULD
+    act as if the file referenced via `mf:action` is returned using such a link header if it
+    is not included in the HTTP response.
+  """ .
+
+:CsvSparqlTest a rdfs:Class ;
+  rdfs:label "CSV SPARQL Test" ;
+  rdfs:subClassOf :PositiveEvaluationTest;
+  rdfs:comment """
+    A `CsvSparqlTest` takes an input file (`mf:accept`) in text/csv format to produce
+    a an RDF graph which used as the default graph of a SPARQL `ASK` query contained in `mf:result`. The test entry MAY use `:implicit` files, have user-specified `:metadata`,
+    and have a `:httpLink` header defining a `describedBy` relationship. Test Processors SHOULD
+    act as if the file referenced via `mf:action` is returned using such a link header if it
+    is not included in the HTTP response.
+  """ .
+
+:CsvToJsonTest a rdfs:Class ;
+  rdfs:label "CSV to JSON Test" ;
+  rdfs:subClassOf :PositiveEvaluationTest;
+  rdfs:comment """
+    A `CsvToJsonTest` takes an input file (`mf:accept`) in text/csv format to
+    produce a an JSON file. The test entry MAY use `:implicit` files, have
+    user-specified `:metadata`, and have a `:httpLink` header defining a
+    `describedBy` relationship. Test Processors SHOULD act as if the file
+    referenced via `mf:action` is returned using such a link header if it is
+    not included in the HTTP response. The expected results are compared using
+    JSON object comparison with the processor output.
+  """ .
+
+:Metadata2RdfTest a rdfs:Class ;
+  rdfs:label "Metadata to RDF Test" ;
+  rdfs:subClassOf :PositiveEvaluationTest;
+  rdfs:comment """
+    A `Metadata2RdfTest` takes an input file (`mf:accept`) in application/ld+json format to produce
+    a an RDF graph which is [isomorphic](http://www.w3.org/TR/rdf11-concepts/#graph-isomorphism) to the graph generated from the result file (`mf:result`)
+    (see [[RDF-CONCEPTS]]). The test entry MAY use `:implicit` files.
+  """ .
+
+:MetadataSparqlTest a rdfs:Class ;
+  rdfs:label "Metadata SPARQL Test" ;
+  rdfs:subClassOf :PositiveEvaluationTest;
+  rdfs:comment """
+    A `MetadataSparqlTest` takes an input file (`mf:accept`) in application/ld+json format to produce
+    a an RDF graph which used as the default graph of a SPARQL `ASK` query contained in `mf:result`. The test entry MAY use `:implicit` files, have user-specified `:metadata`,
+    and have a `:httpLink` header defining a `describedBy` relationship. Test Processors SHOULD
+    act as if the file referenced via `mf:action` is returned using such a link header if it
+    is not included in the HTTP response.
+  """ .
+
+:Metadata2JsonTest a rdfs:Class ;
+  rdfs:label "Metadata to JSON Test" ;
+  rdfs:subClassOf :PositiveEvaluationTest;
+  rdfs:comment """
+    A `Metadata2JsonTest` takes an input file (`mf:accept`) in text/csv format to produce
+    a an JSON file. The test entry MAY use `:implicit` files.
+    The expected results are compared using JSON object comparison with the processor output.
+  """ .
+
+:Option a rdfs:Class ;
+  rdfs:label "Processor Options" ;
+  rdfs:comment "Options passed to the test runner to affect invocation of the appropriate API method." .
+
+:noProv a rdf:Property
+  rdfs:label "No Provenance";
+  rdfs:comment """
+    Processor should run without generating provenance triples
+  """;
+  rdfs:domain :Option
+  rdfs:range xsd:boolean .
+
+## ---- Property declarations for each test ----
+
+:implicit a rdf:Property ;
+  rdfs:label "implicit";
+  rdfs:comment "Implicit input files" ;
+  rdfs:domain	 :Test ;
+  rdfs:range   rdfs:Resource .
+
+:option a rdf:Property ;
+  rdfs:label "option";
+  rdfs:comment "Options affecting processing" ;
+  rdfs:domain	 :Test ;
+  rdfs:range   :Option .
+
+:base a rdf:Property ;
+  rdfs:label "base";
+  rdfs:comment """
+    The base IRI to use when expanding or compacting the document.
+    If set, this overrides the input document's IRI.
+  """ ;
+  rdfs:domain	 :Test ;
+  rdfs:range   rdfs:Resource .
+
+:contentType a rdf:Property ;
+  rdfs:label "content type";
+  rdfs:comment """
+    The HTTP Content-Type used for the input file, in case it is a non-registered type.
+    """ ;
+  rdfs:domain	 :Test ;
+  rdfs:range   xsd:boolean .
+
+:redirectTo a rdf:Property ;
+  rdfs:label "redirect to";
+  rdfs:comment """
+    The location of a URL for redirection. A request made of the input file must be redirected
+    to the designated URL.
+    """ ;
+  rdfs:domain	 :Test ;
+  rdfs:range   xsd:boolean .
+
+:httpStatus a rdf:Property ;
+  rdfs:label "HTTP status";
+  rdfs:comment """
+    The HTTP status code that must be returned when the input file is requested. This
+    is typically used along with the `redirectTo` property.
+    """ ;
+  rdfs:domain	 :Test ;
+  rdfs:range   xsd:boolean .
+
+:httpLink a rdf:Property ;
+  rdfs:label "HTTP link";
+  rdfs:comment """
+    An HTTP Link header to be added to the result of requesting the input file.
+    """ ;
+  rdfs:domain	 :Test ;
+  rdfs:range   xsd:boolean .
