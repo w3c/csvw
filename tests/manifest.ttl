@@ -41,6 +41,12 @@
       <test010r>
       <test011j>
       <test011r>
+      <test012j>
+      <test012r>
+      <test012mj>
+      <test012mr>
+      <test013j>
+      <test013r>
     ) .
 
 <test001j> a csvt:CsvToJsonTest;
@@ -179,7 +185,7 @@
   mf:result     <test009.ttl>;
   .
 
-<test010j> a csvt:CsvToRdfTest;
+<test010j> a csvt:CsvToJsonTest;
   mf:name       "country-codes-and-names example (json)";
   rdfs:comment  "Country Codes and Names example";
   csvt:approval csvt:Proposed;
@@ -196,9 +202,9 @@
   mf:result     <test010.ttl>;
   .
 
-<test011j> a csvt:CsvToRdfTest;
+<test011j> a csvt:CsvToJsonTest;
   mf:name       "tree-ops example with metadata (json)";
-  rdfs:comment  "Field with parseable human formatted time without metadata";
+  rdfs:comment  "tree-ops example with metadata. Processors should load metadata based on action URL.";
   csvt:approval csvt:Proposed;
   mf:action     <test011.csv>;
   csvt:implicit <test011.csv-metadata.json>;
@@ -207,10 +213,94 @@
 
 <test011r> a csvt:CsvToRdfTest;
   mf:name       "tree-ops example with metadata (rdf)";
-  rdfs:comment  "Field with parseable human formatted time without metadata";
+  rdfs:comment  "tree-ops example with metadata. Processors should load metadata based on action URL.";
   csvt:approval csvt:Proposed;
   mf:action     <test011.csv>;
   csvt:implicit <test011.csv-metadata.json>;
   csvt:option   [csvt:noProv true];
   mf:result     <test011.ttl>;
+  .
+
+<test012j> a csvt:CsvToJsonTest;
+  mf:name       "tree-ops example with directory metadata (json)";
+  rdfs:comment  "tree-ops example with directory metadata. Processors should find directory-based metadata.";
+  csvt:approval csvt:Proposed;
+  mf:action     <test012/test012.csv>;
+  csvt:implicit <test012/metadata.json>;
+  mf:result     <test012/test012.json>;
+  .
+
+<test012r> a csvt:CsvToRdfTest;
+  mf:name       "tree-ops example with directory metadata (rdf)";
+  rdfs:comment  "tree-ops example with directory metadata. Processors should find directory-based metadata.";
+  csvt:approval csvt:Proposed;
+  csvt:option   [csvt:noProv true];
+  mf:action     <test012/test012.csv>;
+  csvt:implicit <test012/metadata.json>;
+  mf:result     <test012/test012.ttl>;
+  .
+
+<test012mj> a csvt:MetadataToJsonTest;
+  mf:name       "tree-ops example from metadata (json)";
+  rdfs:comment  "tree-ops example from metadata. Processors should find CSV from metadata action file.";
+  csvt:approval csvt:Proposed;
+  mf:action     <test012/metadata.json>;
+  csvt:implicit <test012/test012.csv>;
+  mf:result     <test012/test012.json>;
+  .
+
+<test012mr> a csvt:MetadataToRdfTest;
+  mf:name       "tree-ops example from metadata (rdf)";
+  rdfs:comment  "tree-ops example from metadata. Processors should find CSV from metadata action file.";
+  csvt:approval csvt:Proposed;
+  csvt:option   [csvt:noProv true];
+  mf:action     <test012/metadata.json>;
+  csvt:implicit <test012/test012.csv>;
+  mf:result     <test012/test012.ttl>;
+  .
+
+<test013j> a csvt:CsvToJsonTest;
+  mf:name       "tree-ops example with user-specified metadata (json)";
+  rdfs:comment  "tree-ops example with user-specified metadata. Processors load user-specified metadata before CSV.";
+  csvt:approval csvt:Proposed;
+  csvt:option   [
+    csvt:metadata <test013/test013-user-metadata.json>;
+  ];
+  mf:action     <test013/test013.csv>;
+  csvt:implicit <test013/test013-user-metadata.json>;
+  mf:result     <test013/test013.json>;
+  .
+
+<test013r> a csvt:CsvToRdfTest;
+  mf:name       "tree-ops example with user-specified metadata (rdf)";
+  rdfs:comment  "tree-ops example with user-specified metadata. Processors load user-specified metadata before CSV.";
+  csvt:approval csvt:Proposed;
+  csvt:option   [
+    csvt:noProv true;
+    csvt:metadata <test013/test013-user-metadata.json>;
+  ];
+  mf:action     <test013/test013.csv>;
+  csvt:implicit <test013/test013-user-metadata.json>;
+  mf:result     <test013/test013.ttl>;
+  .
+
+<test014j> a csvt:CsvToJsonTest;
+  mf:name       "tree-ops example with linked metadata (json)";
+  rdfs:comment  "tree-ops example with linked metadata. Processors load metadata from link header.";
+  csvt:approval csvt:Proposed;
+  csvt:httpLink "<test014-linked-metadata.json>; rel=\"describedby\"";
+  mf:action     <test014/test014.csv>;
+  csvt:implicit <test014/test014-linked-metadata.json>;
+  mf:result     <test014/test014.json>;
+  .
+
+<test014r> a csvt:CsvToRdfTest;
+  mf:name       "tree-ops example with linked metadata (rdf)";
+  rdfs:comment  "tree-ops example with linked metadata. Processors load metadata from link header.";
+  csvt:approval csvt:Proposed;
+  csvt:option   [csvt:noProv true];
+  csvt:httpLink "<test014-linked-metadata.json>; rel=\"describedby\"";
+  mf:action     <test014/test014.csv>;
+  csvt:implicit <test014/test014-linked-metadata.json>;
+  mf:result     <test014/test014.ttl>;
   .
