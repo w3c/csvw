@@ -548,45 +548,6 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           <li><a title="merged">merge</a> the object value of A with B</li>
           <li>if the merged array has a single value, the result is that value, otherwise, it is the array value</li>
         </ul>
-        <section>
-          <h4>Merging Metadata</h4>
-          <p>
-            When processing a tabular data file, the <cite><a href="http://www.w3.org/TR/tabular-data-model/#locating-metadata">Locating Metadata</a></cite> in [[!tabular-data-model]] describes different locations for locating metadata. To property transform a tabular data file, such as a CSV, processors MUST merge metadata from these separate sources to create a single metadata document in a manner consistent with this algorithm.
-          </p>
-          <p>
-            Merging of metadata happens in order from highest priority to lowest priority by merging the first two metadata files (A and B) together to create new merged metadata AB'. This is then used to merge in the next metadata file until all metadata have been processed to create a <a>table group description</a>. If the top-level object of either of the metadata files are <a title="table description">table descriptions</a>, these are treated as if they were <a title="table group description">table group descriptions</a> containing a single table description (ie having a single <code>resource</code> property whose value is the same as the original table description). Ensure that <code>@context</code> definitions are moved from the <a>table description</a> to the <a>table group description</a>.
-          </p>
-          <p>
-            A description object B is <dfn>merged</dfn> into an original description object A by merging each property of B into A. If the property from B does not exist on A, it is simply added to A. If A does have the property, the way the values are merged depends on the type of the property, as follows:
-          </p>
-          <ul>
-            <li>If the property is an <a>array property</a>, the way in which values are merged depends on the property; see the relevant property for this definition.</li>
-            <li>If the property is a <a>link property</a>, then if the property only accepts single values, the value from A overrides that from B, otherwise the result is an array of links: those from A followed by those from B that were not already a value in A.</li>
-            <li>If the property is a <a>URI template property</a>, the value from A overrides that from B.</li>
-            <li>If the property is a <a>column reference property</a>, the value from A overrides that from B.</li>
-            <li>If the property is an <a>object property</a>, then if the property only accepts single objects:
-              <ol>
-                <li>if the value of the property in A is a string or the value from B is a string then the value from A overrides that from B</li>
-                <li>otherwise (if both values as objects) the objects are merged as described here</li>
-              </ol>
-              If the property accepts arrays, the result is an array of objects or strings: those from A followed by those from B that were not already a value in A.</li>
-            <li>If the property is a <a>natural language property</a>, the result is an object whose properties are language codes and where the values of those properties are arrays. The suitable language code for the values is either explicit within the existing value or determined through the <a>default language</a> in the metadata document; if it can't be determined the language code <code>und</code> should be used. The arrays should provide the values from A followed by those from B that were not already a value in A.</li>
-            <li>If the property is an <a>atomic property</a>, then if the property only accepts single values, the value from A overrides that from B; otherwise the result is an array of values: those from A followed by those from B that were not already a value in A.</li>
-            <li>If the property is a common property, the result is an array containing values from A followed by values from B not already in A. An array result having a single value uses that value as it's result.</li>
-            <li>If the property is <code>@context</code>, then the result is an array consisting of the URLs from A followed by the URLs from B not already in A followed by the merge of any object values of A and B.
-              If the resulting array contains only a single value, the result is that value.
-            </li>
-          </ul>
-          <p>
-            If the type of the property cannot be determined, because it is not defined in this specification (ie because it is an extension property), the type of the property is determined based on its values in A and B, as follows, and merged accordingly:
-          </p>
-          <ul>
-            <li>If the value of the property in A and the value of the property in B are both objects, they are treated as if the property is an <a>object property</a> that only accepts single objects.</li>
-            <li>If one of the values is an array and the other is an object, they are treated as if the property is an <a>object property</a> that accepts arrays.</li>
-            <li>If the value of the property in A and the value of the property in B are atomic values, they are treated as if the property is an <a>atomic property</a> that only accepts single values.</li>
-            <li>If one of the values is an array and the other is an atomic value, they are treated as if the property is an <a>atomic property</a> that accepts arrays.</li>
-          </ul>
-        </section>
       </section>
       <section>
         <h3>Common Properties</h3>
@@ -1526,6 +1487,45 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           </p>
         </section>
       </section>
+    </section>
+    <section>
+      <h4>Merging Metadata</h4>
+      <p>
+        When processing a tabular data file, the <cite><a href="http://www.w3.org/TR/tabular-data-model/#locating-metadata">Locating Metadata</a></cite> in [[!tabular-data-model]] describes different locations for locating metadata. To property transform a tabular data file, such as a CSV, processors MUST merge metadata from these separate sources to create a single metadata document in a manner consistent with this algorithm.
+      </p>
+      <p>
+        Merging of metadata happens in order from highest priority to lowest priority by merging the first two metadata files (A and B) together to create new merged metadata AB'. This is then used to merge in the next metadata file until all metadata have been processed to create a <a>table group description</a>. If the top-level object of either of the metadata files are <a title="table description">table descriptions</a>, these are treated as if they were <a title="table group description">table group descriptions</a> containing a single table description (ie having a single <code>resource</code> property whose value is the same as the original table description). Ensure that <code>@context</code> definitions are moved from the <a>table description</a> to the <a>table group description</a>.
+      </p>
+      <p>
+        A description object B is <dfn>merged</dfn> into an original description object A by merging each property of B into A. If the property from B does not exist on A, it is simply added to A. If A does have the property, the way the values are merged depends on the type of the property, as follows:
+      </p>
+      <ul>
+        <li>If the property is an <a>array property</a>, the way in which values are merged depends on the property; see the relevant property for this definition.</li>
+        <li>If the property is a <a>link property</a>, then if the property only accepts single values, the value from A overrides that from B, otherwise the result is an array of links: those from A followed by those from B that were not already a value in A.</li>
+        <li>If the property is a <a>URI template property</a>, the value from A overrides that from B.</li>
+        <li>If the property is a <a>column reference property</a>, the value from A overrides that from B.</li>
+        <li>If the property is an <a>object property</a>, then if the property only accepts single objects:
+          <ol>
+            <li>if the value of the property in A is a string or the value from B is a string then the value from A overrides that from B</li>
+            <li>otherwise (if both values as objects) the objects are merged as described here</li>
+          </ol>
+          If the property accepts arrays, the result is an array of objects or strings: those from A followed by those from B that were not already a value in A.</li>
+        <li>If the property is a <a>natural language property</a>, the result is an object whose properties are language codes and where the values of those properties are arrays. The suitable language code for the values is either explicit within the existing value or determined through the <a>default language</a> in the metadata document; if it can't be determined the language code <code>und</code> should be used. The arrays should provide the values from A followed by those from B that were not already a value in A.</li>
+        <li>If the property is an <a>atomic property</a>, then if the property only accepts single values, the value from A overrides that from B; otherwise the result is an array of values: those from A followed by those from B that were not already a value in A.</li>
+        <li>If the property is a common property, the result is an array containing values from A followed by values from B not already in A. An array result having a single value uses that value as it's result.</li>
+        <li>If the property is <code>@context</code>, then the result is an array consisting of the URLs from A followed by the URLs from B not already in A followed by the merge of any object values of A and B.
+          If the resulting array contains only a single value, the result is that value.
+        </li>
+      </ul>
+      <p>
+        If the type of the property cannot be determined, because it is not defined in this specification (ie because it is an extension property), the type of the property is determined based on its values in A and B, as follows, and merged accordingly:
+      </p>
+      <ul>
+        <li>If the value of the property in A and the value of the property in B are both objects, they are treated as if the property is an <a>object property</a> that only accepts single objects.</li>
+        <li>If one of the values is an array and the other is an object, they are treated as if the property is an <a>object property</a> that accepts arrays.</li>
+        <li>If the value of the property in A and the value of the property in B are atomic values, they are treated as if the property is an <a>atomic property</a> that only accepts single values.</li>
+        <li>If one of the values is an array and the other is an atomic value, they are treated as if the property is an <a>atomic property</a> that accepts arrays.</li>
+      </ul>
     </section>
     <section>
       <h2>Processing Tables</h2>
