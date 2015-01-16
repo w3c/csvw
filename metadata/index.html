@@ -508,7 +508,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       <section>
         <h3>Top-Level Properties</h3>
         <p>
-          The top-level object (whether it is a <a>table group description</a> or a <a>table description</a>) MAY have a <code>@context</code> property, as defined in <cite><a href="http://www.w3.org/TR/json-ld/#context-definitions">Section 8.7</a></cite> of [[!JSON-LD]]. If present, <code>@context</code> may contain any of the following:</p>
+          The top-level object (whether it is a <a>table group description</a> or a <a>table description</a>) MAY have a <code>@context</code> property, an <a>array property</a>, as defined in <cite><a href="http://www.w3.org/TR/json-ld/#context-definitions">Section 8.7</a></cite> of [[!JSON-LD]]. If present, <code>@context</code> may contain any of the following:</p>
           <ul>
             <li>a URL referencing an external context definition,</li>
             <li>An object containing a local context as described below, or</li>
@@ -538,19 +538,26 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             </p>
           </dd>
         </dl>
+        <p>
+          A <code>@context</code> B is <a>merged</a> into an original <code>@context</code> A by:
+        </p>
+        <ul>
+          <li>ensure that each value is an array, by placing an object value of <code>@context</code> into an array containing that value</li>
+          <li>if the array value either A or B does not contain an object as its last element, append a new empty object to that array</li>
+          <li>insert the string values from B not already in A before the last object value.</li>
+          <li><a title="merged">merge</a> the object value of A with B</li>
+          <li>if the merged array has a single value, the result is that value, otherwise, it is the array value</li>
+        </ul>
         <section>
-          <h4>Importing Metadata</h4>
+          <h4>Merging Metadata</h4>
           <p>
-            The top-level object (whether it is a <a>table group description</a> or a <a>table description</a>) MAY also have an <code>import</code> property. This is a <a>link property</a> which references one or more other metadata files to be imported into the original metadata file.
+            When processing a tabular data file, the <cite><a href="http://www.w3.org/TR/tabular-data-model/#locating-metadata">Locating Metadata</a></cite> in [[!tabular-data-model]] describes different locations for locating metadata. To property transform a tabular data file, such as a CSV, processors MUST merge metadata from these separate sources to create a single metadata document in a manner consistent with this algorithm.
           </p>
           <p>
-            If the <code>import</code> property contains an array, imports are carried out in sequence: the first metadata file referenced is imported into the original metadata file; the second is imported into the result and so on. If a referenced metadata file has already been imported (or was the original metadata file) it is ignored.
+            Merging of metadata happens in order from highest priority to lowest priority by merging the first two metadata files (A and B) together to create new merged metadata AB'. This is then used to merge in the next metadata file until all metadata have been processed to create a <a>table group description</a>. If the top-level object of either of the metadata files are <a title="table description">table descriptions</a>, these are treated as if they were <a title="table group description">table group descriptions</a> containing a single table description (ie having a single <code>resource</code> property whose value is the same as the original table description). Ensure that <code>@context</code> definitions are moved from the <a>table description</a> to the <a>table group description</a>.
           </p>
           <p>
-            If the top-level object of any of the metadata files are <a title="table description">table descriptions</a>, these are treated as if they were <a title="table group description">table group descriptions</a> containing a single table description (ie having a single <code>resource</code> property whose value is the same as the original table description).
-          </p>
-          <p>
-            An imported description object B is <dfn>imported</dfn> into an original description object A by merging each property of B into A. If the property from B does not exist on A, it is simply added to A. If A does have the property, the way the values are merged depends on the type of the property, as follows:
+            A description object B is <dfn>merged</dfn> into an original description object A by merging each property of B into A. If the property from B does not exist on A, it is simply added to A. If A does have the property, the way the values are merged depends on the type of the property, as follows:
           </p>
           <ul>
             <li>If the property is an <a>array property</a>, the way in which values are merged depends on the property; see the relevant property for this definition.</li>
@@ -565,6 +572,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               If the property accepts arrays, the result is an array of objects or strings: those from A followed by those from B that were not already a value in A.</li>
             <li>If the property is a <a>natural language property</a>, the result is an object whose properties are language codes and where the values of those properties are arrays. The suitable language code for the values is either explicit within the existing value or determined through the <a>default language</a> in the metadata document; if it can't be determined the language code <code>und</code> should be used. The arrays should provide the values from A followed by those from B that were not already a value in A.</li>
             <li>If the property is an <a>atomic property</a>, then if the property only accepts single values, the value from A overrides that from B; otherwise the result is an array of values: those from A followed by those from B that were not already a value in A.</li>
+            <li>If the property is a common property, the result is an array containing values from A followed by values from B not already in A. An array result having a single value uses that value as it's result.</li>
             <li>If the property is <code>@context</code>, then the result is an array consisting of the URLs from A followed by the URLs from B not already in A followed by the merge of any object values of A and B.
               If the resulting array contains only a single value, the result is that value.
             </li>
@@ -616,9 +624,9 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           <dl>
             <dt id="table-group-resources"><code>resources</code></dt>
             <dd>
-              An <a>array property</a> of <a title="table description">table descriptions</a> for the tables in the group. When an array of table descriptions B is <a>imported</a> into an original array of table descriptions A, each table description within B is combined into the original array A by:
+              An <a>array property</a> of <a title="table description">table descriptions</a> for the tables in the group. When an array of table descriptions B is <a>merged</a> into an original array of table descriptions A, each table description within B is combined into the original array A by:
               <ul>
-                <li>if there is a table description with the same <code>@id</code> in A, the table description from B is <a>imported</a> into the matching table description in A</li>
+                <li>if there is a table description with the same <code>@id</code> in A, the table description from B is <a>merged</a> into the matching table description in A</li>
                 <li>otherwise, the table description from B is appended to the array of table descriptions A</li>
               </ul>
             </dd>
@@ -649,9 +657,9 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             </dd>
             <dt id="table-group-templates"><code>templates</code></dt>
             <dd>
-              An <a>array property</a> of <a title="template specification">template specifications</a> that provide mechanisms to transform the tabular data into other formats. See <a href="#template-specifications" class="sectionRef"></a> for more details. When an array of template specifications B is <a>imported</a> into an original array of template specifications A, each template specification within B is combined into the original array A by:
+              An <a>array property</a> of <a title="template specification">template specifications</a> that provide mechanisms to transform the tabular data into other formats. See <a href="#template-specifications" class="sectionRef"></a> for more details. When an array of template specifications B is <a>merged</a> into an original array of template specifications A, each template specification within B is combined into the original array A by:
               <ul>
-                <li>if there is a template specification with the same <code>targetFormat</code> and <code>templateFormat</code> in A, the template specification from B is <a>imported</a> into the matching template specification in A</li>
+                <li>if there is a template specification with the same <code>targetFormat</code> and <code>templateFormat</code> in A, the template specification from B is <a>merged</a> into the matching template specification in A</li>
                 <li>otherwise, the template specification from B is appended to the array of template specifications A</li>
               </ul>
             </dd>
@@ -921,9 +929,11 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               The <a href="#column-name"><code>name</code></a> properties of the column descriptions MUST be unique within a given table description.
             </p>
             <p>
-              When an array of column descriptions B is <a>imported</a> into an original array of column descriptions A, each column description within B is combined into the original array A by:
+              When an array of column descriptions B is <a>merged</a> into an original array of column descriptions A, each column description within B is combined into the original array A by:
               <ul>
-                <li>if there is a column description at the same index within A and that column description has the same <code>name</code>, the column description from B is <a>imported</a> into the matching column description in A</li>
+                <li>if there is a column description at the same index within A and that column description has the same <code>name</code>, the column description from B is <a>merged</a> into the matching column description in A</li>
+                <li>otherwise, if there is a column description at the same index within A and that column description has a title, is also in A, and the column <code>language</code> is the same in both A and B, the column description from B is imported into the matching column description in A</li>
+                <li>otherwise, if there is no column description at the same index within A, then the column description is taken from that index of B</li>
                 <li>otherwise, the column description is ignored</li>
               </ul>
             </p>
@@ -975,7 +985,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               It is not required for the resource or schema referenced from a <code>foreignKeys</code> property to have a similarly defined <code>primaryKey</code>.
             </p>
             <p>
-              When an array of foreign key definitions B is <a>imported</a> into an original array of foreign key definitions A, each foreign key definition within B which does not appear within A is appended to the original array A.
+              When an array of foreign key definitions B is <a>merged</a> into an original array of foreign key definitions A, each foreign key definition within B which does not appear within A is appended to the original array A.
             </p>
             <p class="issue" data-number="16">
               The cross reference between files should be limited to files from one publisher - else they are just web links with no guarantee of whether the target of the link exists which 'foreign key' might imply.
