@@ -270,7 +270,7 @@ var respecConfig = {
       <section>
         <h3>Embedded Metadata</h3>
         <p>
-          Most syntaxes for tabular data provide a facility for embedding some metadata within the tabular data file itself. The definition of a syntax for tabular data SHOULD include a description of how the syntax maps to an annotated data model. See <a href="#parsing" class="sectionRef"></a> for a description of this for CSV files.
+          Most syntaxes for tabular data provide a facility for <dfn title="embedded metadata">embedding metadata</dfn> within the tabular data file itself. The definition of a syntax for tabular data SHOULD include a description of how the syntax maps to an annotated data model. See <a href="#parsing" class="sectionRef"></a> for a description of this for CSV files.
         </p>
       </section>
       <section>
@@ -599,7 +599,7 @@ Content-Type: text/csv;header=absent
         Standardising the parsing of CSV is outside the chartered scope of the Working Group. This non-normative section is intended to help the creators of parsers handle the wide variety of CSV-based formats that they may encounter due to the current lack of standardisation of the format.
       </p>
       <p>
-        This section describes an algorithm for parsing formats other than the plain CSV+ format specified in <a href="#syntax" class="sectionRef"></a>. It is impossible to do this in a fully automated manner, so this algorithm depends on the following flags being set externally (eg through user input or through the inclusion of a <a href="http://www.w3.org/TR/tabular-metadata/#dialect-descriptions">dialect description</a> within a metadata file):
+        This section describes an algorithm for parsing formats other than the plain CSV+ format specified in <a href="#syntax" class="sectionRef"></a> and extracting <a>embedded metadata</a>. The parsing algorithm depends on metadata properties found while <a href="#locating-metadata" class="sectionRef">Locating Metadata</a>, which may include user input (see <a href="overriding-metadata" class="sectionRef">Overriding Metadata</a>) or through the inclusion of a <a href="http://www.w3.org/TR/tabular-metadata/#dialect-descriptions">dialect description</a> within a metadata file):
       </p>
       <dl>
         <dt><dfn>encoding</dfn></dt>
@@ -640,6 +640,7 @@ Content-Type: text/csv;header=absent
         The algorithm for parsing a document containing tabular data is as follows:
       </p>
       <ol>
+        <li>Create <dfn>merged metadata</dfn> by locating all sources of metadata, other than embedded, as defined in <a href="#locating-metadata" class="sectionRef">Locating Metadata</a> and merge together in priority order as defined in <a href="http://www.w3.org/TR/tabular-metadata/#merging-metadata">Merging Metadata</a> in [[!tabular-metadata]].</li>
         <li>Read the file using the specified <a>encoding</a>.</li>
         <li>Find the rows. Each row ends with a <a>line terminator</a>, but values that are enclosed within the <a>quote character</a> may contain the <a>line terminator</a> without it indicating the end of the row. The <a>quote character</a> may be escaped using the <a>escape character</a> where it appears within cells. If the <a>escape character</a> is not the same as the <a>quote character</a> then the <a>escape character</a> is also used to escape the character that immediately follows it.</li>
         <li>Skip the number of rows indicated by the <a>skip rows</a> parameter. These form <code>rdfs:comment</code> annotations on the table. If a skipped row begins with the <a>comment prefix</a>, strip that prefix from the beginning of the row to create the content of the <code>rdfs:comment</code> annotation.</li>
@@ -652,11 +653,17 @@ Content-Type: text/csv;header=absent
             If <a>trim</a> is <code>true</code> or <code>start</code> then whitespace from the start of values that are not enclosed must be removed from the value. If <a>trim</a> is <code>true</code> or <code>end</code> then whitespace from the end of values that are not enclosed must be removed from the value.
           </p>
         </li>
+        <li>
+          Construct <a>embedded metadata</a> as Table Metadata (see <cite><a href="http://www.w3.org/TR/tabular-metadata/#tables"></a></cite> in [[!tabular-metadata]]) using the <code>@context</code> from <a>merged metadata</a> and setting the <code>language</code> annotation to the default language from the <code>@context</code>.</li>
         <li>In each row, ignore the number of columns indicated by the <a>skip columns</a> parameter. Always start from the first character in the row when counting columns (see <a href="#bidirectionality-in-csv-files" class="sectionRef"></a>).</li>
         <li>Gather the number of header columns indicated by the <a>header column count</a> parameter. Always start from the first character in the row when counting columns (see <a href="#bidirectionality-in-csv-files" class="sectionRef"></a>).</li>
-        <li>Each cell within a header row that is not in a skipped or header column is a <code>title</code> annotation on that column.</li>
+        <li>Each cell within a header row that is not in a skipped or header column is a <code>title</code> annotation on that column.
+          <div class="issue">How are titles from multiple header rows handled? Presume that multiple header cells in the same column are joined together with a newline separator.</div>
+        </li>
         <li>Each cell within a header column is an annotation on the row it appears in; if there is a header row then that provides the type of the annotation for the row, otherwise it is a <code>title</code> annotation.</li>
         <li>If <a>skip blank rows</a> is <code>true</code> then ignore any rows in which all the cell values are empty strings.</li>
+        <li>Re-create <a>merged metadata</a> using by locating all sources of metadata, included embedded metadata as constructed above, as defined in <a href="#locating-metadata" class="sectionRef">Locating Metadata</a> and merge together in priority order as defined in <a href="http://www.w3.org/TR/tabular-metadata/#merging-metadata">Merging Metadata</a> in [[!tabular-metadata]].</li>
+        <li>Generate row data for each row using <a>merged metadata</a> by parsing the cells from each row as defined in <cite><a href="http://www.w3.org/TR/tabular-metadata/#parsing-cells"></a>Parsing Cells</cite> in [[!tablular-metadata]].</li>
       </ol>
       <section>
         <h3>Examples</h3>
@@ -686,6 +693,22 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               <tr><td><var>C5</var></td><td><var>T</var></td><td>5</td><td><var>C1.5</var>, <var>C2.5</var></td><td><code>Inventory Date</code></td></tr>
             </tbody>
           </table>
+          <p>Expressed as Table Metadata:</p>
+          <pre class="highlight">
+{
+  "@id": "http://example.org/tree-ops.csv",
+  "@type": "Table",
+  "schema": {
+    "columns": [
+      {"title": "GID"},
+      {"title": "On Street"},
+      {"title": "Species"},
+      {"title": "Trim Cycle"},
+      {"title": "Inventory Date"}
+    ]
+  }
+}
+          </pre>
           <p>
             The rows have the properties shown in the following table:
           </p>
@@ -751,6 +774,27 @@ data.parse({
 	              <tr><td><var>C5</var></td><td><var>T</var></td><td>5</td><td><var>C1.5</var>, <var>C2.5</var></td><td><code>inventory-date</code></td><td><code>Inventory Date</code></td></tr>
 	            </tbody>
 	          </table>
+          <p>After creating <a>embedded metadata</a> and merging with overriding metadata:</p>
+          <pre class="highlight">
+{
+  "@id": "http://example.org/tree-ops.csv",
+  "@type": "Table",
+  "schema": {
+    "columns": [
+      {"name": "GID", "title": "GID", "datatype": "string"},
+      {"name": "on-street", "title": "On Street", "datatype": "string"},
+      {"name": "species", "title": "Species", "datatype": "string"},
+      {"name": "trim-cycle", "title": "Trim Cycle", "datatype": "string"},
+      {
+        "name": "inventory-date",
+        "title": "Inventory Date",
+        "datatype": "date",
+        "format": "M/D/YYYY"
+      }
+    ]
+  }
+}
+          </pre>
 	          <p>
 	            The cells have the properties shown in the following table. Because of the overrides provided by the consumer to guide the parsing, and the way the parser works, these include additional annotations but also, for the <code>Inventory Date</code> column (cells <var>C1.5</var> and <var>C2.5</var>), have a <a title="cell value">value</a> that is a parsed date rather than an unparsed string.
 	          </p>
