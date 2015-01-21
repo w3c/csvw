@@ -516,7 +516,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           </li>
         </ul>
         <p>The default location for interpreting Tabular Metadata is <code>http://www.w3.org/ns/csvw</code>.</p>
-        <p>The use of a local context definition may be used to provide metadata for interpreting other properties, namely:
+        <p>The use of a local context definition MAY be used to provide metadata for interpreting other properties, namely:
         </p>
         <dl>
           <dt><code>@language</code></dt>
@@ -620,7 +620,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <dd>
               An <a>array property</a> of <a title="template specification">template specifications</a> that provide mechanisms to transform the tabular data into other formats. See <a href="#template-specifications" class="sectionRef"></a> for more details. When an array of template specifications B is <a>merged</a> into an original array of template specifications A, each template specification within B is combined into the original array A by:
               <ul>
-                <li>if there is a template specification with the same <code>targetFormat</code> and <code>templateFormat</code> in A, the template specification from B is <a>merged</a> into the matching template specification in A</li>
+                <li>if there is a template specification with the same <code>@id</code>, <code>targetFormat</code> and <code>templateFormat</code> in A, the template specification from B is <a>merged</a> into the matching template specification in A</li>
                 <li>otherwise, the template specification from B is appended to the array of template specifications A</li>
               </ul>
             </dd>
@@ -895,7 +895,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
                 <li>if there is a column description at the same index within A and that column description has the same <code>name</code>, the column description from B is <a>merged</a> into the matching column description in A</li>
                 <li>otherwise, if there is a column description at the same index within A and that column description has a title, is also in A, and the column <a>default language</a> is the same in both A and B, the column description from B is imported into the matching column description in A</li>
                 <li>otherwise, if there is no column description at the same index within A, then the column description is taken from that index of B</li>
-                <li>otherwise, the column description is ignored</li>
+                <li>otherwise, the column description is ignored. A validator MUST issue a warning if such a column description is encountered.</li>
               </ul>
             </p>
           </dd>
@@ -1493,6 +1493,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
       <p>
         When processing a tabular data file, the <cite><a href="http://www.w3.org/TR/tabular-data-model/#locating-metadata">Locating Metadata</a></cite> in [[!tabular-data-model]] describes different locations for locating metadata. To property transform a tabular data file, such as a CSV, processors MUST merge metadata from these separate sources to create a single metadata document in a manner consistent with this algorithm.
       </p>
+      <p>Implementations MUST merge metadata documents in a manner consistent with these rules. Validators MUST check and issue warnings where merge issues are found as noted below and in the relevant property definitions.</p>
       <p>
         Merging of metadata happens in order from highest priority to lowest priority by merging the first two metadata files (A and B) together to create new merged metadata AB'. This is then used to merge in the next metadata file until all metadata have been processed to create a <a>table group description</a>. If the top-level object of either of the metadata files are <a title="table description">table descriptions</a>, these are treated as if they were <a title="table group description">table group descriptions</a> containing a single table description (ie having a single <code>resource</code> property whose value is the same as the original table description). Ensure that <code>@context</code> definitions are moved from the <a>table description</a> to the <a>table group description</a>.
       </p>
@@ -1510,7 +1511,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             <li>otherwise (if both values as objects) the objects are merged as described here</li>
           </ol>
           If the property accepts arrays, the result is an array of objects or strings: those from A followed by those from B that were not already a value in A.</li>
-        <li>If the property is a <a>natural language property</a>, the result is an object whose properties are language codes and where the values of those properties are arrays. The suitable language code for the values is either explicit within the existing value or determined through the <a>default language</a> in the metadata document; if it can't be determined the language code <code>und</code> should be used. The arrays should provide the values from A followed by those from B that were not already a value in A.</li>
+        <li>If the property is a <a>natural language property</a>, the result is an object whose properties are language codes and where the values of those properties are arrays. The suitable language code for the values is either explicit within the existing value or determined through the <a>default language</a> in the metadata document; if it can't be determined the language code <code>und</code> MUST be used. The arrays should provide the values from A followed by those from B that were not already a value in A.</li>
         <li>If the property is an <a>atomic property</a>, then if the property only accepts single values, the value from A overrides that from B; otherwise the result is an array of values: those from A followed by those from B that were not already a value in A.</li>
         <li>If the property is a common property, the result is an array containing values from A followed by values from B not already in A. An array result having a single value uses that value as it's result.</li>
       </ul>
