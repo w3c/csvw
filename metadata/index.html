@@ -237,6 +237,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       <p>
         the properties <code>name</code>, <code>title</code> and <code>dc:description</code> are <a title="direct annotation">direct annotations</a> that become <code>name</code>, <code>title</code> and <code>dc:description</code> properties on the column in the data model. The <code>datatype</code> and <code>format</code> properties are <a title="inherited property">inherited properties</a> that become <code>datatype</code> and <code>format</code> properties on the cells within the column.
       </p>
+      <p>The <dfn>property value</dfn> of an annotation is that defined in the metadata, unless otherwise noted.</p>
       <section>
         <h3>Direct Annotations</h3>
         <p>
@@ -516,7 +517,6 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <li>a URL referencing an external context definition,</li>
             <li>An object containing a local context as described below, or</li>
             <li>An array consisting of one or more URLs followed by an optional object as described above.</li>
-          </li>
         </ul>
         <p>The default location for interpreting Tabular Metadata is <code>http://www.w3.org/ns/csvw</code>.</p>
         <p>The use of a local context definition MAY be used to provide metadata for interpreting other properties, namely:
@@ -597,7 +597,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           </dl>
         </section>
         <section>
-          <h4>Optional Properties</h3>
+          <h4>Optional Properties</h4>
           <p>
             The description of a group of tables MAY also contain:
           </p>
@@ -776,6 +776,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             If included, <code>@type</code> MUST be set to <code>"Dialect"</code>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.
           </dd>
         </dl>
+        <p>The <a>property value</a> of a <a>dialect description</a> is that defined in the <a>table description</a>, if any, or that defined in the <a>table group description</a>, if any, or the default defined for that property.</p>
         <div class="example">
           <p>
             The default dialect description for CSV files is:
@@ -1156,18 +1157,17 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           Should there be a way to suppress columns?
         </p>
         <section>
-          <h4>Required Properties</h4>
+          <h4>Optional Properties</h4>
           <dl>
             <dt id="column-name"><code>name</code></dt>
             <dd>
               <p>
                 An <a>atomic property</a> that gives a single canonical name for the column. This MUST be a string. Conversion specifications MUST use this property as the basis for the names of properties/elements/attributes in the results of conversions.
               </p>
+              <p>The <a>property value</a> of <code>name</code> is that defined within metadata, if it exists. Otherwise, it is the first <a>property value</a> of <code>title</code> as a string without language, if any. Otherwise, it is the string <code>"_col=<em>[N]</em>"</code> where <code><em>[N]</em></code> is the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column-number">column number</a>.
+              </p>
               <p>
                 For ease of reference within <a title="URI template property">URI template properties</a>, column names SHOULD consist only of alphanumeric characters or underscores (<code>[a-zA-Z0-9_]+</code>). Names beginning with <code>_</code> are reserved by this specification and MUST NOT be used.
-              </p>
-              <p class="issue" data-number="33">
-                What do to with conversion if no column name is given?
               </p>
               <p class="issue" data-number="53">
                 We invite comment on what the syntactic limitations should be on column names to make them most useful when used as the basis of conversion into other formats, bearing in mind that different target languages such as JSON, RDF and XML have different syntactic limitations and common naming conventions.
@@ -1176,15 +1176,10 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
                 During validation, if there is no <code>title</code> property and the column already has a <code>title</code> annotation then a validator MUST issue a warning if the existing <code>title</code> annotation does not match the <code>name</code> specified in the column description.
               </p>
             </dd>
-          </dl>
-        </section>
-        <section>
-          <h4>Optional Properties</h4>
-          <dl>
             <dt id="column-title"><code>title</code></dt>
             <dd>
               <p>
-                A <a>natural language property</a> that provides possible alternative names for the column. The <dfn>possible column titles</dfn> are defined as:
+                A <a>natural language property</a> that provides possible alternative names for the column. The <a>property value</a> is defined as:
               </p>
               <ul>
                 <li>if the value of <code>title</code> is a string, that string</li>
@@ -1194,17 +1189,14 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
               <p>
                 where the <dfn>column language</dfn> is the value of the <code>language</code> property on the column description, or (if there is no such language), the value of the <code>language</code> property on the table description.
               </p>
-              <p>
-                If the column already has a <code>title</code> annotation (because a header row has been included in the original CSV file) then a validator MUST issue a warning if the existing <code>title</code> annotation is not the same as any of the <a>possible column titles</a>.
-              </p>
               <p class="issue" data-number="56">
                 The facility to specify multiple potential titles for a column is important when the same column description is used for multiple CSVs, through a mechanism yet to be defined by this specification.
               </p>
             </dd>
             <dt id="column-required"><code>required</code></dt>
-            <dd>A boolean <a>atomic property</a> taking a single value which indicates whether every cell within the column must have a non-null value.</dd>
+            <dd>A boolean <a>atomic property</a> taking a single value which indicates whether every cell within the column must have a non-null value. Its <a>property value</a> is that defined in metadata, or <code>false</code> otherwise.</dd>
             <dt id="column-predicateUrl"><code>predicateUrl</code></dt>
-            <dd>An <a>atomic property</a> that holds one or more URIs that MAY be used as URIs for predicates if the table is mapped to another format.</dd>
+            <dd>An <a>atomic property</a> that holds one or more URIs that MAY be used as URIs for predicates if the table is mapped to another format. Its <a>property value</a> is that defined in metadata, if any, or the <a>base URL</a> with the URI encoded <a>property value</a> of <code>name</code> as a fragment.</dd>
             <dt id="column-ld-type"><code>@type</code></dt>
             <dd>
               <p>
@@ -1321,6 +1313,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             </p>
           </dd>
         </dl>
+        <p>The <a>property value</a> of an <a>inherited property</a> is the first value, if any, found by looking in the current annotation object through all of its containing objects: a <a>inherited property</a> defined in a <a>column description</a> takes precidence of one defined in a <a>schema description</a>, which in turn takes precidence of one defined in a <a>table description</a>, which in turn takes precidence of one defined in a <a>table group description</a>.</p>
       </section>
       <section>
         <h2>Datatypes</h2>
