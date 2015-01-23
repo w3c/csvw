@@ -1498,12 +1498,18 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
         Merging of metadata happens in order from highest priority to lowest priority by merging the first two metadata files (A and B) together to create new merged metadata AB'. This is then used to merge in the next metadata file until all metadata have been processed to create a <a>table group description</a>. If the top-level object of either of the metadata files are <a title="table description">table descriptions</a>, these are treated as if they were <a title="table group description">table group descriptions</a> containing a single table description (ie having a single <code>resource</code> property whose value is the same as the original table description). Ensure that <code>@context</code> definitions are moved from the <a>table description</a> to the <a>table group description</a>.
       </p>
       <p>
+        The location of the merged metadata is defined to be the location of the highest priority metadata file. This makes the <a>base URL</a> either that of the defined <code>@base</code> or the location of the first metadata file when resolving URLs, unless the user provides a metadata file.
+      </p>
+      <p class="note">
+        This typically will mean that the metadata location is that of the tabular data file from which embedded metadata is extracted, as that is otherwise the highest priority metadata file. As all metadata files typically have the same relative path, resolving a URL against any of these will result in the same absolute URL.
+      </p>
+      <p>
         A description object B is <dfn>merged</dfn> into an original description object A by merging each property of B into A. If the property from B does not exist on A, it is simply added to A. If A does have the property, the way the values are merged depends on the type of the property, as follows:
       </p>
       <ul>
         <li>If the property is an <a>array property</a>, the way in which values are merged depends on the property; see the relevant property for this definition.</li>
-        <li>If the property is a <a>link property</a>, then if the property only accepts single values, the value from A overrides that from B, otherwise the result is an array of links: those from A followed by those from B that were not already a value in A.</li>
-        <li>If the property is a <a>URI template property</a>, the value from A overrides that from B.</li>
+        <li>If the property is a <a>link property</a>, then if the property only accepts single values, the value from A overrides that from B, otherwise the result is an array of links: those from A followed by those from B that were not already a value in A. Values are first resolved against the <a>base URL</a> of A or B respectively.</li>
+        <li>If the property is a <a>URI template property</a>, the value from A overrides that from B. Values are first resolved against the <a>base URL</a> of A or B respectively.</li>
         <li>If the property is a <a>column reference property</a>, the value from A overrides that from B.</li>
         <li>If the property is an <a>object property</a>, then if the property only accepts single objects:
           <ol>
