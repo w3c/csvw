@@ -109,9 +109,10 @@ class Vocab
     properties.each do |id, entry|
       defn = {"@id" => namespaced(id)}
       case entry[:range]
-      when /xsd:/                 then defn['@type'] = entry[:range]
-      when nil                    then ;
-      else                             defn['@type'] = '@id'
+      when "xsd:string" then defn['@language'] = nil
+      when /xsd:/       then defn['@type'] = entry[:range]
+      when nil          then ;
+      else                   defn['@type'] = '@id'
       end
 
       defn['@container'] = entry[:@container] if entry[:@container]
