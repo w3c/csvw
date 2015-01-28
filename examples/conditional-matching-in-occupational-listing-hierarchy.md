@@ -55,7 +55,7 @@ Here's the metadata description for the resource:
     "resources": [{
         "name": "soc-2010-csv",
         "path": "soc_structure_2010.csv",
-        "schema": {"columns": [
+        "tableSchema": {"columns": [
             {
                 "name": "soc-major-group-code",
                 "title": "Major Group",
@@ -266,7 +266,7 @@ Here's the metadata description for the resource:
     "resources": [{
         "name": "2010_Occupations-csv",
         "path": "2010_Occupations.csv",
-        "schema": {"columns": [
+        "tableSchema": {"columns": [
             {
                 "name": "onet-soc-2010-code",
                 "title": "O*NET-SOC 2010 Code",
