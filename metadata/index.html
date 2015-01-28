@@ -133,8 +133,8 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       </p>
       <pre class="example highlight">
 {
-  "@id": "tree-ops.csv",
   "@context": ["http://www.w3.org/ns/csvw", {"@language": "en"}],
+  "url": "tree-ops.csv",
   "dc:title": "Tree Operations",
   "dc:keywords": ["tree", "street", "maintenance"],
   "dc:publisher": [{
@@ -194,9 +194,6 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       </p>
       <p>
         This document defines the format and structure of metadata documents, and how these are interpreted to create an Annotated Tabular Data Model. It also defines how to validate tabular data based on some of these annotations. This metadata can be expressed as an RDF graph. However, all applications that conform to this specification (including validators and applications that read or convert tabular data) MUST read the JSON-based format described in this document.
-      </p>
-      <p class="issue" data-number="81">
-        Should JSON-LD keywords be aliased? The sense is to alias <code>@id</code> as <code>url</code> and not alias the others. We invite comments on the utility of this approach.
       </p>
     </section>
     <section>
@@ -276,10 +273,10 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             </p>
             <pre>
 "resources": [{
-  "@id": "https://example.org/countries.csv",
+  "url": "https://example.org/countries.csv",
   "tableSchema": "https://example.org/countries.json"
 }, {
-  "@id": "https://example.org/country_slice.csv",
+  "url": "https://example.org/country_slice.csv",
   "tableSchema": "https://example.org/country_slice.json"
 }]
             </pre>
@@ -604,7 +601,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <dd>
               An <a>array property</a> of <a title="table description">table descriptions</a> for the tables in the group. When an array of table descriptions B is <a>merged</a> into an original array of table descriptions A, each table description within B is combined into the original array A by:
               <ul>
-                <li>if there is a table description with the same <code>@id</code> in A, the table description from B is <a>merged</a> into the matching table description in A</li>
+                <li>if there is a table description with the same <code>url</code> in A, the table description from B is <a>merged</a> into the matching table description in A</li>
                 <li>otherwise, the table description from B is appended to the array of table descriptions A</li>
               </ul>
             </dd>
@@ -637,9 +634,13 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <dd>
               An <a>array property</a> of <a title="template specification">template specifications</a> that provide mechanisms to transform the tabular data into other formats. See <a href="#template-specifications" class="sectionRef"></a> for more details. When an array of template specifications B is <a>merged</a> into an original array of template specifications A, each template specification within B is combined into the original array A by:
               <ul>
-                <li>if there is a template specification with the same <code>@id</code>, <code>targetFormat</code> and <code>templateFormat</code> in A, the template specification from B is <a>merged</a> into the matching template specification in A</li>
+                <li>if there is a template specification with the same <code>url</code>, <code>targetFormat</code> and <code>templateFormat</code> in A, the template specification from B is <a>merged</a> into the matching template specification in A</li>
                 <li>otherwise, the template specification from B is appended to the array of template specifications A</li>
               </ul>
+            </dd>
+            <dt id="table-group-ld-id"><code>@id</code></dt>
+            <dd>
+              If included, <code>@id</code> identifies the <a>table group description</a>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.
             </dd>
             <dt id="table-group-ld-type"><code>@type</code></dt>
             <dd>
@@ -668,7 +669,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         <section>
           <h4>Required Properties</h4>
           <dl>
-            <dt id="table-id"><code>@id</code></dt>
+            <dt id="table-url"><code>url</code></dt>
             <dd>
               <p>
                 This <a>link property</a> gives the single URL of the CSV file that the table is held in, relative to the location of the metadata document.
@@ -711,6 +712,10 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <dd>As defined for <a href="#table-group-templates">table groups</a>.</dd>
             <dt id="table-dialect"><code>dialect</code></dt>
             <dd>As defined for <a href="#table-group-dialect">table groups</a>.</dd>
+            <dt id="table-ld-id"><code>@id</code></dt>
+            <dd>
+              If included, <code>@id</code> identifies the <a>table description</a>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.
+            </dd>
             <dt id="table-ld-type"><code>@type</code></dt>
             <dd>
               If included, <code>@type</code> MUST be set to <code>"Table"</code>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.
@@ -730,7 +735,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       <section>
         <h3>Dialect Descriptions</h3>
         <p>
-          Much of the tabular data that is published on the web is messy, and CSV parsers frequently need to be configured in order to correctly read in CSV. A <dfn>dialect description</dfn> provides hints to parsers about how to parse the file linked to from the <code>@id</code> property. It can have any of the following properties, which relate to the flags described in <a href="http://www.w3.org/TR/tabular-data-model/#parsing">Section 5 Parsing Tabular Data</a> within [[!tabular-data-model]]:
+          Much of the tabular data that is published on the web is messy, and CSV parsers frequently need to be configured in order to correctly read in CSV. A <dfn>dialect description</dfn> provides hints to parsers about how to parse the file linked to from the <code>url</code> property. It can have any of the following properties, which relate to the flags described in <a href="http://www.w3.org/TR/tabular-data-model/#parsing">Section 5 Parsing Tabular Data</a> within [[!tabular-data-model]]:
         </p>
         <dl>
           <dt id="dialect-encoding"><code>encoding</code></dt>
@@ -789,6 +794,10 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           <dd>
             A single <a>atomic property</a> that, if the boolean <code>true</code>, sets the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-trim">trim</a> flag to <code>true</code> and if the boolean <code>false</code> to <code>false</code>. If the value provided is a string, sets the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-trim">trim</a> flag to the provided value, which MUST be one of <code>"true"</code>, <code>"false"</code>, <code>"start"</code> or <code>"end"</code>.
           </dd>
+            <dt id="dialect-ld-id"><code>@id</code></dt>
+            <dd>
+              If included, <code>@id</code> identifies the <a>dialect description</a>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.
+            </dd>
           <dt id="dialect-ld-type"><code>@type</code></dt>
           <dd>
             If included, <code>@type</code> MUST be set to <code>"Dialect"</code>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.
@@ -829,7 +838,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             Template specifications MUST have the following properties:
           </p>
           <dl>
-            <dt id="template-id"><code>@id</code></dt>
+            <dt id="template-url"><code>url</code></dt>
             <dd>
               <p>
                 A <a>link property</a> giving the single URL of the file that the template is held in, relative to the location of the metadata document.
@@ -869,6 +878,10 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <dd>
               A single string <a>atomic property</a> that provides, if included, the format to which the tabular data should be transformed prior to the transformation using the template. If the value is <code>"json"</code>, the tabular data should first be transformed first to JSON based on the simple mapping defined in <a href="http://w3c.github.io/csvw/csv2json/">Generating JSON from Tabular Data on the Web</a>. If the value is <code>"rdf"</code>, it should similarly first be transformed to XML based on the simple mapping defined in <a href="http://w3c.github.io/csvw/csv2rdf/">Generating RDF from Tabular Data on the Web</a>. If the <code>source</code> property is missing or <code>null</code> then the source of the transformation is the annotated tabular data model.
             </dd>
+            <dt id="template-ld-id"><code>@id</code></dt>
+            <dd>
+              If included, <code>@id</code> identifies the <a>template specification</a>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.
+            </dd>
             <dt id="template-ld-type"><code>@type</code></dt>
             <dd>
               If included, <code>@type</code> MUST be set to <code>"Template"</code>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.
@@ -885,7 +898,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           </p>
           <pre class="example">
 {
-  "@id": "templates/ical.txt",
+  "url": "templates/ical.txt",
   "title": "iCalendar",
   "targetFormat": "http://www.iana.org/assignments/media-types/text/calendar",
   "templateFormat": "https://mustache.github.io/",
@@ -978,6 +991,10 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           <dd>
             A <a>URI template property</a> that MAY be used to create a unique identifier for each row when mapping data to other formats.
           </dd>
+            <dt id="schema-ld-id"><code>@id</code></dt>
+            <dd>
+              If included, <code>@id</code> identifies the <a>schema description</a>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.
+            </dd>
           <dt id="schema-ld-type"><code>@type</code></dt>
           <dd>
             If included, <code>@type</code> MUST be set to <code>"Schema"</code>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.
@@ -1018,7 +1035,7 @@ AF,1962,9989846
 {
   "@context": "http://www.w3.org/ns/csvw",
   "resources": [{
-    "@id": "https://example.org/countries.csv",
+    "url": "https://example.org/countries.csv",
     "tableSchema": {
       "columns": [{
         "name": "countryCode",
@@ -1037,7 +1054,7 @@ AF,1962,9989846
       "primaryKey": "countryCode"
     }
   }, {
-    "@id": "http://example.com/country_slice.csv",
+    "url": "http://example.com/country_slice.csv",
     "tableSchema": {
       "columns": [{
         "name": "countryRef",
@@ -1096,10 +1113,10 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
 {
   "@context": "http://www.w3.org/ns/csvw",
   "resources": [{
-    "@id": "HEFCE_organogram_senior_data_31032011.csv",
+    "url": "HEFCE_organogram_senior_data_31032011.csv",
     "tableSchema": "http://example.org/schema/senior-roles.json"
   }, {
-    "@id": "HEFCE_organogram_junior_data_31032011.csv",
+    "url": "HEFCE_organogram_junior_data_31032011.csv",
     "tableSchema": "http://example.org/schema/junior-roles.json"
   }]
 }
@@ -1110,7 +1127,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             <pre class="example highlight">
 {
   "@context": "http://www.w3.org/ns/csvw",
-  "@id": "http://example.org/schema/senior-roles.json",
+  "url": "http://example.org/schema/senior-roles.json",
   "columns": [{
     "name": "ref",
     "title": "Post Unique Reference"
@@ -1144,7 +1161,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             <pre class="example highlight">
 {
   "@context": "http://www.w3.org/ns/csvw",
-  "@id": "http://example.org/schema/junior-roles.json",
+  "url": "http://example.org/schema/junior-roles.json",
   "columns": [{
     "name": "reportsTo",
     "title": "Reporting Senior Post"
@@ -1207,6 +1224,10 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             <dd>A boolean <a>atomic property</a> taking a single value which indicates whether every cell within the column must have a non-null value. Its <a>property value</a> is that defined in metadata, or <code>false</code> otherwise.</dd>
             <dt id="column-predicateUrl"><code>predicateUrl</code></dt>
             <dd>An <a>atomic property</a> that holds one or more URIs that MAY be used as URIs for predicates if the table is mapped to another format. Its <a>property value</a> is that defined in metadata, if any, or the <a>base URL</a> with the URI encoded <a>property value</a> of <code>name</code> as a fragment.</dd>
+            <dt id="column-ld-id"><code>@id</code></dt>
+            <dd>
+              If included, <code>@id</code> identifies the <a>column description</a>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.
+            </dd>
             <dt id="column-ld-type"><code>@type</code></dt>
             <dd>
               <p>
