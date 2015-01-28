@@ -287,10 +287,7 @@ var respecConfig = {
       <section>
         <h3>Link Header</h3>
         <p>
-          When retrieving a tabular data file via HTTP, the response MAY include a <code>Link</code> header with <code>rel=describedby</code> and <code>type=application/csv-metadata+json</code> that points to a metadata file that describes the tabular data file. If, by inspection, the referenced file is not a valid metadata file then it MUST be ignored. If there is more than one valid metadata file linked to through multiple <code>Link</code> headers, then the metadata referenced by <code>Link</code> headers that appear later in the response are used in preference to those referenced by earlier <code>Link</code> headers.
-        </p>
-        <p class="issue" data-number="43">
-          Suggest that we drop the requirement to ignore invalid metadata files, given that the correct metadata file should be identified through the type of the link.
+          When retrieving a tabular data file via HTTP, the response MAY include a <code>Link</code> header with <code>rel=describedby</code> and <code>type=application/csv-metadata+json</code> that points to a metadata file that describes the tabular data file. If there is more than one valid metadata file linked to through multiple <code>Link</code> headers, then the metadata referenced by <code>Link</code> headers that appear later in the response are used in preference to those referenced by earlier <code>Link</code> headers.
         </p>
       </section>
       <section>
@@ -665,7 +662,7 @@ Content-Type: text/csv;header=absent
           </p>
         </li>
         <li>
-          Construct <a>embedded metadata</a> as Table Metadata (see <cite><a href="http://www.w3.org/TR/tabular-metadata/#tables"></a></cite> in [[!tabular-metadata]]) using the <code>@context</code> from <a>merged metadata</a> and setting the <code>language</code> annotation to the default language from the <code>@context</code>.
+          Construct <a>embedded metadata</a> as Table Metadata (see <cite><a href="http://www.w3.org/TR/tabular-metadata/#tables"></a></cite> in [[!tabular-metadata]]) using the <code>@context</code> from <a>merged metadata</a> and setting the <code>lang</code> annotation to the default language from the <code>@context</code>.
           <div class="issues">
             This change as a result of processing the CSV and deriving embedded metadata. If the asserted metadata has <code>@language: e</code>n, and the column titles are then interpreted to be in English, it won't match with the actual column headings from the CSV, unless they are also in English, thus the addition of adding both <code>@language: en</code> and <code>language: en</code> to the resulting embedded metadata.
           </div>
@@ -678,7 +675,7 @@ Content-Type: text/csv;header=absent
         <li>Each cell within a header column is an annotation on the row it appears in; if there is a header row then that provides the type of the annotation for the row, otherwise it is a <code>title</code> annotation.</li>
         <li>If <a>skip blank rows</a> is <code>true</code> then ignore any rows in which all the cell values are empty strings.</li>
         <li>Re-create <a>merged metadata</a> using by locating all sources of metadata, included embedded metadata as constructed above, as defined in <a href="#locating-metadata" class="sectionRef">Locating Metadata</a> and merge together in priority order as defined in <a href="http://www.w3.org/TR/tabular-metadata/#merging-metadata">Merging Metadata</a> in [[!tabular-metadata]].</li>
-        <li>Generate row data for each row using <a>merged metadata</a> by parsing the cells from each row as defined in <cite><a href="http://www.w3.org/TR/tabular-metadata/#parsing-cells"></a>Parsing Cells</cite> in [[!tablular-metadata]].</li>
+        <li>Generate row data for each row using <a>merged metadata</a> by parsing the cells from each row as defined in <cite><a href="http://www.w3.org/TR/tabular-metadata/#parsing-cells"></a>Parsing Cells</cite> in [[!tabular-metadata]].</li>
       </ol>
       <section>
         <h3>Examples</h3>
@@ -711,9 +708,9 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           <p>Expressed as Table Metadata:</p>
           <pre class="highlight">
 {
-  "@id": "http://example.org/tree-ops.csv",
   "@type": "Table",
-  "schema": {
+  "url": "http://example.org/tree-ops.csv",
+  "tableSchema": {
     "columns": [
       {"title": "GID"},
       {"title": "On Street"},
@@ -792,9 +789,9 @@ data.parse({
           <p>After creating <a>embedded metadata</a> and merging with overriding metadata:</p>
           <pre class="highlight">
 {
-  "@id": "http://example.org/tree-ops.csv",
   "@type": "Table",
-  "schema": {
+  "url": "http://example.org/tree-ops.csv",
+  "tableSchema": {
     "columns": [
       {"name": "GID", "title": "GID", "datatype": "string"},
       {"name": "on-street", "title": "On Street", "datatype": "string"},
@@ -839,17 +836,17 @@ data.parse({
           	</p>
       			<pre class="example highlight">
 {
-  "@id": "tree-ops.csv",
   "@context": ["http://www.w3.org/ns/csvw", {"@language": "en"}],
+  "url": "tree-ops.csv",
   "dc:title": "Tree Operations",
   "dc:keywords": ["tree", "street", "maintenance"],
   "dc:publisher": [{
-    "sch:name": "Example Municipality",
-    "sch:web": "http://example.org"
+    "schema:name": "Example Municipality",
+    "schema:web": "http://example.org"
   }],
   "dc:license": "http://opendefinition.org/licenses/cc-by/",
   "dc:modified": "2010-12-31",
-  "schema": {
+  "tableSchema": {
     "columns": [{
       "name": "GID",
       "title": [
@@ -894,7 +891,7 @@ data.parse({
           		<dt><code>dc:keywords</code></dt>
           		<dd><code>["tree", "street", "maintenance"]</code></dd>
           		<dt><code>dc:publisher</code></dt>
-          		<dd><code>[{ "sch:name": "Example Municipality", "sch:web": "http://example.org" }]</code></dd>
+          		<dd><code>[{ "schema:name": "Example Municipality", "schema:web": "http://example.org" }]</code></dd>
           		<dt><code>dc:license</code></dt>
           		<dd><code>"http://opendefinition.org/licenses/cc-by/"</code></dd>
           		<dt><code>dc:modified</code></dt>
@@ -1266,9 +1263,9 @@ TEXTDATA =  %x20-21 / %x23-2B / %x2D-7E
             <li>Rows in the file MUST NOT contain more fields than are in the header row (though they may
           contain less)</li>
             <li>Each file MUST have an entry in the <code>resources</code> array in the <code>datapackage.json</code> file</li>
-            <li>The resource metadata MUST include a <code>schema</code> attribute whose value MUST conform to the JSON
+            <li>The resource metadata MUST include a <code>tableSchema</code> attribute whose value MUST conform to the JSON
           Table Schema</li>
-            <li>All fields in the CSV files MUST be described in the <code>schema</code></li>
+            <li>All fields in the CSV files MUST be described in the <code>tableSchema</code></li>
           </ul>
 
           <p>CSV files generated by different applications often vary in their syntax, e.g. use of quoting characters, delimiters, etc. To encourage conformance, CSV files in a CSV files in a Tabular Data Package SHOULD</p>
