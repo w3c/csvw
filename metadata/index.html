@@ -195,9 +195,6 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       <p>
         This document defines the format and structure of metadata documents, and how these are interpreted to create an Annotated Tabular Data Model. It also defines how to validate tabular data based on some of these annotations. This metadata can be expressed as an RDF graph. However, all applications that conform to this specification (including validators and applications that read or convert tabular data) MUST read the JSON-based format described in this document.
       </p>
-      <p class="issue" data-number="80">
-        Metadata documents are [[JSON-LD]] documents, however the aim is for the documents to be useable without any extra processing. To be valid, a metadata document MUST use a <cite><a href="http://www.w3.org/TR/json-ld/#the-context">JSON-LD Context</a></cite>, either explicitly via the <code>@context</code> entry, or through the use of an HTTP Link header (see <cite><a href="http://www.w3.org/TR/json-ld/#interpreting-json-as-json-ld">Interpreting JSON as JSON-LD</a></cite> in [[JSON-LD]]). The default location for this context is <code>http://www.w3.org/ns/csvw</code>. CSVW aware processors SHOULD assume a context at this location if one is not provided with the metadata document. We invite comments on the utility of this approach: is it useful for CSV metadata to be interpretable as JSON-LD?
-      </p>
       <p class="issue" data-number="81">
         Should JSON-LD keywords be aliased? The sense is to alias <code>@id</code> as <code>url</code> and not alias the others. We invite comments on the utility of this approach.
       </p>
@@ -461,7 +458,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 "title": "Project title"
             </pre>
             <p>
-              then that string is assumed to be in the language provided through the <code>@language</code> property of the nearest <code>@context</code> (or have no assumed language, if there is no such property). Multiple alternative values can be given in an array:
+              then that string is assumed to be in the language provided through the <code>@language</code> property of the <code>@context</code> (or have no assumed language, if there is no such property). Multiple alternative values can be given in an array:
             </p>
             <pre class="example highlight">
 "title": [
@@ -517,15 +514,10 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       <section>
         <h3>Top-Level Properties</h3>
         <p>
-          The top-level object (whether it is a <a>table group description</a> or a <a>table description</a>) MAY have a <code>@context</code> property, an <a>array property</a>, as defined in <cite><a href="http://www.w3.org/TR/json-ld/#context-definitions">Section 8.7</a></cite> of [[!JSON-LD]]. If present, <code>@context</code> may contain any of the following:</p>
+          The top-level object (whether it is a <a>table group description</a> or a <a>table description</a>) MUST have a <code>@context</code> property, an <a>array property</a>, as defined in <cite><a href="http://www.w3.org/TR/json-ld/#context-definitions">Section 8.7</a></cite> of [[!JSON-LD]]. The <code>@context</code> MUST contain one of the following:</p>
           <ul>
-            <li>a URL referencing an external context definition,</li>
-            <li>An object containing a local context as described below, or</li>
-            <li>An array consisting of one or more URLs followed by an optional object as described above.</li>
-        </ul>
-        <p>The default location for interpreting Tabular Metadata is <code>http://www.w3.org/ns/csvw</code>.</p>
-        <p>The use of a local context definition MAY be used to provide metadata for interpreting other properties, namely:
-        </p>
+            <li>A string value of <code>http://www.w3.org/ns/csvw</code>, or</li>
+            <li>An array composed of a string and an object, where the string is <code>http://www.w3.org/ns/csvw</code> and the object representing a local context definition, which is restricted to contain either or both of the following members.</li>
         <dl>
           <dt><code>@language</code></dt>
           <dd>
@@ -549,13 +541,30 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         <p>
           A <code>@context</code> B is <a>merged</a> into an original <code>@context</code> A by:
         </p>
-        <ul>
-          <li>ensure that each value is an array, by placing an object value of <code>@context</code> into an array containing that value</li>
-          <li>if the array value either A or B does not contain an object as its last element, append a new empty object to that array</li>
-          <li>insert the string values from B not already in A before the last object value.</li>
-          <li><a title="merged">merge</a> the object value of A with B</li>
-          <li>if the merged array has a single value, the result is that value, otherwise, it is the array value</li>
-        </ul>
+        <ol>
+          <li><a title="merged">merge</a> the object value of A with B using empty objects if none exists.</li>
+          <li>If the resulting object is empty, the merged value is the string <code>http://www.w3.org/ns/csvw</code>.</li>
+          <li>Otherwise, the merged value is an array of <code>http://www.w3.org/ns/csvw</code> and the merged object.</li>
+        </ol>
+<pre class="example highlight" title="TableGroup definition with string @context">
+{
+  "@context": "http://www.w3.org/ns/csvw",
+  "@type": "TableGroup",
+  "resources": []
+}
+</pre>
+<pre class="example highlight" title="TableGroup definition with local @context">
+{
+  "@context": [
+    "http://www.w3.org/ns/csvw",
+    {
+      "@language": "en"
+    }
+  ],
+  "@type": "TableGroup",
+  "resources": []
+}
+</pre>
       </section>
       <section>
         <h3>Common Properties</h3>
