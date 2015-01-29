@@ -318,37 +318,41 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             </p>
             <dl>
               <dt><code>_row</code></dt>
-              <dd><code>_row</code> is set to the row number of the row that is   currently being processed
+              <dd><code>_row</code> is set to the row number of the row that is currently being processed
                 <div class="issue" data-number="32">
                   Where does row numbering begin?
                 </div>
               </dd>
+              <dt><code>_name</code></dt>
+              <dd><code>_name</code> is set to the <a>property value</a> of the <code>name</code> property on the cell column that is currently being processed.
+              </dd>
               <dt>column names</dt>
               <dd>a variable is set for each column within the schema; the name of the variable is the percent-encoded name of the column and the value is the canonical representation of the value of the cell in that column in the row that is currently being processed</dd>
             </dl>
+            <p>The <a>property value</a> of a <a>URI template property</a> is only valid while converting tables as defined in <a href="#converting-tables" class="sectionRef"></a>. The value is the result of applying the template for against the current row and resolving against the <a>base URL</a> as a <a>link property</a> if the metadata value is defined, or the default value if defined; otherwise the value is <code>null</code>.</p>
             <p>
-              For example, the <code>urlTemplate</code> property holds a URI template that is used to generate a URL identifier for each row, which might look like:
+              For example, the <a href="#cell-aboutUrl"><code>aboutUrl</code></a> property holds a URI template that is used to generate a URL identifier for each row, which might look like:
             </p>
             <pre class="example highlight">
-"urlTemplate": "http://example.org/example.csv#row={_row}"
+"aboutUrl": "http://example.org/example.csv#row={_row}"
             </pre>
             <p>
               The identifiers that are generated for the rows would then look like <code>http://example.org/example.csv#row=1</code>, <code>http://example.org/example.csv#row=2</code> and so on.
             </p>
             <p>
-              Alternatively, with the CSV and metadata in the <a href="#introduction" class="sectionRef"></a>, the <code>urlTemplate</code> might look like:
+              Alternatively, with the CSV and metadata in the <a href="#introduction" class="sectionRef"></a>, the <a href="#cell-aboutUrl"><code>aboutUrl</code></a> might look like:
             </p>
             <pre class="example highlight">
-"urlTemplate": "http://example.org/tree/{on%2Dstreet}/{GID}"
+"aboutUrl": "http://example.org/tree/{on%2Dstreet}/{GID}"
             </pre>
             <p>
               This would generate URIs such as <code>http://example.org/tree/ADDISON%20AV/1</code> and <code>http://example.org/tree/EMERSON%20ST/2</code>.
             </p>
             <p>
-              Once the URI has been generated, it is resolved against the location of the resource (eg the CSV file) to create an absolute URI. For example, given a <code>urlTemplate</code> within a schema such as:
+              Once the URI has been generated, it is resolved against the location of the resource (eg the CSV file) to create an absolute URI. For example, given a <a href="#cell-aboutUrl"><code>aboutUrl</code></a> within a schema such as:
             </p>
             <pre>
-"urlTemplate": "#row={_row}"
+"aboutUrl": "#row={_row}"
             </pre>
             <p>
               and given a CSV file at <code>http://example.com/temp.csv</code>, the URL for the first row will be <code>http://example.com/temp.csv#row=1</code>.
@@ -987,14 +991,10 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               The cross reference between files should be limited to files from one publisher - else they are just web links with no guarantee of whether the target of the link exists which 'foreign key' might imply.
             </p>
           </dd>
-          <dt id="schema-urlTemplate"><code>urlTemplate</code></dt>
+          <dt id="schema-ld-id"><code>@id</code></dt>
           <dd>
-            A <a>URI template property</a> that MAY be used to create a unique identifier for each row when mapping data to other formats.
+            If included, <code>@id</code> identifies the <a>schema description</a>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.
           </dd>
-            <dt id="schema-ld-id"><code>@id</code></dt>
-            <dd>
-              If included, <code>@id</code> identifies the <a>schema description</a>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.
-            </dd>
           <dt id="schema-ld-type"><code>@type</code></dt>
           <dd>
             If included, <code>@type</code> MUST be set to <code>"Schema"</code>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.
@@ -1050,7 +1050,7 @@ AF,1962,9989846
         "name": "name",
         "datatype": "string"
       }],
-      "urlTemplate": "http://example.org/countries.csv{#countryCode}",
+      "aboutUrl": "http://example.org/countries.csv{#countryCode}",
       "primaryKey": "countryCode"
     }
   }, {
@@ -1078,7 +1078,7 @@ AF,1962,9989846
 }
             </pre>
             <p>
-              When the population data in <code>country_slice.csv</code> is processed (displayed or mapped into another format), a link can be made from the content of the <code>countryRef</code> column based on the <code>urlTemplate</code> for <code>country.csv</code>. For example, if the <code>countryRef</code> column (the value of <code>columns</code> in the <code>foreignKeys</code> object) in <code>country_slice.csv</code> contains the value <code>UK</code> then the processor will use that value to populate the <code>countryCode</code> variable (the value of <code>reference.columns</code> in the <code>foreignKeys</code> object) when interpreting the <code>urlTemplate</code> for <code>country.csv</code>, and create the URL <code>http://example.org/countries.csv#UK</code>. The processor does not need to retrieve <code>http://example.org/countries.csv</code> or check that the value <code>UK</code> appears within the <code>countryCode</code> column to create this link: it is created purely based on the <code>urlTemplate</code> in the description of the referenced resource.
+              When the population data in <code>country_slice.csv</code> is processed (displayed or mapped into another format), a link can be made from the content of the <code>countryRef</code> column based on the <code>aboutUrl</code> for <code>country.csv</code>. For example, if the <code>countryRef</code> column (the value of <code>columns</code> in the <code>foreignKeys</code> object) in <code>country_slice.csv</code> contains the value <code>UK</code> then the processor will use that value to populate the <code>countryCode</code> variable (the value of <code>reference.columns</code> in the <code>foreignKeys</code> object) when interpreting the <code>aboutUrl</code> for <code>country.csv</code>, and create the URL <code>http://example.org/countries.csv#UK</code>. The processor does not need to retrieve <code>http://example.org/countries.csv</code> or check that the value <code>UK</code> appears within the <code>countryCode</code> column to create this link: it is created purely based on the <code>aboutUrl</code> in the description of the referenced resource.
             </p>
           </section>
           <section>
@@ -1145,7 +1145,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
     "title": "Reports to Senior Post"
   }],
   "primaryKey": "ref",
-  "urlTemplate": "#post-{ref}",
+  "aboutUrl": "#post-{ref}",
   "foreignKeys": [{
     "columns": "reportsTo",
     "reference": {
@@ -1178,7 +1178,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
 }
             </pre>
             <p>
-              In the first line of <code>HEFCE_organogram_junior_data_31032011.csv</code>, the <code>reportsTo</code> (<code>Reporting Senior Post</code>) column contains the value <code>90284</code>. When creating a link from that column, the <code>urlTemplate</code> defined within the schema at <code>http://example.org/schema/senior-roles.json</code> is used to generate a URL by expanding the variable reference for <code>ref</code> based on the value from the <code>reportsTo</code> column. This gives the relative URL <code>#post-90284</code> which is then resolved against the base URL of the resource that uses the <code>senior-roles.json</code> schema within the original metadata file, namely <code>HEFCE_organogram_senior_data_31032011.csv</code>.
+              In the first line of <code>HEFCE_organogram_junior_data_31032011.csv</code>, the <code>reportsTo</code> (<code>Reporting Senior Post</code>) column contains the value <code>90284</code>. When creating a link from that column, the <code>aboutUrl</code> defined within the schema at <code>http://example.org/schema/senior-roles.json</code> is used to generate a URL by expanding the variable reference for <code>ref</code> based on the value from the <code>reportsTo</code> column. This gives the relative URL <code>#post-90284</code> which is then resolved against the base URL of the resource that uses the <code>senior-roles.json</code> schema within the original metadata file, namely <code>HEFCE_organogram_senior_data_31032011.csv</code>.
             </p>
           </section>
         </section>
@@ -1222,8 +1222,6 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             </dd>
             <dt id="column-required"><code>required</code></dt>
             <dd>A boolean <a>atomic property</a> taking a single value which indicates whether every cell within the column must have a non-null value. Its <a>property value</a> is that defined in metadata, or <code>false</code> otherwise.</dd>
-            <dt id="column-predicateUrl"><code>predicateUrl</code></dt>
-            <dd>An <a>atomic property</a> that holds one or more URIs that MAY be used as URIs for predicates if the table is mapped to another format. Its <a>property value</a> is that defined in metadata, if any, or the <a>base URL</a> with the URI encoded <a>property value</a> of <code>name</code> as a fragment.</dd>
             <dt id="column-ld-id"><code>@id</code></dt>
             <dd>
               If included, <code>@id</code> identifies the <a>column description</a>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.
@@ -1288,6 +1286,21 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             <p>
               An <a>atomic property</a> that contains a single string that is the main datatype of the values of the cell. The value is a term defined in the default context representing a datatype URL. If the cell contains a list (ie <code>separator</code> is specified and not <code>null</code>) then this is the datatype of each value within the list. Conversion specifications MUST use the datatype of the value to determine the conversion of a cell into the target format. See <a href="#datatypes"></a> for more details.
             </p>
+          </dd>
+          <dt id="cell-aboutUrl"><code>aboutUrl</code></dt>
+          <dd>
+            <p>A <a>URI template property</a> that MAY be used to create a unique identifier for each cell within a row when mapping data to other formats. See <a href="" class="sectionRef"></a> for details.</p>
+            <p class="note"><code>aboutUrl</code> is typically defined on a Schema or Table. If defined on individual Columns, care must be taken to ensure that transformed cell values maintain a semantic relationship.</p>
+          </dd>
+          <dt id="cell-propertyUrl"><code>propertyUrl</code></dt>
+          <dd>
+            <p>An <a>URI template property</a> that holds one or more strings that MAY be expanded to URIs for properties if the table is mapped to another format. The default value of <code>propertyUrl</code> is <code>"{#_name}"</code>.</p>
+            <p class="note"><code>propertyUrl</code> is typically defined on a Column. If defined on a Schema, Table or Table Group, care must be taken to ensure that transformed cell values maintain an appropriate semantic relationship.</p>
+          </dd>
+          <dt id="cell-valueUrl"><code>valueUrl</code></dt>
+          <dd>
+            <p>An <a>URI template property</a> that is used to define one or more <cite><a href="http://www.w3.org/TR/rdf11-concepts/#dfn-resource">resources</a></cite> value of a cell instead of a literal values, as defined in [[!rdf-concepts]]. See <a href="#parsing-cells" class="sectionRef"></a>.</p>
+            <p class="note"><code>valueUrl</code> is typically defined on a Column. If defined on a Schema, Table or Table Group, care must be taken to ensure that transformed cell values maintain an appropriate semantic relationship.</p>
           </dd>
           <dt id="cell-length"><code>length</code></dt>
           <dd>
@@ -1435,7 +1448,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
       <section>
         <h2>Parsing cells</h2>
         <p>
-          Unlike many other data formats, tabular data is designed to be read by humans. For that reason, it's common for data to be represented within tabular data in a human-readable way. The <code>separator</code> and <code>format</code> properties indicates the format used to represent data within the table. This is used:
+          Unlike many other data formats, tabular data is designed to be read by humans. For that reason, it's common for data to be represented within tabular data in a human-readable way. The <a href="#cell-valueUrl"><code>valueUrl</code></a>, <code>separator</code> and <code>format</code> properties indicates the format used to represent data within the table. This is used:
         </p>
         <ul>
           <li>by <strong>validators</strong> to check that the data in the table is in the expected format</li>
@@ -1443,6 +1456,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           <li>when <strong>displaying</strong> data, to map it into formats that are meaningful for those viewing the data (as opposed to those publishing it)</li>
           <li>when <strong>inputting</strong> data, to turn entered values into representations in a consistent format</li>
         </ul>
+        <p>The <dfn>cell value</dfn> of a cell is the result processing the cell as defined here and applying any format-specific mappings to create on or more values. Converters MUST be provided these cell values, along with any in-scope <code>lang</code> and <code>datatype</code> <a title="property value">property values</a>.</p>
         <p>
           The process of parsing the string value of a cell into a single value or a list of values is as follows:
         </p>
@@ -1450,10 +1464,11 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           What should be the mapping of an empty cell? 
         </p>
         <ol>
-          <li>unless the <code>datatype</code> is <code>string</code> or <code>anySimpleType</code> or <code>any</code>, strip leading and trailing whitespace from the value</li>
+          <li>unless the <a href="#cell-valueUrl"><code>valueUrl</code></a> is defined on the cell, <code>datatype</code> is <code>string</code> or <code>anySimpleType</code> or <code>any</code>, strip leading and trailing whitespace from the value</li>
           <li>if the value is the same as the <code>null</code> value, then the value is <code>null</code></li>
           <li>if the <code>separator</code> property is not <code>null</code>, create a list of values by splitting the string at the character specified by the <code>separator</code> property</li>
           <li>validate the value(s) against the <code>format</code>, if one is specified, as described below; raise an error if any of the values do not match the specified format</li>
+          <li>if the cell column has a <a href="#cell-valueUrl"><code>valueUrl</code></a> the value(s) are the result of applying the URI template to each value as a <cite><a href="http://www.w3.org/TR/rdf11-concepts/#dfn-resource">resource</a></cite></li>
           <li>parse the value(s) using the <code>format</code>, as described below</li>
         </ol>
         <section>
@@ -1476,6 +1491,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           <p>
             When the <code>datatype</code> is a numeric type, the <code>format</code> property's value MUST be a number format as specified in [[!xslt-21]].
           </p>
+          <p>The <a>cell value</a> is one or more numbers extracted using the <code>format</code>.</p>
           <p class="issue" data-number="54">
             We invite comment on the best format to specify how to parse numbers.
           </p>
@@ -1488,6 +1504,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           <p>
             If the <code>datatype</code> is <code>boolean</code>, the <code>format</code> property provides the true and false values expected, separated by <code>|</code>. For example if <code>format</code> is <code>Y|N</code> then cells must hold either <code>Y</code> or <code>N</code> with <code>Y</code> meaning <code>true</code> and <code>N</code> meaning <code>false</code>.
           </p>
+          <p>The <a>cell value</a> is one or more <code>true</code> or <code>false</code> values.</p>
         </section>
         <section>
           <h3>Formats for dates and times</h3>
@@ -1535,6 +1552,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           <p>
             The supported date and time formats listed above are expressed in terms of the <a href="http://www.unicode.org/reports/tr35/tr35-dates.html#Date_Field_Symbol_Table">date field symbols</a> defined in [[!UAX35]] and should be interpreted by implementations as defined in that specification.
           </p>
+          <p>The <a>cell value</a> is one or more dates or times extracted using the <code>format</code>.</p>
           <p class="note">
             For simplicity, this version of this standard does not support abbreviated or full month or day names, or double digit years. Future versions of this standard may support other date and time formats, or general purpose date/time pattern strings. Authors of schemas SHOULD use appropriate regular expressions, along with the <code>string</code> datatype, for dates and times that use a format other than that specified here.
           </p>
@@ -1543,6 +1561,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           <h3>Formats for durations</h3>
           <p>
             Durations MUST be formatted and interpreted as defined in [[!xmlschema-2]], using the [[!ISO8601]] format <code>P<var>n</var>Y<var>n</var>M<var>n</var>DT<var>n</var>H<var>n</var>M<var>n</var>S</code>.
+          <p>The <a>cell value</a> is one or more durations extracted using the <code>format</code>.</p>
           </p>
         </section>
       </section>
@@ -1647,7 +1666,10 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           Conversion specifications MUST define a default mapping from an annotated table that lacks any annotations (ie that is equivalent to an un-annotated table).
         </p>
         <p>
-          Conversion specifications MUST use either the <a href="#column-name"><code>name</code></a> or the <a href="#column-predicateUrl"><code>predicateUrl</code></a> of a column as the basis for naming machine-readable fields in the target format, such as the name of the equivalent element or attribute in XML, property in JSON or property URI in RDF.
+          Conversion specifications MUST use the <a>property value</a> of the <a href="#cell-aboutUrl"><code>aboutUrl</code></a> of the first cell column, if any, as the basis for identifying a mapped row.
+        </p>
+        <p>
+          Conversion specifications MUST use the <a>property value</a> of the <a href="#cell-propertyUrl"><code>propertyUrl</code></a> of a column as the basis for naming machine-readable fields in the target format, such as the name of the equivalent element or attribute in XML, property in JSON or property URI in RDF.
         </p>
         <p>
           Conversion specifications MAY use any of the properties defined in this specification to adjust the mapping of an annotated table into another format.
