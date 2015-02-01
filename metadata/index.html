@@ -1489,11 +1489,35 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             If the <code>datatype</code> is a numeric type, the <code>format</code> property indicates the expected format for that number. Validators MUST check that the numbers in the column adhere to the specified format. Converters MUST use the <code>format</code> property to parse the number when mapping it into a suitable type in the target format of the conversion.
           </p>
           <p>
-            When the <code>datatype</code> is a numeric type, the <code>format</code> property's value MUST be a number format as specified in [[!xslt-21]].
+            When the <code>datatype</code> is a numeric type, the <code>format</code> property's value MUST be either a single string or an object with one or more of the properties:
           </p>
-          <p>The <a>cell value</a> is one or more numbers extracted using the <code>format</code>.</p>
-          <p class="issue" data-number="54">
-            We invite comment on the best format to specify how to parse numbers.
+          <dl>
+            <dt id="decimalChar"><code>decimalChar</code></dt>
+            <dd>A single character string whose value is used to represent a decimal point within the number. The default value is <code>"."</code>.</dd>
+            <dt id="groupChar"><code>groupChar</code></dt>
+            <dd>A single character string whose value is used to group digits within the number. The default value is <code>","</code>.</dd>
+            <dt id="number-pattern"><code>pattern</code></dt>
+            <dd>A regular expression string, in the syntax and interpreted as defined by [[!ECMASCRIPT]].</dd>
+          </dl>
+          <p>
+            If the <code>format</code> property is a single string, this is interpreted in the same way as if it were an object with a <code>pattern</code> property whose value is that string.
+          </p>
+          <p>
+            When parsing a value against this format specification, implementations MUST recognise and parse numbers that consist of:
+          </p>
+          <ol>
+            <li>an optional <code>+</code> or <code>-</code> sign</li>
+            <li>followed by a decimal digit (<code>0-9</code>)</li>
+            <li>followed by any number of decimal digits (<code>0-9</code>) and the character specified as the <a href="#groupChar"><code>groupChar</code></a></li>
+            <li>followed by an optional <a href="#decimalChar"><code>decimalChar</code></a> followed by one or more decimal digits (<code>0-9</code>)</li>
+            <li>followed by an optional exponent, consisting of an <code>E</code> followed by an optional <code>+</code> or <code>-</code> sign followed by one or more decimal digits (<code>0-9</code>)</li>
+            <li>followed by an optional percent (<code>%</code>) or per-mille (<code>&permil;</code>) sign</li>
+          </ol>
+          <p>
+            Implementations MUST raise an error if a number does not meet the format defined above, or if it contains two consecutive <a href="#groupChar"><code>groupChar</code></a> characters, or if it does not match the regular expression defined in the <a href="#number-pattern"><code>pattern</code></a> property, if there is one.
+          </p>
+          <p>
+            Converters MUST use the sign, exponent, percent and per-mille signs when interpreting the number ready for conversion. For example, the string value <code>-25%</code> must be interpreted as <code>-0.25</code> and the string value <code>1E6</code> as <code>1000000</code>.
           </p>
         </section>
         <section>
@@ -1555,6 +1579,9 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           <p>The <a>cell value</a> is one or more dates or times extracted using the <code>format</code>.</p>
           <p class="note">
             For simplicity, this version of this standard does not support abbreviated or full month or day names, or double digit years. Future versions of this standard may support other date and time formats, or general purpose date/time pattern strings. Authors of schemas SHOULD use appropriate regular expressions, along with the <code>string</code> datatype, for dates and times that use a format other than that specified here.
+          </p>
+          <p class="issue" data-number="65">
+            Register of recognised date-time picture string formats.
           </p>
         </section>
         <section>
