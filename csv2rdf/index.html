@@ -23,7 +23,8 @@ var respecConfig = {
       "tabular-metadata": {
           "authors": [
             "Rufus Pollock",
-            "Jeni Tennison"
+            "Jeni Tennison",
+            "Gregg Kellogg"
           ],
           "title": "Metadata Vocabulary for Tabular Data",
           "href" : "http://www.w3.org/TR/tabular-metadata/",
@@ -297,19 +298,39 @@ var respecConfig = {
     <section id="map-annotated-tab">
       <h2>Mapping Annotated Tabular Data</h2>
 
-      <p>
-        The procedures and rules for mapping annotated tabular data compliant with the
-        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-tabular-data-model">annotated tabular data model</a>
-        are described below.</p>
-      
-      <p>The metadata for annotated tabular data is established as defined in
-        <cite><a href="http://www.w3.org/TR/tabular-data-model/#locating-metadata">Locating Metadata</a></cite>in [[!tabular-data-model]].
-        These mappings establish a <a>column description object</a> for each
+      <p>The procedures and rules for mapping annotated tabular data compliant with the
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-tabular-data-model">
+        annotated tabular data model</a> are described below.</p>
+      tableSchema
+      <p>The metadata for annotated tabular data MAY be provided by either or both
+        of the following sources:</p>
+      <ul>
+        <li>the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-header-line">
+          header line</a> within the CSV file; and/or</li>
+        <li>the <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">
+          table description</a>, 
+          <a href="http://www.w3.org/TR/tabular-metadata/#dfn-tableSchema">tableSchema</a> and 
+          <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description">
+          column descriptions</a> (as defined in [[!tabular-metadata]]) within the 
+          associated metadata document.</li>
+      </ul>
+
+      <p>Mapping applications SHALL establish a 
+        <a title="column description object">column description object</a> for each
         <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a> within
         the annotated tabular data. The <dfn>column description object</dfn> contains the aggregated set
         of metadata properties for a given column that affect how the 
         <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell values</a>
-        within the associated column are expressed in the <a>output graph</a>,.</p>
+        within the associated column are expressed in the <a>
+        output graph</a>. Metadata properties are sourced from the 
+        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-header-line">header line</a>
+        in the CSV file and <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description">
+        column description</a> in the metadata document and enriched with 
+        <a href="http://www.w3.org/TR/tabular-metadata/#dfn-inherited-property">
+        inherited properties</a> from the 
+        <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">
+        table description</a> and  
+        <a href="http://www.w3.org/TR/tabular-metadata/#dfn-tableSchema">tableSchema</a>.</p>
       
       <p>The <a>output graph</a> MAY include 
         <a href="http://www.w3.org/TR/tabular-metadata/#dfn-direct-annotation">Direct Annotations</a>
@@ -637,6 +658,8 @@ var respecConfig = {
 
         </section>
 
+        </section>
+
       </section>
 
       <section id="map-annotated-tab-examples">
@@ -790,10 +813,8 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 
         <pre class="example" id="map-annotated-tab-examples-2-metadata" title="Metadata description">
 {
-  "@id": "tree-ops",
-  "@context": {
-    "@language": "en"
-  }
+  "@context": ["http://www.w3.org/ns/csvw", {"@language": "en"}],
+  "url": "tree-ops",
   "dcat:distribution": {
     "dcat:downloadURL": "tree-ops.csv"
   }
@@ -808,7 +829,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
     "@value": "2010-12-31",
     "@type": "http://www.w3.org/2001/XMLSchema#date"
   }
-  "schema": {
+  "tableSchema": {
     "columns": [{
       "name": "GID",
       "title": [

@@ -54,7 +54,7 @@ Some of them do not have an `@id`: these definitions are for files that are desc
 
 The `metadata.json` file that refers to the schema contains:
 
-	"schema": "gov.uk/schema.json",
+	"tableSchema": "gov.uk/schema.json",
 	"resources": [{
 		"@id": "hefce.gov.uk/organisation.csv",
 		"name": "organisation"

@@ -23,7 +23,8 @@ var respecConfig = {
       "tabular-metadata": {
           "authors": [
             "Rufus Pollock",
-            "Jeni Tennison"
+            "Jeni Tennison",
+            "Gregg Kellogg"
           ],
           "title": "Metadata Vocabulary for Tabular Data",
           "href" : "http://www.w3.org/TR/tabular-metadata/",
@@ -197,8 +198,7 @@ var respecConfig = {
           which that tabular data is encoded is considered to be a <em>distribution</em> 
           of that tabular data.</p>
       </div>
-      <p class="issue" data-number="93">Are the abstract tabular data and the CSV that 
-        encodes it the same thing? (Is DCAT distribution appropriate?)</p>
+      <p class="issue" data-number="177">Is the DCAT block useful in the RDF output?</p>
       <p>The mapping procedure is intended to be simple; encouraging the provision of 
         compliant mapping applications. The limitation of this <dfn title="simple mapping">
         simple mapping</dfn> is that a single object is created for each 
@@ -412,7 +412,7 @@ var respecConfig = {
           header line</a> within the CSV file; and/or</li>
         <li>the <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">
           table description</a>, 
-          <a href="http://www.w3.org/TR/tabular-metadata/#dfn-schema">schema</a> and 
+          <a href="http://www.w3.org/TR/tabular-metadata/#dfn-tableSchema">tableSchema</a> and 
           <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description">
           column descriptions</a> (as defined in [[!tabular-metadata]]) within the 
           associated metadata document.</li>
@@ -433,7 +433,7 @@ var respecConfig = {
         inherited properties</a> from the 
         <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">
         table description</a> and  
-        <a href="http://www.w3.org/TR/tabular-metadata/#dfn-schema">schema</a>.</p>
+        <a href="http://www.w3.org/TR/tabular-metadata/#dfn-tableSchema">tableSchema</a>.</p>
       <p>The <a title="output graph">output graph</a> MAY include some 
         <a href="http://www.w3.org/TR/tabular-metadata/#dfn-direct-annotation">Direct Annotations</a>
         sourced from the metadata document. Where these are 
@@ -467,11 +467,11 @@ var respecConfig = {
             <li>
               <p>Where provided in the 
                 <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">table 
-                description</a>, the metadata property <code>@id</code> SHALL be used to identify the 
+                description</a>, the metadata property <code>url</code> SHALL be used to identify the 
                 root object.</p>
               <p>The root object SHALL be identified using the <em>name/value pair</em> 
-                <code>"url": "<em>[@id]</em>"</code> where <code><em>[@id]</em></code> is the value
-                of metadata property <code>@id</code>.</p>
+                <code>"url": "<em>[url]</em>"</code> where <code><em>[url]</em></code> is the value
+                of metadata property <code>url</code>.</p>
             </li>
             <li>
               <p>The root object SHALL contain a reference to the CSV-encoded <em>
@@ -539,15 +539,15 @@ var respecConfig = {
                 defined within the 
                 <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">
                 table description</a> and/or 
-                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-schema">schema</a>
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-tableSchema">tableSchema</a>
                 SHALL be added to the <a title="column description object">column description 
                 object</a> for each 
                 <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a>.</p>
               <p>Where the same property is defined in both the
                 <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">
                 table description</a> and the
-                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-schema">schema</a>, the 
-                value from the <a href="http://www.w3.org/TR/tabular-metadata/#dfn-schema">schema</a>
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-tableSchema">tableSchema</a>, the 
+                value from the <a href="http://www.w3.org/TR/tabular-metadata/#dfn-tableSchema">tableSchema</a>
                 SHALL take precedence.</p>
             </li>
             <li>
@@ -555,7 +555,7 @@ var respecConfig = {
                 column description</a> SHALL be matched to a 
                 <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a> in
                 the tabular data based on the order that the description is listed in the <code>columns</code>
-                array of the <a href="http://www.w3.org/TR/tabular-metadata/#dfn-schema">schema</a>.</p>
+                array of the <a href="http://www.w3.org/TR/tabular-metadata/#dfn-tableSchema">tableSchema</a>.</p>
               <p>For each <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description">
                 column description</a> in the metadata document, the following metadata properties
                 SHALL be added to the relevant <a title="column description object">column description
@@ -639,7 +639,7 @@ var respecConfig = {
             </li>
             <li>
               <p>Where the metadata property <code>urlTemplate</code> is provided in the 
-                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-schema">schema</a>, 
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-tableSchema">tableSchema</a>, 
                 each object in the <a title="output graph">output graph</a> corresponding to a 
                 <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">row</a> in the
                 tabular data SHALL be explicitly identified using the <em>name/value pair</em> 
@@ -698,7 +698,7 @@ var respecConfig = {
                   within a <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table">table</a>. 
                   Therefore if, say, English and French versions of the same property are provided 
                   as complementary columns in a CSV file then their <code>name</code> properties 
-                  must be different; e.g. <code>title_en</code> and <code>titre_fr</code>. It may 
+                  must be different; e.g. <code>title_en</code> and <code>title_fr</code>. It may 
                   be possible for applications to infer a language from the name of a
                   <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a> - 
                   but this is entirely dependant on the syntax used by the metadata author when 
@@ -973,10 +973,8 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 
         <pre class="example" id="map-annotated-tab-examples-2-metadata" title="Metadata description">
 {
-  "@id": "tree-ops",
-  "@context": {
-    "@language": "en"
-  }
+  "@context": ["http://www.w3.org/ns/csvw", {"@language": "en"}],
+  "url": "tree-ops",
   "dcat:distribution": {
     "dcat:downloadURL": "tree-ops.csv"
   }
@@ -988,7 +986,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
   }],
   "dc:license": "http://opendefinition.org/licenses/cc-by/",
   "dc:modified": "2010-12-31",
-  "schema": {
+  "tableSchema": {
     "columns": [{
       "name": "GID",
       "title": [
@@ -1132,7 +1130,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
                 table group description</a>, 
                 <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-description">
                 table description</a>,
-                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-schema">schema</a> or 
+                <a href="http://www.w3.org/TR/tabular-metadata/#dfn-tableSchema">tableSchema</a> or 
                 <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description">
                 column description</a> the order of precedence SHALL be:</p>
               <ol>

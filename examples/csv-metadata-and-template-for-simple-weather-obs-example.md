@@ -55,7 +55,7 @@ File: `wx-obs-dec2013-site22580943.json`:
            "name": "wx-obs-dec2013-site22580943",
            "path": "site22580943-2013-dec.csv",
            "modified": "2013-12-31",
-           "schema": {"columns": [
+           "tableSchema": {"columns": [
                {
                    "name": "datetime",
                    "title": {
