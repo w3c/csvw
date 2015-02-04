@@ -1615,13 +1615,21 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
       <p class="note">
         This typically will mean that the metadata location is that of the tabular data file from which embedded metadata is extracted, as that is otherwise the highest priority metadata file. As all metadata files typically have the same relative path, resolving a URL against any of these will result in the same absolute URL.
       </p>
+      <p>Prior to merging, each description object is expanded relative to its <code>@context</code> and values are normalized as follows:</p>
+      <ul>
+        <li>If the property is a <a>link property</a> the value is turned into an absolute URL using the <a>base URL</a>.</li>
+        <li>If the property is a <a>URI template property</a>, the value is turned into an absolute <a>URI template property</a> by expanding using the <a>base URL</a>.</li>
+        <li>If the property is an <a>object property</a> accepting arrays, then an object value is turned into an array containing that object.</li>
+        <li>If the property is a <a>natural language property</a> and the value is not already an object, it is turned into an object whose properties are language codes and where the values of those properties are arrays. The suitable language code for the values is determined through the <a>default language</a>; if it can't be determined the language code <code>und</code> MUST be used.</li>
+        <li>If the property is a <a>common property</a> the values are expended using using <code>@context</code>.</li>
+      </ul>
       <p>
         A description object B is <dfn>merged</dfn> into an original description object A by merging each property of B into A. If the property from B does not exist on A, it is simply added to A. If A does have the property, the way the values are merged depends on the type of the property, as follows:
       </p>
       <ul>
         <li>If the property is an <a>array property</a>, the way in which values are merged depends on the property; see the relevant property for this definition.</li>
         <li>If the property is a <a>link property</a>, then if the property only accepts single values, the value from A overrides that from B, otherwise the result is an array of links: those from A followed by those from B that were not already a value in A. Values are first resolved against the <a>base URL</a> of A or B respectively.</li>
-        <li>If the property is a <a>URI template property</a>, the value from A overrides that from B. Values are first resolved against the <a>base URL</a> of A or B respectively.</li>
+        <li>If the property is a <a>URI template property</a>, the value from A overrides that from B.</li>
         <li>If the property is a <a>column reference property</a>, the value from A overrides that from B.</li>
         <li>If the property is an <a>object property</a>, then if the property only accepts single objects:
           <ol>
@@ -1629,9 +1637,9 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             <li>otherwise (if both values as objects) the objects are merged as described here</li>
           </ol>
           If the property accepts arrays, the result is an array of objects or strings: those from A followed by those from B that were not already a value in A.</li>
-        <li>If the property is a <a>natural language property</a>, the result is an object whose properties are language codes and where the values of those properties are arrays. The suitable language code for the values is either explicit within the existing value or determined through the <a>default language</a> in the metadata document; if it can't be determined the language code <code>und</code> MUST be used. The arrays should provide the values from A followed by those from B that were not already a value in A.</li>
+        <li>If the property is a <a>natural language property</a>, the result is an object whose properties are language codes and where the values of those properties are arrays. The arrays MUST provide the values from A followed by those from B that were not already a value in A. If a value exists in <code>und</code> and any other language</code> the value from <code>und</code> MUST be removed, ensuring that the <code>und</code> property is removed if it's value becomes an empty array.</li>
         <li>If the property is an <a>atomic property</a>, then if the property only accepts single values, the value from A overrides that from B; otherwise the result is an array of values: those from A followed by those from B that were not already a value in A.</li>
-        <li>If the property is a <a>common property</a>, the result is an array containing values from A followed by values from B not already in A. Values are first expanded using the <code>@context</code> of A or B respectively.</li>
+        <li>If the property is a <a>common property</a>, the result is an array containing values from A followed by values from B not already in A.</li>
       </ul>
       <p>
         If the type of the property cannot be determined, because it is not defined in this specification (ie because it is an extension property), the type of the property is determined based on its values in A and B, as follows, and merged accordingly:
@@ -1642,6 +1650,184 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
         <li>If the value of the property in A and the value of the property in B are <a title="atomic value">atomic values</a>, they are treated as if the property is an <a>atomic property</a> that only accepts single values.</li>
         <li>If one of the values is an array and the other is an <a>atomic value</a>, they are treated as if the property is an <a>atomic property</a> that accepts arrays.</li>
       </ul>
+      <p>For example, consider the following two Metadata documents to be merged:</p>
+      <pre class="example highlight" title="Metadata A to be merged">
+{
+  "@context": ["http://www.w3.org/ns/csvw", {"@language": "en"}],
+  "resources": [{
+    "url": "http://example.com/doc1",
+    "dc:title": "foo",
+    "table-direction": "ltr",
+    "tableSchema": {
+      "aboutUrl": "{#foo}",
+      "columns": [
+        {"name": "foo", "title": "Foo", "required": true},
+        {"name": "bar"}
+      ]
+    }
+  }, {
+    "url": "http://example.com/doc2"
+  }]
+}
+      </pre>
+      <pre class="example highlight" title="Metadata B to be merged">
+{
+  "@context": ["http://www.w3.org/ns/csvw", {"@base": "http://example.org/foo"}],
+  "url": "http://example.com/doc1",
+  "dc:description": "bar",
+  "tableSchema": {
+    "propertyUrl": "{#_name}",
+    "columns": [
+      {"title": "Foo", "required": false},
+      {"name": "bar"},
+      {}
+    ]
+  }
+}
+      </pre>
+      <p>The process of merging performs the following steps:</p>
+      <ol>
+        <li>Transform <em>B</em> from <code>Table</code> metadata to <code>TableGroup</code> metadata:
+      <pre class="example highlight" title="Metadata B as a TableGroup">
+{
+  "@context": ["http://www.w3.org/ns/csvw", {"@base": "http://example.org/foo"}],
+  "resources": [{
+    "url": "http://example.com/doc1",
+    "dc:description": "bar",
+    "tableSchema": {
+      "propertyUrl": "{#_name}",
+      "columns": [
+        {"title": "Foo", "required": false},
+        {"name": "bar"},
+        {}
+      ]
+    }
+  }]
+}
+      </pre>
+        </li>
+        <li>The <code>@context</code> is merged as defined in <a href="top-level-properties" class="sectionRef"></a> with <code>@base</code> imported into the value in <em>A</em>.</li>
+        <li><code>resources</code> is an <a>array property</a> with rules specified in <a href="#table-groups" class="sectionRef"></a> and each value is merged accordingly:
+          <ol>
+            <li>The first value from <em>A</em> and <em>B</em> are now the following:
+              <pre class="example highlight" title="first resources values A' and B'">
+{
+  "url": "http://example.com/doc1",
+  "dc:title": "foo",
+  "table-direction": "ltr",
+  "tableSchema": {
+    "aboutUrl": "{#foo}",
+    "columns": [
+      {"name": "foo", "title": "Foo", "required": true},
+      {"name": "bar"}
+    ]
+  }
+}
+
+{
+  "url": "http://example.com/doc1",
+  "dc:description": "bar",
+  "tableSchema": {
+    "propertyUrl": "{#_name}",
+    "columns": [
+      {"title": "Foo", "required": false},
+      {"name": "bar"},
+      {}
+    ]
+  }
+}
+              </pre>
+              The properties of these are expanded relative to the original metadata and context resulting in the following:
+              <pre class="example highlight" title="first resources values A' and B'">
+{
+  "url": "http://example.com/doc1",
+  "dc:title": {"@value": "foo", "@language": "en"},
+  "table-direction": "ltr",
+  "tableSchema": {
+    "aboutUrl": "http://example.com/metadata-a{#foo}",
+    "columns": [
+      {"name": "foo", "title": {"en": ["Foo"]}, "required": true},
+      {"name": "bar"}
+    ]
+  }
+}
+
+{
+  "url": "http://example.com/doc1",
+  "dc:description": {"@value": "bar"},
+  "tableSchema": {
+    "propertyUrl": "http://example.org/foo{#_name}",
+    "columns": [
+      {"title": {"en": ["Foo"]}, "required": false},
+      {"name": "bar"},
+      {}
+    ]
+  }
+}
+              </pre>
+              Next each property from <em>B'</em> is considered:
+              <ol>
+                <li><code>url</code> is a <code>link property</code> so the value from <em>A'</em> overrides <em>B'</em> (althrough they are the same value)</li>
+                <li><code>dc:description</code> does not exist in <em>A'</em> so it is added to <em>A'</em></li>
+                <li>Each has <code>tableSchema</code> merged as an <a>object property</a> <em>A''</em> and <em>B''</em>:
+                  <ol>
+                    <li><em>B''</em> has a <code>propertyUrl</code> which is added to <em>A''</em>.</li>
+                    <li>Each has <code>columns</code> which is merged as described in <a href="#schemas"></a>:
+                      <ol>
+                        <li>The first column matches on <code>title</code> because they each have the value <code>"Foo"</code> and the language tag <code>en</code> matches <code>und</code>. The value of <code>required</code> in <em>A''</em> is retained</li>
+                        <li>The second column has a match on <code>name</code></li>
+                      </ol>
+                    </li>
+                  </ol>
+                </li>
+              </ol>
+              The merged table description is now the following:
+              <pre class="example highlight" title="first resources values merged">
+{
+  "url": "http://example.com/doc1",
+  "dc:title": {"@value": "foo", "@language": "en"},
+  "dc:description": {"@value": "bar}",
+  "table-direction": "ltr",
+  "tableSchema": {
+    "aboutUrl": "http://example.com/metadata-a{#foo}",
+    "propertyUrl": "http://example.org/foo{#_name}",
+    "columns": [
+      {"name": "foo", "title": {"en": ["Foo"]}, "required": true},
+      {"name": "bar"}
+    ]
+  }
+}
+              </pre>
+            </li>
+            <li>As <em>B</em> has no <code>resources</code> value, the value from <em>A</em> is retained.
+          </ol>
+        </li>
+      </ol>
+      <p>The resulting merged metadata is now the following:</p>
+      <pre class="example highlight" title="Fully merged metadata">
+{
+  "@context": ["http://www.w3.org/ns/csvw", {
+    "@language": "en",
+    "@base": "http://example.org/foo"
+  }],
+  "resources": [{
+    "url": "http://example.com/doc1",
+    "dc:title": {"@value": "foo", "@language": "en"},
+    "dc:description":{"@value": "bar"},
+    "table-direction": "ltr",
+    "tableSchema": {
+      "aboutUrl": "http://example.com/metadata-a{#foo}",
+      "propertyUrl": "http://example.org/foo{#_name}",
+      "columns": [
+        {"name": "foo", "title": {"en": ["Foo"]}, "required": true},
+        {"name": "bar"}
+      ]
+    }
+  }, {
+    "url": "http://example.com/doc2"
+  }]
+}
+      </pre>
     </section>
     <section>
       <h2>Processing Tables</h2>
