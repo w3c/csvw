@@ -1298,12 +1298,14 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           </dd>
           <dt id="cell-propertyUrl"><code>propertyUrl</code></dt>
           <dd>
-            <p>An <a>URI template property</a> that MAY be used to create a URI for a property if the table is mapped to another format. The default value of <code>propertyUrl</code> is <code>"{#_name}"</code>.</p>
-            <p class="note"><code>propertyUrl</code> is typically defined on a Column. If defined on a Schema, Table or Table Group, care must be taken to ensure that transformed cell values maintain an appropriate semantic relationship.</p>
+            <p>An <a>URI template property</a> that MAY be used to create a URI for a property if the table is mapped to another format. The default value of <code>propertyUrl</code> is <code>"{#_name}"</code>. See <a href="#converting-tables" class="sectionRef"></a> for details.</p>
+            <p class="note"><code>propertyUrl</code> is typically defined on a Column. If defined on a Schema, Table or Table Group, care must be taken to ensure that transformed cell values maintain an appropriate semantic relationship. For example by including the <code>name</code> of the column in the generated URL by using <code>_name</code> in the template.</p>
           </dd>
           <dt id="cell-valueUrl"><code>valueUrl</code></dt>
           <dd>
-            <p>An <a>URI template property</a> that is used to define one or more <cite><a href="http://www.w3.org/TR/rdf11-concepts/#dfn-resource">resources</a></cite> value of a cell instead of a literal values, as defined in [[!rdf-concepts]]. See <a href="#parsing-cells" class="sectionRef"></a>.</p>
+            <p>An <a>URI template property</a> that is used to map the values to the cells into URLs. See <a href="#parsing-cells" class="sectionRef"></a> for details.</p>
+            <p class="note">
+              This allows a cell value to define one or more RDF <cite><a href="http://www.w3.org/TR/rdf11-concepts/#dfn-resource">resources</a></cite> value of a cell instead of a literal values, as defined in [[rdf-concepts]]. For example, if the value were <code>"{#reference}"</code>, each cell value of a column named <em>reference</em> would be used to create a URI such as <code>http://example.com/#1234</code>, if <code>1234</code> were a cell value of that column.</p>
             <p class="note"><code>valueUrl</code> is typically defined on a Column. If defined on a Schema, Table or Table Group, care must be taken to ensure that transformed cell values maintain an appropriate semantic relationship.</p>
           </dd>
           <dt id="cell-length"><code>length</code></dt>
@@ -1460,7 +1462,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           <li>when <strong>displaying</strong> data, to map it into formats that are meaningful for those viewing the data (as opposed to those publishing it)</li>
           <li>when <strong>inputting</strong> data, to turn entered values into representations in a consistent format</li>
         </ul>
-        <p>The <dfn>cell value</dfn> of a cell is the result processing the cell as defined here and applying any format-specific mappings to create on or more values. Converters MUST be provided these cell values, along with any in-scope <code>lang</code> and <code>datatype</code> <a title="property value">property values</a>.</p>
+        <p>The <dfn>cell value</dfn> of a cell is the result of processing the cell as defined here and applying any format-specific mappings to create on or more values. Converters MUST be provided these cell values, along with any in-scope <code>lang</code> and <code>datatype</code> <a title="property value">property values</a>.</p>
         <p>
           The process of parsing the string value of a cell into a single value or a list of values is as follows:
         </p>
@@ -1472,7 +1474,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           <li>if the value is the same as the <code>null</code> value, then the value is <code>null</code></li>
           <li>if the <code>separator</code> property is not <code>null</code>, create a list of values by splitting the string at the character specified by the <code>separator</code> property</li>
           <li>validate the value(s) against the <code>format</code>, if one is specified, as described below; raise an error if any of the values do not match the specified format</li>
-          <li>if the cell column has a <a href="#cell-valueUrl"><code>valueUrl</code></a> the value(s) are the result of applying the URI template to each value as a <cite><a href="http://www.w3.org/TR/rdf11-concepts/#dfn-resource">resource</a></cite></li>
+          <li>if the cell column has a <a href="#cell-valueUrl"><code>valueUrl</code></a> the value(s) are the result of applying the URI template to each value as described in <a>URI template property</a>.</cite></li>
           <li>parse the value(s) using the <code>format</code>, as described below</li>
         </ol>
         <section>
