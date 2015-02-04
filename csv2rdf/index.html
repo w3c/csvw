@@ -364,8 +364,8 @@ var respecConfig = {
           </dd>
           <dt><dfn>table group resource</dfn></dt><dd>
             The <a>table group resource</a> is a URL based on the <code>@id</code> of the
-            <a>table group description</a> along with the <code>#table-group</code>
-            URI fragment, if <code>@id</code> is present and not a <a href="http://www.w3.org/TR/rdf11-concepts/#section-blank-nodes">blank node</a>, otherwise
+            <a>table group description</a> resolved against the metadata base,
+            if <code>@id</code> is present and not a <a href="http://www.w3.org/TR/rdf11-concepts/#section-blank-nodes">blank node</a>, otherwise
             it is a <a href="http://www.w3.org/TR/rdf11-concepts/#section-blank-nodes">blank node</a>.
           </dd>
           <dt><dfn>table description</dfn></dt><dd>
@@ -375,13 +375,21 @@ var respecConfig = {
           </dd>
           <dt><dfn>table resource</dfn></dt><dd>
             The <a>table resource</a> is a URL based on the <code>@id</code> of the
-            <a>table description</a> along with the <code>#table</code>
-            URI fragment.
+            <a>table description</a> resolved to the metadata base,
+            if <code>@id</code> is present, otherwise
+            it is the value of the <a>table description</a> <code>url</code>
+            along with the <code>#table</code> URI fragment.
           </dd>
           <dt><dfn>schema description</dfn></dt><dd>
             The <a href="http://www.w3.org/TR/tabular-metadata/#dfn-schema-description">schema</a>
             <a href="http://www.w3.org/TR/tabular-metadata/#dfn-description-object">description object</a>
             for a <a>table description</a>.
+          </dd>
+          <dt><dfn>schema resource</dfn></dt><dd>
+            The <a>schema resource</a> is a URL based on the <code>@id</code> of the
+            <a>schema description</a> resolved to the metadata base,
+            if <code>@id</code> is present and not a <a href="http://www.w3.org/TR/rdf11-concepts/#section-blank-nodes">blank node</a>, otherwise
+            it is a <a href="http://www.w3.org/TR/rdf11-concepts/#section-blank-nodes">blank node</a>.
           </dd>
           <dt><dfn>column description</dfn></dt><dd>
             A <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description">column</a>
@@ -389,9 +397,34 @@ var respecConfig = {
             of a <a>schema description</a> associated with a particular
             <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a>.
           </dd>
-          <dt><dfn>predicateUrl</dfn></dt><dd>
-            The <a>predicateUrl</a> is the value of the <code>predicateUrl</code> property of the current
-            <a>column description</a>.
+          <dt><dfn>column resource</dfn></dt><dd>
+            The <a>column resource</a> is a URL based on the <code>@id</code> of the
+            <a>column description</a> resolved to the metadata base,
+            if <code>@id</code> is present and not a <a href="http://www.w3.org/TR/rdf11-concepts/#section-blank-nodes">blank node</a>, otherwise
+            it is a <a href="http://www.w3.org/TR/rdf11-concepts/#section-blank-nodes">blank node</a>.
+          </dd>
+          <dt><dfn>aboutUrl</dfn></dt><dd>
+            The <a>aboutUrl</a> is the evaluation of the <code>aboutUrl</code> property of the current
+            <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">row</a>
+            as defined in
+            <cite><a href="http://www.w3.org/TR/tabular-metadata/#dfn-uri-template-property">URI template properties</a></cite>
+            in [[!tabular-metadata]], or a
+            <a href="http://www.w3.org/TR/rdf11-concepts/#section-blank-nodes">blank node</a>
+            as defined in [[!rdf11-concepts]] if no <code>aboutUrl</code> exists.
+          </dd>
+          <dt><dfn>propertyUrl</dfn></dt><dd>
+            The <a>propertyUrl</a> is the evaluation of the <code>propertyUrl</code> property of the current
+            <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">row</a>
+            as defined in
+            <cite><a href="http://www.w3.org/TR/tabular-metadata/#dfn-uri-template-property">URI template properties</a></cite>
+            in [[!tabular-metadata]].
+          </dd>
+          <dt><dfn>valueUrl</dfn></dt><dd>
+            The <a>valueUrl</a> is the evaluation of the <code>valueUrl</code> property of the current
+            <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">row</a>
+            as defined in
+            <cite><a href="http://www.w3.org/TR/tabular-metadata/#dfn-uri-template-property">URI template properties</a></cite>
+            in [[!tabular-metadata]].
           </dd>
           <dt><dfn>common properties</dfn></dt><dd>
             The <a>common properties</a> of a metadata resource are defined in
@@ -404,15 +437,8 @@ var respecConfig = {
             subject.
           </dd>
           <dt><dfn>row resource</dfn></dt><dd>
-            The <a>row resource</a> is a URI or <a href="http://www.w3.org/TR/rdf11-concepts/#section-blank-nodes">blank node</a> associated with each
-            <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">row</a>
-            based on evaluating the <code>urlTemplate</code> value from the
-            <a>schema description</a>,
-            as defined in
-            <cite><a href="http://www.w3.org/TR/tabular-metadata/#dfn-uri-template-property">URI template properties</a></cite>
-            in [[!tabular-metadata]], or a
-            <a href="http://www.w3.org/TR/rdf11-concepts/#section-blank-nodes">blank node</a>
-            as defined in [[!rdf11-concepts]] if no <code>urlTemplate</code> exists.
+            The <a>row resource</a> is the <a>aboutUrl</a> of the first column in the
+            <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">row</a>.
           </dd>
         </dl>
       </section>
@@ -425,41 +451,42 @@ var respecConfig = {
           
           <ol>
             <li>Emit the following triple defining the type of the <a>table resource</a>:
-            <dl class="triple">
-              <dt>subject</dt>
-              <dd><a>table resource</a></dd>
-              <dt>predicate</dt>
-              <dd><code>rdf:type</code></dd>
-              <dt>object</dt>
-              <dd><code>csvw:Table</code></dd>
-            </dl>
-          </li>
+              <dl class="triple">
+                <dt>subject</dt>
+                <dd><a>table resource</a></dd>
+                <dt>predicate</dt>
+                <dd><code>rdf:type</code></dd>
+                <dt>object</dt>
+                <dd><code>csvw:Table</code></dd>
+              </dl>
+            </li>
 
-          <li>Establish a new <a href="http://www.w3.org/TR/rdf11-concepts/#section-blank-nodes">blank node</a> <em>distribution</em> and emit the following triples:
-            <dl class="triple">
-              <dt>subject</dt>
-              <dd><a>table resource</a></dd>
-              <dt>predicate</dt>
-              <dd><code>dcat:Distribution</code></dd>
-              <dt>object</dt>
-              <dd><em>distribution</em></dd>
-            </dl>
-            <dl class="triple">
-              <dt>subject</dt>
-              <dd><em>distribution</em></dd>
-              <dt>predicate</dt>
-              <dd><code>rdf:type</code></dd>
-              <dt>object</dt>
-              <dd><code>dcat:Distribution</code> </dd>
-            </dl>
-            <dl class="triple">
-              <dt>subject</dt>
-              <dd><em>distribution</em></dd>
-              <dt>predicate</dt>
-              <dd><code>dcat:downloadURL</code></dd>
-              <dt>object</dt>
-              <dd>absolute URL of the source CSV file</dd>
-            </dl>
+            <li>Establish a new <a href="http://www.w3.org/TR/rdf11-concepts/#section-blank-nodes">blank node</a> <em>distribution</em> and emit the following triples:
+              <dl class="triple">
+                <dt>subject</dt>
+                <dd><a>table resource</a></dd>
+                <dt>predicate</dt>
+                <dd><code>dcat:Distribution</code></dd>
+                <dt>object</dt>
+                <dd><em>distribution</em></dd>
+              </dl>
+              <dl class="triple">
+                <dt>subject</dt>
+                <dd><em>distribution</em></dd>
+                <dt>predicate</dt>
+                <dd><code>rdf:type</code></dd>
+                <dt>object</dt>
+                <dd><code>dcat:Distribution</code> </dd>
+              </dl>
+              <dl class="triple">
+                <dt>subject</dt>
+                <dd><em>distribution</em></dd>
+                <dt>predicate</dt>
+                <dd><code>dcat:downloadURL</code></dd>
+                <dt>object</dt>
+                <dd>absolute URL of the source CSV file</dd>
+              </dl>
+            </li>
 
             <li>
               <p>Where present in the <a>table description</a>,
@@ -490,16 +517,90 @@ var respecConfig = {
               </ul>  
             </li>
 
+            <li>Emit the following triples for the <a>schema resource</a>
+              <dl class="triple">
+                <dt>subject</dt>
+                <dd><a>table resource</a></dd>
+                <dt>predicate</dt>
+                <dd><code>csvw:tableSchema</code></dd>
+                <dt>object</dt>
+                <dd><a>schema resource</a></dd>
+              </dl>
+              <dl class="triple">
+                <dt>subject</dt>
+                <dd><a>schema resource</a></dd>
+                <dt>predicate</dt>
+                <dd><code>rdf:type</code></dd>
+                <dt>object</dt>
+                <dd><code>csvw:Schema</code></dd>
+              </dl>
+            </li>
             <li>
               For each <a>column description</a> in the <a>schema description</a>:
               <ul>
+                <li>Emit the following triples for the <a>column resource</a>
+                  <dl class="triple">
+                    <dt>subject</dt>
+                    <dd><a>schema resource</a></dd>
+                    <dt>predicate</dt>
+                    <dd><code>csvw:column</code></dd>
+                    <dt>object</dt>
+                    <dd><a>column resource</a></dd>
+                  </dl>
+                  <dl class="triple">
+                    <dt>subject</dt>
+                    <dd><a>column resource</a></dd>
+                    <dt>predicate</dt>
+                    <dd><code>rdf:type</code></dd>
+                    <dt>object</dt>
+                    <dd><code>csvw:Column</code></dd>
+                  </dl>
+                  <dl class="triple">
+                    <dt>subject</dt>
+                    <dd><a>column resource</a></dd>
+                    <dt>predicate</dt>
+                    <dd><code>csvw:colnum</code></dd>
+                    <dt>object</dt>
+                    <dd>column number of <a>column description</a> as an <code>xsd:integer</code></dd>
+                  </dl>
+                </li>
+                <li>If the <code>aboutUrl</code> of the <a>column description</a> is not null, emit the following triple:
+                  <dl class="triple">
+                    <dt>subject</dt>
+                    <dd><a>column resource</a></dd>
+                    <dt>predicate</dt>
+                    <dd><code>csvw:aboutUrl</code></dd>
+                    <dt>object</dt>
+                    <dd><code>aboutUrl</code> from the <a>column description</a></dd>
+                  </dl>
+                </li>
+                <li>For all <code>propertyUrl</code> of the <a>column description</a> emit the following triples:
+                  <dl class="triple">
+                    <dt>subject</dt>
+                    <dd><a>column resource</a></dd>
+                    <dt>predicate</dt>
+                    <dd><code>csvw:propertyUrl</code></dd>
+                    <dt>object</dt>
+                    <dd><code>propertyUrl</code> from the <a>column description</a></dd>
+                  </dl>
+                </li>
+                <li>If the <code>valueUrl</code> of the <a>column description</a> is not null, emit the following triple:
+                  <dl class="triple">
+                    <dt>subject</dt>
+                    <dd><a>column resource</a></dd>
+                    <dt>predicate</dt>
+                    <dd><code>csvw:valueUrl</code></dd>
+                    <dt>object</dt>
+                    <dd><code>valueUrl</code> from the <a>column description</a></dd>
+                  </dl>
+                </li>
                 <li>
                   <p>For each value <code>title</code> a 
                     <a href="http://www.w3.org/TR/tabular-metadata/#dfn-natural-language-property">natural language property</a>,
                     emit the following triple:</p>
                   <dl class="triple">
                     <dt>subject</dt>
-                    <dd><a>predicateUrl</a></dd>
+                    <dd><a>column resource</a></dd>
                     <dt>predicate</dt>
                     <dd><code>rdfs:label</code></dd>
                     <dt>object</dt>
@@ -520,7 +621,9 @@ var respecConfig = {
 
             <li>For each <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">row</a>:
               <ul>
-                <li>Emit the following triple:
+                <li>The <em>object</em> is the <a href="http://www.w3.org/TR/tabular-metadata/#dfn-cell-value">cell value</a> after applying datatype and format transformations
+                  defined for the column as defined in [[!tabular-metadata]].</li>
+                <li>Emit the following triples:
                   <dl class="triple">
                     <dt>subject</dt>
                     <dd><a>row resource</a></dd>
@@ -529,9 +632,25 @@ var respecConfig = {
                     <dt>object</dt>
                     <dd><em>value</em> (as a simple literal or language-tagged string)</dd>
                   </dl>
+                  <dl class="triple">
+                    <dt>subject</dt>
+                    <dd><a>row resource</a></dd>
+                    <dt>predicate</dt>
+                    <dd><code>csvw:rownum</code></dd>
+                    <dt>object</dt>
+                    <dd>row number of <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">row</a> as an <code>xsd:integer</code></dd>
+                  </dl>
                 </li>
-                <li>Perform <a href="#map-annotated-tab-row" class="sectionRef">Row-level processing</a>
-                  using <a>row resource</a>.</li>
+                <li>If <em>object</em> is not <code>null</code>, then for each <a>propertyUrl</a> <em>pred</em> and <em>object</em> <em>o</em> emit the following triple:
+                  <dl class="triple">
+                    <dt>subject</dt>
+                    <dd><a>aboutUrl</a></dd>
+                    <dt>predicate</dt>
+                    <dd><em>pred</em></dd>
+                    <dt>object</dt>
+                    <dd><em>o</em></dd>
+                  </dl>
+                </li>
               </ul>
             </li>
 
@@ -588,76 +707,6 @@ var respecConfig = {
             </li>
 
           </ol>
-        </section>
-
-        <section id="map-annotated-tab-row">
-          
-          <h4>Row-level processing</h4>
-
-          <p>Each <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">row</a>
-            in the tabular data is processed sequentially to produce a <a>row resource</a>. The behaviour exhibited when processing a given 
-            <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell">cell</a> within the 
-            current <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">row</a> is 
-            dependent on the metadata properties of the 
-            <a>column description object</a> for the 
-            <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a> that
-            that <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell">cell</a> resides
-            in. The effect of each metadata property is defined in 
-            <a href="#map-annotated-tab-metadata">Section 4.1.3 Metadata property effects on row-level 
-            mapping behaviour</a></p>
-
-          <p class="issue">Cell value is not right, value is still a string or null.
-            this should be a semantic value, which off-loads semantic processing to
-            to the Metadata document.</p>
-
-          <ol>
-            <li>
-              <p>A <a>row resource</a> SHALL contain one triple for each
-                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a> 
-                where the 
-                <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a>
-                is not <em>null</em>.</p>
-            </li>
-
-            <li>The <a>row resource</a> <em>subject</em> is set by expanding
-              the <code>urlTemplate</code>, if present, as defined in
-              <cite><a href="http://www.w3.org/TR/tabular-metadata/#dfn-uri-template-property">URI template properties</a></cite>
-              in [[!tabular-metadata]], or a
-              <a href="http://www.w3.org/TR/rdf11-concepts/#section-blank-nodes">blank node</a>
-              as defined in [[!rdf11-concepts]].
-            </li>
-
-            <li>The <em>predicate</em> is determined from the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a> <code>predicateUrl</code>.</li>
-            <li>The <em>object</em> is the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a> after applying datatype and format transformations
-              defined for the column:
-              <ul>
-                <li>If the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a> has a <code>separator</code>, the value is separated
-                  into multiple values and each is transformed into an object using
-                  the steps from this algorithm, with the non-<code>null</code> 
-                  results placed into a new RDF List, which is used as the <em>object</em>.</li>
-                <li>If the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a> has format, and
-                  the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a> does not match format, the <em>object</em> is <code>null</code>.
-                <li>If the transformed <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell value</a> is <code>null</code>,
-                  then if the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a> has a <code>default</code>, the
-                  <em>object</em> is a simple literal with the value of <code>default</code>.</li>
-                <li>Otherwise, if the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a> has <code>datatype</code> <code>anyUri</code>,
-                  the <em>object</em> is a URI expanded relative to the <a>table resource</a>.</li>
-                <li>Otherwise, if the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a> has a <code>datatype</code>, the value
-                  is transformed according to any <code>format</code> and the <em>object</em> is
-                  a datatyped literal.
-                <li>Otherwise, if the
-                  <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a>
-                  has a <code>language</code>, the object is a
-                  <cite><a href="http://www.w3.org/TR/rdf11-concepts/#dfn-language-tagged-string">language tagged string</a></cite>.
-              </ul>
-            </li>
-            <li>If the <em>object</em> is not <code>null</code>, a triple composed
-              of <em>subject</em>, <em>predicate</em>, and <em>object</em> is added
-              to the <a>output graph</a>.</li>
-          </ol>
-
-        </section>
-
         </section>
 
       </section>
@@ -972,7 +1021,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           this is because the CSV and the metadata both include the same <code>title</code> - should the
           mapping application attempt to deduplicate?</p>
 
-        <p class="issue" data-number="">The assertions about the column predicates could
+        <p class="issue" data-number="">The assertions about the column properties could
           include <code>rdfs:range</code> to specify the data type. Is this desirable?</p>
 
       </section>
