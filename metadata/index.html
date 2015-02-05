@@ -183,12 +183,15 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         Given the location of the CSV file, this metadata document can be located by appending <code>-metadata.json</code> to the URL (as described in <a href="http://www.w3.org/TR/tabular-data-model/#standard-file-metadata">Model for Tabular Data and Metadata on the Web</a>). It provides information for different types of applications:
       </p>
       <ul>
-        <li><strong>Viewers</strong> can use the indicated metadata to provide a more user-friendly or human-readable view of the CSV file, which might include displaying it in a table or as graphs or charts.</li>
-        <li><strong>Data entry tools</strong> can use the metadata to prompt people to supply information that is added to a CSV file</li>
-        <li><strong>Validators</strong> can check that the labels of the columns in the metadata file match those in the CSV file, that the values in the columns are of the right type and in the right format, and that values in the <code>GID</code> column are all present and unique.</li>
-        <li><strong>Converters</strong> can use the metadata to map the CSV data into other formats such as JSON, RDF and XML, or into databases or statistical applications, in intelligent ways.</li>
-        <li><strong>Data Aggregators</strong> can use the indicated metadata, such as descriptions, titles, modification dates and licences, to enable more intelligent retrieval of relevant data on the web.</li>
+        <li><dfn>Viewers</dfn> can use the indicated metadata to provide a more user-friendly or human-readable view of the CSV file, which might include displaying it in a table or as graphs or charts.</li>
+        <li><dfn>Data entry tools</dfn> can use the metadata to prompt people to supply information that is added to a CSV file</li>
+        <li><dfn>Validators</dfn> can check that the labels of the columns in the metadata file match those in the CSV file, that the values in the columns are of the right type and in the right format, and that values in the <code>GID</code> column are all present and unique.</li>
+        <li><dfn>Converters</dfn> can use the metadata to map the CSV data into other formats such as JSON, RDF and XML, or into databases or statistical applications, in intelligent ways.</li>
+        <li><dfn>Data Aggregators</dfn> can use the indicated metadata, such as descriptions, titles, modification dates and licences, to enable more intelligent retrieval of relevant data on the web.</li>
       </ul>
+      <p class="note">
+        Implementations may fulfil one or more of these functions. In particular, <a>Converters</a> may or may not act as a <a>Validator</a> (perhaps through the setting of a flag), and check the data that they are converting to ensure that it is complant with the schema. If a Converter does not also act as a Validator it may produce invalid output.
+      </p>
       <p>
         The <a href="http://www.w3.org/TR/tabular-data-model/">Model for Tabular Data and Metadata on the Web</a> specification defines an <a href="http://www.w3.org/TR/tabular-data-model/#annotated-tabular-data-model">Annotated Tabular Data Model</a> in which tables, columns, rows and cells can be annotated with properties and values, and a <a href="http://www.w3.org/TR/tabular-data-model/#grouped-tabular-data-model">Grouped Tabular Data Model</a> in which a group of tables is annotated. That specification also describes <a href="http://www.w3.org/TR/tabular-data-model/#locating-metadata">how to locate metadata</a> about a given CSV file.
       </p>
@@ -877,7 +880,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             </dd>
             <dt id="template-source"><code>source</code></dt>
             <dd>
-              <p>A single string <a>atomic property</a> that provides, if included, the format to which the tabular data should be transformed prior to the transformation using the template. If the value is <code>"json"</code>, the tabular data should first be transformed first to JSON based on the simple mapping defined in <a href="http://w3c.github.io/csvw/csv2json/">Generating JSON from Tabular Data on the Web</a>. If the value is <code>"rdf"</code>, it should similarly first be transformed to XML based on the simple mapping defined in <a href="http://w3c.github.io/csvw/csv2rdf/">Generating RDF from Tabular Data on the Web</a>. If the <code>source</code> property is missing or <code>null</code> then the source of the transformation is the annotated tabular data model.
+              <p>A single string <a>atomic property</a> that provides, if included, the format to which the tabular data should be transformed prior to the transformation using the template. If the value is <code>"json"</code>, the tabular data should first be transformed first to JSON based on the simple mapping defined in <a href="http://w3c.github.io/csvw/csv2json/">Generating JSON from Tabular Data on the Web</a>. If the value is <code>"rdf"</code>, it should similarly first be transformed to an RDF graph based on the simple mapping defined in <a href="http://w3c.github.io/csvw/csv2rdf/">Generating RDF from Tabular Data on the Web</a>. If the <code>source</code> property is missing or <code>null</code> then the source of the transformation is the annotated tabular data model.
             </dd>
             <dt id="template-ld-id"><code>@id</code></dt>
             <dd>
@@ -930,7 +933,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             </p>
             <ul>
               <li>if there is a column description at the same index within A and that column description has the same <code>name</code>, the column description from B is <a>merged</a> into the matching column description in A</li>
-              <li>otherwise, if there is a column description at the same index within A and that column description has a title, is also in A, and the column <a>default language</a> is the same in both A and B, the column description from B is imported into the matching column description in A</li>
+              <li>otherwise, if there is a column description at the same index within A with a <code>title</code> that is also a <code>title</code> in A, considering the language of each <code>title</code> where <code>und</code> matches a value in any language, the column description from B is imported into the matching column description in A.</li>
               <li>otherwise, if there is no column description at the same index within A, then the column description is taken from that index of B</li>
               <li>otherwise, the column description is ignored. A validator MUST issue a warning if such a column description is encountered.</li>
             </ul>
@@ -941,7 +944,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               A <a>column reference property</a> that holds either a single reference to a column description object or an array of references.
             </p>
             <p>
-              Validators MUST check that each row has a unique combination of cells in the indicated columns. For example, if <code>primaryKey</code> is set to <code>["familyName", "givenName"]</code> then every row must have a unique value for the combination of the <code>familyName</code> and <code>givenName</code> columns.
+              <a>Validators</a> MUST check that each row has a unique combination of cells in the indicated columns. For example, if <code>primaryKey</code> is set to <code>["familyName", "givenName"]</code> then every row must have a unique value for the combination of the <code>familyName</code> and <code>givenName</code> columns.
             </p>
             <p class="issue" data-number="66">
               Composite primary keys and foreign key references.
@@ -1200,7 +1203,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
               <p>
                 An <a>atomic property</a> that gives a single canonical name for the column. This MUST be a string. Conversion specifications MUST use this property as the basis for the names of properties/elements/attributes in the results of conversions.
               </p>
-              <p>The <a>property value</a> of <code>name</code> is that defined within metadata, if it exists. Otherwise, it is the first <a>property value</a> of <code>title</code> as a string without language, if any. Otherwise, it is the string <code>"_col=<em>[N]</em>"</code> where <code><em>[N]</em></code> is the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column-number">column number</a>.
+              <p>The <a>property value</a> of <code>name</code> is that defined within metadata, if it exists. Otherwise, it is the first value from the <a>property value</a> of <code>title</code> having the same language tag as <a>default language</a> or <code>und</code> of not specified, as a string without language, if any. Otherwise, it is the string <code>"_col=<em>[N]</em>"</code> where <code><em>[N]</em></code> is the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column-number">column number</a>.
               </p>
               <p>
                 For ease of reference within <a title="URI template property">URI template properties</a>, column names SHOULD consist only of alphanumeric characters or underscores (<code>[a-zA-Z0-9_]+</code>). Names beginning with <code>_</code> are reserved by this specification and MUST NOT be used.
@@ -1474,7 +1477,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             It is not uncommon for numbers within tabular data to be formatted for human consumption, which may involve using commas for decimal points, grouping digits in the number using commas, or adding currency symbols or percent signs to the number.
           </p>
           <p>
-            If the <code>datatype</code> is a numeric type, the <code>format</code> property indicates the expected format for that number. Validators MUST check that the numbers in the column adhere to the specified format. Converters MUST use the <code>format</code> property to parse the number when mapping it into a suitable type in the target format of the conversion.
+            If the <code>datatype</code> is a numeric type, the <code>format</code> property indicates the expected format for that number. <a>Validators</a> MUST check that the numbers in the column adhere to the specified format. <a>Converters</a> MUST use the <code>format</code> property to parse the number when mapping it into a suitable type in the target format of the conversion.
           </p>
           <p>
             When the <code>datatype</code> is a numeric type, the <code>format</code> property's value MUST be either a single string or an object with one or more of the properties:
@@ -1505,7 +1508,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             Implementations MUST raise an error if a number does not meet the format defined above, or if it contains two consecutive <a href="#groupChar"><code>groupChar</code></a> characters, or if it does not match the regular expression defined in the <a href="#number-pattern"><code>pattern</code></a> property, if there is one.
           </p>
           <p>
-            Converters MUST use the sign, exponent, percent and per-mille signs when interpreting the number ready for conversion. For example, the string value <code>-25%</code> must be interpreted as <code>-0.25</code> and the string value <code>1E6</code> as <code>1000000</code>.
+            <a>Converters</a> MUST use the sign, exponent, percent and per-mille signs when interpreting the number ready for conversion. For example, the string value <code>-25%</code> must be interpreted as <code>-0.25</code> and the string value <code>1E6</code> as <code>1000000</code>.
           </p>
         </section>
         <section>
@@ -1523,7 +1526,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             Dates and times are commonly represented in tabular data in formats other than those defined in [[!xmlschema-2]].
           </p>
           <p>
-            If the <code>datatype</code> is a date or time type, the <code>format</code> property indicates the expected format for that date or time. Validators MUST check that the dates or times in the column adhere to the specified format. Converters MUST use the <code>format</code> property to parse the date or time when mapping it into a suitable type in the target language of the conversion.
+            If the <code>datatype</code> is a date or time type, the <code>format</code> property indicates the expected format for that date or time. <a>Validators</a> MUST check that the dates or times in the column adhere to the specified format. <a>Converters</a> MUST use the <code>format</code> property to parse the date or time when mapping it into a suitable type in the target language of the conversion.
           </p>
           <p>
             The following date formats MUST be recognised by implementations:
@@ -1583,7 +1586,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
       <p>
         When processing a tabular data file, the <cite><a href="http://www.w3.org/TR/tabular-data-model/#locating-metadata">Locating Metadata</a></cite> in [[!tabular-data-model]] describes different locations for locating metadata. To property transform a tabular data file, such as a CSV, processors MUST merge metadata from these separate sources to create a single metadata document in a manner consistent with this algorithm.
       </p>
-      <p>Implementations MUST merge metadata documents in a manner consistent with these rules. Validators MUST check and issue warnings where merge issues are found as noted below and in the relevant property definitions.</p>
+      <p>Implementations MUST merge metadata documents in a manner consistent with these rules. <a>Validators</a> MUST check and issue warnings where merge issues are found as noted below and in the relevant property definitions.</p>
       <p>
         Merging of metadata happens in order from highest priority to lowest priority by merging the first two metadata files (A and B) together to create new merged metadata AB'. This is then used to merge in the next metadata file until all metadata have been processed to create a <a>table group description</a>. If the top-level object of either of the metadata files are <a title="table description">table descriptions</a>, these are treated as if they were <a title="table group description">table group descriptions</a> containing a single table description (ie having a single <code>resource</code> property whose value is the same as the original table description). Ensure that <code>@context</code> definitions are moved from the <a>table description</a> to the <a>table group description</a>.
       </p>
@@ -1696,6 +1699,18 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
         </ul>
       </section>
     </section>
+    <section>
+      <h2>Security Considerations</h2>
+      <p>
+        Applications that process tabular data may use that data to drive other actions, which may have security implications. These behaviours are outside the scope of this specification.
+      </p>
+      <p>
+        Third party metadata provided about a tabular data file (such as a CSV file) may rename or ignore headers, or exclude rows or columns, which may lead to data being misinterpreted by applications that process it.
+      </p>
+      <p>
+        <a title="template specification">Template specifications</a> are a possible security risk as they enable the creators of metadata to reference arbitrary code that may be executed to convert tabular data into other formats. Implementations should run this arbitrary code in a sandboxed environment to reduce the security risk.
+      </p>
+    </section>
     <section class="appendix">
       <h2>Acknowledgements</h2>
       <p>
@@ -1710,12 +1725,6 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           We intend to include a registration for a new datatype, namely <code>application/csvm+json</code>. We invite comment about how to indicate that this is consistent with <code>application/ld+json</code>, or whether we should just use <code>application/json</code> or <code>application/ld+json</code> and not create a specific media type for the metadata files defined in this document.
         </p>
       </section>
-    </section>
-    <section class="appendix">
-      <h2>Security Considerations</h2>
-      <p class="issue" data-number="8">
-        TODO: General CSV security considerations.
-      </p>
     </section>
     <section class="appendix">
       <h2>JSON-LD Context</h2>
