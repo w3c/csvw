@@ -785,6 +785,37 @@ var respecConfig = {
                   <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">column</a>.</p>
                 <p>The <em>variable</em> <code>_row</code> evaluates to the number of the row being
                   processed.</p>
+                <div class="issue">
+                  From inline comments, refected here until resolved:
+                  <ul>
+                    <li>@jenit said:
+                      <blockquote>
+                        I think we need to add another variable to support the <code>valueUrl</code> property, ie <code>_value</code> evaluating to the cell value of the cell being processed.
+                      </blockquote>
+                    </li>
+                    <li>@iherman said:
+                      <blockquote>
+                        Clarification... Do you mean that the value of ``_value`` is the raw cell value, as opposed to the one that may have been transformed to match the datatype definition?
+                      </blockquote>
+                    </li>
+                    <li>@gkellogg said:
+                      <blockquote>
+                        <p>My own implementation maintains a <code>_raw</code> value for the Cell, but it's not used anywhere. The cell value should include the effect cell value(s) after transformation, including the <code>valueUrl</code> expanded values.</p>
+                        <p>In this code the cell value reference should get this bit from the Metadata document:</p>
+                        <p>The cell value of a cell is the result processing the cell as defined here and applying any format-specific mappings to create on or more values. Converters must be provided these cell values, along with any in-scope <code>lang</code> and <code>datatype</code> property values.</p>
+                        <p>The process of parsing the string value of a cell into a single value or a list of values is as follows:</p>
+
+                        <ul>
+                        <li>unless the <code>valueUrl</code> is defined on the cell, <code>datatype</code> is string or anySimpleType or any, strip leading and trailing whitespace from the value</li>
+                        <li>if the value is the same as the null value, then the value is null</li>
+                        <li>if the separator property is not null, create a list of values by splitting the string at the character specified by the separator property</li>
+                        <li>validate the value(s) against the format, if one is specified, as described below; raise an error if any of the values do not match the specified format</li>
+                        <li>if the cell column has a <code>valueUrl</code> the value(s) are the result of applying the URI template to each value as a resource</li>
+                        <li>parse the value(s) using the <code>format</code>, as described below</li>
+                        </ul>
+                      </blockquote>
+                    </li>
+                </div>
                 <p>The <em>variable</em> <code>_name</code> evaluates to the <code>name</code> <cite><a href="http://w3c.github.io/csvw/metadata/#dfn-property-value">property value</a></cite> of the column being
                   processed.</p>
                 <p>Once the URL has been generated via the template expansion, relative URLs are
