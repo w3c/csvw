@@ -31,7 +31,7 @@ Tests may have options which should be used to change processor behavior:
 
 * noProv - Do not output provenance triples for RDF tests; these triples are optional and make comparison using RDF isomorphism impossible.
 
-Tests may also have a `csvw:link` property indicating an HTTP Link header which should be returned when serving the `mf:action` file; processors should act as if this value was received in an HTTP request if it is not otherwise set.
+Tests may also have a `csvt:link` property indicating an HTTP Link header which should be returned when serving the `mf:action` file; processors should act as if this value was received in an HTTP request if it is not otherwise set.
 
 The home of the test suite is <http://w3c.github.io/csvw/tests/>.
 The base IRI for parsing each file is `mf:action`.  For example, the test test001j and
