@@ -133,59 +133,20 @@ var respecConfig = {
         There are different levels of data models for tabular data:
       </p>
       <ul>
-        <li>The <dfn>core tabular data model</dfn> described in <a href="#core-tabular-data-model" class="sectionRef"></a> defines the core model for a single table of basic data.</li>
         <li>The <dfn>annotated tabular data model</dfn> described in <a href="#annotated-tabular-data-model" class="sectionRef"></a> defines a model for tables that are annotated with metadata.</li>
         <li>The <dfn>grouped tabular data model</dfn> described in <a href="#grouped-tabular-data-model" class="sectionRef"></a> defines a model for tables that are related to each other in some way.</li>
       </ul>
       <section>
-        <h3>Core Tabular Data Model</h3>
+        <h3>Annotated Tabular Data Model</h3>
         <p>
-          The core tabular data model can be used to describe a table that lacks any annotations, whether those annotations are embedded within a CSV file or arise from a separate metadata document.
-        </p>
-        <p>
-          Data is held in a <dfn>table</dfn>. The properties of a table are:
+          An <dfn>annotated table</dfn> is a <dfn>table</dfn> that is annotated with additional metadata. The core properties of a table are:
         </p>
         <ul>
           <li><dfn title="table columns">columns</dfn> &mdash; the list of <a title="column">columns</a> in the table. A table MUST have one or more columns and the order of the columns within the list is significant and MUST be preserved by applications</li>
           <li><dfn title="table rows">rows</dfn> &mdash; the list of rows in the table</li>
         </ul>
         <p>
-          A <dfn>column</dfn> represents a vertical arrangement of <a title="cell">cells</a> within a <a>table</a>. The properties of a column are:
-        </p>
-        <ul>
-          <li><dfn title="column table">table</dfn> &mdash; the <a>table</a> that the column appears in</li>
-          <li><dfn title="column number">number</dfn> &mdash; the position of the column amongst the <a title="table columns">columns</a> for the associated <a title="column table">table</a>, starting from 1</li>
-          <li><dfn title="column cells">cells</dfn> &mdash; the list of <a title="cell">cells</a> in the column. A column MUST contain one cell from each <a>row</a> in the table. The order of the cells in the list MUST match the order of the rows in which they appear within the <a title="table rows">rows</a> for the associated <a title="column table">table</a>.</li>
-        </ul>
-        <p>
-          A <dfn>row</dfn> represents a horizontal arrangement of <a title="cell">cells</a> within a <a>table</a>. The properties of a row are:
-        </p>
-        <ul>
-          <li><dfn title="row table">table</dfn> &mdash; the <a>table</a> that the row appears in</li>
-          <li><dfn title="row number">number</dfn> &mdash; the position of the row amongst the <a title="table rows">rows</a> for the <a title="row table">table</a>, starting from 1</li>
-          <li><dfn title="row cells">cells</dfn> &mdash; the list of <a title="cell">cells</a> in the row. A row MUST contain one cell from each <a>column</a> in the table. The order of the cells in the list MUST match the order of the columns in which they appear within the <a>table columns</a> for the row's table.</li>
-        </ul>
-        <p>
-          A <dfn>cell</dfn> represents a cell at the intersection of a <a>row</a> and a <a>column</a> within a <a>table</a>. The properties of a cell are:
-        </p>
-        <ul>
-          <li><dfn title="cell table">table</dfn> &mdash; the <a>table</a> that the cell appears in</li>
-          <li><dfn title="cell column">column</dfn> &mdash; the <a>column</a> that the cell appears in; the cell MUST be in the <a title="column cells">cells</a> for that column</li>
-          <li><dfn title="cell row">row</dfn> &mdash; the <a>row</a> that the cell appears in; the cell MUST be in the <a title="row cells">cells</a> for that row</li>
-          <li><dfn>string value</dfn> &mdash; a string that is the original syntactic representation of the value of the cell, ie how the cell appears within a CSV file; this may be an empty string</li>
-          <li><dfn title="cell value">value</dfn> &mdash; the semantic value of the cell; within the core tabular data model (with no other metadata available) this is either a string which is the same as the <a>string value</a> of the cell, or <code>null</code>, if the <a>string value</a> is an empty string</li>
-        </ul>
-        <p class="issue" data-number="40">
-          Should an empty string value always count as a <code>null</code> semantic value within the core data model (ie when there is no other metadata telling the processor how to interpret that value), or should the semantic value be an empty string?
-        </p>
-        <p class="note">
-          There presence or absence of quotes around a value within a CSV file is a syntactic detail that is not reflected in the tabular data model. In other words, there is no distinction in the model between the second value in <code>a,,z</code> and the second value in <code>a,"",z</code>.
-        </p>
-      </section>
-      <section>
-        <h3>Annotated Tabular Data Model</h3>
-        <p>
-          An <dfn>annotated table</dfn> is a <a>table</a> that is annotated with additional metadata. The table MAY have any number of <dfn title="property">properties</dfn> in addition to those provided in the core tabular data model described in <a href="#core-tabular-data-model" class="sectionRef"></a> which provide information about the table as a whole. The <dfn title="value">values</dfn> of these properties may be lists, structured objects, or atomic values. Annotations on a table may include:
+          The table MAY in addition have any number of <dfn title="property">properties</dfn> which provide information about the table as a whole. The <dfn title="value">values</dfn> of these properties may be lists, structured objects, or atomic values. Annotations on a table may include:
         </p>
         <ul>
           <li>titles or descriptions of the table</li>
@@ -193,7 +154,15 @@ var respecConfig = {
           <li>links to other tables (eg to indicate tables that include related information)</li>
         </ul>
         <p>
-          The <a title="column">columns</a> within an <a>annotated table</a> are all <dfn title="annotated column">annotated columns</dfn>: columns which MAY have any number of <a title="property">properties</a> in addition to those provided in the core tabular data model described in <a href="#core-tabular-data-model" class="sectionRef"></a>. The annotations on a column might provide information about how to interpret the <a title="cell">cells</a> in the column or information about the column as a whole. Examples of annotations might be:
+          A <dfn>column</dfn> represents a vertical arrangement of <a title="cell">cells</a> within a <a>table</a>. The core properties of a column are:
+        </p>
+        <ul>
+          <li><dfn title="column table">table</dfn> &mdash; the <a>table</a> that the column appears in</li>
+          <li><dfn title="column number">number</dfn> &mdash; the position of the column amongst the <a title="table columns">columns</a> for the associated <a title="column table">table</a>, starting from 1</li>
+          <li><dfn title="column cells">cells</dfn> &mdash; the list of <a title="cell">cells</a> in the column. A column MUST contain one cell from each <a>row</a> in the table. The order of the cells in the list MUST match the order of the rows in which they appear within the <a title="table rows">rows</a> for the associated <a title="column table">table</a>.</li>
+        </ul>
+        <p>
+          Columns MAY in addition have any number of <a title="property">properties</a>. The annotations on a column might provide information about how to interpret the <a title="cell">cells</a> in the column or information about the column as a whole. Examples of annotations might be:
         </p>
         <ul>
           <li>a name or title for the column</li>
@@ -201,23 +170,41 @@ var respecConfig = {
           <li>an indication of whether the column contains unique values</li>
         </ul>
         <p>
-          The <a title="row">rows</a> within an <a>annotated table</a> are all <dfn title="annotated row">annotated rows</dfn>: rows which MAY have any number of <a title="property">properties</a> in addition to those provided in the core tabular data model described in <a href="#core-tabular-data-model" class="sectionRef"></a>. The annotations on a row provide additional metadata about the information held in the row, such as:
+          A <dfn>row</dfn> represents a horizontal arrangement of <a title="cell">cells</a> within a <a>table</a>. The core properties of a row are:
+        </p>
+        <ul>
+          <li><dfn title="row table">table</dfn> &mdash; the <a>table</a> that the row appears in</li>
+          <li><dfn title="row number">number</dfn> &mdash; the position of the row amongst the <a title="table rows">rows</a> for the <a title="row table">table</a>, starting from 1</li>
+          <li><dfn title="row cells">cells</dfn> &mdash; the list of <a title="cell">cells</a> in the row. A row MUST contain one cell from each <a>column</a> in the table. The order of the cells in the list MUST match the order of the columns in which they appear within the <a>table columns</a> for the row's table.</li>
+        </ul>
+        <p>
+          Rows MAY have any number of additional <a title="property">properties</a>. The annotations on a row provide additional metadata about the information held in the row, such as:
         </p>
         <ul>
           <li>the certainty of the information in that row</li>
           <li>information about the source or provenance of the data in that row</li>
         </ul>
         <p>
-          The <a title="cell">cells</a> within an <a>annotated row</a> are all <dfn title="annotated cell">annotated cells</dfn>: cells which MAY have any number of <a title="property">properties</a> in addition to those provided in the core tabular data model described in <a href="#core-tabular-data-model" class="sectionRef"></a>. The annotations on a cell provide metadata about the value held in the cell, particularly when this overrides the information provided for the <a>annotated column</a> and <a>annotated row</a> that the cell falls within. Annotations on a cell might be:
+          A <dfn>cell</dfn> represents a cell at the intersection of a <a>row</a> and a <a>column</a> within a <a>table</a>. The core properties of a cell are:
+        </p>
+        <ul>
+          <li><dfn title="cell table">table</dfn> &mdash; the <a>table</a> that the cell appears in</li>
+          <li><dfn title="cell column">column</dfn> &mdash; the <a>column</a> that the cell appears in; the cell MUST be in the <a title="column cells">cells</a> for that column</li>
+          <li><dfn title="cell row">row</dfn> &mdash; the <a>row</a> that the cell appears in; the cell MUST be in the <a title="row cells">cells</a> for that row</li>
+          <li><dfn>string value</dfn> &mdash; a string that is the original syntactic representation of the value of the cell, ie how the cell appears within a CSV file; this may be an empty string</li>
+          <li><dfn title="cell value">value</dfn> &mdash; the semantic value of the cell; this MAY be of a datatype other than a string and MAY be <code>null</code>. For example, annotations might enable a processor to understand the <a>string value</a> of the cell as representing a number or a date. By default, if the <a>string value</a> is an empty string, the semantic value of the cell is <code>null</code>. See <a href="http://www.w3.org/TR/tabular-metadata/#parsing-cells">Parsing Cells</a> in [[!tabular-metadata]] for further requirements on obtaining a cell value.</li>
+        </ul>
+        <p class="note">
+          There presence or absence of quotes around a value within a CSV file is a syntactic detail that is not reflected in the tabular data model. In other words, there is no distinction in the model between the second value in <code>a,,z</code> and the second value in <code>a,"",z</code>.
+        </p>
+        <p>
+          Cells MAY have any number of additional <a title="property">properties</a>. The annotations on a cell provide metadata about the value held in the cell, particularly when this overrides the information provided for the <a>column</a> and <a>row</a> that the cell falls within. Annotations on a cell might be:
         </p>
         <ul>
           <li>notes to aid the interpretation of the value</li>
           <li>type annotations for the value</li>
           <li>a flag that indicates the value is a null value</li>
         </ul>
-        <p>
-          The <a title="cell value">value</a> of an <a>annotated cell</a> MAY be of a datatype other than a string. For example, annotations might enable a processor to understand the <a>string value</a> of the cell as representing a number or a date.
-        </p>
         <p class="issue" data-number="41">
           The permitted types of names and values of annotations need to be spelled out here.
         </p>
@@ -312,7 +299,7 @@ var respecConfig = {
     <section id="syntax" class="informative">
       <h2>CSV+ Syntax</h2>
       <p>
-        There is no standard for CSV, and there are many variants of CSV used on the web today. This section defines a method for outputting tabular data adhering to the <a>core tabular data model</a> described in <a href="#core-tabular-data-model" class="sectionRef"></a> into a standard, CSV-based, syntax. Compliant applications that output this format must meet each of the constraints.
+        There is no standard for CSV, and there are many variants of CSV used on the web today. This section defines a method for outputting tabular data adhering to the <a>annotated tabular data model</a> described in <a href="#annotated-tabular-data-model" class="sectionRef"></a> into a standard, CSV-based, syntax. Compliant applications that output this format must meet each of the constraints.
       </p>
       <p class="note">
         We are actively working with the IETF to develop a standard for CSV, which is outside the scope of the Working Group. The details here aim to help shape that standard based on our requirements.
