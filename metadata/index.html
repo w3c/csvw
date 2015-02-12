@@ -154,7 +154,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       "datatype": "string",
       "required": true
     }, {
-      "name": "on-street",
+      "name": "on_street",
       "title": "On Street",
       "dc:description": "The street that the tree is on.",
       "datatype": "string"
@@ -164,12 +164,12 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       "dc:description": "The species of the tree.",
       "datatype": "string"
     }, {
-      "name": "trim-cycle",
+      "name": "trim_cycle",
       "title": "Trim Cycle",
       "dc:description": "The operation performed on the tree.",
       "datatype": "string"
     }, {
-      "name": "inventory-date",
+      "name": "inventory_date",
       "title": "Inventory Date",
       "dc:description": "The date of the operation that was performed.",
       "datatype": "date",
@@ -215,7 +215,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         The description objects themselves contain a number of properties. These are:
       </p>
       <ul>
-        <li>properties that are used to identify the table or column that the annotations should appear on; these match up to properties on those objects in the core tabular data model defined in [[!tabular-data-model]] and do not form additional annotations</li>
+        <li>properties that are used to identify the table or column that the annotations should appear on; these match up to core properties on those objects in the annotated tabular data model defined in [[!tabular-data-model]] and do not form additional annotations</li>
         <li>properties that map directly to annotations that appear directly on the group of tables, table, column, row or cell whose description they appear on, such as the <code>name</code> of a column or the <code>dc:provenance</code> of a table</li>
         <li>properties that are specified on the description of a group of tables, table or column to provide a default value for the equivalent annotation on each of the cells that appear in that table or column</li>
       </ul>
@@ -224,7 +224,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       </p>
       <pre class="example highlight">
 {
-  "name": "inventory-date",
+  "name": "inventory_date",
   "title": "Inventory Date",
   "dc:description": "The date of the operation that was performed.",
   "datatype": "date",
@@ -330,17 +330,17 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               <dd><code>_name</code> is set to the URI decoded <a>property value</a> of the <code>name</code> property on the cell column that is currently being processed. <span class="note">URI decoding is necessary as <code>name</code> may have been encoded if taken from <code>title</code>; this prevents double URI encoding.</span>
               </dd>
               <dt>column names</dt>
-              <dd>a variable is set for each column within the schema; the name of the variable is the percent-encoded name of the column and the value is the canonical representation of the value of the cell in that column in the row that is currently being processed</dd>
+              <dd>a variable is set for each column within the schema; the name of the variable is the name of the column and the value is the canonical representation of the value of the cell in that column in the row that is currently being processed</dd>
             </dl>
             <p>The <a>property value</a> of a <a>URI template property</a> is only available while converting tables as defined in <a href="#converting-tables" class="sectionRef"></a>. The value is the result of applying the template against the cell in that column in the row that is currently being processed, resolving against the <a>base URL</a> as a <a>link property</a> if the metadata value is explicit in the metadata, or the default value if defined; otherwise there is no value.</p>
             <p>
               For example, the <a href="#cell-aboutUrl"><code>aboutUrl</code></a> property holds a URI template that is used to generate a URL identifier for each row, which might look like:
             </p>
             <pre class="example highlight">
-"aboutUrl": "http://example.org/example.csv#row={_row}"
+"aboutUrl": "http://example.org/example.csv#row.{_row}"
             </pre>
             <p>
-              The identifiers that are generated for the rows would then look like <code>http://example.org/example.csv#row=1</code>, <code>http://example.org/example.csv#row=2</code> and so on.
+              The identifiers that are generated for the rows would then look like <code>http://example.org/example.csv#row.1</code>, <code>http://example.org/example.csv#row.2</code> and so on.
             </p>
             <p>
               Alternatively, with the CSV and metadata in the <a href="#introduction" class="sectionRef"></a>, the <a href="#cell-aboutUrl"><code>aboutUrl</code></a> might look like:
@@ -355,10 +355,10 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               Once the URI has been generated, it is resolved against the location of the resource (eg the CSV file) to create an absolute URI. For example, given a <a href="#cell-aboutUrl"><code>aboutUrl</code></a> within a schema such as:
             </p>
             <pre>
-"aboutUrl": "#row={_row}"
+"aboutUrl": "#row.{_row}"
             </pre>
             <p>
-              and given a CSV file at <code>http://example.com/temp.csv</code>, the URL for the first row will be <code>http://example.com/temp.csv#row=1</code>.
+              and given a CSV file at <code>http://example.com/temp.csv</code>, the URL for the first row will be <code>http://example.com/temp.csv#row.1</code>.
             </p>
             <p>The <code>propertyUrl</code> property has the default value of <code>"{#_name}</code>", meaning that it resolves as a fragment identifier relative to the <a>base URL</a>. For example, if no <code>propertyUrl</code> is specified, accessing it from a column with the column name <em>GID</em> would look like:</p>
             <pre class="example highlight" title="expanded default for propertyUrl">
@@ -1204,10 +1204,10 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
               <p>
                 An <a>atomic property</a> that gives a single canonical name for the column. This MUST be a string. Conversion specifications MUST use this property as the basis for the names of properties/elements/attributes in the results of conversions.
               </p>
-              <p>The <a>property value</a> of <code>name</code> is that defined within metadata, if it exists. Otherwise, it is the first value from the <a>property value</a> of <code>title</code> having the same language tag as <a>default language</a> or <code>und</code> of not specified, as a string without language, if any. Otherwise, it is the string <code>"_col=<em>[N]</em>"</code> where <code><em>[N]</em></code> is the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column-number">column number</a>.
+              <p>The <a>property value</a> of <code>name</code> is that defined within metadata, if it exists. Otherwise, it is the first value from the <a>property value</a> of <code>title</code> having the same language tag as <a>default language</a> or <code>und</code> of not specified percent-encoded as necessary to conform to the syntactic requirements described below, as a string without language, if any. Otherwise, it is the string <code>"_col.<em>[N]</em>"</code> where <code><em>[N]</em></code> is the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column-number">column number</a>.
               </p>
               <p>
-                For ease of reference within <a title="URI template property">URI template properties</a>, column names SHOULD consist only of alphanumeric characters or underscores (<code>[a-zA-Z0-9_]+</code>). Names beginning with <code>_</code> are reserved by this specification and MUST NOT be used.
+                For ease of reference within <a title="URI template property">URI template properties</a>, column names MUST consist only of alphanumeric characters, underscores, or <code>"."</code> (<code>[a-zA-Z0-9][a-zA-Z0-9_\.]*</code>). Names beginning with <code>"_"</code> or  <code>"."</code> are reserved by this specification and MUST NOT be used.
               </p>
               <p class="issue" data-number="53">
                 We invite comment on what the syntactic limitations should be on column names to make them most useful when used as the basis of conversion into other formats, bearing in mind that different target languages such as JSON, RDF and XML have different syntactic limitations and common naming conventions.
