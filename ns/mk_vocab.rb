@@ -14,6 +14,9 @@ class Vocab
     :object_nl    => "\n",
     :array_nl     => "\n"
   )
+
+  TITLE = "CSVW Namespace Vocabulary Terms".freeze
+  DESCRIPTION = %(This document describes the RDFS vocabulary description used in the Metadata Vocabulary for Tabular Data [[csvw-metadata]] along with the default JSON-LD Context.).freeze
   attr_accessor :prefixes, :terms, :properties, :classes, :instances, :datatypes
 
   def initialize(file)
@@ -71,13 +74,8 @@ class Vocab
     ontology = {
       "@id" => prefixes["csvw"][:subClassOf],
       "@type" => "owl:Ontology",
-      "dc:title" => {"en" => "Metadata Vocabulary for Tabular Data"},
-      "dc:description" => {"en" => %(Validation, conversion, display and search of tabular data on the web
-    requires additional metadata that describes how the data should be
-    interpreted. This document defines a vocabulary for metadata that
-    annotates tabular data. This can be used to provide metadata at various
-    levels, from collections of data from CSV documents and how they relate
-    to each other down to individual cells within a table.)},
+      "dc:title" => {"en" => TITLE},
+      "dc:description" => {"en" => DESCRIPTION},
       "rdfs_classes" => rdfs_classes,
       "rdfs_properties" => rdfs_properties,
       "rdfs_datatypes" => rdfs_datatypes,
@@ -187,13 +185,8 @@ class Vocab
 
     output << "\n# CSVM Ontology definition"
     output << "csvw: a owl:Ontology;"
-    output << %(  dc:title "Metadata Vocabulary for Tabular Data"@en;)
-    output << %(  dc:description """Validation, conversion, display and search of tabular data on the web
-    requires additional metadata that describes how the data should be
-    interpreted. This document defines a vocabulary for metadata that
-    annotates tabular data. This can be used to provide metadata at various
-    levels, from collections of data from CSV documents and how they relate
-    to each other down to individual cells within a table."""@en;)
+    output << %(  dc:title "#{TITLE}"@en;)
+    output << %(  dc:description """#{DESCRIPTION}"""@en;)
     output << "  .\n"
 
     output << "\n# Class definitions"#{
