@@ -1835,7 +1835,30 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
     <section>
       <h2>Processing Tables</h2>
       <p>
-        This section describes how particular types of applications should use the metadata supplied about a CSV file when they process that CSV file.
+        This section describes how particular types of applications should process tabular data and metadata files.
+      </p>
+      <p>
+        In many cases, applications will start from a tabular data file, such as a CSV file, and <a href="http://www.w3.org/TR/tabular-data-model/#locating-metadata">locate metadata</a> from that file as described in [[!tabular-data-model]]. This metadata will inform the processing of the tabular data file.
+      </p>
+      <p>
+        In other cases, an application might start from a metadata file. In that case, the initial metadata file is treated as <a href="http://www.w3.org/TR/tabular-data-model/#overriding-metadata">overriding metadata</a> and the application SHOULD continue to retrieve other available metadata, located in the normal way, about each of the tabular data files referenced by that initial metadata file.
+      </p>
+      <p>
+        For example, if a validator is passed a locally authored metadata file <code>spending.json</code>, which contains:
+      </p>
+      <pre class="example highlight">
+{
+  "tableSchema": "government-spending.csv",
+  "resources": [{
+    "url": "http://example.org/east-sussex-2015-03.csv",
+  }, {
+    "url": "http://example.org/east-sussex-2015-02.csv"
+  }, ... 
+  ]
+}
+      </pre>
+      <p>
+        the validator would validate all the listed resources, using the locally defined schema at <code>government-spending.csv</code>. It would still use the metadata located from the referenced CSV files; for example, when processing <code>http://example.org/east-sussex-2015-03.csv</code>, it would use embedded metadata within that file, referenced from any <code>Link</code> header found when retrieving that file, and at <code>http://example.org/east-sussex-2015-03.csv-metadata.json</code> and <code>http://example.org/metadata.json</code>.
       </p>
       <section>
         <h3>Displaying Tables</h3>
