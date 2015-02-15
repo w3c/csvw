@@ -1270,7 +1270,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           <dt id="cell-default"><code>default</code></dt>
           <dd>
             <p>
-              An <a>atomic property</a> holding a single string that is used to create a default <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">value</a> for the cell in cases where the original <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-string-value" class="externalDFN">string value</a> is an empty string. This default value MAY be used when converting the table into other formats, or when the table is displayed. If not specified, the default for the <code>default</code> property is <code>null</code>.
+              An <a>atomic property</a> holding a single string that is used to create a default <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">value</a> for the cell in cases where the original <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-string-value" class="externalDFN">string value</a> is an empty string. This default value MAY be used when converting the table into other formats, or when the table is displayed. If not specified, the default for the <code>default</code> property is the empty string, <code>""</code>.
             </p>
           </dd>
           <dt id="cell-format"><code>format</code></dt>
@@ -1470,14 +1470,15 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
         <ol>
           <li>unless the <a href="#cell-datatype"><code>datatype</code></a> is <code>string</code> or <code>anySimpleType</code> or <code>any</code>, strip leading and trailing whitespace from the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-string-value" class="externalDFN">string value</a></li>
           <li>if the resulting string is an empty string, apply the remaining steps to the string given by the <a href="#cell-default"><code>default</code></a> property</li>
-          <li>if the resulting string is the same as the value of the <a href="#cell-null"><code>null</code></a> property, then the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">cell value</a> is <code>null</code></li>
-          <li>otherwise, if the <a href="#cell-separator"><code>separator</code></a> property is not <code>null</code>, the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">cell value</a> is a list of values created by:
+          <li>if the <a href="#cell-separator"><code>separator</code></a> property is not <code>null</code> and the resulting string is an empty string, the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">cell value</a> is an empty list</li>
+          <li>if the <a href="#cell-separator"><code>separator</code></a> property is not <code>null</code>, the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">cell value</a> is a list of values created by:
             <ol>
               <li>splitting the resulting string at the character specified by the <code>separator</code> property</li>
               <li>unless the <a href="#cell-datatype"><code>datatype</code></a> is <code>string</code> or <code>anySimpleType</code> or <code>any</code>, stripping leading and trailing whitespace from these strings</li>
               <li>applying the remaining steps to each of the strings in turn</li>
             </ol>
           </li>
+          <li>if the string is the same as the value of the <a href="#cell-null"><code>null</code></a> property, then the resulting value is <code>null</code></li>
           <li>validate the string based on the datatype, using the <a href="#cell-format"><code>format</code></a> property if one is specified, as described below, and then against the constraints described in <a href="#datatypes" class="sectionRef"></a>; if there are any errors, add them to the list of <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-errors" class="externalDFN">errors</a> for the cell; the resulting value is typed as a <code>string</code> with the language provided by the <a href="#cell-lang"><code>lang</code></a> property</li>
           <li>otherwise, if there are no errors, parse the string using the <a href="#cell-format"><code>format</code></a> if one is specified, as described below; the resulting value is typed according to the <a href="#cell-datatype"><code>datatype</code></a> and if the <code>datatype</code> is <code>string</code> it has the language provided by the <a href="#cell-lang"><code>lang</code></a> property</li>
         </ol>
@@ -1531,6 +1532,9 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           </pre>
           <p>
             and this would mean that the cell's value would be an array containing two integers and a string: <code>[1, 5, "7.0"]</code>. The final value of the array is a string because it is not a valid integer; the cell's <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-errors" class="externalDFN">errors</a> annotation will also contain a validation error.
+          </p>
+          <p>
+            Also, with this configuration, if the string value of the cell were <code>""</code> (ie it was an empty cell) the value of the cell would be an empty list.
           </p>
         </section>
         <section>
