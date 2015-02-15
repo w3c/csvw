@@ -1220,6 +1220,12 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             </dd>
             <dt id="column-required"><code>required</code></dt>
            <dd><p>A boolean <a>atomic property</a> taking a single value which indicates whether every cell within the column must have a non-null value. Its <a>property value</a> is that defined in metadata, or <code>false</code> otherwise.</p></dd>
+            <dt id="column-virtual"><code>virtual</code></dt>
+            <dd>
+              <p>A boolean <a>atomic property</a> taking a single value which indicates whether the column is a <a href="http://www.w3.org/TR/tabular-data-model/#dfn-virtual-columns" class="externalDFN">virtual column</a> not present in the original source. If present, a virtual column MUST appear after all other column definitions</p>
+              <p class="note">Virtual columns are useful for inserting cells into an <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-table" class="externalDFN">annotated table</a>.</p>
+              <p class="issue" data-number="179">We invite comment on whether <a href="http://www.w3.org/TR/tabular-data-model/#dfn-virtual-columns" class="externalDFN">virtual columns</a> are useful enough to include in the final recommendation in spite of the added complexity.</p>
+            </dd>
             <dt id="column-ld-id"><code>@id</code></dt>
             <dd>
               <p>If included, <code>@id</code> identifies the <a>column description</a>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.</p>
@@ -1458,22 +1464,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           <li>when <strong>displaying</strong> data, to map it into formats that are meaningful for those viewing the data (as opposed to those publishing it)</li>
           <li>when <strong>inputting</strong> data, to turn entered values into representations in a consistent format</li>
         </ul>
-        <p>The <strong><a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">cell value</a></strong> of a cell is the result of processing the cell as defined here and applying any format-specific mappings to create on or more values. Converters MUST be provided these cell values, along with any in-scope <code>lang</code> and <code>datatype</code> <a title="property value">property values</a>.</p>
-        <div class="issue">
-          Adding inline coversation here until resolved.
-          <ul>
-            <li>@jenit said:
-              <blockquote>
-                Aren't converters provided everything from the metadata?
-              </blockquote>
-            </li>
-            <li>@gkellogg said:
-              <blockquote>
-                This statement just indicates the an implementation must provide lang and datatype information along with the value for use in the converter. My implementation creates a Cell class including everything needed for RDF or JSON to properly perform a transformation, but that detail is not defined here. Wording improvements are welcome.
-              </blockquote>
-            </li>
-          </ul>
-        </div>
+        <p>The <strong><a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">cell value</a></strong> of a cell is the result of processing the cell as defined here and applying any format-specific mappings to create on or more values. The cell value includes the in-scope <code>lang</code> and <code>datatype</code> <a title="property value">property values</a>.</p>
         <p>
           The process of parsing the string value of a cell into a single value or a list of values is as follows:
         </p>
@@ -1892,9 +1883,6 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
         </p>
         <p>
           Conversion specifications MUST define a default mapping from an annotated table that lacks any annotations (ie that is equivalent to an un-annotated table).
-        </p>
-        <p>
-          Conversion specifications MUST use the <a>property value</a> of the <a href="#cell-aboutUrl"><code>aboutUrl</code></a> of the first cell column, if any, as the basis for identifying a mapped row.
         </p>
         <p>
           Conversion specifications MUST use the <a>property value</a> of the <a href="#cell-propertyUrl"><code>propertyUrl</code></a> of a column as the basis for naming machine-readable fields in the target format, such as the name of the equivalent element or attribute in XML, property in JSON or property URI in RDF.
