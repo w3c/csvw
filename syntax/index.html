@@ -139,30 +139,35 @@ var respecConfig = {
       <section>
         <h3>Annotated Tabular Data Model</h3>
         <p>
-          An <dfn>annotated table</dfn> is a <dfn>table</dfn> that is annotated with additional metadata. The core properties of a table are:
+          An <dfn>annotated table</dfn> is a <dfn>table</dfn> that is annotated with additional metadata. The core annotations of a table are:
         </p>
         <ul>
           <li><dfn title="table columns">columns</dfn> &mdash; the list of <a title="column">columns</a> in the table. A table MUST have one or more columns and the order of the columns within the list is significant and MUST be preserved by applications</li>
           <li><dfn title="table rows">rows</dfn> &mdash; the list of rows in the table</li>
+          <li><dfn title="table source">source</dfn> &mdash; a link to the source of the data in the table, or <code>null</code> if this is undefined</li>
         </ul>
         <p>
-          The table MAY in addition have any number of <dfn title="property">properties</dfn> which provide information about the table as a whole. The <dfn title="value">values</dfn> of these properties may be lists, structured objects, or atomic values. Annotations on a table may include:
+          The table MAY in addition have any number of <dfn title="annotation">annotations</dfn> which provide information about the table as a whole. The <dfn title="value">values</dfn> of these annotations may be lists, structured objects, or atomic values. Annotations on a table may include:
         </p>
         <ul>
           <li>titles or descriptions of the table</li>
           <li>information about the source or provenance of the data in the table</li>
           <li>links to other tables (eg to indicate tables that include related information)</li>
         </ul>
+        <p class="note">
+          In this document, the term <a>annotation</a> refers to any metadata associated with an object in the annotated tabular data model. These are not necessarily web annotations in the sense of [[annotation-model]].
+        </p>
         <p>
-          A <dfn>column</dfn> represents a vertical arrangement of <a title="cell">cells</a> within a <a>table</a>. The core properties of a column are:
+          A <dfn>column</dfn> represents a vertical arrangement of <a title="cell">cells</a> within a <a>table</a>. The core annotations of a column are:
         </p>
         <ul>
           <li><dfn title="column table">table</dfn> &mdash; the <a>table</a> that the column appears in</li>
           <li><dfn title="column number">number</dfn> &mdash; the position of the column amongst the <a title="table columns">columns</a> for the associated <a title="column table">table</a>, starting from 1</li>
+          <li><dfn title="column source number">source number</dfn> &mdash; the position of the column in the original <a title="table source">source</a> of the table, or <code>null</code></li>
           <li><dfn title="column cells">cells</dfn> &mdash; the list of <a title="cell">cells</a> in the column. A column MUST contain one cell from each <a>row</a> in the table. The order of the cells in the list MUST match the order of the rows in which they appear within the <a title="table rows">rows</a> for the associated <a title="column table">table</a>.</li>
         </ul>
         <p>
-          Columns MAY in addition have any number of <a title="property">properties</a>. The annotations on a column might provide information about how to interpret the <a title="cell">cells</a> in the column or information about the column as a whole. Examples of annotations might be:
+          Columns MAY in addition have any number of <a title="annotation">annotations</a>. The annotations on a column might provide information about how to interpret the <a title="cell">cells</a> in the column or information about the column as a whole. Examples of annotations might be:
         </p>
         <ul>
           <li>a name or title for the column</li>
@@ -170,22 +175,23 @@ var respecConfig = {
           <li>an indication of whether the column contains unique values</li>
         </ul>
         <p>
-          A <dfn>row</dfn> represents a horizontal arrangement of <a title="cell">cells</a> within a <a>table</a>. The core properties of a row are:
+          A <dfn>row</dfn> represents a horizontal arrangement of <a title="cell">cells</a> within a <a>table</a>. The core annotations of a row are:
         </p>
         <ul>
           <li><dfn title="row table">table</dfn> &mdash; the <a>table</a> that the row appears in</li>
           <li><dfn title="row number">number</dfn> &mdash; the position of the row amongst the <a title="table rows">rows</a> for the <a title="row table">table</a>, starting from 1</li>
+          <li><dfn title="row source number">source number</dfn> &mdash; the position of the row in the original <a title="table source">source</a> of the table, or <code>null</code></li>
           <li><dfn title="row cells">cells</dfn> &mdash; the list of <a title="cell">cells</a> in the row. A row MUST contain one cell from each <a>column</a> in the table. The order of the cells in the list MUST match the order of the columns in which they appear within the <a>table columns</a> for the row's table.</li>
         </ul>
         <p>
-          Rows MAY have any number of additional <a title="property">properties</a>. The annotations on a row provide additional metadata about the information held in the row, such as:
+          Rows MAY have any number of additional <a title="annotation">annotations</a>. The annotations on a row provide additional metadata about the information held in the row, such as:
         </p>
         <ul>
           <li>the certainty of the information in that row</li>
           <li>information about the source or provenance of the data in that row</li>
         </ul>
         <p>
-          A <dfn>cell</dfn> represents a cell at the intersection of a <a>row</a> and a <a>column</a> within a <a>table</a>. The core properties of a cell are:
+          A <dfn>cell</dfn> represents a cell at the intersection of a <a>row</a> and a <a>column</a> within a <a>table</a>. The core annotations of a cell are:
         </p>
         <ul>
           <li><dfn title="cell table">table</dfn> &mdash; the <a>table</a> that the cell appears in</li>
@@ -193,12 +199,13 @@ var respecConfig = {
           <li><dfn title="cell row">row</dfn> &mdash; the <a>row</a> that the cell appears in; the cell MUST be in the <a title="row cells">cells</a> for that row</li>
           <li><dfn>string value</dfn> &mdash; a string that is the original syntactic representation of the value of the cell, ie how the cell appears within a CSV file; this may be an empty string</li>
           <li><dfn title="cell value">value</dfn> &mdash; the semantic value of the cell; this MAY be of a datatype other than a string and MAY be <code>null</code>. For example, annotations might enable a processor to understand the <a>string value</a> of the cell as representing a number or a date. By default, if the <a>string value</a> is an empty string, the semantic value of the cell is <code>null</code>. See <a href="http://www.w3.org/TR/tabular-metadata/#parsing-cells">Parsing Cells</a> in [[!tabular-metadata]] for further requirements on obtaining a cell value.</li>
+          <li><dfn title="cell errors">errors</dfn> &mdash; a (possibly empty) list of validation errors on the cell</li>
         </ul>
         <p class="note">
           There presence or absence of quotes around a value within a CSV file is a syntactic detail that is not reflected in the tabular data model. In other words, there is no distinction in the model between the second value in <code>a,,z</code> and the second value in <code>a,"",z</code>.
         </p>
         <p>
-          Cells MAY have any number of additional <a title="property">properties</a>. The annotations on a cell provide metadata about the value held in the cell, particularly when this overrides the information provided for the <a>column</a> and <a>row</a> that the cell falls within. Annotations on a cell might be:
+          Cells MAY have any number of additional <a title="annotation">annotations</a>. The annotations on a cell provide metadata about the value held in the cell, particularly when this overrides the information provided for the <a>column</a> and <a>row</a> that the cell falls within. Annotations on a cell might be:
         </p>
         <ul>
           <li>notes to aid the interpretation of the value</li>
@@ -212,7 +219,7 @@ var respecConfig = {
       <section>
         <h3>Grouped Tabular Data Model</h3>
         <p>
-          A <dfn>group of tables</dfn> comprises a set of <a title="table">tables</a> (which may be <a title="annotated table">annotated tables</a>) and a set of annotations (<a title="property">properties</a> and <a title="value">values</a>) that relate to the set.
+          A <dfn>group of tables</dfn> comprises a set of <a title="annotated table">annotated tables</a> and a set of annotations that relate to the set.
         </p>
         <p class="note">
           Tables can be loosely related to each other simply through annotations; not all tables that are related to each other need to grouped together. Groups of tables are useful because they can be annotated with metadata that applies to all the tables in the group.
@@ -246,9 +253,6 @@ var respecConfig = {
       <p>
         Processors MUST attempt to locate metadata documents based on each of these locations in order, and use all metadata documents that are successfully located in this way, merging them in the order found as defined in <a href="http://www.w3.org/TR/tabular-metadata/#merging-metadata"></a> in [[!tabular-metadata]].
       </p>
-      <p class="issue" data-number="42">
-        What should processors do if they have been passed a metadata file and located a CSV file from that metadata file. Should they still check for metadata files related specifically to the CSV file itself? For example, say that an application has been pointed at a metadata file at <code>http://example.org/metadata.json</code> which references <code>http://example.org/toilets.csv</code> but there is also a metadata file at <code>http://example.org/toilets.csv-metadata.json</code>. If the processor had been originally pointed to <code>http://example.org/toilets.csv</code> then it would have located the file-specific metadata at <code>http://example.org/toilets.csv-metadata.json</code>, but coming via <code>http://example.org/metadata.json</code> means that file-specific metadata is skipped.
-      </p>
       <p>If no metadata is supplied or found, then the following Metadata is used as the default for extracted <a>embedded metadata</a>:</p>
       <pre>
 {
@@ -262,8 +266,13 @@ var respecConfig = {
       <section>
         <h3>Overriding Metadata</h3>
         <p>
-          Processors SHOULD provide users with the facility to provide their own metadata for tabular data files that they process.
+          Processors SHOULD provide users with the facility to provide their own metadata for tabular data files that they process. This might be provided:
         </p>
+        <ul>
+          <li>by providing processor options, such as using command-line options for a command-line implementation or checkboxes in a GUI</li>
+          <li>by enabling the user to select an existing metadata file, which may be local or remote</li>
+          <li>by enabling the user to specify a series of metadata files, which are merged by the processor and handled as if they were a single file</li>
+        </ul>
       </section>
       <section>
         <h3>Embedded Metadata</h3>
@@ -594,7 +603,7 @@ Content-Type: text/csv;header=absent
         Standardising the parsing of CSV is outside the chartered scope of the Working Group. This non-normative section is intended to help the creators of parsers handle the wide variety of CSV-based formats that they may encounter due to the current lack of standardisation of the format.
       </p>
       <p>
-        This section describes an algorithm for parsing formats other than the plain CSV+ format specified in <a href="#syntax" class="sectionRef"></a> and extracting <a>embedded metadata</a>. The parsing algorithm depends on metadata properties found while <a href="#locating-metadata" class="sectionRef">Locating Metadata</a>, which may include user input (see <a href="overriding-metadata" class="sectionRef">Overriding Metadata</a>) or through the inclusion of a <a href="http://www.w3.org/TR/tabular-metadata/#dialect-descriptions">dialect description</a> within a metadata file):
+        This section describes an algorithm for parsing formats other than the plain CSV+ format specified in <a href="#syntax" class="sectionRef"></a> and extracting <a>embedded metadata</a>. The parsing algorithm uses the following flags. These may be set by metadata properties found while <a href="#locating-metadata" class="sectionRef">Locating Metadata</a>, including through user input (see <a href="overriding-metadata" class="sectionRef">Overriding Metadata</a>) or through the inclusion of a <a href="http://www.w3.org/TR/tabular-metadata/#dialect-descriptions">dialect description</a> within a metadata file:
       </p>
       <dl>
         <dt><dfn>encoding</dfn></dt>
@@ -656,12 +665,15 @@ Content-Type: text/csv;header=absent
         <li>Re-create <a>merged metadata</a> using by locating all sources of metadata, included embedded metadata as constructed above, as defined in <a href="#locating-metadata" class="sectionRef">Locating Metadata</a> and merge together in priority order as defined in <a href="http://www.w3.org/TR/tabular-metadata/#merging-metadata">Merging Metadata</a> in [[!tabular-metadata]].</li>
         <li>Generate row data for each row using <a>merged metadata</a> by parsing the cells from each row as defined in <cite><a href="http://www.w3.org/TR/tabular-metadata/#parsing-cells"></a>Parsing Cells</cite> in [[!tabular-metadata]].</li>
       </ol>
+      <p class="note">
+        This parsing algorithm does not account for the possibility of there being more than one area of tabular data within a single CSV file.
+      </p>
       <section>
         <h3>Examples</h3>
         <section>
           <h4>Simple Example</h4>
           <p>
-            A simple CSV+ file might look like:
+            A simple CSV+ file at <code>http://example.org/tree-ops.csv</code> might look like:
           </p>
           <pre class="example">
 GID,On Street,Species,Trim Cycle,Inventory Date
@@ -669,19 +681,19 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 2,EMERSON ST,Liquidambar styraciflua,Large Tree Routine Prune,6/2/2010
           </pre>
           <p>
-            Parsing this file results in an <a>annotated tabular data model</a> of a single <a>table</a> <var>T</var> with five columns and two rows. The columns have the properties shown in the following table:
+            Parsing this file results in an <a>annotated tabular data model</a> of a single <a>table</a> <var>T</var> with five columns and two rows. The columns have the annotations shown in the following table:
           </p>
           <table style="width: 100%; text-align: left">
             <thead>
-              <tr><th rowspan="2">id</th><th colspan="3">core properties</th><th>annotations</th></tr>
-              <tr><th>table</th><th>number</th><th>cells</th><th><code>title</code></th></tr>
+              <tr><th rowspan="2">id</th><th colspan="3">core annotations</th><th>annotations</th></tr>
+              <tr><th>table</th><th>number</th><th>source number</th><th>cells</th><th><code>title</code></th></tr>
             </thead>
             <tbody>
-              <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td><var>C1.1</var>, <var>C2.1</var></td><td><code>GID</code></td></tr>
-              <tr><td><var>C2</var></td><td><var>T</var></td><td>2</td><td><var>C1.2</var>, <var>C2.2</var></td><td><code>On Street</code></td></tr>
-              <tr><td><var>C3</var></td><td><var>T</var></td><td>3</td><td><var>C1.3</var>, <var>C2.3</var></td><td><code>Species</code></td></tr>
-              <tr><td><var>C4</var></td><td><var>T</var></td><td>4</td><td><var>C1.4</var>, <var>C2.4</var></td><td><code>Trim Cycle</code></td></tr>
-              <tr><td><var>C5</var></td><td><var>T</var></td><td>5</td><td><var>C1.5</var>, <var>C2.5</var></td><td><code>Inventory Date</code></td></tr>
+              <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td>1</td><td><var>C1.1</var>, <var>C2.1</var></td><td><code>GID</code></td></tr>
+              <tr><td><var>C2</var></td><td><var>T</var></td><td>2</td><td>2</td><td><var>C1.2</var>, <var>C2.2</var></td><td><code>On Street</code></td></tr>
+              <tr><td><var>C3</var></td><td><var>T</var></td><td>3</td><td>3</td><td><var>C1.3</var>, <var>C2.3</var></td><td><code>Species</code></td></tr>
+              <tr><td><var>C4</var></td><td><var>T</var></td><td>4</td><td>4</td><td><var>C1.4</var>, <var>C2.4</var></td><td><code>Trim Cycle</code></td></tr>
+              <tr><td><var>C5</var></td><td><var>T</var></td><td>5</td><td>5</td><td><var>C1.5</var>, <var>C2.5</var></td><td><code>Inventory Date</code></td></tr>
             </tbody>
           </table>
           <p>Expressed as Table Metadata:</p>
@@ -701,37 +713,40 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 }
           </pre>
           <p>
-            The rows have the properties shown in the following table:
+            The rows have the annotations shown in the following table:
           </p>
           <table style="width: 100%; text-align: left">
             <thead>
-              <tr><th rowspan="2">id</th><th colspan="3">core properties</th></tr>
-              <tr><th>table</th><th>number</th><th>cells</th></tr>
+              <tr><th rowspan="2">id</th><th colspan="3">core annotations</th></tr>
+              <tr><th>table</th><th>number</th><th>source number</th><th>cells</th></tr>
             </thead>
             <tbody>
-              <tr><td><var>R1</var></td><td><var>T</var></td><td>1</td><td><var>C1.1</var>, <var>C1.2</var>, <var>C1.3</var>, <var>C1.4</var>, <var>C1.5</var></td></tr>
-              <tr><td><var>R2</var></td><td><var>T</var></td><td>2</td><td><var>C2.1</var>, <var>C2.2</var>, <var>C2.3</var>, <var>C2.4</var>, <var>C2.5</var></td></tr>
+              <tr><td><var>R1</var></td><td><var>T</var></td><td>1</td><td>2</td><td><var>C1.1</var>, <var>C1.2</var>, <var>C1.3</var>, <var>C1.4</var>, <var>C1.5</var></td></tr>
+              <tr><td><var>R2</var></td><td><var>T</var></td><td>2</td><td>3</td><td><var>C2.1</var>, <var>C2.2</var>, <var>C2.3</var>, <var>C2.4</var>, <var>C2.5</var></td></tr>
             </tbody>
           </table>
+          <p class="note">
+            The <a title="row source number">source number</a> of each row is offset by one from the <a title="row number">number</a> of each row because in the source CSV+ file, the header line is the first line. It is possible to reconstruct a [[RFC7111]] compliant reference to the first record in the original CSV+ file (<code>http://example.org/tree-ops.csv#row=2</code>) using the value of the row's source number. This enables implementations to retain provenance between the table model and the original file.
+          </p>
           <p>
-            The cells have the properties shown in the following table (note that the <a title="cell value">values</a> of all the cells in the table are strings, denoted by the double quotes in the table below):
+            The cells have the annotations shown in the following table (note that the <a title="cell value">values</a> of all the cells in the table are strings, denoted by the double quotes in the table below):
           </p>
           <table style="width: 100%; text-align: left">
             <thead>
-              <tr><th rowspan="2">id</th><th colspan="3">core properties</th></tr>
-              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th></tr>
+              <tr><th rowspan="2">id</th><th colspan="6">core annotations</th></tr>
+              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th><th>errors</th></tr>
             </thead>
             <tbody>
-              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"1"</code></td><td><code>"1"</code></td></tr>
-              <tr><td><var>C1.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R1</var></td><td><code>"ADDISON AV"</code></td><td><code>"ADDISON AV"</code></td></tr>
-              <tr><td><var>C1.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R1</var></td><td><code>"Celtis australis"</code></td><td><code>"Celtis australis"</code></td></tr>
-              <tr><td><var>C1.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R1</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td></tr>
-              <tr><td><var>C1.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R1</var></td><td><code>"10/18/2010"</code></td><td><code>"10/18/2010"</code></td></tr>
-              <tr><td><var>C2.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R2</var></td><td><code>"2"</code></td><td><code>"2"</code></td></tr>
-              <tr><td><var>C2.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R2</var></td><td><code>"EMERSON ST"</code></td><td><code>"EMERSON ST"</code></td></tr>
-              <tr><td><var>C2.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R2</var></td><td><code>"Liquidambar styraciflua"</code></td><td><code>"Liquidambar styraciflua"</code></td></tr>
-              <tr><td><var>C2.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R2</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td></tr>
-              <tr><td><var>C2.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R2</var></td><td><code>"6/2/2010"</code></td><td><code>"6/2/2010"</code></td></tr>
+              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"1"</code></td><td><code>"1"</code></td><td></td></tr>
+              <tr><td><var>C1.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R1</var></td><td><code>"ADDISON AV"</code></td><td><code>"ADDISON AV"</code></td><td></td></tr>
+              <tr><td><var>C1.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R1</var></td><td><code>"Celtis australis"</code></td><td><code>"Celtis australis"</code></td><td></td></tr>
+              <tr><td><var>C1.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R1</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td><td></td></tr>
+              <tr><td><var>C1.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R1</var></td><td><code>"10/18/2010"</code></td><td><code>"10/18/2010"</code></td><td></td></tr>
+              <tr><td><var>C2.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R2</var></td><td><code>"2"</code></td><td><code>"2"</code></td><td></td></tr>
+              <tr><td><var>C2.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R2</var></td><td><code>"EMERSON ST"</code></td><td><code>"EMERSON ST"</code></td><td></td></tr>
+              <tr><td><var>C2.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R2</var></td><td><code>"Liquidambar styraciflua"</code></td><td><code>"Liquidambar styraciflua"</code></td><td></td></tr>
+              <tr><td><var>C2.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R2</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td><td></td></tr>
+              <tr><td><var>C2.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R2</var></td><td><code>"6/2/2010"</code></td><td><code>"6/2/2010"</code></td><td></td></tr>
             </tbody>
           </table>
           <section>
@@ -750,19 +765,19 @@ data.parse({
           		The parser could then create an <a>annotated tabular data model</a> that included <code>name</code> annotations on the columns, <code>datatype</code> and <code>format</code> annotations on the cells, and created cells whose <a title="cell value">values</a> were of appropriate types (in the case of this Javascript implementation, the cells in the last column would be <code>Date</code> objects, for example).
           	</p>
 						<p>
-							Assuming this kind of implementation-defined parsing, the columns would then have the properties shown in the following table:
+							Assuming this kind of implementation-defined parsing, the columns would then have the annotations shown in the following table:
 	          </p>
 	          <table style="width: 100%; text-align: left">
 	            <thead>
-	              <tr><th rowspan="2">id</th><th colspan="3">core properties</th><th colspan="2">annotations</th></tr>
-	              <tr><th>table</th><th>number</th><th>cells</th><th><code>name</code></th><th><code>title</code></th></tr>
+	              <tr><th rowspan="2">id</th><th colspan="3">core annotations</th><th colspan="2">annotations</th></tr>
+	              <tr><th>table</th><th>number</th><th>source number</th><th>cells</th><th><code>name</code></th><th><code>title</code></th></tr>
 	            </thead>
 	            <tbody>
-	              <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td><var>C1.1</var>, <var>C2.1</var></td><td><code>GID</code></td><td><code>GID</code></td></tr>
-	              <tr><td><var>C2</var></td><td><var>T</var></td><td>2</td><td><var>C1.2</var>, <var>C2.2</var></td><td><code>on_street</code></td><td><code>On Street</code></td></tr>
-	              <tr><td><var>C3</var></td><td><var>T</var></td><td>3</td><td><var>C1.3</var>, <var>C2.3</var></td><td><code>species</code></td><td><code>Species</code></td></tr>
-	              <tr><td><var>C4</var></td><td><var>T</var></td><td>4</td><td><var>C1.4</var>, <var>C2.4</var></td><td><code>trim_cycle</code></td><td><code>Trim Cycle</code></td></tr>
-	              <tr><td><var>C5</var></td><td><var>T</var></td><td>5</td><td><var>C1.5</var>, <var>C2.5</var></td><td><code>inventory_date</code></td><td><code>Inventory Date</code></td></tr>
+	              <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td>1</td><td><var>C1.1</var>, <var>C2.1</var></td><td><code>GID</code></td><td><code>GID</code></td></tr>
+	              <tr><td><var>C2</var></td><td><var>T</var></td><td>2</td><td>2</td><td><var>C1.2</var>, <var>C2.2</var></td><td><code>on_street</code></td><td><code>On Street</code></td></tr>
+	              <tr><td><var>C3</var></td><td><var>T</var></td><td>3</td><td>3</td><td><var>C1.3</var>, <var>C2.3</var></td><td><code>species</code></td><td><code>Species</code></td></tr>
+	              <tr><td><var>C4</var></td><td><var>T</var></td><td>4</td><td>4</td><td><var>C1.4</var>, <var>C2.4</var></td><td><code>trim_cycle</code></td><td><code>Trim Cycle</code></td></tr>
+	              <tr><td><var>C5</var></td><td><var>T</var></td><td>5</td><td>5</td><td><var>C1.5</var>, <var>C2.5</var></td><td><code>inventory_date</code></td><td><code>Inventory Date</code></td></tr>
 	            </tbody>
 	          </table>
           <p>After creating <a>embedded metadata</a> and merging with overriding metadata:</p>
@@ -787,24 +802,24 @@ data.parse({
 }
           </pre>
 	          <p>
-	            The cells have the properties shown in the following table. Because of the overrides provided by the consumer to guide the parsing, and the way the parser works, these include additional annotations but also, for the <code>Inventory Date</code> column (cells <var>C1.5</var> and <var>C2.5</var>), have a <a title="cell value">value</a> that is a parsed date rather than an unparsed string.
+	            The cells have the annotations shown in the following table. Because of the overrides provided by the consumer to guide the parsing, and the way the parser works, these include additional annotations but also, for the <code>Inventory Date</code> column (cells <var>C1.5</var> and <var>C2.5</var>), have a <a title="cell value">value</a> that is a parsed date rather than an unparsed string.
 	          </p>
 	          <table style="width: 100%; text-align: left">
 	            <thead>
-	              <tr><th rowspan="2">id</th><th colspan="3">core properties</th><th colspan="2">annotations</th></tr>
-	              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th><th>datatype</th><th>format</th></tr>
+	              <tr><th rowspan="2">id</th><th colspan="6">core annotations</th><th colspan="2">annotations</th></tr>
+	              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th><th>errors</th><th>datatype</th><th>format</th></tr>
 	            </thead>
 	            <tbody>
-	              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"1"</code></td><td><code>"1"</code></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C1.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R1</var></td><td><code>"ADDISON AV"</code></td><td><code>"ADDISON AV"</code></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C1.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R1</var></td><td><code>"Celtis australis"</code></td><td><code>"Celtis australis"</code></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C1.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R1</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C1.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R1</var></td><td><code>"10/18/2010"</code></td><td><code>2010-10-18</code></td><td><code>date</code></td><td><code>M/D/YYYY</code></td></tr>
-	              <tr><td><var>C2.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R2</var></td><td><code>"2"</code></td><td><code>"2"</code></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C2.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R2</var></td><td><code>"EMERSON ST"</code></td><td><code>"EMERSON ST"</code></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C2.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R2</var></td><td><code>"Liquidambar styraciflua"</code></td><td><code>"Liquidambar styraciflua"</code></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C2.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R2</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C2.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R2</var></td><td><code>"6/2/2010"</code></td><td><code>2010-06-02</code></td><td><code>date</code></td><td><code>M/D/YYYY</code></td></tr>
+	              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"1"</code></td><td><code>"1"</code></td><td></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C1.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R1</var></td><td><code>"ADDISON AV"</code></td><td><code>"ADDISON AV"</code></td><td></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C1.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R1</var></td><td><code>"Celtis australis"</code></td><td><code>"Celtis australis"</code></td><td></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C1.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R1</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td><td></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C1.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R1</var></td><td><code>"10/18/2010"</code></td><td><code>2010-10-18</code></td><td></td><td><code>date</code></td><td><code>M/D/YYYY</code></td></tr>
+	              <tr><td><var>C2.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R2</var></td><td><code>"2"</code></td><td><code>"2"</code></td><td></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C2.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R2</var></td><td><code>"EMERSON ST"</code></td><td><code>"EMERSON ST"</code></td><td></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C2.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R2</var></td><td><code>"Liquidambar styraciflua"</code></td><td><code>"Liquidambar styraciflua"</code></td><td></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C2.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R2</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td><td></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C2.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R2</var></td><td><code>"6/2/2010"</code></td><td><code>2010-06-02</code></td><td></td><td><code>date</code></td><td><code>M/D/YYYY</code></td></tr>
 	            </tbody>
 	          </table>
           </section>
@@ -821,7 +836,7 @@ data.parse({
   "dc:keywords": ["tree", "street", "maintenance"],
   "dc:publisher": [{
     "schema:name": "Example Municipality",
-    "schema:web": "http://example.org"
+    "schema:url": "http://example.org"
   }],
   "dc:license": "http://opendefinition.org/licenses/cc-by/",
   "dc:modified": "2010-12-31",
@@ -870,7 +885,7 @@ data.parse({
           		<dt><code>dc:keywords</code></dt>
           		<dd><code>["tree", "street", "maintenance"]</code></dd>
           		<dt><code>dc:publisher</code></dt>
-          		<dd><code>[{ "schema:name": "Example Municipality", "schema:web": "http://example.org" }]</code></dd>
+          		<dd><code>[{ "schema:name": "Example Municipality", "schema:url": "http://example.org" }]</code></dd>
           		<dt><code>dc:license</code></dt>
           		<dd><code>"http://opendefinition.org/licenses/cc-by/"</code></dd>
           		<dt><code>dc:modified</code></dt>
@@ -882,40 +897,40 @@ data.parse({
           		Note that the value of the <code>primaryKey</code> annotation is a pointer to the <a>column</a> <var>C1</var> within the annotated tabular data model.
           	</p>
 						<p>
-							The columns would have the properties shown in the following table:
+							The columns would have the annotations shown in the following table:
 	          </p>
 	          <table style="width: 100%; text-align: left">
 	            <thead>
-	              <tr><th rowspan="2">id</th><th colspan="3">core properties</th><th colspan="3">annotations</th></tr>
-	              <tr><th>table</th><th>number</th><th>cells</th><th><code>name</code></th><th><code>title</code></th><th><code>dc:description</code></th></tr>
+	              <tr><th rowspan="2">id</th><th colspan="3">core annotations</th><th colspan="3">annotations</th></tr>
+	              <tr><th>table</th><th>number</th><th>source number</th><th>cells</th><th><code>name</code></th><th><code>title</code></th><th><code>dc:description</code></th></tr>
 	            </thead>
 	            <tbody>
-	              <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td><var>C1.1</var>, <var>C2.1</var></td><td><code>GID</code></td><td><code>GID</code>, <code>Generic Identifier</code></td><td><code>An identifier for the operation on a tree.</code></td></tr>
-	              <tr><td><var>C2</var></td><td><var>T</var></td><td>2</td><td><var>C1.2</var>, <var>C2.2</var></td><td><code>on_street</code></td><td><code>On Street</code></td><td><code>The street that the tree is on.</code></td></tr>
-	              <tr><td><var>C3</var></td><td><var>T</var></td><td>3</td><td><var>C1.3</var>, <var>C2.3</var></td><td><code>species</code></td><td><code>Species</code></td><td><code>The species of the tree.</code></td></tr>
-	              <tr><td><var>C4</var></td><td><var>T</var></td><td>4</td><td><var>C1.4</var>, <var>C2.4</var></td><td><code>trim_cycle</code></td><td><code>Trim Cycle</code></td><td><code>The operation performed on the tree.</code></td></tr>
-	              <tr><td><var>C5</var></td><td><var>T</var></td><td>5</td><td><var>C1.5</var>, <var>C2.5</var></td><td><code>inventory_date</code></td><td><code>Inventory Date</code></td><td><code>The date of the operation that was performed.</code></td></tr>
+	              <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td>1</td><td><var>C1.1</var>, <var>C2.1</var></td><td><code>GID</code></td><td><code>GID</code>, <code>Generic Identifier</code></td><td><code>An identifier for the operation on a tree.</code></td></tr>
+	              <tr><td><var>C2</var></td><td><var>T</var></td><td>2</td><td>2</td><td><var>C1.2</var>, <var>C2.2</var></td><td><code>on_street</code></td><td><code>On Street</code></td><td><code>The street that the tree is on.</code></td></tr>
+	              <tr><td><var>C3</var></td><td><var>T</var></td><td>3</td><td>3</td><td><var>C1.3</var>, <var>C2.3</var></td><td><code>species</code></td><td><code>Species</code></td><td><code>The species of the tree.</code></td></tr>
+	              <tr><td><var>C4</var></td><td><var>T</var></td><td>4</td><td>4</td><td><var>C1.4</var>, <var>C2.4</var></td><td><code>trim_cycle</code></td><td><code>Trim Cycle</code></td><td><code>The operation performed on the tree.</code></td></tr>
+	              <tr><td><var>C5</var></td><td><var>T</var></td><td>5</td><td>5</td><td><var>C1.5</var>, <var>C2.5</var></td><td><code>inventory_date</code></td><td><code>Inventory Date</code></td><td><code>The date of the operation that was performed.</code></td></tr>
 	            </tbody>
 	          </table>
 	          <p>
-	            Thanks to the provided metadata, the cells again have the properties shown in the following table. The metadata file has provided the information to supplement the model with additional annotations but also, for the <code>Inventory Date</code> column (cells <var>C1.5</var> and <var>C2.5</var>), have a <a title="cell value">value</a> that is a parsed date rather than an unparsed string.
+	            Thanks to the provided metadata, the cells again have the annotations shown in the following table. The metadata file has provided the information to supplement the model with additional annotations but also, for the <code>Inventory Date</code> column (cells <var>C1.5</var> and <var>C2.5</var>), have a <a title="cell value">value</a> that is a parsed date rather than an unparsed string.
 	          </p>
 	          <table style="width: 100%; text-align: left">
 	            <thead>
-	              <tr><th rowspan="2">id</th><th colspan="3">core properties</th><th colspan="2">annotations</th></tr>
-	              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th><th>datatype</th><th>format</th></tr>
+	              <tr><th rowspan="2">id</th><th colspan="6">core annotations</th><th colspan="2">annotations</th></tr>
+	              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th><th>errors</th><th>datatype</th><th>format</th></tr>
 	            </thead>
 	            <tbody>
-	              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"1"</code></td><td><code>"1"</code></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C1.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R1</var></td><td><code>"ADDISON AV"</code></td><td><code>"ADDISON AV"</code></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C1.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R1</var></td><td><code>"Celtis australis"</code></td><td><code>"Celtis australis"</code></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C1.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R1</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C1.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R1</var></td><td><code>"10/18/2010"</code></td><td><code>2010-10-18</code></td><td><code>date</code></td><td><code>M/D/YYYY</code></td></tr>
-	              <tr><td><var>C2.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R2</var></td><td><code>"2"</code></td><td><code>"2"</code></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C2.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R2</var></td><td><code>"EMERSON ST"</code></td><td><code>"EMERSON ST"</code></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C2.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R2</var></td><td><code>"Liquidambar styraciflua"</code></td><td><code>"Liquidambar styraciflua"</code></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C2.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R2</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C2.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R2</var></td><td><code>"6/2/2010"</code></td><td><code>2010-06-02</code></td><td><code>date</code></td><td><code>M/D/YYYY</code></td></tr>
+	              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"1"</code></td><td><code>"1"</code></td><td></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C1.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R1</var></td><td><code>"ADDISON AV"</code></td><td><code>"ADDISON AV"</code></td><td></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C1.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R1</var></td><td><code>"Celtis australis"</code></td><td><code>"Celtis australis"</code></td><td></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C1.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R1</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td><td></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C1.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R1</var></td><td><code>"10/18/2010"</code></td><td><code>2010-10-18</code></td><td></td><td><code>date</code></td><td><code>M/D/YYYY</code></td></tr>
+	              <tr><td><var>C2.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R2</var></td><td><code>"2"</code></td><td><code>"2"</code></td><td></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C2.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R2</var></td><td><code>"EMERSON ST"</code></td><td><code>"EMERSON ST"</code></td><td></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C2.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R2</var></td><td><code>"Liquidambar styraciflua"</code></td><td><code>"Liquidambar styraciflua"</code></td><td></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C2.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R2</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td><td></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C2.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R2</var></td><td><code>"6/2/2010"</code></td><td><code>2010-06-02</code></td><td></td><td><code>date</code></td><td><code>M/D/YYYY</code></td></tr>
 	            </tbody>
 	          </table>
           </section>
@@ -931,24 +946,24 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 2,,"Liquidambar styraciflua","Large Tree Routine Prune",
           </pre>
           <p>
-            Parsing this file similarly results in an <a>annotated tabular data model</a> of a single <a>table</a> <var>T</var> with five columns and two rows. The columns and rows have exactly the same properties as previously, but there are two <code>null</code> cell values for <var>C2.2</var> and <var>C2.5</var>. Note that the quoting of values within the CSV makes no difference to either the <a>string value</a> or <a title="cell value">value</a> of the cell.
+            Parsing this file similarly results in an <a>annotated tabular data model</a> of a single <a>table</a> <var>T</var> with five columns and two rows. The columns and rows have exactly the same annotations as previously, but there are two <code>null</code> cell values for <var>C2.2</var> and <var>C2.5</var>. Note that the quoting of values within the CSV makes no difference to either the <a>string value</a> or <a title="cell value">value</a> of the cell.
           </p>
           <table style="width: 100%; text-align: left">
             <thead>
-              <tr><th rowspan="2">id</th><th colspan="3">core properties</th></tr>
-              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th></tr>
+              <tr><th rowspan="2">id</th><th colspan="6">core annotations</th></tr>
+              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th><th>errors</th></tr>
             </thead>
             <tbody>
-              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"1"</code></td><td><code>"1"</code></td></tr>
-              <tr><td><var>C1.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R1</var></td><td><code>"ADDISON AV"</code></td><td><code>"ADDISON AV"</code></td></tr>
-              <tr><td><var>C1.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R1</var></td><td><code>"Celtis australis"</code></td><td><code>"Celtis australis"</code></td></tr>
-              <tr><td><var>C1.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R1</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td></tr>
-              <tr><td><var>C1.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R1</var></td><td><code>"10/18/2010"</code></td><td><code>"10/18/2010"</code></td></tr>
-              <tr><td><var>C2.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R2</var></td><td><code>"2"</code></td><td><code>"2"</code></td></tr>
-              <tr><td><var>C2.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R2</var></td><td><code>""</code></td><td><code>null</code></td></tr>
-              <tr><td><var>C2.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R2</var></td><td><code>"Liquidambar styraciflua"</code></td><td><code>"Liquidambar styraciflua"</code></td></tr>
-              <tr><td><var>C2.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R2</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td></tr>
-              <tr><td><var>C2.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R2</var></td><td><code>""</code></td><td><code>null</code></td></tr>
+              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"1"</code></td><td><code>"1"</code></td><td></td></tr>
+              <tr><td><var>C1.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R1</var></td><td><code>"ADDISON AV"</code></td><td><code>"ADDISON AV"</code></td><td></td></tr>
+              <tr><td><var>C1.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R1</var></td><td><code>"Celtis australis"</code></td><td><code>"Celtis australis"</code></td><td></td></tr>
+              <tr><td><var>C1.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R1</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td><td></td></tr>
+              <tr><td><var>C1.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R1</var></td><td><code>"10/18/2010"</code></td><td><code>"10/18/2010"</code></td><td></td></tr>
+              <tr><td><var>C2.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R2</var></td><td><code>"2"</code></td><td><code>"2"</code></td><td></td></tr>
+              <tr><td><var>C2.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R2</var></td><td><code>""</code></td><td><code>null</code></td><td></td></tr>
+              <tr><td><var>C2.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R2</var></td><td><code>"Liquidambar styraciflua"</code></td><td><code>"Liquidambar styraciflua"</code></td><td></td></tr>
+              <tr><td><var>C2.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R2</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td><td></td></tr>
+              <tr><td><var>C2.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R2</var></td><td><code>""</code></td><td><code>null</code></td><td></td></tr>
             </tbody>
           </table>
         </section>
@@ -972,49 +987,49 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 	        <section>
 	          <h5>Naive Parsing</h5>
 	          <p>
-	            Naive parsing of the above data will assume a comma separator and thus results in a single <a>table</a> <var>T</var> with a single column and six rows. The column has the properties shown in the following table:
+	            Naive parsing of the above data will assume a comma separator and thus results in a single <a>table</a> <var>T</var> with a single column and six rows. The column has the annotations shown in the following table:
 	          </p>
 	          <table style="width: 100%; text-align: left">
 	            <thead>
-	              <tr><th rowspan="2">id</th><th colspan="3">core properties</th><th>annotations</th></tr>
-	              <tr><th>table</th><th>number</th><th>cells</th><th><code>title</code></th></tr>
+	              <tr><th rowspan="2">id</th><th colspan="3">core annotations</th><th>annotations</th></tr>
+	              <tr><th>table</th><th>number</th><th>source number</th><th>cells</th><th><code>title</code></th></tr>
 	            </thead>
 	            <tbody>
-	              <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td><var>C1.1</var>, <var>C2.1</var>, <var>C3.1</var>, <var>C4.1</var>, <var>C5.1</var></td><td><code># publisher City of Palo Alto</code></td></tr>
+	              <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td>1</td><td><var>C1.1</var>, <var>C2.1</var>, <var>C3.1</var>, <var>C4.1</var>, <var>C5.1</var></td><td><code># publisher City of Palo Alto</code></td></tr>
 	            </tbody>
 	          </table>
 	          <p>
-	            The rows have the properties shown in the following table:
+	            The rows have the annotations shown in the following table:
 	          </p>
 	          <table style="width: 100%; text-align: left">
 	            <thead>
-	              <tr><th rowspan="2">id</th><th colspan="3">core properties</th></tr>
-	              <tr><th>table</th><th>number</th><th>cells</th></tr>
+	              <tr><th rowspan="2">id</th><th colspan="3">core annotations</th></tr>
+	              <tr><th>table</th><th>number</th><th>source number</th><th>cells</th></tr>
 	            </thead>
 	            <tbody>
-	              <tr><td><var>R1</var></td><td><var>T</var></td><td>1</td><td><var>C1.1</var></td></tr>
-	              <tr><td><var>R2</var></td><td><var>T</var></td><td>2</td><td><var>C2.1</var></td></tr>
-	              <tr><td><var>R3</var></td><td><var>T</var></td><td>3</td><td><var>C3.1</var></td></tr>
-	              <tr><td><var>R4</var></td><td><var>T</var></td><td>4</td><td><var>C4.1</var></td></tr>
-	              <tr><td><var>R5</var></td><td><var>T</var></td><td>5</td><td><var>C5.1</var></td></tr>
-	              <tr><td><var>R6</var></td><td><var>T</var></td><td>6</td><td><var>C6.1</var></td></tr>
+	              <tr><td><var>R1</var></td><td><var>T</var></td><td>1</td><td>2</td><td><var>C1.1</var></td></tr>
+	              <tr><td><var>R2</var></td><td><var>T</var></td><td>2</td><td>3</td><td><var>C2.1</var></td></tr>
+	              <tr><td><var>R3</var></td><td><var>T</var></td><td>3</td><td>4</td><td><var>C3.1</var></td></tr>
+	              <tr><td><var>R4</var></td><td><var>T</var></td><td>4</td><td>5</td><td><var>C4.1</var></td></tr>
+	              <tr><td><var>R5</var></td><td><var>T</var></td><td>5</td><td>6</td><td><var>C5.1</var></td></tr>
+	              <tr><td><var>R6</var></td><td><var>T</var></td><td>6</td><td>7</td><td><var>C6.1</var></td></tr>
 	            </tbody>
 	          </table>
 	          <p>
-	            The cells have the properties shown in the following table (note that the <a title="cell value">values</a> of all the cells in the table are strings, denoted by the double quotes in the table below):
+	            The cells have the annotations shown in the following table (note that the <a title="cell value">values</a> of all the cells in the table are strings, denoted by the double quotes in the table below):
 	          </p>
 	          <table style="width: 100%; text-align: left">
 	            <thead>
-	              <tr><th rowspan="2">id</th><th colspan="3">core properties</th></tr>
-	              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th></tr>
+	              <tr><th rowspan="2">id</th><th colspan="6">core annotations</th></tr>
+	              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th><th>errors</th></tr>
 	            </thead>
 	            <tbody>
-	              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"# updated 12/31/2010"</code></td><td><code>"# updated 12/31/2010"</code></td></tr>
-	              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"#name	GID	on_street	species	trim_cycle	inventory_date"</code></td><td><code>"#name	GID	on_street	species	trim_cycle	inventory_date"</code></td></tr>
-	              <tr><td><var>C2.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R2</var></td><td><code>"#datatype	string	string	string	string	date:M/D/YYYY"</code></td><td><code>"#datatype	string	string	string	string	date:M/D/YYYY"</code></td></tr>
-	              <tr><td><var>C3.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R3</var></td><td><code>"	GID	On Street	Species	Trim Cycle	Inventory Date"</code></td><td><code>"	GID	On Street	Species	Trim Cycle	Inventory Date"</code></td></tr>
-	              <tr><td><var>C4.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R4</var></td><td><code>"	1 ADDISON AV	Celtis australis	Large Tree Routine Prune	10/18/2010"</code></td><td><code>"	1 ADDISON AV	Celtis australis	Large Tree Routine Prune	10/18/2010"</code></td></tr>
-	              <tr><td><var>C5.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R5</var></td><td><code>"	2 EMERSON ST	Liquidambar styraciflua Large Tree Routine Prune	6/2/2010"</code></td><td><code>"	2 EMERSON ST	Liquidambar styraciflua Large Tree Routine Prune	6/2/2010"</code></td></tr>
+	              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"# updated 12/31/2010"</code></td><td><code>"# updated 12/31/2010"</code></td><td></td></tr>
+	              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"#name	GID	on_street	species	trim_cycle	inventory_date"</code></td><td><code>"#name	GID	on_street	species	trim_cycle	inventory_date"</code></td><td></td></tr>
+	              <tr><td><var>C2.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R2</var></td><td><code>"#datatype	string	string	string	string	date:M/D/YYYY"</code></td><td><code>"#datatype	string	string	string	string	date:M/D/YYYY"</code></td><td></td></tr>
+	              <tr><td><var>C3.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R3</var></td><td><code>"	GID	On Street	Species	Trim Cycle	Inventory Date"</code></td><td><code>"	GID	On Street	Species	Trim Cycle	Inventory Date"</code></td><td></td></tr>
+	              <tr><td><var>C4.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R4</var></td><td><code>"	1 ADDISON AV	Celtis australis	Large Tree Routine Prune	10/18/2010"</code></td><td><code>"	1 ADDISON AV	Celtis australis	Large Tree Routine Prune	10/18/2010"</code></td><td></td></tr>
+	              <tr><td><var>C5.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R5</var></td><td><code>"	2 EMERSON ST	Liquidambar styraciflua Large Tree Routine Prune	6/2/2010"</code></td><td><code>"	2 EMERSON ST	Liquidambar styraciflua Large Tree Routine Prune	6/2/2010"</code></td><td></td></tr>
 	            </tbody>
 	          </table>
 	        </section>
@@ -1039,7 +1054,10 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 }
 	          </pre>
 	          <p>
-	            With these flags in operation, parsing this file results in an <a>annotated tabular data model</a> of a single <a>table</a> <var>T</var> with five columns and two rows which is largely the same as that created from the original simple example described in <a href="#simple-example" class="sectionRef"></a>. The only difference is that because the four skipped rows began with the default <a>comment prefix</a>, the table itself now has four <code>rdfs:comment</code> annotations, with the values:
+	            With these flags in operation, parsing this file results in an <a>annotated tabular data model</a> of a single <a>table</a> <var>T</var> with five columns and two rows which is largely the same as that created from the original simple example described in <a href="#simple-example" class="sectionRef"></a>. There are three differences.
+            </p>
+            <p>
+              First, because the four skipped rows began with the default <a>comment prefix</a>, the table itself now has four <code>rdfs:comment</code> annotations, with the values:
 	          </p>
 	          <ol>
 	            <li><code> publisher	City of Palo Alto</code></li>
@@ -1047,6 +1065,35 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 	            <li><code>name	GID	on_street	species	trim_cycle	inventory_date</code></li>
 	            <li><code>datatype	string	string	string	string	date:M/D/YYYY</code></li>
 	          </ol>
+            <p>
+              Second, because the first column has been skipped, the <a title="column source number">source number</a> of each of the columns is offset by one:
+            </p>
+            <table style="width: 100%; text-align: left">
+              <thead>
+                <tr><th rowspan="2">id</th><th colspan="3">core properties</th><th>annotations</th></tr>
+                <tr><th>table</th><th>number</th><th>source number</th><th>cells</th><th><code>title</code></th></tr>
+              </thead>
+              <tbody>
+                <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td>2</td><td><var>C1.1</var>, <var>C2.1</var></td><td><code>GID</code></td></tr>
+                <tr><td><var>C2</var></td><td><var>T</var></td><td>2</td><td>3</td><td><var>C1.2</var>, <var>C2.2</var></td><td><code>On Street</code></td></tr>
+                <tr><td><var>C3</var></td><td><var>T</var></td><td>3</td><td>4</td><td><var>C1.3</var>, <var>C2.3</var></td><td><code>Species</code></td></tr>
+                <tr><td><var>C4</var></td><td><var>T</var></td><td>4</td><td>5</td><td><var>C1.4</var>, <var>C2.4</var></td><td><code>Trim Cycle</code></td></tr>
+                <tr><td><var>C5</var></td><td><var>T</var></td><td>5</td><td>6</td><td><var>C1.5</var>, <var>C2.5</var></td><td><code>Inventory Date</code></td></tr>
+              </tbody>
+            </table>
+            <p>
+              Finally, because four additional rows have been skipped, the <a title="row source number">source number</a> of each of the rows is offset by five from the <a>row number</a> (the four skipped rows plus the single header row):
+            </p>
+            <table style="width: 100%; text-align: left">
+              <thead>
+                <tr><th rowspan="2">id</th><th colspan="3">core properties</th></tr>
+                <tr><th>table</th><th>number</th><th>source number</th><th>cells</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><var>R1</var></td><td><var>T</var></td><td>1</td><td>6</td><td><var>C1.1</var>, <var>C1.2</var>, <var>C1.3</var>, <var>C1.4</var>, <var>C1.5</var></td></tr>
+                <tr><td><var>R2</var></td><td><var>T</var></td><td>2</td><td>7</td><td><var>C2.1</var>, <var>C2.2</var>, <var>C2.3</var>, <var>C2.4</var>, <var>C2.5</var></td></tr>
+              </tbody>
+            </table>
 	        </section>
 	        <section>
 	        	<h5>Recognising Tabular Data Formats</h5>
@@ -1072,53 +1119,53 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 							<dd><code>12/31/2010</code></dd>
 						</dl>
 						<p>
-							The columns have the properties shown in the following table:
+							The columns have the annotations shown in the following table:
 	          </p>
 	          <table style="width: 100%; text-align: left">
 	            <thead>
-	              <tr><th rowspan="2">id</th><th colspan="3">core properties</th><th colspan="2">annotations</th></tr>
-	              <tr><th>table</th><th>number</th><th>cells</th><th><code>name</code></th><th><code>title</code></th></tr>
+	              <tr><th rowspan="2">id</th><th colspan="3">core annotations</th><th colspan="2">annotations</th></tr>
+	              <tr><th>table</th><th>number</th><th>source number</th><th>cells</th><th><code>name</code></th><th><code>title</code></th></tr>
 	            </thead>
 	            <tbody>
-	              <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td><var>C1.1</var>, <var>C2.1</var></td><td><code>GID</code></td><td><code>GID</code></td></tr>
-	              <tr><td><var>C2</var></td><td><var>T</var></td><td>2</td><td><var>C1.2</var>, <var>C2.2</var></td><td><code>on_street</code></td><td><code>On Street</code></td></tr>
-	              <tr><td><var>C3</var></td><td><var>T</var></td><td>3</td><td><var>C1.3</var>, <var>C2.3</var></td><td><code>species</code></td><td><code>Species</code></td></tr>
-	              <tr><td><var>C4</var></td><td><var>T</var></td><td>4</td><td><var>C1.4</var>, <var>C2.4</var></td><td><code>trim_cycle</code></td><td><code>Trim Cycle</code></td></tr>
-	              <tr><td><var>C5</var></td><td><var>T</var></td><td>5</td><td><var>C1.5</var>, <var>C2.5</var></td><td><code>inventory_date</code></td><td><code>Inventory Date</code></td></tr>
+	              <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td>2</td><td><var>C1.1</var>, <var>C2.1</var></td><td><code>GID</code></td><td><code>GID</code></td></tr>
+	              <tr><td><var>C2</var></td><td><var>T</var></td><td>2</td><td>3</td><td><var>C1.2</var>, <var>C2.2</var></td><td><code>on_street</code></td><td><code>On Street</code></td></tr>
+	              <tr><td><var>C3</var></td><td><var>T</var></td><td>3</td><td>4</td><td><var>C1.3</var>, <var>C2.3</var></td><td><code>species</code></td><td><code>Species</code></td></tr>
+	              <tr><td><var>C4</var></td><td><var>T</var></td><td>4</td><td>5</td><td><var>C1.4</var>, <var>C2.4</var></td><td><code>trim_cycle</code></td><td><code>Trim Cycle</code></td></tr>
+	              <tr><td><var>C5</var></td><td><var>T</var></td><td>5</td><td>6</td><td><var>C1.5</var>, <var>C2.5</var></td><td><code>inventory_date</code></td><td><code>Inventory Date</code></td></tr>
 	            </tbody>
 	          </table>
 	          <p>
-	            The rows have the properties shown in the following table, exactly as in previous examples:
+	            The rows have the annotations shown in the following table, exactly as in previous examples:
 	          </p>
 	          <table style="width: 100%; text-align: left">
 	            <thead>
-	              <tr><th rowspan="2">id</th><th colspan="3">core properties</th></tr>
-	              <tr><th>table</th><th>number</th><th>cells</th></tr>
+	              <tr><th rowspan="2">id</th><th colspan="3">core annotations</th></tr>
+	              <tr><th>table</th><th>number</th><th>source number</th><th>cells</th></tr>
 	            </thead>
 	            <tbody>
-	              <tr><td><var>R1</var></td><td><var>T</var></td><td>1</td><td><var>C1.1</var>, <var>C1.2</var>, <var>C1.3</var>, <var>C1.4</var>, <var>C1.5</var></td></tr>
-	              <tr><td><var>R2</var></td><td><var>T</var></td><td>2</td><td><var>C2.1</var>, <var>C2.2</var>, <var>C2.3</var>, <var>C2.4</var>, <var>C2.5</var></td></tr>
+	              <tr><td><var>R1</var></td><td><var>T</var></td><td>1</td><td>6</td><td><var>C1.1</var>, <var>C1.2</var>, <var>C1.3</var>, <var>C1.4</var>, <var>C1.5</var></td></tr>
+	              <tr><td><var>R2</var></td><td><var>T</var></td><td>2</td><td>7</td><td><var>C2.1</var>, <var>C2.2</var>, <var>C2.3</var>, <var>C2.4</var>, <var>C2.5</var></td></tr>
 	            </tbody>
 	          </table>
 	          <p>
-	            The cells have the properties shown in the following table. Because of the way the particular tabular data format has been specified, these include additional annotations but also, for the <code>Inventory Date</code> column (cells <var>C1.5</var> and <var>C2.5</var>), have a <a title="cell value">value</a> that is a parsed date rather than an unparsed string.
+	            The cells have the annotations shown in the following table. Because of the way the particular tabular data format has been specified, these include additional annotations but also, for the <code>Inventory Date</code> column (cells <var>C1.5</var> and <var>C2.5</var>), have a <a title="cell value">value</a> that is a parsed date rather than an unparsed string.
 	          </p>
 	          <table style="width: 100%; text-align: left">
 	            <thead>
-	              <tr><th rowspan="2">id</th><th colspan="3">core properties</th><th colspan="2">annotations</th></tr>
-	              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th><th>datatype</th><th>format</th></tr>
+	              <tr><th rowspan="2">id</th><th colspan="6">core annotations</th><th colspan="2">annotations</th></tr>
+	              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th><th>errors</th><th>datatype</th><th>format</th></tr>
 	            </thead>
 	            <tbody>
-	              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"1"</code></td><td><code>"1"</code></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C1.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R1</var></td><td><code>"ADDISON AV"</code></td><td><code>"ADDISON AV"</code></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C1.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R1</var></td><td><code>"Celtis australis"</code></td><td><code>"Celtis australis"</code></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C1.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R1</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C1.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R1</var></td><td><code>"10/18/2010"</code></td><td><code>2010-10-18</code></td><td><code>date</code></td><td><code>M/D/YYYY</code></td></tr>
-	              <tr><td><var>C2.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R2</var></td><td><code>"2"</code></td><td><code>"2"</code></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C2.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R2</var></td><td><code>"EMERSON ST"</code></td><td><code>"EMERSON ST"</code></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C2.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R2</var></td><td><code>"Liquidambar styraciflua"</code></td><td><code>"Liquidambar styraciflua"</code></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C2.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R2</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C2.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R2</var></td><td><code>"6/2/2010"</code></td><td><code>2010-06-02</code></td><td><code>date</code></td><td><code>M/D/YYYY</code></td></tr>
+	              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"1"</code></td><td><code>"1"</code></td><td></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C1.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R1</var></td><td><code>"ADDISON AV"</code></td><td><code>"ADDISON AV"</code></td><td></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C1.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R1</var></td><td><code>"Celtis australis"</code></td><td><code>"Celtis australis"</code></td><td></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C1.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R1</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td><td></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C1.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R1</var></td><td><code>"10/18/2010"</code></td><td><code>2010-10-18</code></td><td></td><td><code>date</code></td><td><code>M/D/YYYY</code></td></tr>
+	              <tr><td><var>C2.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R2</var></td><td><code>"2"</code></td><td><code>"2"</code></td><td></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C2.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R2</var></td><td><code>"EMERSON ST"</code></td><td><code>"EMERSON ST"</code></td><td></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C2.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R2</var></td><td><code>"Liquidambar styraciflua"</code></td><td><code>"Liquidambar styraciflua"</code></td><td></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C2.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R2</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td><td></td><td><code>string</code></td><td></td></tr>
+	              <tr><td><var>C2.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R2</var></td><td><code>"6/2/2010"</code></td><td><code>2010-06-02</code></td><td></td><td><code>date</code></td><td><code>M/D/YYYY</code></td></tr>
 	            </tbody>
 	          </table>
 	        </section>
