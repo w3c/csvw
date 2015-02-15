@@ -144,6 +144,7 @@ var respecConfig = {
         <ul>
           <li><dfn title="table columns">columns</dfn> &mdash; the list of <a title="column">columns</a> in the table. A table MUST have one or more columns and the order of the columns within the list is significant and MUST be preserved by applications</li>
           <li><dfn title="table rows">rows</dfn> &mdash; the list of rows in the table</li>
+          <li><dfn title="table source">source</dfn> &mdash; a link to the source of the data in the table, or <code>null</code> if this is undefined</li>
         </ul>
         <p>
           The table MAY in addition have any number of <dfn title="property">properties</dfn> which provide information about the table as a whole. The <dfn title="value">values</dfn> of these properties may be lists, structured objects, or atomic values. Annotations on a table may include:
@@ -159,6 +160,7 @@ var respecConfig = {
         <ul>
           <li><dfn title="column table">table</dfn> &mdash; the <a>table</a> that the column appears in</li>
           <li><dfn title="column number">number</dfn> &mdash; the position of the column amongst the <a title="table columns">columns</a> for the associated <a title="column table">table</a>, starting from 1</li>
+          <li><dfn title="column source number">source number</dfn> &mdash; the position of the column in the original <a title="table source">source</a> of the table, or <code>null</code></li>
           <li><dfn title="column cells">cells</dfn> &mdash; the list of <a title="cell">cells</a> in the column. A column MUST contain one cell from each <a>row</a> in the table. The order of the cells in the list MUST match the order of the rows in which they appear within the <a title="table rows">rows</a> for the associated <a title="column table">table</a>.</li>
         </ul>
         <p>
@@ -175,6 +177,7 @@ var respecConfig = {
         <ul>
           <li><dfn title="row table">table</dfn> &mdash; the <a>table</a> that the row appears in</li>
           <li><dfn title="row number">number</dfn> &mdash; the position of the row amongst the <a title="table rows">rows</a> for the <a title="row table">table</a>, starting from 1</li>
+          <li><dfn title="row source number">source number</dfn> &mdash; the position of the row in the original <a title="table source">source</a> of the table, or <code>null</code></li>
           <li><dfn title="row cells">cells</dfn> &mdash; the list of <a title="cell">cells</a> in the row. A row MUST contain one cell from each <a>column</a> in the table. The order of the cells in the list MUST match the order of the columns in which they appear within the <a>table columns</a> for the row's table.</li>
         </ul>
         <p>
@@ -665,7 +668,7 @@ Content-Type: text/csv;header=absent
         <section>
           <h4>Simple Example</h4>
           <p>
-            A simple CSV+ file might look like:
+            A simple CSV+ file at <code>http://example.org/tree-ops.csv</code> might look like:
           </p>
           <pre class="example">
 GID,On Street,Species,Trim Cycle,Inventory Date
@@ -673,19 +676,19 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 2,EMERSON ST,Liquidambar styraciflua,Large Tree Routine Prune,6/2/2010
           </pre>
           <p>
-            Parsing this file results in an <a>annotated tabular data model</a> of a single <a>table</a> <var>T</var> with five columns and two rows. The columns have the properties shown in the following table:
+            Parsing this file results in an <a>annotated tabular data model</a> of a single <a>table</a> <var>T</var> with five <a title="table columns">columns</a>, two <a title="table rows">rows</a> and the <a title="table source">source</a> <code>http://example.org/tree-ops.csv</code>. The columns have the properties shown in the following table:
           </p>
           <table style="width: 100%; text-align: left">
             <thead>
               <tr><th rowspan="2">id</th><th colspan="3">core properties</th><th>annotations</th></tr>
-              <tr><th>table</th><th>number</th><th>cells</th><th><code>title</code></th></tr>
+              <tr><th>table</th><th>number</th><th>source number</th><th>cells</th><th><code>title</code></th></tr>
             </thead>
             <tbody>
-              <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td><var>C1.1</var>, <var>C2.1</var></td><td><code>GID</code></td></tr>
-              <tr><td><var>C2</var></td><td><var>T</var></td><td>2</td><td><var>C1.2</var>, <var>C2.2</var></td><td><code>On Street</code></td></tr>
-              <tr><td><var>C3</var></td><td><var>T</var></td><td>3</td><td><var>C1.3</var>, <var>C2.3</var></td><td><code>Species</code></td></tr>
-              <tr><td><var>C4</var></td><td><var>T</var></td><td>4</td><td><var>C1.4</var>, <var>C2.4</var></td><td><code>Trim Cycle</code></td></tr>
-              <tr><td><var>C5</var></td><td><var>T</var></td><td>5</td><td><var>C1.5</var>, <var>C2.5</var></td><td><code>Inventory Date</code></td></tr>
+              <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td>1</td><td><var>C1.1</var>, <var>C2.1</var></td><td><code>GID</code></td></tr>
+              <tr><td><var>C2</var></td><td><var>T</var></td><td>2</td><td>2</td><td><var>C1.2</var>, <var>C2.2</var></td><td><code>On Street</code></td></tr>
+              <tr><td><var>C3</var></td><td><var>T</var></td><td>3</td><td>3</td><td><var>C1.3</var>, <var>C2.3</var></td><td><code>Species</code></td></tr>
+              <tr><td><var>C4</var></td><td><var>T</var></td><td>4</td><td>4</td><td><var>C1.4</var>, <var>C2.4</var></td><td><code>Trim Cycle</code></td></tr>
+              <tr><td><var>C5</var></td><td><var>T</var></td><td>5</td><td>5</td><td><var>C1.5</var>, <var>C2.5</var></td><td><code>Inventory Date</code></td></tr>
             </tbody>
           </table>
           <p>Expressed as Table Metadata:</p>
@@ -710,13 +713,16 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           <table style="width: 100%; text-align: left">
             <thead>
               <tr><th rowspan="2">id</th><th colspan="3">core properties</th></tr>
-              <tr><th>table</th><th>number</th><th>cells</th></tr>
+              <tr><th>table</th><th>number</th><th>source number</th><th>cells</th></tr>
             </thead>
             <tbody>
-              <tr><td><var>R1</var></td><td><var>T</var></td><td>1</td><td><var>C1.1</var>, <var>C1.2</var>, <var>C1.3</var>, <var>C1.4</var>, <var>C1.5</var></td></tr>
-              <tr><td><var>R2</var></td><td><var>T</var></td><td>2</td><td><var>C2.1</var>, <var>C2.2</var>, <var>C2.3</var>, <var>C2.4</var>, <var>C2.5</var></td></tr>
+              <tr><td><var>R1</var></td><td><var>T</var></td><td>1</td><td>2</td><td><var>C1.1</var>, <var>C1.2</var>, <var>C1.3</var>, <var>C1.4</var>, <var>C1.5</var></td></tr>
+              <tr><td><var>R2</var></td><td><var>T</var></td><td>2</td><td>3</td><td><var>C2.1</var>, <var>C2.2</var>, <var>C2.3</var>, <var>C2.4</var>, <var>C2.5</var></td></tr>
             </tbody>
           </table>
+          <p class="note">
+            The <a title="row source number">source number</a> of each row is offset by one from the <a title="row number">number</a> of each row because in the source CSV+ file, the header line is the first line. It is possible to reconstruct a [[RFC7111]] compliant reference to the first record in the original CSV+ file (<code>http://example.org/tree-ops.csv#row=2</code>) using the value of the row's source number. This enables implementations to retain provenance between the table model and the original file.
+          </p>
           <p>
             The cells have the properties shown in the following table (note that the <a title="cell value">values</a> of all the cells in the table are strings, denoted by the double quotes in the table below):
           </p>
@@ -759,14 +765,14 @@ data.parse({
 	          <table style="width: 100%; text-align: left">
 	            <thead>
 	              <tr><th rowspan="2">id</th><th colspan="3">core properties</th><th colspan="2">annotations</th></tr>
-	              <tr><th>table</th><th>number</th><th>cells</th><th><code>name</code></th><th><code>title</code></th></tr>
+	              <tr><th>table</th><th>number</th><th>source number</th><th>cells</th><th><code>name</code></th><th><code>title</code></th></tr>
 	            </thead>
 	            <tbody>
-	              <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td><var>C1.1</var>, <var>C2.1</var></td><td><code>GID</code></td><td><code>GID</code></td></tr>
-	              <tr><td><var>C2</var></td><td><var>T</var></td><td>2</td><td><var>C1.2</var>, <var>C2.2</var></td><td><code>on_street</code></td><td><code>On Street</code></td></tr>
-	              <tr><td><var>C3</var></td><td><var>T</var></td><td>3</td><td><var>C1.3</var>, <var>C2.3</var></td><td><code>species</code></td><td><code>Species</code></td></tr>
-	              <tr><td><var>C4</var></td><td><var>T</var></td><td>4</td><td><var>C1.4</var>, <var>C2.4</var></td><td><code>trim_cycle</code></td><td><code>Trim Cycle</code></td></tr>
-	              <tr><td><var>C5</var></td><td><var>T</var></td><td>5</td><td><var>C1.5</var>, <var>C2.5</var></td><td><code>inventory_date</code></td><td><code>Inventory Date</code></td></tr>
+	              <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td>1</td><td><var>C1.1</var>, <var>C2.1</var></td><td><code>GID</code></td><td><code>GID</code></td></tr>
+	              <tr><td><var>C2</var></td><td><var>T</var></td><td>2</td><td>2</td><td><var>C1.2</var>, <var>C2.2</var></td><td><code>on_street</code></td><td><code>On Street</code></td></tr>
+	              <tr><td><var>C3</var></td><td><var>T</var></td><td>3</td><td>3</td><td><var>C1.3</var>, <var>C2.3</var></td><td><code>species</code></td><td><code>Species</code></td></tr>
+	              <tr><td><var>C4</var></td><td><var>T</var></td><td>4</td><td>4</td><td><var>C1.4</var>, <var>C2.4</var></td><td><code>trim_cycle</code></td><td><code>Trim Cycle</code></td></tr>
+	              <tr><td><var>C5</var></td><td><var>T</var></td><td>5</td><td>5</td><td><var>C1.5</var>, <var>C2.5</var></td><td><code>inventory_date</code></td><td><code>Inventory Date</code></td></tr>
 	            </tbody>
 	          </table>
           <p>After creating <a>embedded metadata</a> and merging with overriding metadata:</p>
@@ -891,14 +897,14 @@ data.parse({
 	          <table style="width: 100%; text-align: left">
 	            <thead>
 	              <tr><th rowspan="2">id</th><th colspan="3">core properties</th><th colspan="3">annotations</th></tr>
-	              <tr><th>table</th><th>number</th><th>cells</th><th><code>name</code></th><th><code>title</code></th><th><code>dc:description</code></th></tr>
+	              <tr><th>table</th><th>number</th><th>source number</th><th>cells</th><th><code>name</code></th><th><code>title</code></th><th><code>dc:description</code></th></tr>
 	            </thead>
 	            <tbody>
-	              <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td><var>C1.1</var>, <var>C2.1</var></td><td><code>GID</code></td><td><code>GID</code>, <code>Generic Identifier</code></td><td><code>An identifier for the operation on a tree.</code></td></tr>
-	              <tr><td><var>C2</var></td><td><var>T</var></td><td>2</td><td><var>C1.2</var>, <var>C2.2</var></td><td><code>on_street</code></td><td><code>On Street</code></td><td><code>The street that the tree is on.</code></td></tr>
-	              <tr><td><var>C3</var></td><td><var>T</var></td><td>3</td><td><var>C1.3</var>, <var>C2.3</var></td><td><code>species</code></td><td><code>Species</code></td><td><code>The species of the tree.</code></td></tr>
-	              <tr><td><var>C4</var></td><td><var>T</var></td><td>4</td><td><var>C1.4</var>, <var>C2.4</var></td><td><code>trim_cycle</code></td><td><code>Trim Cycle</code></td><td><code>The operation performed on the tree.</code></td></tr>
-	              <tr><td><var>C5</var></td><td><var>T</var></td><td>5</td><td><var>C1.5</var>, <var>C2.5</var></td><td><code>inventory_date</code></td><td><code>Inventory Date</code></td><td><code>The date of the operation that was performed.</code></td></tr>
+	              <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td>1</td><td><var>C1.1</var>, <var>C2.1</var></td><td><code>GID</code></td><td><code>GID</code>, <code>Generic Identifier</code></td><td><code>An identifier for the operation on a tree.</code></td></tr>
+	              <tr><td><var>C2</var></td><td><var>T</var></td><td>2</td><td>2</td><td><var>C1.2</var>, <var>C2.2</var></td><td><code>on_street</code></td><td><code>On Street</code></td><td><code>The street that the tree is on.</code></td></tr>
+	              <tr><td><var>C3</var></td><td><var>T</var></td><td>3</td><td>3</td><td><var>C1.3</var>, <var>C2.3</var></td><td><code>species</code></td><td><code>Species</code></td><td><code>The species of the tree.</code></td></tr>
+	              <tr><td><var>C4</var></td><td><var>T</var></td><td>4</td><td>4</td><td><var>C1.4</var>, <var>C2.4</var></td><td><code>trim_cycle</code></td><td><code>Trim Cycle</code></td><td><code>The operation performed on the tree.</code></td></tr>
+	              <tr><td><var>C5</var></td><td><var>T</var></td><td>5</td><td>5</td><td><var>C1.5</var>, <var>C2.5</var></td><td><code>inventory_date</code></td><td><code>Inventory Date</code></td><td><code>The date of the operation that was performed.</code></td></tr>
 	            </tbody>
 	          </table>
 	          <p>
@@ -981,10 +987,10 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 	          <table style="width: 100%; text-align: left">
 	            <thead>
 	              <tr><th rowspan="2">id</th><th colspan="3">core properties</th><th>annotations</th></tr>
-	              <tr><th>table</th><th>number</th><th>cells</th><th><code>title</code></th></tr>
+	              <tr><th>table</th><th>number</th><th>source number</th><th>cells</th><th><code>title</code></th></tr>
 	            </thead>
 	            <tbody>
-	              <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td><var>C1.1</var>, <var>C2.1</var>, <var>C3.1</var>, <var>C4.1</var>, <var>C5.1</var></td><td><code># publisher City of Palo Alto</code></td></tr>
+	              <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td>1</td><td><var>C1.1</var>, <var>C2.1</var>, <var>C3.1</var>, <var>C4.1</var>, <var>C5.1</var></td><td><code># publisher City of Palo Alto</code></td></tr>
 	            </tbody>
 	          </table>
 	          <p>
@@ -993,15 +999,15 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 	          <table style="width: 100%; text-align: left">
 	            <thead>
 	              <tr><th rowspan="2">id</th><th colspan="3">core properties</th></tr>
-	              <tr><th>table</th><th>number</th><th>cells</th></tr>
+	              <tr><th>table</th><th>number</th><th>source number</th><th>cells</th></tr>
 	            </thead>
 	            <tbody>
-	              <tr><td><var>R1</var></td><td><var>T</var></td><td>1</td><td><var>C1.1</var></td></tr>
-	              <tr><td><var>R2</var></td><td><var>T</var></td><td>2</td><td><var>C2.1</var></td></tr>
-	              <tr><td><var>R3</var></td><td><var>T</var></td><td>3</td><td><var>C3.1</var></td></tr>
-	              <tr><td><var>R4</var></td><td><var>T</var></td><td>4</td><td><var>C4.1</var></td></tr>
-	              <tr><td><var>R5</var></td><td><var>T</var></td><td>5</td><td><var>C5.1</var></td></tr>
-	              <tr><td><var>R6</var></td><td><var>T</var></td><td>6</td><td><var>C6.1</var></td></tr>
+	              <tr><td><var>R1</var></td><td><var>T</var></td><td>1</td><td>2</td><td><var>C1.1</var></td></tr>
+	              <tr><td><var>R2</var></td><td><var>T</var></td><td>2</td><td>3</td><td><var>C2.1</var></td></tr>
+	              <tr><td><var>R3</var></td><td><var>T</var></td><td>3</td><td>4</td><td><var>C3.1</var></td></tr>
+	              <tr><td><var>R4</var></td><td><var>T</var></td><td>4</td><td>5</td><td><var>C4.1</var></td></tr>
+	              <tr><td><var>R5</var></td><td><var>T</var></td><td>5</td><td>6</td><td><var>C5.1</var></td></tr>
+	              <tr><td><var>R6</var></td><td><var>T</var></td><td>6</td><td>7</td><td><var>C6.1</var></td></tr>
 	            </tbody>
 	          </table>
 	          <p>
@@ -1043,7 +1049,10 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 }
 	          </pre>
 	          <p>
-	            With these flags in operation, parsing this file results in an <a>annotated tabular data model</a> of a single <a>table</a> <var>T</var> with five columns and two rows which is largely the same as that created from the original simple example described in <a href="#simple-example" class="sectionRef"></a>. The only difference is that because the four skipped rows began with the default <a>comment prefix</a>, the table itself now has four <code>rdfs:comment</code> annotations, with the values:
+	            With these flags in operation, parsing this file results in an <a>annotated tabular data model</a> of a single <a>table</a> <var>T</var> with five columns and two rows which is largely the same as that created from the original simple example described in <a href="#simple-example" class="sectionRef"></a>. There are three differences.
+            </p>
+            <p>
+              First, because the four skipped rows began with the default <a>comment prefix</a>, the table itself now has four <code>rdfs:comment</code> annotations, with the values:
 	          </p>
 	          <ol>
 	            <li><code> publisher	City of Palo Alto</code></li>
@@ -1051,6 +1060,35 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 	            <li><code>name	GID	on_street	species	trim_cycle	inventory_date</code></li>
 	            <li><code>datatype	string	string	string	string	date:M/D/YYYY</code></li>
 	          </ol>
+            <p>
+              Second, because the first column has been skipped, the <a title="column source number">source number</a> of each of the columns is offset by one:
+            </p>
+            <table style="width: 100%; text-align: left">
+              <thead>
+                <tr><th rowspan="2">id</th><th colspan="3">core properties</th><th>annotations</th></tr>
+                <tr><th>table</th><th>number</th><th>source number</th><th>cells</th><th><code>title</code></th></tr>
+              </thead>
+              <tbody>
+                <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td>2</td><td><var>C1.1</var>, <var>C2.1</var></td><td><code>GID</code></td></tr>
+                <tr><td><var>C2</var></td><td><var>T</var></td><td>2</td><td>3</td><td><var>C1.2</var>, <var>C2.2</var></td><td><code>On Street</code></td></tr>
+                <tr><td><var>C3</var></td><td><var>T</var></td><td>3</td><td>4</td><td><var>C1.3</var>, <var>C2.3</var></td><td><code>Species</code></td></tr>
+                <tr><td><var>C4</var></td><td><var>T</var></td><td>4</td><td>5</td><td><var>C1.4</var>, <var>C2.4</var></td><td><code>Trim Cycle</code></td></tr>
+                <tr><td><var>C5</var></td><td><var>T</var></td><td>5</td><td>6</td><td><var>C1.5</var>, <var>C2.5</var></td><td><code>Inventory Date</code></td></tr>
+              </tbody>
+            </table>
+            <p>
+              Finally, because four additional rows have been skipped, the <a title="row source number">source number</a> of each of the rows is offset by five from the <a>row number</a> (the four skipped rows plus the single header row):
+            </p>
+            <table style="width: 100%; text-align: left">
+              <thead>
+                <tr><th rowspan="2">id</th><th colspan="3">core properties</th></tr>
+                <tr><th>table</th><th>number</th><th>source number</th><th>cells</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><var>R1</var></td><td><var>T</var></td><td>1</td><td>6</td><td><var>C1.1</var>, <var>C1.2</var>, <var>C1.3</var>, <var>C1.4</var>, <var>C1.5</var></td></tr>
+                <tr><td><var>R2</var></td><td><var>T</var></td><td>2</td><td>7</td><td><var>C2.1</var>, <var>C2.2</var>, <var>C2.3</var>, <var>C2.4</var>, <var>C2.5</var></td></tr>
+              </tbody>
+            </table>
 	        </section>
 	        <section>
 	        	<h5>Recognising Tabular Data Formats</h5>
@@ -1081,14 +1119,14 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 	          <table style="width: 100%; text-align: left">
 	            <thead>
 	              <tr><th rowspan="2">id</th><th colspan="3">core properties</th><th colspan="2">annotations</th></tr>
-	              <tr><th>table</th><th>number</th><th>cells</th><th><code>name</code></th><th><code>title</code></th></tr>
+	              <tr><th>table</th><th>number</th><th>source number</th><th>cells</th><th><code>name</code></th><th><code>title</code></th></tr>
 	            </thead>
 	            <tbody>
-	              <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td><var>C1.1</var>, <var>C2.1</var></td><td><code>GID</code></td><td><code>GID</code></td></tr>
-	              <tr><td><var>C2</var></td><td><var>T</var></td><td>2</td><td><var>C1.2</var>, <var>C2.2</var></td><td><code>on_street</code></td><td><code>On Street</code></td></tr>
-	              <tr><td><var>C3</var></td><td><var>T</var></td><td>3</td><td><var>C1.3</var>, <var>C2.3</var></td><td><code>species</code></td><td><code>Species</code></td></tr>
-	              <tr><td><var>C4</var></td><td><var>T</var></td><td>4</td><td><var>C1.4</var>, <var>C2.4</var></td><td><code>trim_cycle</code></td><td><code>Trim Cycle</code></td></tr>
-	              <tr><td><var>C5</var></td><td><var>T</var></td><td>5</td><td><var>C1.5</var>, <var>C2.5</var></td><td><code>inventory_date</code></td><td><code>Inventory Date</code></td></tr>
+	              <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td>2</td><td><var>C1.1</var>, <var>C2.1</var></td><td><code>GID</code></td><td><code>GID</code></td></tr>
+	              <tr><td><var>C2</var></td><td><var>T</var></td><td>2</td><td>3</td><td><var>C1.2</var>, <var>C2.2</var></td><td><code>on_street</code></td><td><code>On Street</code></td></tr>
+	              <tr><td><var>C3</var></td><td><var>T</var></td><td>3</td><td>4</td><td><var>C1.3</var>, <var>C2.3</var></td><td><code>species</code></td><td><code>Species</code></td></tr>
+	              <tr><td><var>C4</var></td><td><var>T</var></td><td>4</td><td>5</td><td><var>C1.4</var>, <var>C2.4</var></td><td><code>trim_cycle</code></td><td><code>Trim Cycle</code></td></tr>
+	              <tr><td><var>C5</var></td><td><var>T</var></td><td>5</td><td>6</td><td><var>C1.5</var>, <var>C2.5</var></td><td><code>inventory_date</code></td><td><code>Inventory Date</code></td></tr>
 	            </tbody>
 	          </table>
 	          <p>
@@ -1097,11 +1135,11 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 	          <table style="width: 100%; text-align: left">
 	            <thead>
 	              <tr><th rowspan="2">id</th><th colspan="3">core properties</th></tr>
-	              <tr><th>table</th><th>number</th><th>cells</th></tr>
+	              <tr><th>table</th><th>number</th><th>source number</th><th>cells</th></tr>
 	            </thead>
 	            <tbody>
-	              <tr><td><var>R1</var></td><td><var>T</var></td><td>1</td><td><var>C1.1</var>, <var>C1.2</var>, <var>C1.3</var>, <var>C1.4</var>, <var>C1.5</var></td></tr>
-	              <tr><td><var>R2</var></td><td><var>T</var></td><td>2</td><td><var>C2.1</var>, <var>C2.2</var>, <var>C2.3</var>, <var>C2.4</var>, <var>C2.5</var></td></tr>
+	              <tr><td><var>R1</var></td><td><var>T</var></td><td>1</td><td>6</td><td><var>C1.1</var>, <var>C1.2</var>, <var>C1.3</var>, <var>C1.4</var>, <var>C1.5</var></td></tr>
+	              <tr><td><var>R2</var></td><td><var>T</var></td><td>2</td><td>7</td><td><var>C2.1</var>, <var>C2.2</var>, <var>C2.3</var>, <var>C2.4</var>, <var>C2.5</var></td></tr>
 	            </tbody>
 	          </table>
 	          <p>
