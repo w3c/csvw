@@ -193,7 +193,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         Implementations may fulfil one or more of these functions. In particular, <a>Converters</a> may or may not act as a <a title="Validators">Validator</a> (perhaps through the setting of a flag), and check the data that they are converting to ensure that it is complant with the schema. If a Converter does not also act as a Validator it may produce invalid output.
       </p>
       <p>
-        The <a href="http://www.w3.org/TR/tabular-data-model/">Model for Tabular Data and Metadata on the Web</a> specification defines an <a href="http://www.w3.org/TR/tabular-data-model/#annotated-tabular-data-model">Annotated Tabular Data Model</a> in which tables, columns, rows and cells can be annotated with properties and values, and a <a href="http://www.w3.org/TR/tabular-data-model/#grouped-tabular-data-model">Grouped Tabular Data Model</a> in which a group of tables is annotated. That specification also describes <a href="http://www.w3.org/TR/tabular-data-model/#locating-metadata">how to locate metadata</a> about a given CSV file.
+        The <a href="http://www.w3.org/TR/tabular-data-model/">Model for Tabular Data and Metadata on the Web</a> specification defines an <a href="http://www.w3.org/TR/tabular-data-model/#annotated-tabular-data-model">Annotated Tabular Data Model</a> in which tables, columns, rows and cells can be annotated with annotations, and a <a href="http://www.w3.org/TR/tabular-data-model/#grouped-tabular-data-model">Grouped Tabular Data Model</a> in which a group of tables is annotated. That specification also describes <a href="http://www.w3.org/TR/tabular-data-model/#locating-metadata">how to locate metadata</a> about a given CSV file.
       </p>
       <p>
         This document defines the format and structure of metadata documents, and how these are interpreted to create an Annotated Tabular Data Model. It also defines how to validate tabular data based on some of these annotations. This metadata can be expressed as an RDF graph. However, all applications that conform to this specification (including validators and applications that read or convert tabular data) MUST read the JSON-based format described in this document.
@@ -202,7 +202,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
     <section>
       <h2>Annotating Tables</h2>
       <p>
-        The metadata defined in this specification is used to annotate an existing <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-table">annotated table</a> or <a href="http://www.w3.org/TR/tabular-data-model/#dfn-group-of-tables">group of tables</a>, as defined in [[!tabular-data-model]]. Annotated tables form the basis for all further processing, such as validating or displaying the tables. All compliant applications MUST create annotated tables based on the algorithm defined here.
+        The metadata defined in this specification is used to provide annotations on an <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-table">annotated table</a> or <a href="http://www.w3.org/TR/tabular-data-model/#dfn-group-of-tables">group of tables</a>, as defined in [[!tabular-data-model]]. Annotated tables form the basis for all further processing, such as validating, converting or displaying the tables. All compliant applications MUST create annotated tables based on the algorithm defined here.
       </p>
       <p>
         Metadata documents contain descriptions of groups of tables, tables, columns, rows, cells and regions which are used to create annotations on a tabular data model. There are two types of description objects:
@@ -215,7 +215,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         The description objects themselves contain a number of properties. These are:
       </p>
       <ul>
-        <li>properties that are used to identify the table or column that the annotations should appear on; these match up to core properties on those objects in the annotated tabular data model defined in [[!tabular-data-model]] and do not form additional annotations</li>
+        <li>properties that are used to identify the table or column that the annotations should appear on; these match up to core annotations on those objects in the annotated tabular data model defined in [[!tabular-data-model]] and do not create new annotations</li>
         <li>properties that map directly to annotations that appear directly on the group of tables, table, column, row or cell whose description they appear on, such as the <code>name</code> of a column or the <code>dc:provenance</code> of a table</li>
         <li>properties that are specified on the description of a group of tables, table or column to provide a default value for the equivalent annotation on each of the cells that appear in that table or column</li>
       </ul>
@@ -232,13 +232,13 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 }
       </pre>
       <p>
-        the properties <code>name</code>, <code>title</code> and <code>dc:description</code> are <a title="direct annotation">direct annotations</a> that become <code>name</code>, <code>title</code> and <code>dc:description</code> properties on the column in the data model. The <code>datatype</code> and <code>format</code> properties are <a title="inherited property">inherited properties</a> that become <code>datatype</code> and <code>format</code> properties on the cells within the column.
+        the properties <code>name</code>, <code>title</code> and <code>dc:description</code> are <a title="direct property">direct properties</a> that become <code>name</code>, <code>title</code> and <code>dc:description</code> properties on the column in the data model. The <code>datatype</code> and <code>format</code> properties are <a title="inherited property">inherited properties</a> that become <code>datatype</code> and <code>format</code> properties on the cells within the column.
       </p>
       <p>The <dfn>property value</dfn> of an annotation is that defined in the metadata, unless otherwise noted.</p>
       <section>
-        <h3>Direct Annotations</h3>
+        <h3>Direct Properties</h3>
         <p>
-          <dfn title="direct annotation">Direct annotations</dfn> are properties on the description object for a given table, column, row or cell which map directly to properties on the described table, column, row or cell. The name of the annotation is the same as the name of the property on the annotation. The value of the annotation is the same as the value of the property on the description object.
+          <dfn title="direct property">Direct properties</dfn> are properties on the description object for a given table group, table, column, row or cell which map directly to annotations on the described table group, table, column, row or cell. The name of the annotation is the same as the name of the property. The value of the annotation is the same as the <a>property value</a>.
         </p>
       </section>
       <section>
@@ -257,7 +257,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
     <section>
       <h2>Metadata Format</h2>
       <p>
-        This section defines a set of properties and permitted values for annotating tabular data, and how these annotations should be interpreted by applications.
+        This section defines a set of properties and permitted values for annotating tabular data, and how these properties should be interpreted by applications.
       </p>
       <p>
         A metadata document is a JSON document which holds an object at the top level. This object is a <a>description object</a> of either a table group or a single table. A <dfn>description object</dfn> is a JSON object that describes a component of the tabular data model (a table group, a table, a column, a row or a cell) and has one or more properties are mapped into properties on that component. 
@@ -687,16 +687,10 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <dt id="table-notes"><code>notes</code></dt>
             <dd>
               <p>
-                An <a>object property</a> that provides an array of objects representing annotations. This specification does not place any constraints on the structure of these objects.
+                An <a>object property</a> that provides an array of objects representing arbitrary annotations on the annotated tabular data model. This specification does not place any constraints on the structure of these objects.
               </p>
               <p class="note">
                 The <a href="http://www.w3.org/annotation/">Web Annotation Working Group</a> is developing a vocabulary for expressing annotations. In future versions of this specification, we anticipate referencing that vocabulary.
-              </p>
-              <p class="issue" data-number="70">
-                Should there be column or level notes as well?
-              </p>
-              <p class="issue" data-number="71">
-                The Annotation Model can indeed become very complex.
               </p>
             </dd>
             <dt id="table-title"><code>title</code></dt>
@@ -1357,7 +1351,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             </p>
           </dd>
         </dl>
-        <p>The <a>property value</a> of an <a>inherited property</a> is the first value, if any, found by looking in the current annotation object through all of its containing objects: a <a>inherited property</a> defined in a <a>column description</a> takes precidence of one defined in a <a>schema description</a>, which in turn takes precidence of one defined in a <a>table description</a>, which in turn takes precidence of one defined in a <a>table group description</a>.</p>
+        <p>The <a>property value</a> of an <a>inherited property</a> is the first value, if any, found by looking in the current description object through all of its containing objects: a <a>inherited property</a> defined in a <a>column description</a> takes precedence of one defined in a <a>schema description</a>, which in turn takes precedence of one defined in a <a>table description</a>, which in turn takes precedence of one defined in a <a>table group description</a>.</p>
       </section>
       <section>
         <h2>Datatypes</h2>
