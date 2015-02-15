@@ -311,16 +311,16 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               <dt><code>_column</code></dt>
               <dd><code>_column</code> is set to the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column-number" class="externalDFN">column number</a> of the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column" class="externalDFN">column</a> from the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-table" class="externalDFN">annotated table</a>that is currently being processed</dd>
               <dt><code>_sourceColumn</code></dt>
-              <dd><code>_sourceColumn</code> is set to the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column-source-number">source number</a> of the column that is currently being processed; this varies form <a>_column</a> by <a href="http://www.w3.org/TR/tabular-data-model/#dfn-skip-columns">skip columns</a> and <a href="http://www.w3.org/TR/tabular-data-model/#dfn-header-columns">header columns</a></dd>
+              <dd><code>_sourceColumn</code> is set to the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column-source-number">source number</a> of the column that is currently being processed; this varies form <code>_column</code> by <a href="http://www.w3.org/TR/tabular-data-model/#dfn-skip-columns">skip columns</a> and <a href="http://www.w3.org/TR/tabular-data-model/#dfn-header-columns">header columns</a></dd>
               <dt><code>_row</code></dt>
               <dd><code>_row</code> is set to the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row-number" class="externalDFN">row number</a> of the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row" class="externalDFN">row</a> from the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-table" class="externalDFN">annotated table</a>that is currently being processed</dd>
               <dt><code>_sourceRow</code></dt>
-              <dd><code>_sourceRow</code> is set to the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row-source-number">source number</a> of the row that is currently being processed; this varies form <a>_row</a> by <a href="http://www.w3.org/TR/tabular-data-model/#dfn-skip-rows">skip rows</a> and <a href="http://www.w3.org/TR/tabular-data-model/#dfn-header-rows">header rows</a></dd>
+              <dd><code>_sourceRow</code> is set to the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row-source-number">source number</a> of the row that is currently being processed; this varies form <code>_row</code> by <a href="http://www.w3.org/TR/tabular-data-model/#dfn-skip-rows">skip rows</a> and <a href="http://www.w3.org/TR/tabular-data-model/#dfn-header-rows">header rows</a></dd>
               <dt><code>_name</code></dt>
               <dd><code>_name</code> is set to the URI decoded <a>property value</a> of the <code>name</code> property on the cell column that is currently being processed. <span class="note">URI decoding is necessary as <code>name</code> may have been encoded if taken from <code>title</code>; this prevents double URI encoding.</span>
               </dd>
               <dt>column names</dt>
-              <dd>a variable is set for each column within the schema; the name of the variable is the name of the column and the value is the canonical representation of the value of the cell in that column in the row that is currently being processed</dd>
+              <dd>a variable is set for each column within the schema; the name of the variable is the <a href="#cell-name"><code>name</code></a> of the column and the value is the canonical representation of the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">value</a> of the cell in that column in the row that is currently being processed</dd>
             </dl>
             <p>The <a>property value</a> of a <a>URI template property</a> is only available while converting tables as defined in <a href="#converting-tables" class="sectionRef"></a>. The value is the result of applying the template against the cell in that column in the row that is currently being processed, resolving against the <a>base URL</a> as a <a>link property</a> if the metadata value is explicit in the metadata, or the default value if defined; otherwise there is no value.</p>
             <p>
@@ -621,9 +621,6 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               <p>
                 An <a>atomic property</a> that MUST have a single string value that is one of <code>"rtl"</code>, <code>"ltr"</code> or <code>"default"</code>. Indicates whether the tables in the group should be displayed with the first column on the right, on the left, or based on the first character in the table that has a specific direction. See <a href="#bidirectional-tables" class="sectionRef"></a> for more details.
               </p>
-              <p class="issue" data-number="51">
-                This should be a defined controlled vocabulary in JSON-LD, so that the values map on to URIs in the RDF version rather than strings. We invite comment on how to configure the JSON-LD context to enable these values to be interpreted in this way.
-              </p>
             </dd>
             <dt id="table-group-dialect"><code>dialect</code></dt>
             <dd>
@@ -652,18 +649,12 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           <p>
             The description MAY contain <a title="inherited property">inherited properties</a> to describe cells within the tables.
           </p>
-          <p class="issue" data-number="22">
-            This issue relates to the use of type vs datatype as a column property. (This issue seems moot now that neither are included.)
-          </p>
         </section>
       </section>
       <section>
         <h3>Tables</h3>
         <p>
           A <dfn>table description</dfn> is a JSON object that describes a table within a CSV file.
-        </p>
-        <p class="issue" data-number="50">
-          A CSV file might not be the same as the table that it contains. For example, a given CSV file might contain two tables (in different regions of the CSV file), or might contain a table that isn't positioned at the top left of the CSV file. We invite comment about whether we should assume that pre-processing is used to extract tables where there isn't a 1:1 correspondence between CSV file and table, or not.
         </p>
         <section>
           <h4>Required Properties</h4>
@@ -938,9 +929,6 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <p>
               <a>Validators</a> MUST check that each row has a unique combination of cells in the indicated columns. For example, if <code>primaryKey</code> is set to <code>["familyName", "givenName"]</code> then every row must have a unique value for the combination of the <code>familyName</code> and <code>givenName</code> columns.
             </p>
-            <p class="issue" data-number="66">
-              Composite primary keys and foreign key references.
-            </p>
           </dd>
           <dt id="table-foreignKeys"><code>foreignKeys</code></dt>
           <dd>
@@ -1194,10 +1182,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
               <p>The <a>property value</a> of <code>name</code> is that defined within metadata, if it exists. Otherwise, it is the first value from the <a>property value</a> of <code>title</code> having the same language tag as <a>default language</a> or <code>und</code> of not specified percent-encoded as necessary to conform to the syntactic requirements described below, as a string without language, if any. Otherwise, it is the string <code>"_col.<em>[N]</em>"</code> where <code><em>[N]</em></code> is the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column-number">column number</a>.
               </p>
               <p>
-                For ease of reference within <a title="URI template property">URI template properties</a>, column names MUST consist only of alphanumeric characters, underscores, or <code>"."</code> (<code>[a-zA-Z0-9][a-zA-Z0-9_\.]*</code>). Names beginning with <code>"_"</code> or  <code>"."</code> are reserved by this specification and MUST NOT be used.
-              </p>
-              <p class="issue" data-number="53">
-                We invite comment on what the syntactic limitations should be on column names to make them most useful when used as the basis of conversion into other formats, bearing in mind that different target languages such as JSON, RDF and XML have different syntactic limitations and common naming conventions.
+                For ease of reference within <a title="URI template property">URI template properties</a>, column names MUST consist only of alphanumeric characters, underscores, or <code>"."</code> (matching <code>[a-zA-Z0-9][a-zA-Z0-9_\.]*</code>). Names beginning with <code>"_"</code> are reserved by this specification and MUST NOT be used.
               </p>
               <p>
                 During validation, if there is no <code>title</code> property and the column already has a <code>title</code> annotation then a validator MUST issue a warning if the existing <code>title</code> annotation does not match the <code>name</code> specified in the column description.
@@ -1245,10 +1230,10 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           Cell descriptions may override <a title="inherited property">inherited properties</a>, as described in <a href="#annotating-tables" class="sectionRef"></a>. It is good practice to define these properties on columns, so that all cells within a given column are handled in the same way, or on tables if appropriate. These properties are:
         </p>
         <dl>
-          <dt id="cell-empty-value"><code>null</code></dt>
+          <dt id="cell-null"><code>null</code></dt>
           <dd>
             <p>
-              An <a>atomic property</a> giving the string or strings used for null values. If not specified, the default for this is the empty string.
+              An <a>atomic property</a> giving the string or strings used for null values within the data. If the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-string-value" class="externalDFN">string value</a> of the cell is equal to this value, the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">cell value</a> is <code>null</code>. If not specified, the default for the <code>null</code> property is the empty string.
             </p>
           </dd>
           <dt id="cell-language"><code>lang</code></dt>
@@ -1272,7 +1257,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           <dt id="cell-default"><code>default</code></dt>
           <dd>
             <p>
-              An <a>atomic property</a> holding a single string that provides a default string value for the cell in cases where the original string value is a <code>null</code> values. This default value MAY be used when converting the table into other formats.
+              An <a>atomic property</a> holding a single string that is used to create a default <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">value</a> for the cell in cases where the original <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-string-value" class="externalDFN">string value</a> is an empty string. This default value MAY be used when converting the table into other formats, or when the table is displayed. If not specified, the default for the <code>default</code> property is the empty string, <code>""</code>.
             </p>
           </dd>
           <dt id="cell-format"><code>format</code></dt>
@@ -1450,7 +1435,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
       <section>
         <h2>Parsing cells</h2>
         <p>
-          Unlike many other data formats, tabular data is designed to be read by humans. For that reason, it's common for data to be represented within tabular data in a human-readable way. The <a href="#cell-valueUrl"><code>valueUrl</code></a>, <code>separator</code> and <code>format</code> properties indicates the format used to represent data within the table. This is used:
+          Unlike many other data formats, tabular data is designed to be read by humans. For that reason, it's common for data to be represented within tabular data in a human-readable way. The <a href="#cell-null"><code>null</code></a>, <a href="#cell-default"><code>default</code></a>, <a href="#cell-separator"><code>separator</code></a>, <a href="#cell-datatype"><code>datatype</code></a>, <a href="#cell-format"><code>format</code></a> and <a href="#cell-lang"><code>lang</code></a> properties provide the information needed to parse the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-string-value" class="externalDFN">string value</a> of a cell into its (semantic) <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">value</a>. This is used:
         </p>
         <ul>
           <li>by <strong>validators</strong> to check that the data in the table is in the expected format</li>
@@ -1462,25 +1447,87 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
         <p>
           The process of parsing the string value of a cell into a single value or a list of values is as follows:
         </p>
-        <p class="issue" data-number="61">
-          What should be the mapping of an empty cell? 
-        </p>
         <ol>
-          <li>unless the <code>datatype</code> is <code>string</code> or <code>anySimpleType</code> or <code>any</code>, strip leading and trailing whitespace from the value</li>
-          <li>if the value is the same as the <code>null</code> value, then the value is <code>null</code></li>
-          <li>if the <code>separator</code> property is not <code>null</code>, create a list of values by splitting the string at the character specified by the <code>separator</code> property</li>
-          <li>validate the value(s) against the <code>format</code>, if one is specified, as described below; raise an error if any of the values do not match the specified format</li>
-          <li>if the cell column has a <a href="#cell-valueUrl"><code>valueUrl</code></a> the value(s) are the result of applying the URI template to each value as described in <a>URI template property</a>.</cite></li>
-          <li>parse the value(s) using the <code>format</code>, as described below</li>
+          <li>unless the <a href="#cell-datatype"><code>datatype</code></a> is <code>string</code> or <code>anySimpleType</code> or <code>any</code>, strip leading and trailing whitespace from the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-string-value" class="externalDFN">string value</a></li>
+          <li>if the resulting string is an empty string, apply the remaining steps to the string given by the <a href="#cell-default"><code>default</code></a> property</li>
+          <li>if the <a href="#cell-separator"><code>separator</code></a> property is not <code>null</code> and the resulting string is an empty string, the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">cell value</a> is an empty list</li>
+          <li>if the <a href="#cell-separator"><code>separator</code></a> property is not <code>null</code>, the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">cell value</a> is a list of values created by:
+            <ol>
+              <li>splitting the resulting string at the character specified by the <code>separator</code> property</li>
+              <li>unless the <a href="#cell-datatype"><code>datatype</code></a> is <code>string</code> or <code>anySimpleType</code> or <code>any</code>, stripping leading and trailing whitespace from these strings</li>
+              <li>applying the remaining steps to each of the strings in turn</li>
+            </ol>
+          </li>
+          <li>if the string is the same as the value of the <a href="#cell-null"><code>null</code></a> property, then the resulting value is <code>null</code></li>
+          <li>validate the string based on the datatype, using the <a href="#cell-format"><code>format</code></a> property if one is specified, as described below, and then against the constraints described in <a href="#datatypes" class="sectionRef"></a>; if there are any errors, add them to the list of <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-errors" class="externalDFN">errors</a> for the cell; the resulting value is typed as a <code>string</code> with the language provided by the <a href="#cell-lang"><code>lang</code></a> property</li>
+          <li>otherwise, if there are no errors, parse the string using the <a href="#cell-format"><code>format</code></a> if one is specified, as described below; the resulting value is typed according to the <a href="#cell-datatype"><code>datatype</code></a> and if the <code>datatype</code> is <code>string</code> it has the language provided by the <a href="#cell-lang"><code>lang</code></a> property</li>
         </ol>
-        <section>
-          <h3>Formats for strings</h3>
+        <section class="informative">
+          <h3>Parsing examples</h3>
           <p>
-            If the <code>datatype</code> is a string type, the <code>format</code> property provides a regular expression for the string values, in the syntax and processed as defined by [[!ECMASCRIPT]].
+            When no metadata is available, the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">value</a> of a cell is the same as its <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-string-value" class="externalDFN">string value</a>. For example, a cell with a string value of <code>"99"</code> would similarly have the (semantic) value <code>"99"</code>.
           </p>
-          <p class="note">
-            Authors are encouraged to be conservative in the regular expressions that they use, sticking to the basic features of regular expressions that are likely to be supported across implementations.
+          <p>
+            If a <a href="#cell-datatype"><code>datatype</code></a> is provided for the cell, that is used to create a (semantic) value for the cell. For example, if the metadata contains:
           </p>
+          <pre class="example highlight">
+"datatype": "integer"
+          </pre>
+          <p>
+            for the cell with the string value <code>"99"</code> then the value of that cell will be the integer <code>99</code>. A cell whose string value was not a valid integer (such as <code>"one"</code> or <code>"1.0"</code>) would be assigned that string value as its (semantic) value, but also have a validation error listed in its <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-errors" class="externalDFN">errors</a> annotation.
+          </p>
+          <p>
+            Sometimes data uses special codes to indicate unknown or null values. For example, a particular column might contain a number that is expected to be between <code>1</code> and <code>10</code>, with the string <code>99</code> used in the original tabular data file to indicate a null value. The metadata for such a column would include:
+          </p>
+          <pre class="example highlight">
+"datatype": "integer",
+"minimum": 1,
+"maximum": 10,
+"null": "99"
+          </pre>
+          <p>
+            In this case, a cell with a string value of <code>"5"</code> would have the (semantic) value of the integer <code>5</code>; a cell with a string value of <code>"99"</code> would have the value <code>null</code>.
+          </p>
+          <p>
+            Similarly, a cell may be assigned a default value if the string value for the cell is empty. A configuration such as:
+          </p>
+          <pre class="example highlight">
+"datatype": "integer",
+"minimum": 1,
+"maximum": 10,
+"default": "5"
+          </pre>
+          <p>
+            In this case, a cell whose string value is <code>""</code> would be assigned the value of the integer <code>5</code>. A cell whose string value contains whitespace, such as a single tab character, would also be assigned the value of the integer <code>5</code>: when the datatype is something other than <code>string</code> or <code>anySimpleType</code> or <code>any</code>, leading and trailing whitespace is stripped from string values before the remainder of the processing is carried out.
+          </p>
+          <p>
+            Cells can contain sequences of values. For example, a cell might have the string value <code>"1 5 7.0"</code>. In this case, the separator is a space character. The appropriate configuration would be:
+          </p>
+          <pre class="example highlight">
+"datatype": "integer",
+"minimum": 1,
+"maximum": 10,
+"default": "5",
+"separator": " "
+          </pre>
+          <p>
+            and this would mean that the cell's value would be an array containing two integers and a string: <code>[1, 5, "7.0"]</code>. The final value of the array is a string because it is not a valid integer; the cell's <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-errors" class="externalDFN">errors</a> annotation will also contain a validation error.
+          </p>
+          <p>
+            Also, with this configuration, if the string value of the cell were <code>""</code> (ie it was an empty cell) the value of the cell would be an empty list.
+          </p>
+          <p>
+            Using the <code>valueUrl</code> property, a transformation can create a URL representation of a value, including if the value has a <a href="#cell-datatype"><code>datatype</code></a> and <a href="#cell-separator"><code>separator</code></a> (presuming the cell name is <code>values</code>):
+          </p>
+          <pre class="example highlight">
+"datatype": "integer",
+"minimum": 1,
+"maximum": 10,
+"default": "5",
+"separator": " ",
+"valueUrl": "{?values}"
+          </pre>
+          <p>After exampansion, the resulting <code>valueUrl</code> would be <code>?values=1,5,7.0</code>.</p>
         </section>
         <section>
           <h3>Formats for numeric types</h3>
@@ -1488,10 +1535,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             It is not uncommon for numbers within tabular data to be formatted for human consumption, which may involve using commas for decimal points, grouping digits in the number using commas, or adding currency symbols or percent signs to the number.
           </p>
           <p>
-            If the <code>datatype</code> is a numeric type, the <code>format</code> property indicates the expected format for that number. <a>Validators</a> MUST check that the numbers in the column adhere to the specified format. <a>Converters</a> MUST use the <code>format</code> property to parse the number when mapping it into a suitable type in the target format of the conversion.
-          </p>
-          <p>
-            When the <code>datatype</code> is a numeric type, the <code>format</code> property's value MUST be either a single string or an object with one or more of the properties:
+            If the <a href="#cell-datatype"><code>datatype</code></a> is a numeric type, the <a href="#cell-format"><code>format</code></a> property indicates the expected format for that number. Its value MUST be either a single string or an object with one or more of the properties:
           </p>
           <dl>
             <dt id="decimalChar"><code>decimalChar</code></dt>
@@ -1502,10 +1546,10 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             <dd>A regular expression string, in the syntax and interpreted as defined by [[!ECMASCRIPT]].</dd>
           </dl>
           <p>
-            If the <code>format</code> property is a single string, this is interpreted in the same way as if it were an object with a <code>pattern</code> property whose value is that string.
+            If the <a href="#cell-format"><code>format</code></a> property is a single string, this is interpreted in the same way as if it were an object with a <code>pattern</code> property whose value is that string.
           </p>
           <p>
-            When parsing a value against this format specification, implementations MUST recognise and parse numbers that consist of:
+            When parsing the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-string-value" class="externalDFN">string value</a> of a cell against this format specification, implementations MUST recognise and parse numbers that consist of:
           </p>
           <ol>
             <li>an optional <code>+</code> or <code>-</code> sign</li>
@@ -1516,10 +1560,17 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             <li>followed by an optional percent (<code>%</code>) or per-mille (<code>&permil;</code>) sign</li>
           </ol>
           <p>
-            Implementations MUST raise an error if a number does not meet the format defined above, or if it contains two consecutive <a href="#groupChar"><code>groupChar</code></a> characters, or if it does not match the regular expression defined in the <a href="#number-pattern"><code>pattern</code></a> property, if there is one.
+            Implementations MUST add a validation error to the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-errors" class="externalDFN">errors</a> annotation for the cell if the string being parsed:
           </p>
+          <ul>
+            <li>does not meet the numeric format defined above</li>
+            <li>contains two consecutive <a href="#groupChar"><code>groupChar</code></a> characters</li>
+            <li>does not match the regular expression defined in the <a href="#number-pattern"><code>pattern</code></a> property, if there is one</li>
+            <li>contains the <a href="#decimalChar"><code>decimalChar</code></a>, if the <a href="#cell-datatype"><code>datatype</code></a> is <code>integer</code> or one of its sub-values</li>
+            <li>contains an exponent, if the <a href="#cell-datatype"><code>datatype</code></a> is <code>decimal</code> or one of its sub-values</li>
+          </ul>
           <p>
-            <a>Converters</a> MUST use the sign, exponent, percent and per-mille signs when interpreting the number ready for conversion. For example, the string value <code>-25%</code> must be interpreted as <code>-0.25</code> and the string value <code>1E6</code> as <code>1000000</code>.
+            Implementations MUST use the sign, exponent, percent and per-mille signs when parsing the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-string-value" class="externalDFN">string value</a> of a cell to provide the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">value</a> of the cell. For example, the string value <code>"-25%"</code> must be interpreted as <code>-0.25</code> and the string value <code>"1E6"</code> as <code>1000000</code>.
           </p>
         </section>
         <section>
@@ -1528,9 +1579,11 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             Boolean values may be represented in many ways aside from the standard <code>1</code> and <code>0</code> or <code>true</code> and <code>false</code>.
           </p>
           <p>
-            If the <code>datatype</code> is <code>boolean</code>, the <code>format</code> property provides the true and false values expected, separated by <code>|</code>. For example if <code>format</code> is <code>Y|N</code> then cells must hold either <code>Y</code> or <code>N</code> with <code>Y</code> meaning <code>true</code> and <code>N</code> meaning <code>false</code>.
+            If the <a href="#cell-datatype"><code>datatype</code></a> for a cell is <code>boolean</code>, the <a href="#cell-format"><code>format</code></a> property provides the true and false values expected, separated by <code>|</code>. For example if <code>format</code> is <code>Y|N</code> then cells must hold either <code>Y</code> or <code>N</code> with <code>Y</code> meaning <code>true</code> and <code>N</code> meaning <code>false</code>.
           </p>
-          <p>The <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">cell value</a> is one or more <code>true</code> or <code>false</code> values.</p>
+          <p>
+            The resulting <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">cell value</a> will be one or more boolean <code>true</code> or <code>false</code> values.
+          </p>
         </section>
         <section>
           <h3>Formats for dates and times</h3>
@@ -1538,7 +1591,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             Dates and times are commonly represented in tabular data in formats other than those defined in [[!xmlschema-2]].
           </p>
           <p>
-            If the <code>datatype</code> is a date or time type, the <code>format</code> property indicates the expected format for that date or time. <a>Validators</a> MUST check that the dates or times in the column adhere to the specified format. <a>Converters</a> MUST use the <code>format</code> property to parse the date or time when mapping it into a suitable type in the target language of the conversion.
+            If the <a href="#cell-datatype"><code>datatype</code></a> is a date or time type, the <a href="#cell-format"><code>format</code></a> property indicates the expected format for that date or time.
           </p>
           <p>
             The following date formats MUST be recognised by implementations:
@@ -1573,24 +1626,34 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           </p>
           <ul>
             <li><code>yyyy-MM-ddTHH:mm:ss</code> eg <code>2015-03-15T15:02:37</code></li>
-            <li>Any of the date formats above, followed by a space, followed by any of the time formats above, eg <code>M/d/yyyy HH:mm</code> for <code>3/22/2015 15:02</code> or <code>dd.MM.yyyy HH:mm:ss</code> for <code>22.03.2015 15:02:37</code></li>
+            <li>any of the date formats above, followed by a space, followed by any of the time formats above, eg <code>M/d/yyyy HH:mm</code> for <code>3/22/2015 15:02</code> or <code>dd.MM.yyyy HH:mm:ss</code> for <code>22.03.2015 15:02:37</code></li>
           </ul>
           <p>
             The supported date and time formats listed above are expressed in terms of the <a href="http://www.unicode.org/reports/tr35/tr35-dates.html#Date_Field_Symbol_Table">date field symbols</a> defined in [[!UAX35]] and should be interpreted by implementations as defined in that specification.
           </p>
-          <p>The <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">cell value</a> is one or more dates or times extracted using the <code>format</code>.</p>
+          <p>
+            The <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">cell value</a> will one or more dates/time values extracted using the <code>format</code>.
+          </p>
           <p class="note">
             For simplicity, this version of this standard does not support abbreviated or full month or day names, or double digit years. Future versions of this standard may support other date and time formats, or general purpose date/time pattern strings. Authors of schemas SHOULD use appropriate regular expressions, along with the <code>string</code> datatype, for dates and times that use a format other than that specified here.
-          </p>
-          <p class="issue" data-number="65">
-            Register of recognised date-time picture string formats.
           </p>
         </section>
         <section>
           <h3>Formats for durations</h3>
           <p>
             Durations MUST be formatted and interpreted as defined in [[!xmlschema-2]], using the [[!ISO8601]] format <code>P<var>n</var>Y<var>n</var>M<var>n</var>DT<var>n</var>H<var>n</var>M<var>n</var>S</code>.
-          <p>The <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">cell value</a> is one or more durations extracted using the <code>format</code>.</p>
+          </p>
+          <p>
+            The <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">cell value</a> will be one or more durations extracted using the <code>format</code>.</p>
+          </p>
+        </section>
+        <section>
+          <h3>Formats for other types</h3>
+          <p>
+            If the <a href="#cell-datatype"><code>datatype</code></a> is not numeric, <code>boolean</code>, a date/time type or a duration type, the <code>format</code> property provides a regular expression for the string values, in the syntax and processed as defined by [[!ECMASCRIPT]].
+          </p>
+          <p class="note">
+            Authors are encouraged to be conservative in the regular expressions that they use, sticking to the basic features of regular expressions that are likely to be supported across implementations.
           </p>
         </section>
       </section>
