@@ -697,6 +697,10 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <dd><p>As defined for <a href="#table-group-templates">table groups</a>.</p></dd>
             <dt id="table-dialect"><code>dialect</code></dt>
             <dd><p>As defined for <a href="#table-group-dialect">table groups</a>.</p></dd>
+            <dt id="table-suppressOutput"><code>suppressOutput</code></dt>
+            <dd>
+              <p>A boolean <a>atomic property</a>. If <code>true</code>, suppresses any output that would be generated when converting this table.</p>
+            </dd>
             <dt id="table-ld-id"><code>@id</code></dt>
             <dd>
               <p>If included, <code>@id</code> identifies the <a>table description</a>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.</p>
@@ -1169,9 +1173,6 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
         <p>
           A <dfn>column description</dfn> is a simple JSON object that describes a single column. The description provides additional human-readable documentation for a column, as well as additional information that may be used to validate the cells within the column, create a user interface for data entry, or inform conversion into other formats.
         </p>
-        <p class="issue" data-number="64">
-          Should there be a way to suppress columns?
-        </p>
         <section>
           <h4>Optional Properties</h4>
           <dl>
@@ -1199,7 +1200,13 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
               </p>
             </dd>
             <dt id="column-required"><code>required</code></dt>
-           <dd><p>A boolean <a>atomic property</a> taking a single value which indicates whether every cell within the column must have a non-null value. Its <a>property value</a> is that defined in metadata, or <code>false</code> otherwise.</p></dd>
+            <dd>
+              <p>A boolean <a>atomic property</a> taking a single value which indicates whether every cell within the column must have a non-null value. Its <a>property value</a> is that defined in metadata, or <code>false</code> otherwise.</p>
+            </dd>
+            <dt id="column-suppressOutput"><code>suppressOutput</code></dt>
+            <dd>
+              <p>A boolean <a>atomic property</a>. If <code>true</code>, suppresses any output that would be generated when converting cells in this column.</p>
+            </dd>
             <dt id="column-virtual"><code>virtual</code></dt>
             <dd>
               <p>A boolean <a>atomic property</a> taking a single value which indicates whether the column is a <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column-virtual" class="externalDFN">virtual column</a> not present in the original source. If present, a virtual column MUST appear after all other non-virtual column definitions.</p>
@@ -1624,17 +1631,16 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             Also, with this configuration, if the string value of the cell were <code>""</code> (ie it was an empty cell) the value of the cell would be an empty list.
           </p>
           <p>
-            Using the <code>valueUrl</code> property, a transformation can create a URL representation of a value, including if the value has a <a href="#cell-datatype"><code>datatype</code></a> and <a href="#cell-separator"><code>separator</code></a> (presuming the cell name is <code>values</code>):
+            A <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">cell value</a> can be inserted into a URL created using a <a>URI template property</a> such as <code>valueUrl</code>. For example, if a cell with the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-string-value" class="externalDFN">string value</a> <code>"1 5 7.0"</code> were in a column named <code>values</code>, defined with:
           </p>
           <pre class="example highlight">
-"datatype": "integer",
-"minimum": 1,
-"maximum": 10,
-"default": "5",
+"datatype": "decimal",
 "separator": " ",
 "valueUrl": "{?values}"
           </pre>
-          <p>After exampansion, the resulting <code>valueUrl</code> would be <code>?values=1,5,7.0</code>.</p>
+          <p>
+            then after expansion of the URI template, the resulting <code>valueUrl</code> would be <code>?values=1.0,5.0,7.0</code>. The canonical representations of the decimal values are used within the URL.
+          </p>
         </section>
         <section>
           <h3>Formats for numeric types</h3>
