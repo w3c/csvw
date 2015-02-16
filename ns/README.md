@@ -1,6 +1,6 @@
 # Updating vocabulary
 
-Vocabulary definitions are managed in \_vocab.xlsx. Add or change entries within this file and export as CSV to \_vocab.csv. Regenerate csvw.ttl, csvw.jsonld, and index.html as described below.
+Vocabulary definitions are managed in \_vocab.csv. Add or change entries within this file. Regenerate csvw.ttl, csvw.jsonld, and index.html as described below.
 
 # Building index.html, csvw.jsonld and csvw.ttl
 
