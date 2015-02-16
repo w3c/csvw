@@ -133,16 +133,13 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       </p>
       <pre class="example highlight">
 {
-  "@context": ["http://www.w3.org/ns/csvw", {"@language": "en"}],
   "url": "tree-ops.csv",
+  "@context": ["http://www.w3.org/ns/csvw", {"@language": "en"}],
   "dc:title": "Tree Operations",
   "dc:keywords": ["tree", "street", "maintenance"],
-  "dc:publisher": [{
-    "schema:name": "Example Municipality",
-    "schema:url": "http://example.org"
-  }],
-  "dc:license": "http://opendefinition.org/licenses/cc-by/",
-  "dc:modified": "2010-12-31",
+  "dc:publisher": "Example Municipality",
+  "dc:license": {"@id": "http://opendefinition.org/licenses/cc-by/"},
+  "dc:modified": {"@value": "2010-12-31", "@type": "xsd:date"},
   "tableSchema": {
     "columns": [{
       "name": "GID",
@@ -175,7 +172,8 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       "datatype": "date",
       "format": "M/D/YYYY"
     }],
-    "primaryKey": "GID"
+    "primaryKey": "GID",
+    "aboutUrl": "#gid-{GID}"
   }
 }
       </pre>
@@ -986,7 +984,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         <p>
           The description MAY contain <a title="inherited property">inherited properties</a> to describe cells within the table.
         </p>
-        <section>
+        <section class="informative">
           <h4>Examples</h4>
           <section>
             <h5>Foreign Key Reference Between Resources</h5>
@@ -1222,6 +1220,65 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           <p>
             The description MAY contain <a title="inherited property">inherited properties</a> to describe cells within the column.
           </p>
+          <section class="informative">
+            <h3>Examples</h3>
+            <section>
+              <h4>Use of <code>virtual</code> columns</h4>
+              <p>Virtual columns are useful when data needs to be added as part of an output transformation that doesn't exist in the source file. This may be to add type information to a column, or to relate different columns having different <code>aboutUrl</code>. For example, the <code>http://example.org/tree-ops.csv</code> example used in the introduction can be extended by providing an additional metadata file <code>http://example.org/tree-ops-relations.json</code>:</p>
+              <pre class="example highlight">
+{
+  "url": "tree-ops.csv",
+  "@context": ["http://www.w3.org/ns/csvw", {"@language": "en"}],
+  "tableSchema": {
+    "columns": [{
+      "name": "GID",
+      "title": "GID",
+      "datatype": "string",
+      "propertyUrl": "schema:url",
+      "valueUrl": "#gid-{GID}"
+    }, {
+      "name": "on_street",
+      "title": "On Street",
+      "datatype": "string",
+      "aboutUrl": "#location-{GID}",
+      "propertyUrl": "schema:streetAddress"
+    }, {
+      "name": "species",
+      "title": "Species",
+      "datatype": "string",
+      "propertyUrl": "schema:name"
+    }, {
+      "name": "trim_cycle",
+      "title": "Trim Cycle",
+      "datatype": "string"
+    }, {
+      "name": "inventory_date",
+      "title": "Inventory Date",
+      "datatype": "date",
+      "format": "M/D/YYYY",
+      "aboutUrl": "#event-{inventory_date}",
+      "propertyUrl": "schema:startDate"
+    }, {
+      "propertyUrl": "schema:event",
+      "valueUrl": "#event-{inventory_date}",
+      "virtual": true
+    }, {
+      "propertyUrl": "schema:location",
+      "valueUrl": "#location-{GID}",
+      "virtual": true
+    }, {
+      "aboutUrl": "#location-{GID}",
+      "propertyUrl": "rdf:type",
+      "valueUrl": "schema:PostalAddress",
+      "virtual": true
+    }],
+    "aboutUrl": "#gid-{GID}"
+  }
+}
+              </pre>
+              <p>This metadata creates a relationship model between data in each column by different combinations of <code>aboutUrl</code>, <code>propertyUrl</code>, and <code>valueUrl</code> on existing tables, and defining new <em>virtual</em> columns to supply additional information. In this case, the <code>on_street</code> and <code>inventory_date</code> values are split into separate entities, each having their own <code>aboutUrl</code>. New <em>virtual</em> columns are defined to provide a location type, and to relate the main row entity to the event and location associated with it.</p>
+            </section>
+          </section>
         </section>
       </section>
       <section>
