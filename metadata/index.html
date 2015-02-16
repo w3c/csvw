@@ -133,16 +133,16 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       </p>
       <pre class="example highlight">
 {
-  "@context": ["http://www.w3.org/ns/csvw", {"@language": "en"}],
   "url": "tree-ops.csv",
+  "@context": ["http://www.w3.org/ns/csvw", {"@language": "en"}],
   "dc:title": "Tree Operations",
   "dc:keywords": ["tree", "street", "maintenance"],
-  "dc:publisher": [{
+  "dc:publisher": {
     "schema:name": "Example Municipality",
     "schema:url": "http://example.org"
-  }],
-  "dc:license": "http://opendefinition.org/licenses/cc-by/",
-  "dc:modified": "2010-12-31",
+  },
+  "dc:license": {"@id": "http://opendefinition.org/licenses/cc-by/"},
+  "dc:modified": {"@value": "2010-12-31", "@type": "xsd:date"},
   "tableSchema": {
     "columns": [{
       "name": "GID",
@@ -175,7 +175,8 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       "datatype": "date",
       "format": "M/D/YYYY"
     }],
-    "primaryKey": "GID"
+    "primaryKey": "GID",
+    "aboutUrl": "#gid-{GID}"
   }
 }
       </pre>
@@ -990,7 +991,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         <p>
           The description MAY contain <a title="inherited property">inherited properties</a> to describe cells within the table.
         </p>
-        <section>
+        <section class="informative">
           <h4>Examples</h4>
           <section>
             <h5>Foreign Key Reference Between Resources</h5>
@@ -1206,6 +1207,12 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             <dd>
               <p>A boolean <a>atomic property</a>. If <code>true</code>, suppresses any output that would be generated when converting cells in this column.</p>
             </dd>
+            <dt id="column-virtual"><code>virtual</code></dt>
+            <dd>
+              <p>A boolean <a>atomic property</a> taking a single value which indicates whether the column is a <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column-virtual" class="externalDFN">virtual column</a> not present in the original source. If present, a virtual column MUST appear after all other non-virtual column definitions.</p>
+              <p class="note">Virtual columns are useful for inserting cells with default values into an <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-table" class="externalDFN">annotated table</a> to control the results of conversions.</p>
+              <p class="issue" data-number="179">We invite comment on whether <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column-virtual" class="externalDFN">virtual columns</a> are useful enough to include in the final recommendation in spite of the added complexity.</p>
+            </dd>
             <dt id="column-ld-id"><code>@id</code></dt>
             <dd>
               <p>If included, <code>@id</code> identifies the <a>column description</a>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.</p>
@@ -1223,6 +1230,112 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           <p>
             The description MAY contain <a title="inherited property">inherited properties</a> to describe cells within the column.
           </p>
+          <section class="informative">
+            <h3>Examples</h3>
+            <section>
+              <h4>Use of <code>virtual</code> columns</h4>
+              <p>
+                Virtual columns are useful when data needs to be added as part of an output transformation that doesn't exist in the source file. This may be to add type information to a column, or to relate different columns having different <code>aboutUrl</code>. For example, the <code>http://example.org/tree-ops.csv</code> example used in the introduction can be used with the following metadata:
+              </p>
+              <pre class="example highlight">
+{
+  "url": "tree-ops.csv",
+  "@context": ["http://www.w3.org/ns/csvw", {"@language": "en"}],
+  "tableSchema": {
+    "aboutUrl": "#gid-{GID}",
+    "columns": [{
+      "name": "GID",
+      "title": "GID",
+      "datatype": "string",
+      "propertyUrl": "schema:url",
+      "valueUrl": "#gid-{GID}"
+    }, {
+      "name": "on_street",
+      "title": "On Street",
+      "datatype": "string",
+      "aboutUrl": "#location-{GID}",
+      "propertyUrl": "schema:streetAddress"
+    }, {
+      "name": "species",
+      "title": "Species",
+      "datatype": "string",
+      "propertyUrl": "schema:name"
+    }, {
+      "name": "trim_cycle",
+      "title": "Trim Cycle",
+      "datatype": "string"
+    }, {
+      "name": "inventory_date",
+      "title": "Inventory Date",
+      "datatype": "date",
+      "format": "M/D/YYYY",
+      "aboutUrl": "#event-{inventory_date}",
+      "propertyUrl": "schema:startDate"
+    }, {
+      "propertyUrl": "schema:event",
+      "valueUrl": "#event-{inventory_date}",
+      "virtual": true
+    }, {
+      "aboutUrl": "#event-{inventory_date}",
+      "propertyUrl": "rdf:type",
+      "valueUrl": "schema:Event",
+      "virtual": true
+    }, {
+      "propertyUrl": "schema:location",
+      "valueUrl": "#location-{GID}",
+      "virtual": true
+    }, {
+      "aboutUrl": "#location-{GID}",
+      "propertyUrl": "rdf:type",
+      "valueUrl": "schema:PostalAddress",
+      "virtual": true
+    }]
+  }
+}
+              </pre>
+              <p>
+                This metadata creates a relationship model between data in each column by different combinations of <code>aboutUrl</code>, <code>propertyUrl</code>, and <code>valueUrl</code> on existing columns, and defining new <em>virtual</em> columns to supply additional information. In this case, the <code>on_street</code> and <code>inventory_date</code> values are split into separate entities, each having their own <code>aboutUrl</code>. New <em>virtual</em> columns are defined to provide a location type, and to relate the main row entity to the event and location associated with it. The result of converting the table to RDF would include the following, for the first row, with the contributions from the virtual columns highlighted:
+              </p>
+              <pre class="example highlight">
+&lt;#gid-1&gt;
+  schema:url &lt;#gid-1&gt; ;
+  schema:name "Celtis australis" ;
+  :trim_cycle "Large Tree Routine Prune" ;
+  <b>schema:event &lt;#event-2010-10-18&gt; ;</b>
+  <b>schema:location &lt;#location-1&gt; ;</b>
+  .
+
+<b>&lt;#event-1&gt; a schema:Event ;</b>
+  schema:startDate "2010-10-18"^^xsd:date ;
+  .
+
+<b>&lt;#location-1&gt; a schema:PostalAddress ;</b>
+  schema:streetAddress "ADDISON AV" ;
+  .
+              </pre>
+              <p>
+                The JSON would similarly include, again with the contributions from the virtual columns highlighted:
+              </p>
+              <pre class="example highlight">
+{
+  "@id": "#gid-1",
+  "schema:url": "#gid-1",
+  "schema:name": "Celtis australis",
+  "trim_cycle": "Large Tree Routine Prune",
+  <b>"schema:event": {
+    "@id": "#event-1",</b>
+    <b>"@type": "schema:Event",</b>
+    "schema:startDate": "2010-10-18"
+  },
+  <b>"schema:location": {
+    "@id": "#location-1",</b>
+    <b>"@type": "schema:PostalAddress",</b>
+    "schema:streetAddress": "ADDISON AV"
+  }
+}
+              </pre>
+            </section>
+          </section>
         </section>
       </section>
       <section>
@@ -1440,12 +1553,12 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           <li>when <strong>inputting</strong> data, to turn entered values into representations in a consistent format</li>
         </ul>
         <p>
-          After parsing, the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">cell value</a> can be:
-        </p>
-        <ul>
-          <li><code>null</code></li>
-          <li>a single value with an associated optional datatype or language</li>
-          <li>a sequence of such values</li>
+          After parsing, the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">cell value</a> can be:    
+        </p>   
+        <ul>   
+          <li><code>null</code></li>   
+          <li>a single value with an associated optional datatype or language</li>   
+          <li>a sequence of such values</li>   
         </ul>
         <p>
           The process of parsing the string value of a cell into a single value or a list of values is as follows:
@@ -1977,9 +2090,6 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
         </p>
         <p>
           Conversion specifications MUST define a default mapping from an annotated table that lacks any annotations (ie that is equivalent to an un-annotated table).
-        </p>
-        <p>
-          Conversion specifications MUST use the <a>property value</a> of the <a href="#cell-aboutUrl"><code>aboutUrl</code></a> of the first cell column, if any, as the basis for identifying a mapped row.
         </p>
         <p>
           Conversion specifications MUST use the <a>property value</a> of the <a href="#cell-propertyUrl"><code>propertyUrl</code></a> of a column as the basis for naming machine-readable fields in the target format, such as the name of the equivalent element or attribute in XML, property in JSON or property URI in RDF.
