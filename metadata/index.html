@@ -914,7 +914,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           A <dfn>tableSchema</dfn> is a definition of a tabular format that may be common to multiple tables. For example, multiple tables from different sources may have the same columns and be designed such that they can be aggregated together.
         </p>
         <p>
-          A <dfn>schema description</dfn> is a JSON object that encodes the information about a schema. All the properties of a schema description are optional.
+          A <dfn>schema description</dfn> is a JSON object that encodes the information about a <dfn>schema</dfn>, which describes the structure of a table. All the properties of a schema description are optional.
         </p>
         <dl>
           <dt id="schema-columns"><code>columns</code></dt>
@@ -926,14 +926,25 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               The <a href="#column-name"><code>name</code></a> properties of the column descriptions MUST be unique within a given table description.
             </p>
             <p>
-              When an array of column descriptions B is <a>merged</a> into an original array of column descriptions A, each column description within B is combined into the original array A by:
+              When an array of column descriptions B is <a>merged</a> into an original array of column descriptions A, each column description within B is combined into the original array A, based on the index of each column description, as follows:
             </p>
-            <ul>
-              <li>if there is a column description at the same index within A and that column description has the same <code>name</code>, the column description from B is <a>merged</a> into the matching column description in A</li>
-              <li>otherwise, if there is a column description at the same index within A with a <code>title</code> that is also a <code>title</code> in A, considering the language of each <code>title</code> where <code>und</code> matches a value in any language, the column description from B is imported into the matching column description in A.</li>
-              <li>otherwise, if there is no column description at the same index within A, then the column description is taken from that index of B</li>
-              <li>otherwise, the column description is ignored. A validator MUST issue a warning if such a column description is encountered.</li>
-            </ul>
+            <ol>
+              <li>if the column descriptions at the same index within A and B have the same <a href="#column-name"><code>name</code></a>, the column description from B is <a>merged</a> into the matching column description in A</li>
+              <li>otherwise, if the column descriptions at the same index within A and B have matching <a href="#column-title"><code>title</code></a>s (both titles are the same and either they both have the same language or one of them has an undefined language (<code>und</code>)), the column description from B is <a>merged</a> into the matching column description in A</li>
+              <li>otherwise, if there are column descriptions at the same index within A and B, a validator MUST generate an error</li>
+              <li>otherwise, if at a given index there is no column description within A, but there is a column description within B, then:
+                <ol>
+                  <li>if the <a href="#column-virtual"><code>virtual</code></a> property of the column description in B is <code>true</code>, then the column description is appended to A</li>
+                  <li>otherwise, a validator MUST generate an error</li>
+                </ol>
+              </li>
+              <li>otherwise, if at a given index there is no column description within B, but there is a column description within A, then:
+                <ol>
+                  <li>if the <a href="#column-virtual"><code>virtual</code></a> property of the column description in A is <code>true</code>, then the column description is retained</li>
+                  <li>otherwise, a validator MUST generate an error</li>
+                </ol>
+              </li>
+            </ol>
           </dd>
           <dt id="table-primaryKey"><code>primaryKey</code></dt>
           <dd>
@@ -1218,9 +1229,9 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             </dd>
             <dt id="column-virtual"><code>virtual</code></dt>
             <dd>
-              <p>A boolean <a>atomic property</a> taking a single value which indicates whether the column is a <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column-virtual" class="externalDFN">virtual column</a> not present in the original source. If present, a virtual column MUST appear after all other non-virtual column definitions.</p>
+              <p>A boolean <a>atomic property</a> taking a single value which indicates whether the column is a <a href="http://www.w3.org/TR/tabular-data-model/#dfn-virtual-column" class="externalDFN">virtual column</a> not present in the original source. If present, a virtual column MUST appear after all other non-virtual column definitions.</p>
               <p class="note">Virtual columns are useful for inserting cells with default values into an <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-table" class="externalDFN">annotated table</a> to control the results of conversions.</p>
-              <p class="issue" data-number="179">We invite comment on whether <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column-virtual" class="externalDFN">virtual columns</a> are useful enough to include in the final recommendation in spite of the added complexity.</p>
+              <p class="issue" data-number="179">We invite comment on whether <a href="http://www.w3.org/TR/tabular-data-model/#dfn-virtual-column" class="externalDFN">virtual columns</a> are useful enough to include in the final recommendation in spite of the added complexity.</p>
             </dd>
             <dt id="column-ld-id"><code>@id</code></dt>
             <dd>
@@ -1303,7 +1314,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
 }
               </pre>
               <p>
-                This metadata creates a relationship model between data in each column by different combinations of <code>aboutUrl</code>, <code>propertyUrl</code>, and <code>valueUrl</code> on existing columns, and defining new <em>virtual</em> columns to supply additional information. In this case, the <code>on_street</code> and <code>inventory_date</code> values are split into separate entities, each having their own <code>aboutUrl</code>. New <em>virtual</em> columns are defined to provide a location type, and to relate the main row entity to the event and location associated with it. The result of converting the table to RDF would include the following, for the first row, with the contributions from the virtual columns highlighted:
+                This metadata creates a relationship model between data in each column by different combinations of <code>aboutUrl</code>, <code>propertyUrl</code>, and <code>valueUrl</code> on existing columns, and defining new <em>virtual</em> columns to supply additional information. In this case, the <code>on_street</code> and <code>inventory_date</code> values are split into separate entities, each having their own <code>aboutUrl</code>. New <em>virtual</em> columns are defined to provide a location type, and to relate the main row entity to the event and location associated with it. The result of converting the table to RDF would include the following, for the first row, with the contributions from the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-virtual-column" class="externalDFN">virtual columns</a> highlighted:
               </p>
               <pre class="example highlight">
 &lt;#gid-1&gt;
@@ -1323,7 +1334,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
   .
               </pre>
               <p>
-                The JSON would similarly include, again with the contributions from the virtual columns highlighted:
+                The JSON would similarly include, again with the contributions from the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-virtual-column" class="externalDFN">virtual columns</a> highlighted:
               </p>
               <pre class="example highlight">
 {
@@ -2088,6 +2099,9 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
       </section>
       <section>
         <h3>Validating Tables</h3>
+        <p>
+          <a>Validators</a> test whether given tabular data files adhere to the structure defined within a <a>schema</a>.
+        </p>
         <p class="issue">
           We intend to detail how to validate groups of tabular data files against metadata. This would be normative: compliant validators would have to report the errors and warnings that we define. We invite comment on whether this is a useful thing to specify.
         </p>
