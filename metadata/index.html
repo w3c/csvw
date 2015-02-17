@@ -651,12 +651,12 @@ CSVW,foaf:Project,table;data;conversion
             <dd>
               <p>An <a>object property</a> that provides a single <a>dialect description</a>. If provided, <code>dialect</code> provides hints to processors about how to parse the referenced files for to create tabular data models for the tables in the group. This may be provided as an embedded object or as a URL reference. See <a href="#dialect-descriptions" class="sectionRef"></a> for more details.</p>
             </dd>
-            <dt id="table-group-templates"><code>templates</code></dt>
+            <dt id="table-group-conversions"><code>conversions</code></dt>
             <dd>
-              <p>An <a>array property</a> of <a title="template specification">template specifications</a> that provide mechanisms to transform the tabular data into other formats. See <a href="#template-specifications" class="sectionRef"></a> for more details. When an array of template specifications B is <a>merged</a> into an original array of template specifications A, each template specification within B is combined into the original array A by:</p>
+              <p>An <a>array property</a> of <a title="conversion specification">conversion specifications</a> that provide mechanisms to transform the tabular data into other formats. See <a href="#conversion-specifications" class="sectionRef"></a> for more details. When an array of conversion specifications B is <a>merged</a> into an original array of conversion specifications A, each conversion specification within B is combined into the original array A by:</p>
               <ul>
-                <li>if there is a template specification with the same <code>url</code>, <code>targetFormat</code> and <code>templateFormat</code> in A, the template specification from B is <a>merged</a> into the matching template specification in A</li>
-                <li>otherwise, the template specification from B is appended to the array of template specifications A</li>
+                <li>if there is a conversion specification with the same <code>url</code>, <code>targetFormat</code> and <code>scriptFormat</code> in A, the conversion specification from B is <a>merged</a> into the matching conversion specification in A</li>
+                <li>otherwise, the conversion specification from B is appended to the array of conversion specifications A</li>
               </ul>
             </dd>
             <dt id="table-group-ld-id"><code>@id</code></dt>
@@ -841,23 +841,23 @@ CSVW,foaf:Project,table;data;conversion
         </div>
       </section>
       <section>
-        <h3>Template Specifications</h3>
+        <h3>Conversion Specifications</h3>
         <p>
-          A <dfn>template specification</dfn> is a definition of how tabular data can be transformed into another format. It has the following properties:
+          A <dfn>conversion specification</dfn> is a definition of how tabular data can be transformed into another format using a script or template. It has the following properties:
         </p>
         <section>
           <h4>Required Properties</h4>
           <p>
-            Template specifications MUST have the following properties:
+            Conversion specifications MUST have the following properties:
           </p>
           <dl>
-            <dt id="template-url"><code>url</code></dt>
+            <dt id="conversion-url"><code>url</code></dt>
             <dd>
               <p>
-                A <a>link property</a> giving the single URL of the file that the template is held in, relative to the location of the metadata document.
+                A <a>link property</a> giving the single URL of the file that the script or template is held in, relative to the location of the metadata document.
               </p>
             </dd>
-            <dt id="template-targetFormat"><code>targetFormat</code></dt>
+            <dt id="conversion-targetFormat"><code>targetFormat</code></dt>
             <dd>
               <p>
                 A <a>link property</a> giving the single URL for the format that will be created through the transformation. If one has been defined, this should be a URL for a media type, in the form <code>http://www.iana.org/assignments/media-types/<var>media-type</var></code> such as <code>http://www.iana.org/assignments/media-types/text/calendar</code>. Otherwise, it can be any URL that describes the target format.
@@ -866,13 +866,13 @@ CSVW,foaf:Project,table;data;conversion
                 The <code>targetFormat</code> URL is intended as an informative identifier for the target format, and applications SHOULD NOT access the URL.
               </p>
             </dd>
-            <dt id="template-templateFormat"><code>templateFormat</code></dt>
+            <dt id="conversion-templateFormat"><code>scriptFormat</code></dt>
             <dd>
               <p>
-                A <a>link property</a> giving the single URL for the format that is used by the template. If one has been defined, this should be a URL for a media type, in the form <code>http://www.iana.org/assignments/media-types/<var>media-type</var></code> such as <code>http://www.iana.org/assignments/media-types/application/javascript</code>. Otherwise, it can be any URL that describes the template format.
+                A <a>link property</a> giving the single URL for the format that is used by the script or template. If one has been defined, this should be a URL for a media type, in the form <code>http://www.iana.org/assignments/media-types/<var>media-type</var></code> such as <code>http://www.iana.org/assignments/media-types/application/javascript</code>. Otherwise, it can be any URL that describes the script or template format.
               </p>
               <p class="note">
-                The <code>templateFormat</code> URL is intended as an informative identifier for the template format, and applications SHOULD NOT access the URL. The template formats that an application supports are implementation defined.
+                The <code>scriptFormat</code> URL is intended as an informative identifier for the template format, and applications SHOULD NOT access the URL. The template formats that an application supports are implementation defined.
               </p>
             </dd>
           </dl>
@@ -880,41 +880,41 @@ CSVW,foaf:Project,table;data;conversion
         <section>
           <h4>Optional Properties</h4>
           <p>
-            Template specifications MAY have the following properties:
+            Conversion specifications MAY have the following properties:
           </p>
           <dl>
-            <dt id="template-title"><code>title</code></dt>
+            <dt id="conversion-title"><code>title</code></dt>
             <dd>
               <p>A <a>natural language property</a> that describes the format that will be generated from the transformation. This is useful if the target format is a generic format (such as <code>application/json</code>) and the transformation is creating a specific profile of that format.</p>
             </dd>
-            <dt id="template-source"><code>source</code></dt>
+            <dt id="conversion-source"><code>source</code></dt>
             <dd>
-              <p>A single string <a>atomic property</a> that provides, if included, the format to which the tabular data should be transformed prior to the transformation using the template. If the value is <code>"json"</code>, the tabular data should first be transformed first to JSON based on the simple mapping defined in <a href="http://www.w3.org/TR/csv2json/">Generating JSON from Tabular Data on the Web</a>. If the value is <code>"rdf"</code>, it should similarly first be transformed to to an RDF graph based on the simple mapping defined in <a href="http://www.w3.org/TR/csv2rdf/">Generating RDF from Tabular Data on the Web</a>. If the <code>source</code> property is missing or <code>null</code> then the source of the transformation is the annotated tabular data model.
+              <p>A single string <a>atomic property</a> that provides, if included, the format to which the tabular data should be transformed prior to the transformation using the script or template. If the value is <code>json</code>, the tabular data should first be transformed first to JSON based on the simple mapping defined in <a href="http://www.w3.org/TR/csv2json/">Generating JSON from Tabular Data on the Web</a>. If the value is <code>rdf</code>, it should similarly first be transformed to to an RDF graph based on the simple mapping defined in <a href="http://www.w3.org/TR/csv2rdf/">Generating RDF from Tabular Data on the Web</a>. If the <code>source</code> property is missing or <code>null</code> then the source of the transformation is the annotated tabular data model. No other values are valid.
             </dd>
-            <dt id="template-ld-id"><code>@id</code></dt>
+            <dt id="conversion-ld-id"><code>@id</code></dt>
             <dd>
-              <p>If included, <code>@id</code> identifies the <a>template specification</a>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.</p>
+              <p>If included, <code>@id</code> identifies the <a>conversion specification</a>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.</p>
             </dd>
-            <dt id="template-ld-type"><code>@type</code></dt>
+            <dt id="conversion-ld-type"><code>@type</code></dt>
             <dd>
               <p>If included, <code>@type</code> MUST be set to <code>"Template"</code>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.</p>
             </dd>
           </dl>
           <p>
-            The template specification MAY contain any <a title="common property">common properties</a> to provide extra metadata about the transformation.
+            The conversion specification MAY contain any <a title="common property">common properties</a> to provide extra metadata about the transformation.
           </p>
         </section>
         <section>
           <h4>Example</h4>
           <p>
-            The following template specification will enable a processor that supports it to generate an iCalendar document using a <a href="https://mustache.github.io/">Mustache template</a> based on the JSON created from the simple mapping to JSON.
+            The following conversion specification will enable a processor that supports it to generate an iCalendar document using a <a href="https://mustache.github.io/">Mustache template</a> based on the JSON created from the simple mapping to JSON.
           </p>
           <pre class="example">
 {
   "url": "templates/ical.txt",
   "title": "iCalendar",
   "targetFormat": "http://www.iana.org/assignments/media-types/text/calendar",
-  "templateFormat": "https://mustache.github.io/",
+  "scriptFormat": "https://mustache.github.io/",
   "source": "json"
 } 
           </pre>
@@ -2154,7 +2154,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
         Third party metadata provided about a tabular data file (such as a CSV file) may rename or ignore headers, or exclude rows or columns, which may lead to data being misinterpreted by applications that process it.
       </p>
       <p>
-        <a title="template specification">Template specifications</a> are a possible security risk as they enable the creators of metadata to reference arbitrary code that may be executed to convert tabular data into other formats. Implementations should run this arbitrary code in a sandboxed environment to reduce the security risk.
+        <a title="conversion specification">Conversion specifications</a> are a possible security risk as they enable the creators of metadata to reference arbitrary code that may be executed to convert tabular data into other formats. Implementations should run this arbitrary code in a sandboxed environment to reduce the security risk.
       </p>
     </section>
     <section class="appendix">
