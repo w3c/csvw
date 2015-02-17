@@ -975,37 +975,37 @@ CSVW,foaf:Project,table;data;conversion
             <dl>
               <dt id="foreign-key-columns"><code>columns</code></dt>
               <dd>
-                <p>A <a>column reference property</a> that holds either a single reference to a column description object within this schema, or an array of references.</p>
+                <p>A <a>column reference property</a> that holds either a single reference to a column description object within this schema, or an array of references. These form the <dfn>referencing columns</dfn> for the <a>foreign key definition</a>.</p>
               </dd>
               <dt id="foreign-key-reference"><code>reference</code></dt>
               <dd>
                 <p>
-                  An object with the properties:
+                  An object that identifies a <dfn>referenced table</dfn> and a set of <dfn>referenced columns</dfn> within that table. Its properties are:
                 </p>
                 <dl>
                   <dt id="foreign-key-reference-resource"><code>resource</code></dt>
                   <dd>
-                    <p>A <a>link property</a> holding a URL that is the identifier for a specific resource that is being referenced. If this is present then <code>tableSchema</code> MUST NOT be present. The metadata document MUST contain a description of the resource.</p>
+                    <p>A <a>link property</a> holding a URL that is the identifier for a specific table that is being referenced. If this property is present then <code>tableSchema</code> MUST NOT be present. The <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table-group" class="externalDFN">table group</a> MUST contain a <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table" class="externalDFN">table</a> whose <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table-url" class="externalDFN">url</a> annotation is identical to the <a>property value</a> of this property. That table is the <a>referenced table</a>.</p>
                   </dd>
                   <dt id="foreign-key-reference-schema"><code>tableSchema</code></dt>
                   <dd>
-                    <p>A <a>link property</a> holding a URL that is the identifier for a schema that is being referenced. If this is present then <code>resource</code> MUST NOT be present. The metadata document that forms the basis of processing MUST contain a description of a resource that uses the referenced schema, and there MUST NOT be more than one such resource.</p>
+                    <p>A <a>link property</a> holding a URL that is the identifier for a <a>schema</a> that is being referenced. If this property is present then <code>resource</code> MUST NOT be present. The <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table-group" class="externalDFN">table group</a> MUST contain a <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table" class="externalDFN">table</a> whose <a href="#table-tableSchema"><code>tableSchema</code></a> <a>property value</a> is identical to the <a>property value</a> of this property, and there MUST NOT be more than one such table. That table is the <a>referenced table</a>.</p>
                   </dd>
                   <dt id="foreign-key-reference-columns"><code>columns</code></dt>
                   <dd>
-                    <p>A <a>column reference property</a> that holds either a single reference to a column description object within this schema, or an array of references.</p>
+                    <p>A <a>column reference property</a> that holds either a single reference to a column description object within the <a href="#table-tableSchema"><code>tableSchema</code></a> of the <a>referenced table</a>, or an array of such references.</p>
                   </dd>
                 </dl>
+                <p>
+                  <a>Validators</a> MUST check that, for each row, the combination of cells in the <a>referencing columns</a> reference a unique row within the <a>referenced table</a> through a combination of cells in the <a>referenced columns</a>. For examples, see <a href="#foreign-key-reference-between-resources" class="sectionRef"></a> and <a href="#foreign-key-reference-between-schemas" class="sectionRef"></a>.
+                </p>
               </dd>
             </dl>
             <p class="note">
-              It is not required for the resource or schema referenced from a <code>foreignKeys</code> property to have a similarly defined <code>primaryKey</code>.
+              It is not required for the resource or schema referenced from a <code>foreignKeys</code> property to have a similarly defined <code>primaryKey</code>, though frequently it will.
             </p>
             <p>
               When an array of foreign key definitions B is <a>merged</a> into an original array of foreign key definitions A, each foreign key definition within B which does not appear within A is appended to the original array A.
-            </p>
-            <p class="issue" data-number="16">
-              The cross reference between files should be limited to files from one publisher - else they are just web links with no guarantee of whether the target of the link exists which 'foreign key' might imply.
             </p>
           </dd>
           <dt id="schema-ld-id"><code>@id</code></dt>
@@ -1067,7 +1067,6 @@ AF,1962,9989846
         "name": "name",
         "datatype": "string"
       }],
-      "aboutUrl": "http://example.org/countries.csv{#countryCode}",
       "primaryKey": "countryCode"
     }
   }, {
@@ -1095,7 +1094,7 @@ AF,1962,9989846
 }
             </pre>
             <p>
-              When the population data in <code>country_slice.csv</code> is processed (displayed or mapped into another format), a link can be made from the content of the <code>countryRef</code> column based on the <code>aboutUrl</code> for <code>country.csv</code>. For example, if the <code>countryRef</code> column (the value of <code>columns</code> in the <code>foreignKeys</code> object) in <code>country_slice.csv</code> contains the value <code>UK</code> then the processor will use that value to populate the <code>countryCode</code> variable (the value of <code>reference.columns</code> in the <code>foreignKeys</code> object) when interpreting the <code>aboutUrl</code> for <code>country.csv</code>, and create the URL <code>http://example.org/countries.csv#UK</code>. The processor does not need to retrieve <code>http://example.org/countries.csv</code> or check that the value <code>UK</code> appears within the <code>countryCode</code> column to create this link: it is created purely based on the <code>aboutUrl</code> in the description of the referenced resource.
+              When the population data in <code>country_slice.csv</code> is validated, the validator must check that every <code>countryRef</code> within <code>country_slice.csv</code> has a matching <code>countryCode</code> within <code>countries.csv</code>.
             </p>
           </section>
           <section>
@@ -1139,12 +1138,12 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
 }
             </pre>
             <p>
-              The schema for the senior role CSV (at <code>http://example.org/schema/senior-roles.json</code>) is as follows; it includes a foreign key reference to itself:
+              The schema for the senior role CSV (at <code>http://example.org/schema/senior-roles.json</code>) is as follows:
             </p>
             <pre class="example highlight">
 {
+  "@id": "http://example.org/schema/senior-roles.json",
   "@context": "http://www.w3.org/ns/csvw",
-  "url": "http://example.org/schema/senior-roles.json",
   "columns": [{
     "name": "ref",
     "title": "Post Unique Reference"
@@ -1161,15 +1160,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
     "name": "reportsTo",
     "title": "Reports to Senior Post"
   }],
-  "primaryKey": "ref",
-  "aboutUrl": "#post-{ref}",
-  "foreignKeys": [{
-    "columns": "reportsTo",
-    "reference": {
-      "tableSchema": "http://example.org/schema/senior-roles.json",
-      "columns": "ref"
-    }
-  }]
+  "primaryKey": "ref"
 }
             </pre>
             <p>
@@ -1177,8 +1168,8 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             </p>
             <pre class="example highlight">
 {
+  "@id": "http://example.org/schema/junior-roles.json",
   "@context": "http://www.w3.org/ns/csvw",
-  "url": "http://example.org/schema/junior-roles.json",
   "columns": [{
     "name": "reportsTo",
     "title": "Reporting Senior Post"
@@ -1195,7 +1186,44 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
 }
             </pre>
             <p>
-              In the first line of <code>HEFCE_organogram_junior_data_31032011.csv</code>, the <code>reportsTo</code> (<code>Reporting Senior Post</code>) column contains the value <code>90284</code>. When creating a link from that column, the <code>aboutUrl</code> defined within the schema at <code>http://example.org/schema/senior-roles.json</code> is used to generate a URL by expanding the variable reference for <code>ref</code> based on the value from the <code>reportsTo</code> column. This gives the relative URL <code>#post-90284</code> which is then resolved against the base URL of the resource that uses the <code>senior-roles.json</code> schema within the original metadata file, namely <code>HEFCE_organogram_senior_data_31032011.csv</code>.
+              In the first line of <code>HEFCE_organogram_junior_data_31032011.csv</code>, the <code>reportsTo</code> (<code>Reporting Senior Post</code>) column contains the value <code>90284</code>. When validating that file, a validator will check that there is a single row within the table generated from <code>HEFCE_organogram_senior_data_31032011.csv</code> whose <code>ref</code> column contains the value <code>90284</code>.
+            </p>
+          </section>
+          <section>
+            <h4>Weak Linking between Resources</h4>
+            <p>
+              <a title="foreign key definition">Foreign key definitions</a> provide for strong linking between resources. It is also possible to provide weak linking between resources when converting tabular data into other formats, using <a href="#column-aboutUrl"><code>aboutUrl</code></a> and <a href="#column-valueUrl"><code>valueUrl</code></a>.
+            </p>
+            <p>
+              Taking the example above as a starting point, the schema for <code>HEFCE_organogram_senior_data_31032011.csv</code> could use <a href="#column-aboutUrl"><code>aboutUrl</code></a> to provide a URL for each row, which can similarly be created as a <a href="#column-valueUrl"><code>valueUrl</code></a> for the <code>reportsTo</code> column:
+            </p>
+            <pre class="example highlight">
+{
+  "@id": "http://example.org/schema/senior-roles.json",
+  "@context": "http://www.w3.org/ns/csvw",
+  <strong>"aboutUrl": "#role-{ref}",</strong>
+  "columns": [{
+    "name": "ref",
+    "title": "Post Unique Reference"
+  }, {
+    "name": "name",
+    "title": "Name"
+  }, {
+    "name": "grade",
+    "title": "Grade"
+  }, {
+    "name": "job",
+    "title": "Job Title"
+  }, {
+    "name": "reportsTo",
+    "title": "Reports to Senior Post",
+    <strong>"valueUrl": "#role-{reportsTo}"</strong>
+  }],
+  "primaryKey": "ref"
+}
+            </pre>
+            <p>
+              The URLs generated for the values of the <code>reportsTo</code> will (if the data is correct) match the URLs generated for each row within the table. There will be no error, however, if there is a value in the <code>reportsTo</code> column that does not match a value in the <code>ref</code> column.
             </p>
           </section>
         </section>
