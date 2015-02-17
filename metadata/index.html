@@ -323,11 +323,11 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               <dt>column names</dt>
               <dd>a variable is set for each column within the schema; the name of the variable is the <a href="#cell-name"><code>name</code></a> of the column and the value is the canonical representation of the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">value</a> of the cell in that column in the row that is currently being processed</dd>
             </dl>
-            <p>The <a>property value</a> of a <a>URI template property</a> is only available while converting tables as defined in <a href="#converting-tables" class="sectionRef"></a>. The value is the result of applying the template against the cell in that column in the row that is currently being processed, resolving against the <a>base URL</a> as a <a>link property</a> if the metadata value is explicit in the metadata, or the default value if defined; otherwise there is no value.</p>
+            <p>The <a>property value</a> of a <a>URI template property</a> is only available while converting tables as defined in <a href="#converting-tables" class="sectionRef"></a>. The value is the result of applying the template against the cell in that column in the row that is currently being processed, resolving using <code>@context</code> with the base URL of the Table <a href="#table-url"><code>url</code></a> <a>property value</a> if not null; otherwise there is no value.</p>
             <p>
               For example, the <a href="#cell-aboutUrl"><code>aboutUrl</code></a> property holds a URI template that is used to generate a URL identifier for each row, which might look like:
             </p>
-            <pre class="example highlight">
+            <pre class="example highlight" title="expanded aboutUrl using _row">
 "aboutUrl": "http://example.org/example.csv#row.{_row}"
             </pre>
             <p>
@@ -336,7 +336,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <p>
               Alternatively, with the CSV and metadata in the <a href="#introduction" class="sectionRef"></a>, the <a href="#cell-aboutUrl"><code>aboutUrl</code></a> might look like:
             </p>
-            <pre class="example highlight">
+            <pre class="example highlight" title="definition of aboutUrl using column titles">
 "aboutUrl": "http://example.org/tree/{on%2Dstreet}/{GID}"
             </pre>
             <p>
@@ -354,6 +354,23 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <p>The <code>propertyUrl</code> property has the default value of <code>"{#_name}</code>", meaning that it resolves as a fragment identifier relative to the <a>base URL</a>. For example, if no <code>propertyUrl</code> is specified, accessing it from a column with the column name <em>GID</em> would look like:</p>
             <pre class="example highlight" title="expanded default for propertyUrl">
 "http://example.org/example.csv#GID"
+            </pre>
+            <p>A value defined within the data is also subject to expansion. For example, consider the following table:</p>
+            <pre class="example" title="table with compact URLs and micro syntax">
+project_name,project_type,specs
+CSVW,foaf:Project,"tabular-data-model,tabular-metadata,csv2rdf,csv2json"
+            </pre>
+            <p>The <em>project_type</em> might have a <code>valueUrl</code> specified as <code>"{project_type}"</code>. In the first row the cell value is <code>"foaf:Project"</code>. The <code>@context</code> defines the <code>foaf</code> term and expands the value to <code>http://xmlns.com/foaf/0.1/Project</code>.</p>
+            <p>Similarly, the <em>specs</em> might have a <code>valueUrl</code> specified as <code>"http://www.w3.org/TR/{specs}"</code>. If the column also specifies <code>"separator": ","</code>, then the cell value of the <em>specs</em> column would be separated into four values. These would each be expanded to form for URLs: <code>http://www.w3.org/TR/tabular-data-model</code>, <code>http://www.w3.org/TR/tabular-metadata</code>, <code>http://www.w3.org/TR/csv2rdf</code>, and <code>http://www.w3.org/TR/csv2json</code>. Taken together, the final results expressed in RDF would be:</p>
+            <pre class="example highlight" title="expanded project RDF">
+[
+  &lt;#project_name&gt; &quot;CSVW&quot; ;
+  &lt;#project_type&gt; &lt;http://xmlns.com/foaf/0.1/Project&gt; ;
+  &lt;#specs&gt; &lt;http://www.w3.org/TR/tabular-data-model&gt; ,
+    &lt;http://www.w3.org/TR/tabular-metadata&gt; ,
+    &lt;http://www.w3.org/TR/csv2rdf&gt; ,
+    &lt;http://www.w3.org/TR/csv2json&gt;
+]
             </pre>
           </dd>
           <dt><dfn title="column reference property">column reference properties</dfn></dt>
