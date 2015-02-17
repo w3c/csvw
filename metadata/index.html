@@ -323,7 +323,12 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               <dt>column names</dt>
               <dd>a variable is set for each column within the schema; the name of the variable is the <a href="#cell-name"><code>name</code></a> of the column and the value is the canonical representation of the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">value</a> of the cell in that column in the row that is currently being processed</dd>
             </dl>
-            <p>The <a>property value</a> of a <a>URI template property</a> is only available while converting tables as defined in <a href="#converting-tables" class="sectionRef"></a>. The value is the result of applying the template against the cell in that column in the row that is currently being processed, resolving using <code>@context</code> with the base URL of the Table <a href="#table-url"><code>url</code></a> <a>property value</a> if not null; otherwise there is no value.</p>
+            <p>The <a>property value</a> of a <a>URI template property</a> is only available while converting tables as defined in <a href="#converting-tables" class="sectionRef"></a>. The value is the result of:</p>
+            <ol>
+              <li>applying the template against the cell in that column in the row that is currently being processed</li>
+              <li>expanding any prefixes as if the value were the name of a common property, as described in <a href="#common-properties" class="sectionRef"></a></li>
+              <li>resolving the resulting URL against the base URL of the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table-url" class="externalDFN">table url</a> if not null</ol>
+            </ol>
             <p>
               For example, the <a href="#cell-aboutUrl"><code>aboutUrl</code></a> property holds a URI template that is used to generate a URL identifier for each row, which might look like:
             </p>
@@ -351,27 +356,17 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <p>
               and given a CSV file at <code>http://example.com/temp.csv</code>, the URL for the first row will be <code>http://example.com/temp.csv#row.1</code>.
             </p>
-            <p>The <code>propertyUrl</code> property has the default value of <code>"{#_name}</code>", meaning that it resolves as a fragment identifier relative to the <a>base URL</a>. For example, if no <code>propertyUrl</code> is specified, accessing it from a column with the column name <em>GID</em> would look like:</p>
+            <p>The <code>propertyUrl</code> property has the default value of <code>"{#_name}</code>", meaning that it resolves as a fragment identifier relative to the URL of the source of the table. For example, if no <code>propertyUrl</code> is specified, accessing it from a column with the column name <em>GID</em> would look like:</p>
             <pre class="example highlight" title="expanded default for propertyUrl">
 "http://example.org/example.csv#GID"
             </pre>
             <p>A value defined within the data is also subject to expansion. For example, consider the following table:</p>
             <pre class="example" title="table with compact URLs and micro syntax">
-project_name,project_type,specs
-CSVW,foaf:Project,"tabular-data-model,tabular-metadata,csv2rdf,csv2json"
+project_name,project_type,keywords
+CSVW,foaf:Project,table;data;conversion
             </pre>
-            <p>The <em>project_type</em> might have a <code>valueUrl</code> specified as <code>"{project_type}"</code>. In the first row the cell value is <code>"foaf:Project"</code>. The <code>@context</code> defines the <code>foaf</code> term and expands the value to <code>http://xmlns.com/foaf/0.1/Project</code>.</p>
-            <p>Similarly, the <em>specs</em> might have a <code>valueUrl</code> specified as <code>"http://www.w3.org/TR/{specs}"</code>. If the column also specifies <code>"separator": ","</code>, then the cell value of the <em>specs</em> column would be separated into four values. These would each be expanded to form for URLs: <code>http://www.w3.org/TR/tabular-data-model</code>, <code>http://www.w3.org/TR/tabular-metadata</code>, <code>http://www.w3.org/TR/csv2rdf</code>, and <code>http://www.w3.org/TR/csv2json</code>. Taken together, the final results expressed in RDF would be:</p>
-            <pre class="example highlight" title="expanded project RDF">
-[
-  &lt;#project_name&gt; &quot;CSVW&quot; ;
-  &lt;#project_type&gt; &lt;http://xmlns.com/foaf/0.1/Project&gt; ;
-  &lt;#specs&gt; &lt;http://www.w3.org/TR/tabular-data-model&gt; ,
-    &lt;http://www.w3.org/TR/tabular-metadata&gt; ,
-    &lt;http://www.w3.org/TR/csv2rdf&gt; ,
-    &lt;http://www.w3.org/TR/csv2json&gt;
-]
-            </pre>
+            <p>The <code>project_type</code> column might have a <code>valueUrl</code> specified as <code>"{project_type}"</code>. In the first row the cell value is <code>"foaf:Project"</code>. The <code>foaf</code> prefix is understood, as described in <a href="#common-properties" class="sectionRef"></a> to expand to <code>http://xmlns.com/foaf/0.1/Project</code>.</p>
+            <p>Similarly, the <code>keywords</code> column might have a <code>valueUrl</code> specified as <code>"https://duckduckgo.com/?q={keywords}"</code>. If the column also specifies <code>"separator": ";"</code>, then the cell value of the <code>keywords</code> column would be an array of the three values <code>table</code>, <code>data</code> and <code>conversion</code>. This is set as the value of the <em>keywords</em> variable within the URI template, which means the result would be <code>https://duckduckgo.com/?q=table,data,conversion</code>.</p>
           </dd>
           <dt><dfn title="column reference property">column reference properties</dfn></dt>
           <dd>
