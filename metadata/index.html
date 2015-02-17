@@ -54,16 +54,19 @@ var respecConfig = {
       name: "Rufus Pollock", 
       url: "http://rufuspollock.org/",
       company: "Open Knowledge", 
-      companyURL: "https://okfn.org/" 
+      companyURL: "https://okfn.org/",
+      w3cid: "62304"
     }, {
       name: "Jeni Tennison",
       company: "Open Data Institute",
-      companyURL: "http://theodi.org/"
+      companyURL: "http://theodi.org/",
+      w3cid: "33715"
     }, { 
       name: "Gregg Kellogg", 
       url: "http://greggkellogg.net/",
       company: "Kellogg Associates", 
-      companyURL: "http://kellogg-assoc.com/" 
+      companyURL: "http://kellogg-assoc.com/",
+      w3cid: "44770"
     }],
     wg: "CSV on the Web Working Group",
     wgURI: "http://www.w3.org/2013/csvw/",
@@ -203,8 +206,17 @@ GID,On Street,Species,Trim Cycle,Inventory Date
     <section>
       <h2>Annotating Tables</h2>
       <p>
-        The metadata defined in this specification is used to provide annotations on an <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-table">annotated table</a> or <a href="http://www.w3.org/TR/tabular-data-model/#dfn-group-of-tables">group of tables</a>, as defined in [[!tabular-data-model]]. Annotated tables form the basis for all further processing, such as validating, converting or displaying the tables. All compliant applications MUST create annotated tables based on the algorithm defined here.
+        The metadata defined in this specification is used to provide annotations on an <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-table">annotated table</a> or <a href="http://www.w3.org/TR/tabular-data-model/#dfn-group-of-tables">group of tables</a>, as defined in [[!tabular-data-model]]. Annotated tables form the basis for all further processing, such as validating, converting or displaying the tables.
       </p>
+      <p>
+        All compliant applications MUST create annotated tables based on the algorithm defined here. All compliant applications MUST generate errors if a metadata document does not conform to this specification, such as:
+      </p>
+      <ul>
+        <li>not being compliant with JSON syntax</li>
+        <li>not specifying a property that it is required to specify</li>
+        <li>including properties (aside from <a title="common property">common properties</a>) which are not defined in this specification</li>
+        <li>having invalid values for a given property</li>
+      </ul>
       <p>
         Metadata documents contain descriptions of groups of tables, tables, columns, rows, cells and regions which are used to create annotations on a tabular data model. There are two types of description objects:
       </p>
@@ -710,9 +722,6 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               <p>If included, <code>@type</code> MUST be set to <code>"Table"</code>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.</p>
             </dd>
           </dl>
-          <p class="issue" data-numer="52">
-            We invite comment on whether we should include properties that help in checking the integrity of the file: datapackage includes <code>bytes</code> and <code>hash</code>. We could reuse the <a href="http://www.w3.org/TR/SRI/">Subresource Integrity</a> work here.
-          </p>
           <p>
             The description MAY contain any <a title="common property">common properties</a> to provide extra metadata about the table as a whole.
           </p>
@@ -1588,13 +1597,13 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           The process of parsing the string value of a cell into a single value or a list of values is as follows:
         </p>
         <ol>
-          <li>unless the <a href="#cell-datatype"><code>datatype</code></a> is <code>string</code> or <code>anySimpleType</code> or <code>any</code>, strip leading and trailing whitespace from the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-string-value" class="externalDFN">string value</a></li>
+          <li>unless the <a href="#cell-datatype"><code>datatype</code></a> is <code>string</code> or <code>anyAtomicType</code> or <code>any</code>, strip leading and trailing whitespace from the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-string-value" class="externalDFN">string value</a></li>
           <li>if the resulting string is an empty string, apply the remaining steps to the string given by the <a href="#cell-default"><code>default</code></a> property</li>
           <li>if the <a href="#cell-separator"><code>separator</code></a> property is not <code>null</code> and the resulting string is an empty string, the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">cell value</a> is an empty list</li>
           <li>if the <a href="#cell-separator"><code>separator</code></a> property is not <code>null</code>, the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">cell value</a> is a list of values created by:
             <ol>
               <li>splitting the resulting string at the character specified by the <code>separator</code> property</li>
-              <li>unless the <a href="#cell-datatype"><code>datatype</code></a> is <code>string</code> or <code>anySimpleType</code> or <code>any</code>, stripping leading and trailing whitespace from these strings</li>
+              <li>unless the <a href="#cell-datatype"><code>datatype</code></a> is <code>string</code> or <code>anyAtomicType</code> or <code>any</code>, stripping leading and trailing whitespace from these strings</li>
               <li>applying the remaining steps to each of the strings in turn</li>
             </ol>
           </li>
@@ -1638,7 +1647,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
 "default": "5"
           </pre>
           <p>
-            In this case, a cell whose string value is <code>""</code> would be assigned the value of the integer <code>5</code>. A cell whose string value contains whitespace, such as a single tab character, would also be assigned the value of the integer <code>5</code>: when the datatype is something other than <code>string</code> or <code>anySimpleType</code> or <code>any</code>, leading and trailing whitespace is stripped from string values before the remainder of the processing is carried out.
+            In this case, a cell whose string value is <code>""</code> would be assigned the value of the integer <code>5</code>. A cell whose string value contains whitespace, such as a single tab character, would also be assigned the value of the integer <code>5</code>: when the datatype is something other than <code>string</code> or <code>anyAtomicType</code> or <code>any</code>, leading and trailing whitespace is stripped from string values before the remainder of the processing is carried out.
           </p>
           <p>
             Cells can contain sequences of values. For example, a cell might have the string value <code>"1 5 7.0"</code>. In this case, the separator is a space character. The appropriate configuration would be:

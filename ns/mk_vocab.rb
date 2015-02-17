@@ -16,7 +16,7 @@ class Vocab
   )
 
   TITLE = "CSVW Namespace Vocabulary Terms".freeze
-  DESCRIPTION = %(This document describes the RDFS vocabulary description used in the Metadata Vocabulary for Tabular Data [[csvw-metadata]] along with the default JSON-LD Context.).freeze
+  DESCRIPTION = %(This document describes the RDFS vocabulary description used in the Metadata Vocabulary for Tabular Data [[tabular-metadata]] along with the default JSON-LD Context.).freeze
   attr_accessor :prefixes, :terms, :properties, :classes, :instances, :datatypes
 
   def initialize(file)
