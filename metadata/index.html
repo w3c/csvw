@@ -926,37 +926,24 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               The <a href="#column-name"><code>name</code></a> properties of the column descriptions MUST be unique within a given table description.
             </p>
             <p>
-              When an array of column descriptions B is <a>merged</a> into an original array of column descriptions A, each column description within B is combined into the original array A as follows:
+              When an array of column descriptions B is <a>merged</a> into an original array of column descriptions A, each column description within B is combined into the original array A, based on the index of each column description, as follows:
             </p>
             <ol>
-              <li>the two arrays are each split into two arrays, one containing the descriptions of <a href="http://www.w3.org/TR/tabular-data-model/#dfn-real-column" class="externalDFN">real columns</a> and one containing the descriptions of <a href="http://www.w3.org/TR/tabular-data-model/#dfn-virtual-column" class="externalDFN">virtual columns</a></li>
-              <li>the arrays of the descriptions of <a href="http://www.w3.org/TR/tabular-data-model/#dfn-real-column" class="externalDFN">real columns</a> are combined based on the index of each column description in the array, as follows:
+              <li>if the column descriptions at the same index within A and B have the same <a href="#column-name"><code>name</code></a>, the column description from B is <a>merged</a> into the matching column description in A</li>
+              <li>otherwise, if the column descriptions at the same index within A and B have matching <a href="#column-title"><code>title</code></a>s (both titles are the same and either they both have the same language or one of them has an undefined language (<code>und</code>)), the column description from B is <a>merged</a> into the matching column description in A</li>
+              <li>otherwise, if there are column descriptions at the same index within A and B, a validator MUST generate an error</li>
+              <li>otherwise, if at a given index there is no column description within A, but there is a column description within B, then:
                 <ol>
-                  <li>if the column descriptions at the same index within A and B have the same <a href="#column-name"><code>name</code></a>, the column description from B is <a>merged</a> into the matching column description in A</li>
-                  <li>otherwise, if the column descriptions at the same index within A and B have matching <a href="#column-title"><code>title</code></a>s (both titles are the same and either they both have the same language or one of them has an undefined language (<code>und</code>)), the column description from B is <a>merged</a> into the matching column description in A</li>
-                  <li>otherwise, if there are column descriptions at the same index within A and B, a validator MUST generate an error</li>
-                  <li>otherwise, if at a given index there is no column description within A, but there is a column description within B, then:
-                    <ol>
-                      <li>if the <a>validator mode</a> is <code>open</code>, the column description from B is inserted into A</li>
-                      <li>if the <a>validator mode</a> is <code>restriction</code>, the column description from B is ignored</li>
-                      <li>otherwise, a validator MUST generate an error</li>
-                    </ol>
-                  </li>
-                  <li>otherwise, if at a given index there is no column description within B, but there is a column description within A, then:
-                    <ol>
-                      <li>if the <a>validator mode</a> is <code>open</code> or <code>extension</code>, the column description from A is retained</li>
-                      <li>otherwise, a validator MUST generate an error</li>
-                    </ol>
-                  </li>
+                  <li>if the <a href="#column-virtual"><code>virtual</code></a> property of the column description in B is <code>true</code>, then the column description is appended to A</li>
+                  <li>otherwise, a validator MUST generate an error</li>
                 </ol>
               </li>
-              <li>the array of descriptions of <a href="http://www.w3.org/TR/tabular-data-model/#dfn-virtual-column" class="externalDFN">virtual columns</a> from B is merged into the array of descriptions of virtual columns from A
+              <li>otherwise, if at a given index there is no column description within B, but there is a column description within A, then:
                 <ol>
-                  <li>if the column description from B has the same <a href="#column-name"><code>name</code></a> as a column description within A, the column description from B is <a>merged</a> into the matching column description in A</li>
-                  <li>otherwise, the column description from B is appended to A</li>
+                  <li>if the <a href="#column-virtual"><code>virtual</code></a> property of the column description in A is <code>true</code>, then the column description is retained</li>
+                  <li>otherwise, a validator MUST generate an error</li>
                 </ol>
               </li>
-              <li>the resulting array is the merged array of descriptions of <a href="http://www.w3.org/TR/tabular-data-model/#dfn-real-column" class="externalDFN">real columns</a> followed by the merged array of descriptions of <a href="http://www.w3.org/TR/tabular-data-model/#dfn-virtual-column" class="externalDFN">virtual columns</a></li>
             </ol>
           </dd>
           <dt id="table-primaryKey"><code>primaryKey</code></dt>
@@ -2115,19 +2102,6 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
         <p>
           <a>Validators</a> test whether given tabular data files adhere to the structure defined within a <a>schema</a>.
         </p>
-        <p>
-          Validators should have the option to operate in one of four <dfn title="validator mode">validator modes</a>:
-        </p>
-        <dl>
-          <dt><dfn title="closed validation">closed</dfn></dt>
-          <dd>an error is generated if the columns specified in the schema for a table and those in the table do not match exactly (with the exception of <a href="http://www.w3.org/TR/tabular-data-model/#dfn-virtual-column" class="externalDFN">virtual columns</a>)</dd>
-          <dt><dfn title="extension validation">extension</dfn></dt>
-          <dd>an error is generated if there are columns (aside from <a href="http://www.w3.org/TR/tabular-data-model/#dfn-virtual-column" class="externalDFN">virtual columns</a>) described in the schema for a table that do not appear in the table itself, but no error is generated if there are columns in the table that do not appear in the schema for the table</dd>
-          <dt><dfn title="restriction validation">restriction</dfn></dt>
-          <dd>an error is generated if there are columns in the table that do not appear in the schema for the table, but no error is generated if there are columns (aside from <a href="http://www.w3.org/TR/tabular-data-model/#dfn-virtual-column" class="externalDFN">virtual columns</a>) described in the schema for the table that do not appear in the table itself</dd>
-          <dt><dfn title="open validation">open</dfn></dt>
-          <dd>no errors are generated if there are additional columns in the table that are not in the schema for the table, or columns described in the schema for the table that are not in the table itself</dd>
-        </dl>
         <p class="issue">
           We intend to detail how to validate groups of tabular data files against metadata. This would be normative: compliant validators would have to report the errors and warnings that we define. We invite comment on whether this is a useful thing to specify.
         </p>
