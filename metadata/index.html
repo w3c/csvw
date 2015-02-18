@@ -27,18 +27,6 @@ var respecConfig = {
           "title": "Metadata Vocabulary for Tabular Data",
           "href" : "http://www.w3.org/ns/csvw",
           "publisher": "W3C"
-      },
-      "UNICODE-BIDI" : {
-        "authors" : [
-          "Mark Davis",
-          "Aharon Lanin",
-          "Andrew Glass"
-        ],
-        "title": "TR9, Unicode Bidirectional Algorithm",
-        "href": "http://unicode.org/reports/tr9/",
-        "rawDate" : "2013-09-24",
-        "publisher" : "Unicode Consortium",
-        "status" : "Report"
       }
     },
     specStatus: "ED",
@@ -2103,107 +2091,6 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
   }]
 }
       </pre>
-    </section>
-    <section>
-      <h2>Processing Tables</h2>
-      <p>
-        This section describes how particular types of applications should process tabular data and metadata files.
-      </p>
-      <p>
-        In many cases, applications will start from a tabular data file, such as a CSV file, and <a href="http://www.w3.org/TR/tabular-data-model/#locating-metadata">locate metadata</a> from that file as described in [[!tabular-data-model]]. This metadata will inform the processing of the tabular data file.
-      </p>
-      <p>
-        In other cases, an application might start from a metadata file. In that case, the initial metadata file is treated as <a href="http://www.w3.org/TR/tabular-data-model/#overriding-metadata">overriding metadata</a> and the application SHOULD continue to retrieve other available metadata, located in the normal way, about each of the tabular data files referenced by that initial metadata file.
-      </p>
-      <p>
-        For example, if a validator is passed a locally authored metadata file <code>spending.json</code>, which contains:
-      </p>
-      <pre class="example highlight">
-{
-  "tableSchema": "government-spending.csv",
-  "resources": [{
-    "url": "http://example.org/east-sussex-2015-03.csv",
-  }, {
-    "url": "http://example.org/east-sussex-2015-02.csv"
-  }, ... 
-  ]
-}
-      </pre>
-      <p>
-        the validator would validate all the listed resources, using the locally defined schema at <code>government-spending.csv</code>. It would still use the metadata located from the referenced CSV files; for example, when processing <code>http://example.org/east-sussex-2015-03.csv</code>, it would use embedded metadata within that file, referenced from any <code>Link</code> header found when retrieving that file, and at <code>http://example.org/east-sussex-2015-03.csv-metadata.json</code> and <code>http://example.org/metadata.json</code>.
-      </p>
-      <section>
-        <h3>Displaying Tables</h3>
-        <div class="issue">
-          <p>
-            We intend to include other sections here about:
-          </p>
-          <ul>
-            <li>displaying metadata about groups of tables, tables, columns, rows, cells and regions</li>
-            <li>what headings to use for columns when displaying tabular content</li>
-            <li>how to format values in cells</li>
-          </ul>
-          <p>
-            Much of this is likely to be non-normative. We invite comment on whether it's useful to provide this kind of guidance.
-          </p>
-        </div>
-        <section>
-          <h4>Bidirectional Tables</h4>
-          <p>
-            There are two levels of bidirectionality to consider when displaying tables: the directionality of the table (ie whether the columns should be arranged left-to-right or right-to-left) and the directionality of the content of individual cells.
-          </p>
-          <p>
-            The <a href="#tableDirection"><code>tableDirection</code> property</a> provides information about the desired display of the table. If <code>tableDirection=ltr</code> then the first column SHOULD be displayed on the left and the last column on the right. If <code>tableDirection=rtl</code> then the first column SHOULD be displayed on the right and the last column on the left.
-          </p>
-          <p>
-            If <code>tableDirection=default</code> then tables SHOULD be displayed with attention to the bidirectionality of the content of the file. Specifically, the values of the cells in the table should be scanned breadth first: from the first cell in the first column through to the last cell in the first column, down to the last cell in the last column. If the first character in the table with a <a href="http://unicode.org/reports/tr9/#Bidirectional_Character_Types">strong type</a> as defined in [[!UNICODE-BIDI]] indicates a <abbr title="right-to-left">RTL</abbr> directionality, the table should be displayed with the first column on the right and the last column on the left. Otherwise, the table should be displayed with the first column on the left and the last column on the right. Characters such as whitespace, quotes, commas and numbers do not have a strong type, and therefore are skipped when identifying the character that determines the directionality of the table.
-          </p>
-          <p>
-            Implementations SHOULD enable user preferences to override the indicated metadata about the directionality of the table.
-          </p>
-          <p>
-            Once the directionality of the table has been determined, each cell within the table should be considered as a separate <a href="http://unicode.org/reports/tr9/#The_Paragraph_Level">paragraph</a>, as defined by the <abbr title="Unicode Bidirectional Algorithm">UBA</abbr> in [[!UNICODE-BIDI]]. The default directionality for the cell is determined by looking at the <a href="#cell-textDirection"><code>textDirection</code> property</a>, which is an <a>inherited property</a>.
-          </p>
-          <p>
-            Thus, as defined by the <abbr title="Unicode Bidirectional Algorithm">UBA</abbr>, if a cell contains no characters with a strong type (if it's a number or date for example) then the way the cell is displayed should be determined by the <a href="#cell-textDirection"><code>textDirection</code> property</a> of the cell. However, when the cell contains characters with a strong type (such as letters) then they MUST be displayed according to the Unicode Bidirectional Algorithm as described in [[!UNICODE-BIDI]].
-          </p>
-        </section>
-      </section>
-      <section>
-        <h3>Validating Tables</h3>
-        <p>
-          <a>Validators</a> test whether given tabular data files adhere to the structure defined within a <a>schema</a>.
-        </p>
-        <p class="issue">
-          We intend to detail how to validate groups of tabular data files against metadata. This would be normative: compliant validators would have to report the errors and warnings that we define. We invite comment on whether this is a useful thing to specify.
-        </p>
-      </section>
-      <section>
-        <h3>Converting Tables</h3>
-        <p>
-          Conversions of tabular data to other formats operate over a <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-table">annotated table</a> constructed as defined in <a href="#annotating-tables" class="sectionRef"></a>. The mechanics of these conversions to other formats are defined in other specifications.
-        </p>
-        <p>
-          Conversion specifications MUST define a default mapping from an annotated table that lacks any annotations (ie that is equivalent to an un-annotated table).
-        </p>
-        <p>
-          Conversion specifications MUST use the <a>property value</a> of the <a href="#cell-propertyUrl"><code>propertyUrl</code></a> of a column as the basis for naming machine-readable fields in the target format, such as the name of the equivalent element or attribute in XML, property in JSON or property URI in RDF.
-        </p>
-        <p>
-          Conversion specifications MAY use any of the properties defined in this specification to adjust the mapping of an annotated table into another format.
-        </p>
-        <p>
-          Conversion specifications MAY define additional properties, not defined in this specification, which are specifically used when converting to the target format of the conversion. For example, a conversion to XML might specify a <code>element-or-attribute</code> property on columns that determines whether a particular column is represented through an element or an attribute in the data.
-        </p>
-        <p>
-          Conversion specifications SHOULD specify format-specific properties specifying external processing steps to provide more control to people defining conversions. If these are specified, the conversion specification MUST specify at what point in the processing this external processing takes place, and what it takes place on. Examples might be:
-        </p>
-        <ul>
-          <li>the URL of an XSLT file that is used to process XML after it is generated</li>
-          <li>a string containing a SPARQL CONSTRUCT pattern that is executed on RDF after it is generated</li>
-          <li>properties that contain definitions of Javascript callback functions that are used when processing particular columns or individual rows</li>
-        </ul>
-      </section>
     </section>
     <section>
       <h2>Security Considerations</h2>
