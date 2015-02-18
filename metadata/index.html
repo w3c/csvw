@@ -366,10 +366,13 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             Alternatively, with the CSV and metadata in the <a href="#introduction" class="sectionRef"></a>, the <a href="#cell-aboutUrl"><code>aboutUrl</code></a> might look like:
           </p>
           <pre class="example highlight" title="definition of aboutUrl using column titles">
-"aboutUrl": "http://example.org/tree/{on%2Dstreet}/{GID}"
+"aboutUrl": "http://example.org/tree/{on_street}/{GID}"
           </pre>
           <p>
             This would generate URIs such as <code>http://example.org/tree/ADDISON%20AV/1</code> and <code>http://example.org/tree/EMERSON%20ST/2</code>.
+          </p>
+          <p>
+            If the value of the <code>on_street</code> or <code>GID</code> column were <code>null</code>, the URL would still be generated with the null value generating an empty string in the URL. For example if <code>on_street</code> were <code>null</code> and <code>GID</code> were <code>3</code>, the generated URL would be <code>http://example.org/tree//3</code>.
           </p>
           <p>
             Once the URI has been generated, it is resolved against the location of the resource (eg the CSV file) to create an absolute URI. For example, given a <a href="#cell-aboutUrl"><code>aboutUrl</code></a> within a schema such as:
@@ -398,6 +401,9 @@ CSVW,foaf:Project,table;data;conversion
           </p>
           <p>
             Similarly, the <code>keywords</code> column might have a <code>valueUrl</code> specified as <code>"https://duckduckgo.com/?q={keywords}"</code>. If the column also specifies <code>"separator": ";"</code>, then the cell value of the <code>keywords</code> column would be an array of the three values <code>table</code>, <code>data</code> and <code>conversion</code>. This is set as the value of the <em>keywords</em> variable within the URI template, which means the result would be <code>https://duckduckgo.com/?q=table,data,conversion</code>.
+          </p>
+          <p>
+            If the value in the <code>keywords</code> column were an empty sequence (created from an empty cell in the original data), the reference to that column would be expanded to an empty string, generating <code>https://duckduckgo.com/?q=</code>.
           </p>
         </section>
         <section>
