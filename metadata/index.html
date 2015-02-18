@@ -280,14 +280,24 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         <p>
           There are different types of properties on description objects:
         </p>
-        <dl>
-          <dt><dfn title="array property">array properties</dfn></dt>
-          <dd>
-            <p>These hold an array of one or more objects, which are usually <a title="description object">description objects</a>.</p>
-            <p>
-              For example, the <code>resources</code> property is an array property. A <a>table group description</a> might contain:
-            </p>
-            <pre>
+        <ul>
+          <li><a href="#array-properties" class="sectionRef"></a></li>
+          <li><a href="#link-properties" class="sectionRef"></a></li>
+          <li><a href="#uri-template-properties" class="sectionRef"></a></li>
+          <li><a href="#column-reference-properties" class="sectionRef"></a></li>
+          <li><a href="#object-properties" class="sectionRef"></a></li>
+          <li><a href="#natural-language-properties" class="sectionRef"></a></li>
+          <li><a href="#atomic-properties" class="sectionRef"></a></li>
+        </ul>
+        <section>
+          <h4>Array Properties</h4>
+          <p>
+            <dfn title="array property">Array properties</dfn> hold an array of one or more objects, which are usually <a title="description object">description objects</a>.
+          </p>
+          <p>
+            For example, the <code>resources</code> property is an array property. A <a>table group description</a> might contain:
+          </p>
+          <pre>
 "resources": [{
   "url": "https://example.org/countries.csv",
   "tableSchema": "https://example.org/countries.json"
@@ -295,113 +305,160 @@ GID,On Street,Species,Trim Cycle,Inventory Date
   "url": "https://example.org/country_slice.csv",
   "tableSchema": "https://example.org/country_slice.json"
 }]
-            </pre>
-            <p>
-              in which case the <code>resources</code> property has a value that is an array of two <a>table description</a> objects.
-            </p>
-          </dd>
-          <dt><dfn title="link property">link properties</dfn></dt>
-          <dd>
-            <p>These hold a single reference to anther resource by URL. Their value is a
-              <strong>strings</strong> &mdash; resolved as URLs against the <a>base URL</a>.
-            </p>
-            <p>
-              For example, the <code>url</code> property is a link property. A <a>table description</a> might contain:
-            </p>
-            <pre class="example highlight">
+          </pre>
+          <p>
+            in which case the <code>resources</code> property has a value that is an array of two <a>table description</a> objects.
+          </p>
+        </section>
+        <section>
+          <h4>Link Properties</h4>
+          <p>
+            <dfn title="link property">Link properties</dfn> hold a single reference to anther resource by URL. Their value is a <strong>string</strong> &mdash; resolved as a URL against the <a>base URL</a>.
+          </p>
+          <p>
+            For example, the <code>url</code> property is a link property. A <a>table description</a> might contain:
+          </p>
+          <pre class="example highlight">
 "url": "example-2014-01-03.csv"
-            </pre>
-            <p>
-              in which case the <code>url</code> property on the table would have a single value, a link to <code>example-2014-01-03.csv</code>.
-            </p>
-          </dd>
-          <dt><dfn title="URI template property">URI template properties</dfn></dt>
-          <dd>
-            <p>
-              A URI template property contains a [[!URI-TEMPLATE]] which can be used to generate a URI. These URI templates are expanded in the context of each row by combining the template with a set of variables with values. The variables that are set are:
-            </p>
-            <dl>
-              <dt><code>_column</code></dt>
-              <dd><code>_column</code> is set to the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column-number" class="externalDFN">column number</a> of the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column" class="externalDFN">column</a> from the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-table" class="externalDFN">annotated table</a>that is currently being processed</dd>
-              <dt><code>_sourceColumn</code></dt>
-              <dd><code>_sourceColumn</code> is set to the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column-source-number">source number</a> of the column that is currently being processed; this varies form <code>_column</code> by <a href="http://www.w3.org/TR/tabular-data-model/#dfn-skip-columns">skip columns</a> and <a href="http://www.w3.org/TR/tabular-data-model/#dfn-header-columns">header columns</a></dd>
-              <dt><code>_row</code></dt>
-              <dd><code>_row</code> is set to the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row-number" class="externalDFN">row number</a> of the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row" class="externalDFN">row</a> from the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-table" class="externalDFN">annotated table</a>that is currently being processed</dd>
-              <dt><code>_sourceRow</code></dt>
-              <dd><code>_sourceRow</code> is set to the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row-source-number">source number</a> of the row that is currently being processed; this varies form <code>_row</code> by <a href="http://www.w3.org/TR/tabular-data-model/#dfn-skip-rows">skip rows</a> and <a href="http://www.w3.org/TR/tabular-data-model/#dfn-header-rows">header rows</a></dd>
-              <dt><code>_name</code></dt>
-              <dd><code>_name</code> is set to the URI decoded <a>property value</a> of the <code>name</code> property on the cell column that is currently being processed. <span class="note">URI decoding is necessary as <code>name</code> may have been encoded if taken from <code>title</code>; this prevents double URI encoding.</span>
-              </dd>
-              <dt>column names</dt>
-              <dd>a variable is set for each column within the schema; the name of the variable is the <a href="#cell-name"><code>name</code></a> of the column and the value is the canonical representation of the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">value</a> of the cell in that column in the row that is currently being processed</dd>
-            </dl>
-            <p>The <a>property value</a> of a <a>URI template property</a> is only available while converting tables as defined in <a href="#converting-tables" class="sectionRef"></a>. The value is the result of:</p>
-            <ol>
-              <li>applying the template against the cell in that column in the row that is currently being processed</li>
-              <li>expanding any prefixes as if the value were the name of a common property, as described in <a href="#common-properties" class="sectionRef"></a></li>
-              <li>resolving the resulting URL against the base URL of the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table-url" class="externalDFN">table url</a> if not null</ol>
-            </ol>
-            <p>
-              For example, the <a href="#cell-aboutUrl"><code>aboutUrl</code></a> property holds a URI template that is used to generate a URL identifier for each row, which might look like:
-            </p>
-            <pre class="example highlight" title="expanded aboutUrl using _row">
+          </pre>
+          <p>
+            in which case the <code>url</code> property on the table would have a single value, a link to <code>example-2014-01-03.csv</code>, resolved against the <a>base URL</a> of the metadata document in which this was located.
+          </p>
+        </section>
+        <section>
+          <h4>URI Template Properties</h4>
+          <p>
+            A <dfn>URI template property</dfn> contains a [[!URI-TEMPLATE]] which can be used to generate a URI. These URI templates are expanded in the context of each row by combining the template with a set of variables with values. The variables that are set are:
+          </p>
+          <dl>
+            <dt>column names</dt>
+            <dd>a variable is set for each column within the schema; the name of the variable is the <a href="#cell-name"><code>name</code></a> of the column and the value is derived from the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">value</a> of the cell in that column in the row that is currently being processed, namely one of:
+              <ul>
+                <li><code>null</code></li>
+                <li>the <a href="http://www.w3.org/TR/xmlschema11-2/#dt-canonical-representation" class="externalDFN">canonical representation</a> of the value of the cell, as defined in [[!xmlschema11-2]], if it has a single value</li>
+                <li>a list of <a href="http://www.w3.org/TR/xmlschema11-2/#dt-canonical-representation" class="externalDFN">canonical representations</a> of the values of the cell, if it has a sequence value</li>
+              </ul>
+            </dd>
+            <dt><code>_column</code></dt>
+            <dd><code>_column</code> is set to the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column-number" class="externalDFN">column number</a> of the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column" class="externalDFN">column</a> from the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-table" class="externalDFN">annotated table</a> that is currently being processed</dd>
+            <dt><code>_sourceColumn</code></dt>
+            <dd><code>_sourceColumn</code> is set to the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column-source-number">source number</a> of the column that is currently being processed; this usually varies from <code>_column</code> by <a href="http://www.w3.org/TR/tabular-data-model/#dfn-skip-columns">skip columns</a> and <a href="http://www.w3.org/TR/tabular-data-model/#dfn-header-columns">header columns</a></dd>
+            <dt><code>_row</code></dt>
+            <dd><code>_row</code> is set to the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row-number" class="externalDFN">row number</a> of the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row" class="externalDFN">row</a> from the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-table" class="externalDFN">annotated table</a> that is currently being processed</dd>
+            <dt><code>_sourceRow</code></dt>
+            <dd><code>_sourceRow</code> is set to the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row-source-number">source number</a> of the row that is currently being processed; this usually varies from <code>_row</code> by <a href="http://www.w3.org/TR/tabular-data-model/#dfn-skip-rows">skip rows</a> and <a href="http://www.w3.org/TR/tabular-data-model/#dfn-header-rows">header rows</a></dd>
+            <dt><code>_name</code></dt>
+            <dd><code>_name</code> is set to the URI decoded <a>property value</a> of the <code>name</code> property on the cell column that is currently being processed. <span class="note">URI decoding is necessary as <code>name</code> may have been encoded if taken from <code>title</code>; this prevents double URI encoding.</span>
+            </dd>
+          </dl>
+          <p>
+            The <a>property value</a> of a <a>URI template property</a> is only available when processing individual cells in a table, usually while converting tables as defined in <a href="#converting-tables" class="sectionRef"></a>. The value is the result of:
+          </p>
+          <ol>
+            <li>applying the template against the cell in that column in the row that is currently being processed</li>
+            <li>expanding any prefixes as if the value were the name of a common property, as described in <a href="#common-properties" class="sectionRef"></a></li>
+            <li>resolving the resulting URL against the base URL of the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table-url" class="externalDFN">table url</a> if not null</ol>
+          </ol>
+          <p>
+            For example, the <a href="#cell-aboutUrl"><code>aboutUrl</code></a> property holds a URI template that is used to generate a URL identifier for each row, which might look like:
+          </p>
+          <pre class="example highlight" title="expanded aboutUrl using _row">
 "aboutUrl": "http://example.org/example.csv#row.{_row}"
-            </pre>
-            <p>
-              The identifiers that are generated for the rows would then look like <code>http://example.org/example.csv#row.1</code>, <code>http://example.org/example.csv#row.2</code> and so on.
-            </p>
-            <p>
-              Alternatively, with the CSV and metadata in the <a href="#introduction" class="sectionRef"></a>, the <a href="#cell-aboutUrl"><code>aboutUrl</code></a> might look like:
-            </p>
-            <pre class="example highlight" title="definition of aboutUrl using column titles">
-"aboutUrl": "http://example.org/tree/{on%2Dstreet}/{GID}"
-            </pre>
-            <p>
-              This would generate URIs such as <code>http://example.org/tree/ADDISON%20AV/1</code> and <code>http://example.org/tree/EMERSON%20ST/2</code>.
-            </p>
-            <p>
-              Once the URI has been generated, it is resolved against the location of the resource (eg the CSV file) to create an absolute URI. For example, given a <a href="#cell-aboutUrl"><code>aboutUrl</code></a> within a schema such as:
-            </p>
-            <pre>
+          </pre>
+          <p>
+            The identifiers that are generated for the rows would then look like <code>http://example.org/example.csv#row.1</code>, <code>http://example.org/example.csv#row.2</code> and so on.
+          </p>
+          <p>
+            Alternatively, with the CSV and metadata in the <a href="#introduction" class="sectionRef"></a>, the <a href="#cell-aboutUrl"><code>aboutUrl</code></a> might look like:
+          </p>
+          <pre class="example highlight" title="definition of aboutUrl using column titles">
+"aboutUrl": "http://example.org/tree/{on_street}/{GID}"
+          </pre>
+          <p>
+            This would generate URIs such as <code>http://example.org/tree/ADDISON%20AV/1</code> and <code>http://example.org/tree/EMERSON%20ST/2</code>.
+          </p>
+          <p>
+            If the value of the <code>on_street</code> or <code>GID</code> column were <code>null</code>, the URL would still be generated with the null value generating an empty string in the URL. For example if <code>on_street</code> were <code>null</code> and <code>GID</code> were <code>3</code>, the generated URL would be <code>http://example.org/tree//3</code>.
+          </p>
+          <p>
+            Once the URI has been generated, it is resolved against the location of the resource (eg the CSV file) to create an absolute URI. For example, given a <a href="#cell-aboutUrl"><code>aboutUrl</code></a> within a schema such as:
+          </p>
+          <pre class="example highlight" title="definition of aboutUrl as a relative URL">
 "aboutUrl": "#row.{_row}"
-            </pre>
-            <p>
-              and given a CSV file at <code>http://example.com/temp.csv</code>, the URL for the first row will be <code>http://example.com/temp.csv#row.1</code>.
-            </p>
-            <p>The <code>propertyUrl</code> property has the default value of <code>"{#_name}</code>", meaning that it resolves as a fragment identifier relative to the URL of the source of the table. For example, if no <code>propertyUrl</code> is specified, accessing it from a column with the column name <em>GID</em> would look like:</p>
-            <pre class="example highlight" title="expanded default for propertyUrl">
+          </pre>
+          <p>
+            and given a CSV file at <code>http://example.com/temp.csv</code>, the URL for the first row will be <code>http://example.com/temp.csv#row.1</code>.
+          </p>
+          <p>
+            The <code>propertyUrl</code> property has the default value of <code>"{#_name}</code>", meaning that it resolves as a fragment identifier relative to the URL of the source of the table. For example, if no <code>propertyUrl</code> is specified, accessing it from a column with the column name <em>GID</em> would look like:
+          </p>
+          <pre class="example highlight" title="expanded default for propertyUrl">
 "http://example.org/example.csv#GID"
-            </pre>
-            <p>A value defined within the data is also subject to expansion. For example, consider the following table:</p>
-            <pre class="example" title="table with compact URLs and micro syntax">
+          </pre>
+          <p>
+            A value defined within the data is also subject to expansion. For example, consider the following table:
+          </p>
+          <pre class="example" title="table with compact URLs and micro syntax">
 project_name,project_type,keywords
 CSVW,foaf:Project,table;data;conversion
-            </pre>
-            <p>The <code>project_type</code> column might have a <code>valueUrl</code> specified as <code>"{project_type}"</code>. In the first row the cell value is <code>"foaf:Project"</code>. The <code>foaf</code> prefix is understood, as described in <a href="#common-properties" class="sectionRef"></a> to expand to <code>http://xmlns.com/foaf/0.1/Project</code>.</p>
-            <p>Similarly, the <code>keywords</code> column might have a <code>valueUrl</code> specified as <code>"https://duckduckgo.com/?q={keywords}"</code>. If the column also specifies <code>"separator": ";"</code>, then the cell value of the <code>keywords</code> column would be an array of the three values <code>table</code>, <code>data</code> and <code>conversion</code>. This is set as the value of the <em>keywords</em> variable within the URI template, which means the result would be <code>https://duckduckgo.com/?q=table,data,conversion</code>.</p>
-          </dd>
-          <dt><dfn title="column reference property">column reference properties</dfn></dt>
-          <dd>
-            <p>These hold one or more references to other column description objects. The referenced description object must have an <code>name</code> property. Column reference properties can then reference column description objects through values that are:</p>
-            <ul>
-              <li><strong>strings</strong> &mdash; which MUST match the <code>name</code> on a column description object within the metadata document</li>
-              <li><strong>arrays</strong> &mdash; lists of strings as above</li>
-            </ul>
-            <p>
-              For example, the <code>primaryKey</code> property is an column reference property on the schema. It has to hold references to columns defined elsewhere in the schema, and the descriptions of those columns must have <code>name</code> properties. It can hold a single reference, like this:
-            </p>
-            <pre class="example highlight">
+          </pre>
+          <p>
+            The <code>project_type</code> column might have a <code>valueUrl</code> specified as <code>"{project_type}"</code>. In the first row the cell value is <code>"foaf:Project"</code>. The <code>foaf</code> prefix is understood, as described in <a href="#common-properties" class="sectionRef"></a> to expand to <code>http://xmlns.com/foaf/0.1/Project</code>.
+          </p>
+          <p>
+            Similarly, the <code>keywords</code> column might have a <code>valueUrl</code> specified as <code>"https://duckduckgo.com/?q={keywords}"</code>. If the column also specifies <code>"separator": ";"</code>, then the cell value of the <code>keywords</code> column would be an array of the three values <code>table</code>, <code>data</code> and <code>conversion</code>. This is set as the value of the <em>keywords</em> variable within the URI template, which means the result would be <code>https://duckduckgo.com/?q=table,data,conversion</code>.
+          </p>
+          <p>
+            If the value in the <code>keywords</code> column were an empty sequence (created from an empty cell in the original data), the reference to that column would be expanded to an empty string, generating <code>https://duckduckgo.com/?q=</code>.
+          </p>
+          <p>
+            When a cell's <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">value</a> is not a string, the canonical representation of that value is used within the expanded URL. For example, the data may include dates such as those in:
+          </p>
+          <pre class="example highlight" title="CSV containing dates">
+GID,On Street,Species,Trim Cycle,Inventory Date
+1,ADDISON AV,Celtis australis,Large Tree Routine Prune,10/18/2010
+2,EMERSON ST,Liquidambar styraciflua,Large Tree Routine Prune,6/2/2010
+3,EMERSON ST,Liquidambar styraciflua,Large Tree Routine Prune,6/2/2010
+          </pre>
+          <p>
+            The <code>Inventory Date</code> column description would indicate that these were dates with the format <code>M/d/yyyy</code>:
+          </p>
+          <pre class="example highlight">
+{
+  "name": "inventory_date",
+  "title": "Inventory Date",
+  "datatype": "date",
+  "format": "M/d/yyyy"
+}
+          </pre>
+          <p>
+            The string value of the <code>inventory_date</code> column in the first row is parsed to create the date 18th October 2010. When the <code>inventory_date</code> column is referenced within a URI template such as <code>http://example.org/event/{inventory_date}</code>, the <a href="http://www.w3.org/TR/xmlschema11-2/#dt-canonical-representation" class="externalDFN">canonical representation</a> of that date is used within the URL, giving the result <code>http://example.org/event/2010-10-18</code>.
+          </p>
+        </section>
+        <section>
+          <h4>Column Reference Properties</h4>
+          <p>
+            <dfn title="column reference property">Column reference properties</dfn> hold one or more references to other column description objects. The referenced description object must have an <code>name</code> property. Column reference properties can then reference column description objects through values that are:
+          </p>
+          <ul>
+            <li><strong>strings</strong> &mdash; which MUST match the <code>name</code> on a column description object within the metadata document</li>
+            <li><strong>arrays</strong> &mdash; lists of strings as above</li>
+          </ul>
+          <p>
+            For example, the <code>primaryKey</code> property is an column reference property on the schema. It has to hold references to columns defined elsewhere in the schema, and the descriptions of those columns must have <code>name</code> properties. It can hold a single reference, like this:
+          </p>
+          <pre class="example highlight">
 "tableSchema": {
   "columns": [{
     "name": "GID"
   }, ... ],
   "primaryKey": "GID"
 }
-            </pre>
-            <p>
-              or it can contain an array of references, like this:
-            </p>
-            <pre class="example highlight">
+          </pre>
+          <p>
+            or it can contain an array of references, like this:
+          </p>
+          <pre class="example highlight">
 "tableSchema": {
   "columns": [{
     "name": "givenName"
@@ -410,126 +467,101 @@ CSVW,foaf:Project,table;data;conversion
   }, ... ],
   "primaryKey": [ "givenName", "familyName" ]
 }
-            </pre>
-          </dd>
-          <dt><dfn title="object property">object properties</dfn></dt>
-          <dd>
-            <p>These hold one or more objects or references to objects by URL. Their values may be:</p>
-            <ul>
-              <li><strong>strings</strong> &mdash; resolved as URLs against the <a>base URL</a></li>
-              <li><strong>objects</strong> &mdash; interpreted as structured objects</li>
-              <li><strong>arrays</strong> &mdash; lists of strings and/or objects, interpreted as URLs or structured objects</li>
-            </ul>
-            <p>
-              Object properties are often used when the values can be or should be values within controlled vocabularies, or structured information which may be held elsewhere. For example, the <code>dc:creator</code> of a table should be an object property. It could be provided as a URL that indicates the creator, like this:
-            </p>
-            <pre class="example highlight">
-"dc:creator": "http://ons.gov.uk"
-            </pre>
-            <p>
-              or a structured object, like this:
-            </p>
-            <pre class="example highlight">
-"dc:creator": {
-  "schema:name": "Office of National Statistics",
-  "schema:url": "http://ons.gov.uk",
-  "schema:email": "info@ons.gsi.gov.uk"
+          </pre>
+        </section>
+        <section>
+          <h4>Object Properties</h4>
+          <p>
+            <dfn title="object property">Object properties</dfn> hold one or more objects or references to objects by URL. Their values may be:
+          </p>
+          <ul>
+            <li><strong>strings</strong> &mdash; resolved as URLs against the <a>base URL</a></li>
+            <li><strong>objects</strong> &mdash; interpreted as structured objects</li>
+          </ul>
+          <p>
+            Object properties are often used when the values can be or should be values within controlled vocabularies, or structured information which may be held elsewhere. For example, the <code>dialect</code> of a table is an object property. It could be provided as a URL that indicates a commonly used dialect, like this:
+          </p>
+          <pre class="example highlight">
+"dialect": "http://example.org/tab-separated-values"
+          </pre>
+          <p>
+            or a structured object, like this:
+          </p>
+          <pre class="example highlight">
+"dialect": {
+  "delimiter": "\t",
+  "encoding": "utf-8"
 }
-            </pre>
-            <p>
-              or an array of URLs, like this:
-            </p>
-            <pre class="example highlight">
-"dc:creator": [ "http://ons.gov.uk", "https://www.gov.uk/government/organisations/department-for-transport" ]
-            </pre>
-            <p>
-              or an array of structured objects:
-            </p>
-            <pre class="example highlight">
-"dc:creator": [{
-  "schema:name": "Office of National Statistics",
-  "schema:url": "http://ons.gov.uk",
-  "schema:email": "info@ons.gsi.gov.uk"
-}, {
-  "schema:name": "Department for Transport",
-  "schema:url": "https://www.gov.uk/government/organisations/department-for-transport"
-}]
-            </pre>
-            <p>
-              or an array that mixes URLs and objects:
-            </p>
-            <pre class="example highlight">
-"dc:creator": [{
-  "schema:name": "Office of National Statistics",
-  "schema:url": "http://ons.gov.uk",
-  "schema:email": "info@ons.gsi.gov.uk"
-}, "https://www.gov.uk/government/organisations/department-for-transport" ]
-            </pre>
-          </dd>
-          <dt><dfn title="natural language property">natural language properties</dfn></dt>
-          <dd>
-            <p>These hold natural language strings. Their values may be:</p>
-            <ul>
-              <li><strong>strings</strong> &mdash; interpreted as natural language strings in the <a>default language</a></li>
-              <li><strong>arrays</strong> &mdash; interpreted as alternative natural language strings in the <a>default language</a></li>
-              <li><strong>objects</strong> whose properties MUST be language codes as defined by [[!BCP47]] and whose values are either strings or arrays, providing natural language strings in that language</li>
-            </ul>
-            <p>
-              Natural language properties are used for things like descriptions and titles. For example, the <code>title</code> property provides a natural language label for a column. If it's a plain string like this:
-            </p>
-            <pre class="example highlight">
+          </pre>
+        </section>
+        <section>
+          <h4>Natural Language Properties</h4>
+          <p>
+            <dfn title="natural language property">Natural language properties</dfn> hold natural language strings. Their values may be:
+          </p>
+          <ul>
+            <li><strong>strings</strong> &mdash; interpreted as natural language strings in the <a>default language</a></li>
+            <li><strong>arrays</strong> &mdash; interpreted as alternative natural language strings in the <a>default language</a></li>
+            <li><strong>objects</strong> whose properties MUST be language codes as defined by [[!BCP47]] and whose values are either strings or arrays, providing natural language strings in that language</li>
+          </ul>
+          <p>
+            Natural language properties are used for things like descriptions and titles. For example, the <code>title</code> property provides a natural language label for a column. If it's a plain string like this:
+          </p>
+          <pre class="example highlight">
 "title": "Project title"
-            </pre>
-            <p>
-              then that string is assumed to be in the language provided through the <code>@language</code> property of the <code>@context</code> (or have no assumed language, if there is no such property). Multiple alternative values can be given in an array:
-            </p>
-            <pre class="example highlight">
+          </pre>
+          <p>
+            then that string is assumed to be in the language provided through the <code>@language</code> property of the <code>@context</code> (or have no assumed language, if there is no such property). Multiple alternative values can be given in an array:
+          </p>
+          <pre class="example highlight">
 "title": [
   "Project title",
   "Project"
 ]
-            </pre>
-            <p>
-              It's also possible to provide multiple values in different languages, using an object structure. For example:
-            </p>
-            <pre class="example highlight">
+          </pre>
+          <p>
+            It's also possible to provide multiple values in different languages, using an object structure. For example:
+          </p>
+          <pre class="example highlight">
 "title": {
   "en": "Project title",
   "fr": "Titre du projet"
 }
-            </pre>
-            <p>
-              and within such an object, the values of the properties can themselves be arrays:
-            </p>
-            <pre class="example highlight">
+          </pre>
+          <p>
+            and within such an object, the values of the properties can themselves be arrays:
+          </p>
+          <pre class="example highlight">
 "title": {
   "en": [ "Project title", "Project" ],
   "fr": "Titre du projet"
 }
-            </pre>
-            <p>
-             The <a>property value</a> of a <a>natural language property</a> is an object whose properties are language codes and where the values of those properties are an array of strings (see <cite><a href="http://www.w3.org/TR/json-ld/#language-maps">Language Maps</a></cite> in [[!JSON-LD]]).</p>
-             <p class="note">
-               When extracting a <a>property value</a> metadata will have already been <a>merged</a>, a <a>natural language property</a> will already have this form.
-             </p>
-          </dd>
-          <dt><dfn title="atomic property">atomic properties</dfn></dt>
-          <dd>
-            <p>These hold <dfn title="atomic value">atomic values</dfn>. Their values may be:</p>
-            <ul>
-              <li><strong>numbers</strong> &mdash; interpreted as integers or doubles</li>
-              <li><strong>booleans</strong> &mdash; interpreted as booleans (<code>true</code> or <code>false</code>)</li>
-              <li><strong>strings</strong> &mdash; interpreted as defined by the property</li>
-              <li><strong>arrays</strong> &mdash; lists of numbers, booleans or strings</li>
-            </ul>
-            <p class="note">
-              JSON does not have date or time types. Where a property takes a date as a value, this MUST be a string in the format <code>YYYY-MM-DD</code>.
-            </p>
-            <p class="issue" data-number="136">
-              Having <strong>arrays</strong> as an atomic property creates issues when merging. We may consider the difference between an <a>atomic property</a> and an <a>atomic value</a>, where an atomic property takes an <a>atomic value</a> or an array of <a title="atomic value">atomic values</a>. However, the only case of an <a>atomic property</a> which accepts an array of values is <code>null</code>, which may not be required, so we may just restrict <code>null</code> to taking a single <a>atomic value</a>, and re-define an <a>atomic value</a> to be <strong>numbers</strong>, <strong>booleans</strong> or <strong>strings</strong>.
-            </p>
-          </dd>
-        </dl>
+          </pre>
+          <p>
+           The <a>property value</a> of a <a>natural language property</a> is an object whose properties are language codes and where the values of those properties are an array of strings (see <cite><a href="http://www.w3.org/TR/json-ld/#language-maps">Language Maps</a></cite> in [[!JSON-LD]]).
+          </p>
+          <p class="note">
+            When extracting a <a>property value</a> metadata will have already been <a>merged</a>, a <a>natural language property</a> will already have this form.
+          </p>
+        </section>
+        <section>
+          <h4>Atomic Properties</h4>
+          <p>
+            <dfn title="atomic property">Atomic properties</dfn> hold <dfn title="atomic value">atomic values</dfn>. Their values may be:
+          </p>
+          <ul>
+            <li><strong>numbers</strong> &mdash; interpreted as integers or doubles</li>
+            <li><strong>booleans</strong> &mdash; interpreted as booleans (<code>true</code> or <code>false</code>)</li>
+            <li><strong>strings</strong> &mdash; interpreted as defined by the property</li>
+            <li><strong>arrays</strong> &mdash; lists of numbers, booleans or strings</li>
+          </ul>
+          <p class="note">
+            JSON does not have date or time types. Where a property takes a date as a value, this MUST be a string in the format <code>YYYY-MM-DD</code>.
+          </p>
+          <p class="issue" data-number="136">
+            Having <strong>arrays</strong> as an atomic property creates issues when merging. We may consider the difference between an <a>atomic property</a> and an <a>atomic value</a>, where an atomic property takes an <a>atomic value</a> or an array of <a title="atomic value">atomic values</a>. However, the only case of an <a>atomic property</a> which accepts an array of values is <code>null</code>, which may not be required, so we may just restrict <code>null</code> to taking a single <a>atomic value</a>, and re-define an <a>atomic value</a> to be <strong>numbers</strong>, <strong>booleans</strong> or <strong>strings</strong>.
+          </p>
+        </section>
       </section>
       <section>
         <h3>Top-Level Properties</h3>
@@ -705,7 +737,7 @@ CSVW,foaf:Project,table;data;conversion
             <dt id="table-notes"><code>notes</code></dt>
             <dd>
               <p>
-                An <a>object property</a> that provides an array of objects representing arbitrary annotations on the annotated tabular data model. This specification does not place any constraints on the structure of these objects.
+                An <a>array property</a> that provides an array of objects representing arbitrary annotations on the annotated tabular data model. This specification does not place any constraints on the structure of these objects.
               </p>
               <p class="note">
                 The <a href="http://www.w3.org/annotation/">Web Annotation Working Group</a> is developing a vocabulary for expressing annotations. In future versions of this specification, we anticipate referencing that vocabulary.
