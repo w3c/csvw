@@ -47,7 +47,8 @@ class Vocab
   end
 
   def to_jsonld
-    context = ::JSON.parse %({
+    context = {}
+    rdfs_context = ::JSON.parse %({
       "id": "@id",
       "type": "@type",
       "dc:title": {"@container": "@language"},
@@ -71,16 +72,6 @@ class Vocab
       "rdfs_instances": {"@reverse": "rdfs:isDefinedBy", "@type": "@id"}
     })
     rdfs_classes, rdfs_properties, rdfs_datatypes, rdfs_instances = [], [], [], []
-    ontology = {
-      "@id" => prefixes["csvw"][:subClassOf],
-      "@type" => "owl:Ontology",
-      "dc:title" => {"en" => TITLE},
-      "dc:description" => {"en" => DESCRIPTION},
-      "rdfs_classes" => rdfs_classes,
-      "rdfs_properties" => rdfs_properties,
-      "rdfs_datatypes" => rdfs_datatypes,
-      "rdfs_instances" => rdfs_instances
-    }
 
     prefixes.each do |id, entry|
       context[id] = entry[:subClassOf]
@@ -168,14 +159,27 @@ class Vocab
       }
     end
 
-    # Add ontology to context
-    {"@context" => context}.merge!(ontology).to_json(JSON_STATE)
+    # Use separate rdfs context so as not to polute the CSVW context.
+    {
+      "@context" => context,
+      "@graph" => {
+        "@context" => rdfs_context,
+        "@id" => prefixes["csvw"][:subClassOf],
+        "@type" => "owl:Ontology",
+        "dc:title" => {"en" => TITLE},
+        "dc:description" => {"en" => DESCRIPTION},
+        "rdfs_classes" => rdfs_classes,
+        "rdfs_properties" => rdfs_properties,
+        "rdfs_datatypes" => rdfs_datatypes,
+        "rdfs_instances" => rdfs_instances
+      }
+    }.to_json(JSON_STATE)
   end
 
   def to_html
     json = JSON.parse(to_jsonld)
     eruby = Erubis::Eruby.new(File.read("template.html"))
-    eruby.result(ont: json)
+    eruby.result(ont: json['@graph'], context: json['@context'])
   end
 
   def to_ttl
