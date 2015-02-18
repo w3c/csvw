@@ -332,7 +332,13 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           </p>
           <dl>
             <dt>column names</dt>
-            <dd>a variable is set for each column within the schema; the name of the variable is the <a href="#cell-name"><code>name</code></a> of the column and the value is the canonical representation of the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">value</a> of the cell in that column in the row that is currently being processed</dd>
+            <dd>a variable is set for each column within the schema; the name of the variable is the <a href="#cell-name"><code>name</code></a> of the column and the value is derived from the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">value</a> of the cell in that column in the row that is currently being processed, namely one of:
+              <ul>
+                <li><code>null</code></li>
+                <li>the <a href="http://www.w3.org/TR/xmlschema11-2/#dt-canonical-representation" class="externalDFN">canonical representation</a> of the value of the cell, as defined in [[!xmlschema11-2]], if it has a single value</li>
+                <li>a list of <a href="http://www.w3.org/TR/xmlschema11-2/#dt-canonical-representation" class="externalDFN">canonical representations</a> of the values of the cell, if it has a sequence value</li>
+              </ul>
+            </dd>
             <dt><code>_column</code></dt>
             <dd><code>_column</code> is set to the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column-number" class="externalDFN">column number</a> of the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column" class="externalDFN">column</a> from the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-table" class="externalDFN">annotated table</a>that is currently being processed</dd>
             <dt><code>_sourceColumn</code></dt>
@@ -404,6 +410,29 @@ CSVW,foaf:Project,table;data;conversion
           </p>
           <p>
             If the value in the <code>keywords</code> column were an empty sequence (created from an empty cell in the original data), the reference to that column would be expanded to an empty string, generating <code>https://duckduckgo.com/?q=</code>.
+          </p>
+          <p>
+            When a cell's <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">value</a> is not a string, the canonical representation of that value is used within the expanded URL. For example, the data may include dates such as those in:
+          </p>
+          <pre class="example highlight" title="CSV containing dates">
+GID,On Street,Species,Trim Cycle,Inventory Date
+1,ADDISON AV,Celtis australis,Large Tree Routine Prune,10/18/2010
+2,EMERSON ST,Liquidambar styraciflua,Large Tree Routine Prune,6/2/2010
+3,EMERSON ST,Liquidambar styraciflua,Large Tree Routine Prune,6/2/2010
+          </pre>
+          <p>
+            The <code>Inventory Date</code> column description would indicate that these were dates with the format <code>M/d/yyyy</code>:
+          </p>
+          <pre class="example highlight">
+{
+  "name": "inventory_date",
+  "title": "Inventory Date",
+  "datatype": "date",
+  "format": "M/d/yyyy"
+}
+          </pre>
+          <p>
+            The string value of the <code>inventory_date</code> column in the first row is parsed to create the date 18th October 2010. When the <code>inventory_date</code> column is referenced within a URI template such as <code>http://example.org/event/{inventory_date}</code>, the <a href="http://www.w3.org/TR/xmlschema11-2/#dt-canonical-representation" class="externalDFN">canonical representation</a> of that date is used within the URL, giving the result <code>http://example.org/event/2010-10-18</code>.
           </p>
         </section>
         <section>
