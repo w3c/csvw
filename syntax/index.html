@@ -242,6 +242,85 @@ var respecConfig = {
       </section>
     </section>
     <section>
+      <h2>Locating Metadata</h2>
+      <p>
+        As described in <a href="#annotated-tabular-data-model" class="sectionRef"></a>, tabular data may have a number of annotations associated with it. Here we describe the different methods that can be used to locate those annotations given a link to a CSV file.
+      </p>
+      <p>
+        In most methods of locating metadata described here, metadata is provided within a separate document. The syntax of this document is defined in the <a href="http://www.w3.org/TR/tabular-metadata/">Metadata Vocabulary for Tabular Data</a> specification. These documents can include things like:
+      </p>
+      <ul>
+        <li>metadata about the table, such as titles, descriptions, provenance, and links to other tables</li>
+        <li>metadata about columns in the table, such as titles, data types and other constraints, or flags to indicate values in the column are unique</li>
+        <li>metadata about rows in the table, such as certainty or provenance</li>
+        <li>metadata about values in the table, such as notes or type annotations</li>
+      </ul>
+      <p>
+        When creating a set of annotations from metadata, if the same property is specified in two locations then information "closer" to the end user or interpreter of the document should override other information, and information "closer" to the document itself should override information "further" from the document. Explicitly, the order of preference is:
+      </p>
+      <ol>
+        <li>metadata supplied by the user of the implementation that is processing the tabular data, see <a href="#overriding-metadata" class="sectionRef"></a></li>
+        <li>metadata embedded within the tabular data file itself, see <a href="#embedded-metadata" class="sectionRef"></a></li>
+        <li>metadata in a document linked to using a <code>Link</code> header associated with the tabular data file, see <a href="#link-header" class="sectionRef"></a></li>
+        <li>file-specific metadata in a document located based on the location of the tabular data file, see <a href="#standard-file-metadata" class="sectionRef"></a></li>
+        <li>directory-specific metadata in a document located based on the location of the tabular data file, see <a href="#standard-directory-metadata" class="sectionRef"></a></li>
+      </ol>
+      <p>
+        Processors MUST attempt to locate metadata documents based on each of these locations in order, and use all metadata documents that are successfully located in this way, merging them in the order found as defined in <a href="http://w3c.github.io/csvw/metadata/#merging-metadata"></a> in [[!tabular-metadata]].
+      </p>
+      <p>If no metadata is supplied or found, then the following Metadata is used as the default for extracted <a>embedded metadata</a>:</p>
+      <pre>
+{
+  "@type": "TableGroup",
+  "resources": []
+}
+      </pre>
+      <p class="issue" data-number="175">
+        This particular value for default metadata will allow a header line to be extracted from the tabular data file to create simple metadata using header cells as column names and titles.
+      </p>
+      <section>
+        <h3>Overriding Metadata</h3>
+        <p>
+          Processors SHOULD provide users with the facility to provide their own metadata for tabular data files that they process. This might be provided:
+        </p>
+        <ul>
+          <li>by providing processor options, such as using command-line options for a command-line implementation or checkboxes in a GUI</li>
+          <li>by enabling the user to select an existing metadata file, which may be local or remote</li>
+          <li>by enabling the user to specify a series of metadata files, which are merged by the processor and handled as if they were a single file</li>
+        </ul>
+      </section>
+      <section>
+        <h3>Embedded Metadata</h3>
+        <p>
+          Most syntaxes for tabular data provide a facility for <dfn title="embedded metadata">embedding metadata</dfn> within the tabular data file itself. The definition of a syntax for tabular data SHOULD include a description of how the syntax maps to an annotated data model. See <a href="#parsing" class="sectionRef"></a> for a description of this for CSV files.
+        </p>
+      </section>
+      <section>
+        <h3>Link Header</h3>
+        <p>
+          When retrieving a tabular data file via HTTP, the response MAY include a <code>Link</code> header with <code>rel=describedby</code> and <code>type=application/csv-metadata+json</code> that points to a metadata file that describes the tabular data file. If there is more than one valid metadata file linked to through multiple <code>Link</code> headers, then the metadata referenced by <code>Link</code> headers that appear later in the response are used in preference to those referenced by earlier <code>Link</code> headers.
+        </p>
+      </section>
+      <section>
+        <h3>Standard File Metadata</h3>
+        <p>
+          If no metadata document has been located through higher-priority mechanisms, processors MUST attempt to locate a file-specific metadata document. This method is only used if the URL of the tabular data file does not contain a query component.
+        </p>
+        <p>
+          In this case, the file-specific metadata document should be located at <code><var>location</var>-metadata.json</code>, where <var>location</var> is the base URL of the tabular data file with the fragment component of the URL removed, if applicable. For example, if the tabular data file is at <code>http://example.org/south-west/devon.csv</code> then processors should attempt to locate a metadata document at <code>http://example.org/south-west/devon.csv-metadata.json</code>. If the metadata file found at this location does not explicitly point to the relevant tabular data file then it MUST be ignored.
+        </p>
+      </section>
+      <section>
+        <h3>Standard Directory Metadata</h3>
+        <p>
+          If no metadata document has been located through higher-priority mechanisms, processors MUST attempt to locate a directory-level metadata document. This method is only used if the URL of the tabular data file does not contain a query component.
+        </p>
+        <p>
+          The common metadata document for a directory can be located by resolving the relative URL <code>metadata.json</code> against the base URL of the tabular data file. For example, if the tabular data file is at <code>http://example.org/south-west/devon.csv</code> then processors should attempt to locate a metadata file at <code>http://example.org/south-west/metadata.json</code>. If the metadata file found at this location does not explicitly point to the relevant tabular data file then it MUST be ignored.
+        </p>
+      </section>
+    </section>
+    <section>
       <h2>Processing Tables</h2>
       <p>
         This section describes how particular types of applications should process tabular data and metadata files.
@@ -340,85 +419,6 @@ var respecConfig = {
           <li>a string containing a SPARQL CONSTRUCT pattern that is executed on RDF after it is generated</li>
           <li>properties that contain definitions of Javascript callback functions that are used when processing particular columns or individual rows</li>
         </ul>
-      </section>
-    </section>
-    <section>
-      <h2>Locating Metadata</h2>
-      <p>
-        As described in <a href="#annotated-tabular-data-model" class="sectionRef"></a>, tabular data may have a number of annotations associated with it. Here we describe the different methods that can be used to locate those annotations given a link to a CSV file.
-      </p>
-      <p>
-        In most methods of locating metadata described here, metadata is provided within a separate document. The syntax of this document is defined in the <a href="http://www.w3.org/TR/tabular-metadata/">Metadata Vocabulary for Tabular Data</a> specification. These documents can include things like:
-      </p>
-      <ul>
-        <li>metadata about the table, such as titles, descriptions, provenance, and links to other tables</li>
-        <li>metadata about columns in the table, such as titles, data types and other constraints, or flags to indicate values in the column are unique</li>
-        <li>metadata about rows in the table, such as certainty or provenance</li>
-        <li>metadata about values in the table, such as notes or type annotations</li>
-      </ul>
-      <p>
-        When creating a set of annotations from metadata, if the same property is specified in two locations then information "closer" to the end user or interpreter of the document should override other information, and information "closer" to the document itself should override information "further" from the document. Explicitly, the order of preference is:
-      </p>
-      <ol>
-        <li>metadata supplied by the user of the implementation that is processing the tabular data, see <a href="#overriding-metadata" class="sectionRef"></a></li>
-        <li>metadata embedded within the tabular data file itself, see <a href="#embedded-metadata" class="sectionRef"></a></li>
-        <li>metadata in a document linked to using a <code>Link</code> header associated with the tabular data file, see <a href="#link-header" class="sectionRef"></a></li>
-        <li>file-specific metadata in a document located based on the location of the tabular data file, see <a href="#standard-file-metadata" class="sectionRef"></a></li>
-        <li>directory-specific metadata in a document located based on the location of the tabular data file, see <a href="#standard-directory-metadata" class="sectionRef"></a></li>
-      </ol>
-      <p>
-        Processors MUST attempt to locate metadata documents based on each of these locations in order, and use all metadata documents that are successfully located in this way, merging them in the order found as defined in <a href="http://w3c.github.io/csvw/metadata/#merging-metadata"></a> in [[!tabular-metadata]].
-      </p>
-      <p>If no metadata is supplied or found, then the following Metadata is used as the default for extracted <a>embedded metadata</a>:</p>
-      <pre>
-{
-  "@type": "TableGroup",
-  "resources": []
-}
-      </pre>
-      <p class="issue" data-number="175">
-        This particular value for default metadata will allow a header line to be extracted from the tabular data file to create simple metadata using header cells as column names and titles.
-      </p>
-      <section>
-        <h3>Overriding Metadata</h3>
-        <p>
-          Processors SHOULD provide users with the facility to provide their own metadata for tabular data files that they process. This might be provided:
-        </p>
-        <ul>
-          <li>by providing processor options, such as using command-line options for a command-line implementation or checkboxes in a GUI</li>
-          <li>by enabling the user to select an existing metadata file, which may be local or remote</li>
-          <li>by enabling the user to specify a series of metadata files, which are merged by the processor and handled as if they were a single file</li>
-        </ul>
-      </section>
-      <section>
-        <h3>Embedded Metadata</h3>
-        <p>
-          Most syntaxes for tabular data provide a facility for <dfn title="embedded metadata">embedding metadata</dfn> within the tabular data file itself. The definition of a syntax for tabular data SHOULD include a description of how the syntax maps to an annotated data model. See <a href="#parsing" class="sectionRef"></a> for a description of this for CSV files.
-        </p>
-      </section>
-      <section>
-        <h3>Link Header</h3>
-        <p>
-          When retrieving a tabular data file via HTTP, the response MAY include a <code>Link</code> header with <code>rel=describedby</code> and <code>type=application/csv-metadata+json</code> that points to a metadata file that describes the tabular data file. If there is more than one valid metadata file linked to through multiple <code>Link</code> headers, then the metadata referenced by <code>Link</code> headers that appear later in the response are used in preference to those referenced by earlier <code>Link</code> headers.
-        </p>
-      </section>
-      <section>
-        <h3>Standard File Metadata</h3>
-        <p>
-          If no metadata document has been located through higher-priority mechanisms, processors MUST attempt to locate a file-specific metadata document. This method is only used if the URL of the tabular data file does not contain a query component.
-        </p>
-        <p>
-          In this case, the file-specific metadata document should be located at <code><var>location</var>-metadata.json</code>, where <var>location</var> is the base URL of the tabular data file with the fragment component of the URL removed, if applicable. For example, if the tabular data file is at <code>http://example.org/south-west/devon.csv</code> then processors should attempt to locate a metadata document at <code>http://example.org/south-west/devon.csv-metadata.json</code>. If the metadata file found at this location does not explicitly point to the relevant tabular data file then it MUST be ignored.
-        </p>
-      </section>
-      <section>
-        <h3>Standard Directory Metadata</h3>
-        <p>
-          If no metadata document has been located through higher-priority mechanisms, processors MUST attempt to locate a directory-level metadata document. This method is only used if the URL of the tabular data file does not contain a query component.
-        </p>
-        <p>
-          The common metadata document for a directory can be located by resolving the relative URL <code>metadata.json</code> against the base URL of the tabular data file. For example, if the tabular data file is at <code>http://example.org/south-west/devon.csv</code> then processors should attempt to locate a metadata file at <code>http://example.org/south-west/metadata.json</code>. If the metadata file found at this location does not explicitly point to the relevant tabular data file then it MUST be ignored.
-        </p>
       </section>
     </section>
     <section id="syntax" class="informative">
