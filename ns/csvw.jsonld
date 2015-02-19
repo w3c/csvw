@@ -87,6 +87,7 @@
     "unsignedShort": "xsd:unsignedShort",
     "yearMonthDuration": "xsd:yearMonthDuration",
     "Column": "csvw:Column",
+    "Datatype": "csvw:Datatype",
     "Dialect": "csvw:Dialect",
     "Direction": "csvw:Direction",
     "Schema": "csvw:Schema",
@@ -95,6 +96,10 @@
     "Template": "csvw:Template",
     "aboutUrl": {
       "@id": "csvw:aboutUrl",
+      "@type": "@id"
+    },
+    "base": {
+      "@id": "csvw:base",
       "@type": "@id"
     },
     "columns": {
@@ -109,6 +114,10 @@
     "datatype": {
       "@id": "csvw:datatype",
       "@type": "@vocab"
+    },
+    "decimalChar": {
+      "@id": "csvw:decimalChar",
+      "@language": null
     },
     "default": {
       "@id": "csvw:default",
@@ -136,6 +145,10 @@
     },
     "format": {
       "@id": "csvw:format",
+      "@language": null
+    },
+    "groupChar": {
+      "@id": "csvw:groupChar",
       "@language": null
     },
     "header": {
@@ -195,6 +208,10 @@
     },
     "null": {
       "@id": "csvw:null",
+      "@language": null
+    },
+    "pattern": {
+      "@id": "csvw:pattern",
       "@language": null
     },
     "primaryKey": {
@@ -391,6 +408,16 @@
         }
       },
       {
+        "@id": "csvw:Datatype",
+        "@type": "rdfs:Class",
+        "rdfs:label": {
+          "en": "Datatype"
+        },
+        "rdfs:comment": {
+          "en": "Describes facets of a datatype."
+        }
+      },
+      {
         "@id": "csvw:Dialect",
         "@type": "rdfs:Class",
         "rdfs:label": {
@@ -472,6 +499,18 @@
         "rdfs:range": "csvw:uriTemplate"
       },
       {
+        "@id": "csvw:base",
+        "@type": "rdf:Property",
+        "rdfs:label": {
+          "en": "base"
+        },
+        "rdfs:comment": {
+          "en": "An atomic property that contains a single string: a term defined in the default context representing a built-in datatype URL"
+        },
+        "rdfs:domain": "csvw:Datatype",
+        "rdfs:range": "rdfs:Datatype"
+      },
+      {
         "@id": "csvw:columns",
         "@type": "rdf:Property",
         "rdfs:label": {
@@ -502,7 +541,7 @@
           "en": "datatype"
         },
         "rdfs:comment": {
-          "en": "The main datatype of the values of the cell. If the cell contains a list (ie separator is specified and not null) then this is the datatype of each value within the list."
+          "en": "An object property that contains either a single string that is the main datatype of the values of the cell or a datatype description object."
         },
         "rdfs:domain": {
           "owl:unionOf": [
@@ -512,7 +551,19 @@
             "csvw:Column"
           ]
         },
-        "rdfs:range": "rdfs:Datatype"
+        "rdfs:range": "rdfs:Datatype Datatype"
+      },
+      {
+        "@id": "csvw:decimalChar",
+        "@type": "rdf:Property",
+        "rdfs:label": {
+          "en": "decimal character"
+        },
+        "rdfs:comment": {
+          "en": "A single character string whose value is used to represent a decimal point within the number. The default value is \".\"."
+        },
+        "rdfs:domain": "csvw:Datatype",
+        "rdfs:range": "xsd:string"
       },
       {
         "@id": "csvw:default",
@@ -607,14 +658,19 @@
         "rdfs:comment": {
           "en": "A definition of the format of the cell, used when parsing the cell."
         },
-        "rdfs:domain": {
-          "owl:unionOf": [
-            "csvw:TableGroup",
-            "csvw:Table",
-            "csvw:Schema",
-            "csvw:Column"
-          ]
+        "rdfs:domain": "csvw:Datatype",
+        "rdfs:range": "xsd:string"
+      },
+      {
+        "@id": "csvw:groupChar",
+        "@type": "rdf:Property",
+        "rdfs:label": {
+          "en": "group character"
         },
+        "rdfs:comment": {
+          "en": "A single character string whose value is used to group digits within the number. The default value is \",\"."
+        },
+        "rdfs:domain": "csvw:Datatype",
         "rdfs:range": "xsd:string"
       },
       {
@@ -624,7 +680,7 @@
           "en": "header"
         },
         "rdfs:comment": {
-          "en": ""
+          "en": "A single boolean atomic property that, if true, sets the header row count flag to 1, and if false to 0, unless headerRowCount is provided, in which case the value provided for the header property is ignored."
         },
         "rdfs:domain": "csvw:Dialect",
         "rdfs:range": "xsd:boolean"
@@ -681,14 +737,7 @@
         "rdfs:comment": {
           "en": "The exact length of the value of the cell."
         },
-        "rdfs:domain": {
-          "owl:unionOf": [
-            "csvw:TableGroup",
-            "csvw:Table",
-            "csvw:Schema",
-            "csvw:Column"
-          ]
-        },
+        "rdfs:domain": "csvw:Datatype",
         "rdfs:range": "xsd:nonNegativeInteger"
       },
       {
@@ -712,14 +761,7 @@
         "rdfs:comment": {
           "en": "The maximum value for the cell (exclusive)."
         },
-        "rdfs:domain": {
-          "owl:unionOf": [
-            "csvw:TableGroup",
-            "csvw:Table",
-            "csvw:Schema",
-            "csvw:Column"
-          ]
-        },
+        "rdfs:domain": "csvw:Datatype",
         "rdfs:range": "xsd:integer"
       },
       {
@@ -731,14 +773,7 @@
         "rdfs:comment": {
           "en": "The maximum value for the cell (inclusive). "
         },
-        "rdfs:domain": {
-          "owl:unionOf": [
-            "csvw:TableGroup",
-            "csvw:Table",
-            "csvw:Schema",
-            "csvw:Column"
-          ]
-        },
+        "rdfs:domain": "csvw:Datatype",
         "rdfs:range": "xsd:integer"
       },
       {
@@ -750,14 +785,7 @@
         "rdfs:comment": {
           "en": "The maximum length of the value of the cell."
         },
-        "rdfs:domain": {
-          "owl:unionOf": [
-            "csvw:TableGroup",
-            "csvw:Table",
-            "csvw:Schema",
-            "csvw:Column"
-          ]
-        },
+        "rdfs:domain": "csvw:Datatype",
         "rdfs:range": "xsd:nonNegativeInteger"
       },
       {
@@ -769,14 +797,7 @@
         "rdfs:comment": {
           "en": "The minimum value for the cell (exclusive)."
         },
-        "rdfs:domain": {
-          "owl:unionOf": [
-            "csvw:TableGroup",
-            "csvw:Table",
-            "csvw:Schema",
-            "csvw:Column"
-          ]
-        },
+        "rdfs:domain": "csvw:Datatype",
         "rdfs:range": "xsd:integer"
       },
       {
@@ -788,14 +809,7 @@
         "rdfs:comment": {
           "en": "The minimum value for the cell (inclusive)."
         },
-        "rdfs:domain": {
-          "owl:unionOf": [
-            "csvw:TableGroup",
-            "csvw:Table",
-            "csvw:Schema",
-            "csvw:Column"
-          ]
-        },
+        "rdfs:domain": "csvw:Datatype",
         "rdfs:range": "xsd:integer"
       },
       {
@@ -807,14 +821,7 @@
         "rdfs:comment": {
           "en": "The minimum length of the value of the cell."
         },
-        "rdfs:domain": {
-          "owl:unionOf": [
-            "csvw:TableGroup",
-            "csvw:Table",
-            "csvw:Schema",
-            "csvw:Column"
-          ]
-        },
+        "rdfs:domain": "csvw:Datatype",
         "rdfs:range": "xsd:nonNegativeInteger"
       },
       {
@@ -857,6 +864,18 @@
             "csvw:Column"
           ]
         },
+        "rdfs:range": "xsd:string"
+      },
+      {
+        "@id": "csvw:pattern",
+        "@type": "rdf:Property",
+        "rdfs:label": {
+          "en": "pattern"
+        },
+        "rdfs:comment": {
+          "en": "A regular expression string, in the syntax and interpreted as defined by [ECMASCRIPT]."
+        },
+        "rdfs:domain": "csvw:Datatype",
         "rdfs:range": "xsd:string"
       },
       {

@@ -163,8 +163,10 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       "name": "inventory_date",
       "title": "Inventory Date",
       "dc:description": "The date of the operation that was performed.",
-      "datatype": "date",
-      "format": "M/D/YYYY"
+      "datatype": {
+        "base": "date",
+        "format": "M/d/yyyy"
+      }
     }],
     "primaryKey": "GID",
     "aboutUrl": "#gid-{GID}"
@@ -228,8 +230,10 @@ GID,On Street,Species,Trim Cycle,Inventory Date
   "name": "inventory_date",
   "title": "Inventory Date",
   "dc:description": "The date of the operation that was performed.",
-  "datatype": "date",
-  "format": "M/D/YYYY"
+  "datatype": {
+    "base": "date",
+    "format": "M/d/yyyy"
+  }
 }
       </pre>
       <p>
@@ -415,8 +419,10 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 {
   "name": "inventory_date",
   "title": "Inventory Date",
-  "datatype": "date",
-  "format": "M/d/yyyy"
+  "datatype": {
+    "base": "date",
+    "format": "M/d/yyyy"
+  }
 }
           </pre>
           <p>
@@ -1353,8 +1359,10 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
     }, {
       "name": "inventory_date",
       "title": "Inventory Date",
-      "datatype": "date",
-      "format": "M/D/YYYY",
+      "datatype": {
+        "base": "date",
+        "format": "M/d/yyyy"
+      },
       "aboutUrl": "#event-{inventory_date}",
       "propertyUrl": "schema:startDate"
     }, {
@@ -1460,16 +1468,10 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
               An <a>atomic property</a> holding a single string that is used to create a default <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">value</a> for the cell in cases where the original <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-string-value" class="externalDFN">string value</a> is an empty string. This default value MAY be used when converting the table into other formats, or when the table is displayed. If not specified, the default for the <code>default</code> property is the empty string, <code>""</code>.
             </p>
           </dd>
-          <dt id="cell-format"><code>format</code></dt>
-          <dd>
-            <p>
-              An <a>atomic property</a> that contains a single string that is the definition of the format of the cell, used when parsing the cell as described in <a href="#parsing-cells"></a>.
-            </p>
-          </dd>
           <dt id="cell-datatype"><code>datatype</code></dt>
           <dd>
             <p>
-              An <a>atomic property</a> that contains a single string that is the main datatype of the values of the cell. The value is a term defined in the default context representing a datatype URL. If the cell contains a list (ie <code>separator</code> is specified and not <code>null</code>) then this is the datatype of each value within the list. Conversion specifications MUST use the datatype of the value to determine the conversion of a cell into the target format. See <a href="#datatypes"></a> for more details.
+              An <a>object property</a> that contains either a single string that is the main datatype of the values of the cell or a <a>datatype description</a> object. If the value of this property is a string, it is a term defined in the default context representing a built-in datatype URL; if it is an object then it describes a more specialised datatype. If a cell contains a sequence (ie the <code>separator</code> property is specified and not <code>null</code>) then this property specifies the datatype of each value within that sequence. See <a href="#datatypes"></a> for more details.
             </p>
           </dd>
           <dt id="cell-aboutUrl"><code>aboutUrl</code></dt>
@@ -1489,115 +1491,137 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
               This allows a <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">cell value</a> to define one or more RDF <cite><a href="http://www.w3.org/TR/rdf11-concepts/#dfn-resource">resources</a></cite> value of a cell instead of a literal values, as defined in [[rdf-concepts]]. For example, if the value were <code>"{#reference}"</code>, each cell value of a column named <em>reference</em> would be used to create a URI such as <code>http://example.com/#1234</code>, if <code>1234</code> were a cell value of that column.</p>
             <p class="note"><code>valueUrl</code> is typically defined on a Column. If defined on a Schema, Table or Table Group, care must be taken to ensure that transformed cell values maintain an appropriate semantic relationship.</p>
           </dd>
-          <dt id="cell-length"><code>length</code></dt>
-          <dd>
-            <p>
-              An <a>atomic property</a> that contains a single integer that is the exact length of the value of the cell. See <a href="#length-constraints" class="sectionRef"></a> for details.
-            </p>
-          </dd>
-          <dt id="cell-minLength"><code>minLength</code></dt>
-          <dd>
-            <p>
-              An <a>atomic property</a> that contains a single integer that is the minimum length of the value of the cell. See <a href="#length-constraints" class="sectionRef"></a> for details.
-            </p>
-          </dd>
-          <dt id="cell-maxLength"><code>maxLength</code></dt>
-          <dd>
-            <p>
-              An <a>atomic property</a> that contains a single integer that is the maximum length of the value of the cell. See <a href="#length-constraints" class="sectionRef"></a> for details.
-            </p>
-          </dd>
-          <dt id="cell-minimum"><code>minimum</code></dt>
-          <dd>
-            <p>
-              An <a>atomic property</a> that contains a single number that is the minimum value for the cell (inclusive); equivalent to <code>minInclusive</code>. See <a href="#value-constraints" class="sectionRef"></a> for details.
-            </p>
-          </dd>
-          <dt id="cell-maximum"><code>maximum</code></dt>
-          <dd>
-            <p>
-              An <a>atomic property</a> that contains a single number that is the maximum value for the cell (inclusive); equivalent to <code>maxInclusive</code>. See <a href="#value-constraints" class="sectionRef"></a> for details.
-            </p>
-          </dd>
-          <dt id="cell-minInclusive"><code>minInclusive</code></dt>
-          <dd>
-            <p>
-              An <a>atomic property</a> that contains a single number that is the minimum value for the cell (inclusive). See <a href="#value-constraints" class="sectionRef"></a> for details.
-            </p>
-          </dd>
-          <dt id="cell-maxInclusive"><code>maxInclusive</code></dt>
-          <dd>
-            <p>
-              An <a>atomic property</a> that contains a single number that is the maximum value for the cell (inclusive). See <a href="#value-constraints" class="sectionRef"></a> for details.
-            </p>
-          </dd>
-          <dt id="cell-minExclusive"><code>minExclusive</code></dt>
-          <dd>
-            <p>
-              An <a>atomic property</a> that contains a single number that is the minimum value for the cell (exclusive). See <a href="#value-constraints" class="sectionRef"></a> for details.
-            </p>
-          </dd>
-          <dt id="cell-maxExclusive"><code>maxExclusive</code></dt>
-          <dd>
-            <p>
-              An <a>atomic property</a> that contains a single number that is the maximum value for the cell (exclusive). See <a href="#value-constraints" class="sectionRef"></a> for details.
-            </p>
-          </dd>
         </dl>
         <p>The <a>property value</a> of an <a>inherited property</a> is the first value, if any, found by looking in the current description object through all of its containing objects: a <a>inherited property</a> defined in a <a>column description</a> takes precedence of one defined in a <a>schema description</a>, which in turn takes precedence of one defined in a <a>table description</a>, which in turn takes precedence of one defined in a <a>table group description</a>.</p>
       </section>
       <section>
         <h2>Datatypes</h2>
         <p>
-          Cells within tables may be annotated with a <code>datatype</code> which indicates the type of the value obtained by parsing the value of the cell. The format expected in the cell is determined by the <code>format</code> annotation, if there is one, or uses a default format determined by the type.
+          Cells within tables may be annotated with a <code>datatype</code> which indicates the type of the values obtained by parsing the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-string-value" class="externalDFN">string value</a> of the cell. See <a href="#parsing-cells"></a> for details of how string values are parsed against datatypes.
         </p>
-        <p>
-          The possible datatypes are:
-        </p>
-        <ul>
-          <li>
-            <p>the datatypes defined in [[!xmlschema11-2]] as derived from and including <code>anyAtomicType</code>, as shown in <a href="#fig-datatypes" class="sectionRef"></a>, with the exception of those that rely on XML mechanisms for definition, namely those in the diagram except:</p>
-            <ul>
-              <li><code>anyType</code></li>
-              <li><code>anySimpleType</code></li>
-              <li><code>ENTITIES</code></li>
-              <li><code>IDREFS</code></li>
-              <li><code>NMTOKENS</code></li>
-              <li><code>ENTITY</code></li>
-              <li><code>ID</code></li>
-              <li><code>IDREF</code></li>
-              <li><code>NOTATION</code></li>
-            </ul>
-          </li>
-          <li>the datatype <code>number</code> which is exactly equivalent to <code>double</code></li>
-          <li>the datatype <code>binary</code> which is exactly equivalent to <code>base64Binary</code></li>
-          <li>the datatype <code>datetime</code> which is exactly equivalent to <code>dateTime</code></li>
-          <li>the datatype <code>any</code> which is exactly equivalent to <code>anyAtomicType</code></li>
-          <li>the datatype <code>xml</code> which indicates the cell contains an XML fragment</li>
-          <li>the datatype <code>html</code> which indicates the cell contains an HTML fragment</li>
-          <li>the datatype <code>json</code> which indicates the cell contains serialized JSON</li>
-        </ul>
-        <figure id="fig-datatypes">
-          <img src="http://www.w3.org/TR/xmlschema11-2/type-hierarchy-201104.png" width="810" height="1060" alt="Built-in Datatype Hierarchy diagram" longdesc="http://www.w3.org/TR/xmlschema11-2/type-hierarchy-201104.longdesc.html">
-          <figcaption>Diagram showing the datatypes from [[!xmlschema11-2]]
-   (A <a href="http://www.w3.org/TR/xmlschema11-2/type-hierarchy-201104.longdesc.html" shape="rect">long description of the diagram</a>
-    is available separately.)
-          </figcaption>
-        </figure>
+        <section>
+          <h3>Built-in Datatypes</h3>
+          <p>
+            The possible built-in datatypes are:
+          </p>
+          <ul>
+            <li>
+              <p>the datatypes defined in [[!xmlschema11-2]] as derived from and including <code>anyAtomicType</code>, as shown in <a href="#fig-datatypes" class="sectionRef"></a>, with the exception of those that rely on XML mechanisms for definition, namely those in the diagram except:</p>
+              <ul>
+                <li><code>anyType</code></li>
+                <li><code>anySimpleType</code></li>
+                <li><code>ENTITIES</code></li>
+                <li><code>IDREFS</code></li>
+                <li><code>NMTOKENS</code></li>
+                <li><code>ENTITY</code></li>
+                <li><code>ID</code></li>
+                <li><code>IDREF</code></li>
+                <li><code>NOTATION</code></li>
+              </ul>
+            </li>
+            <li>the datatype <code>number</code> which is exactly equivalent to <code>double</code></li>
+            <li>the datatype <code>binary</code> which is exactly equivalent to <code>base64Binary</code></li>
+            <li>the datatype <code>datetime</code> which is exactly equivalent to <code>dateTime</code></li>
+            <li>the datatype <code>any</code> which is exactly equivalent to <code>anyAtomicType</code></li>
+            <li>the datatype <code>xml</code>, a sub-type of <code>string</code> which indicates the value is an XML fragment</li>
+            <li>the datatype <code>html</code>, a sub-type of <code>string</code> which indicates the value is an HTML fragment</li>
+            <li>the datatype <code>json</code>, a sub-type of <code>string</code> which indicates the value is serialized JSON</li>
+          </ul>
+          <figure id="fig-datatypes">
+            <img src="http://www.w3.org/TR/xmlschema11-2/type-hierarchy-201104.png" width="810" height="1060" alt="Built-in Datatype Hierarchy diagram" longdesc="http://www.w3.org/TR/xmlschema11-2/type-hierarchy-201104.longdesc.html">
+            <figcaption>Diagram showing the built-in datatypes from [[!xmlschema11-2]]</figcaption>
+          </figure>
+        </section>
+        <section>
+          <h4>Derived Datatypes</h4>
+          <p>
+            More specialised datatypes can be defined through a <dfn>datatype description</dfn>. A datatype description may have any of the following properties, all of which are optional.
+          </p>
+          <dl>
+            <dt id="datatype-base"><code>base</code></dt>
+            <dd>
+              <p>
+                An <a>atomic property</a> that contains a single string: a term defined in the default context representing a built-in datatype URL, as listed above. If this property is missing, its default is <code>string</code>. All values of the datatype MUST be valid values of the base datatype.
+              </p>
+            </dd>
+            <dt id="datatype-format"><code>format</code></dt>
+            <dd>
+              <p>
+                An <a>atomic property</a> that contains either a single string or an object that defines the format of a value of this type, used when parsing a string value as described in <a href="#parsing-cells"></a>.
+              </p>
+            </dd>
+            <dt id="datatype-length"><code>length</code></dt>
+            <dd>
+              <p>
+                An <a>atomic property</a> that contains a single integer that is the exact length of the value. See <a href="#length-constraints" class="sectionRef"></a> for details.
+              </p>
+            </dd>
+            <dt id="datatype-minLength"><code>minLength</code></dt>
+            <dd>
+              <p>
+                An <a>atomic property</a> that contains a single integer that is the minimum length of the value. See <a href="#length-constraints" class="sectionRef"></a> for details.
+              </p>
+            </dd>
+            <dt id="datatype-maxLength"><code>maxLength</code></dt>
+            <dd>
+              <p>
+                An <a>atomic property</a> that contains a single integer that is the maximum length of the value. See <a href="#length-constraints" class="sectionRef"></a> for details.
+              </p>
+            </dd>
+            <dt id="datatype-minimum"><code>minimum</code></dt>
+            <dd>
+              <p>
+                An <a>atomic property</a> that contains a single number that is the minimum valid value (inclusive); equivalent to <code>minInclusive</code>. See <a href="#value-constraints" class="sectionRef"></a> for details.
+              </p>
+            </dd>
+            <dt id="datatype-maximum"><code>maximum</code></dt>
+            <dd>
+              <p>
+                An <a>atomic property</a> that contains a single number that is the maximum valid value (inclusive); equivalent to <code>maxInclusive</code>. See <a href="#value-constraints" class="sectionRef"></a> for details.
+              </p>
+            </dd>
+            <dt id="datatype-minInclusive"><code>minInclusive</code></dt>
+            <dd>
+              <p>
+                An <a>atomic property</a> that contains a single number that is the minimum valid value (inclusive). See <a href="#value-constraints" class="sectionRef"></a> for details.
+              </p>
+            </dd>
+            <dt id="datatype-maxInclusive"><code>maxInclusive</code></dt>
+            <dd>
+              <p>
+                An <a>atomic property</a> that contains a single number that is the maximum valid value (inclusive). See <a href="#value-constraints" class="sectionRef"></a> for details.
+              </p>
+            </dd>
+            <dt id="datatype-minExclusive"><code>minExclusive</code></dt>
+            <dd>
+              <p>
+                An <a>atomic property</a> that contains a single number that is the minimum valid value (exclusive). See <a href="#value-constraints" class="sectionRef"></a> for details.
+              </p>
+            </dd>
+            <dt id="datatype-maxExclusive"><code>maxExclusive</code></dt>
+            <dd>
+              <p>
+                An <a>atomic property</a> that contains a single number that is the maximum valid value (exclusive). See <a href="#value-constraints" class="sectionRef"></a> for details.
+              </p>
+            </dd>
+          </dl>
+          <p>
+            The <a>datatype description</a> MAY contain any <a title="common property">common properties</a> to provide extra metadata about the datatype, such as a title or description.
+          </p>
+        </section>
         <section>
           <h3>Length Constraints</h3>
           <p>
-            The <code>length</code>, <code>minLength</code> and <code>maxLength</code> properties indicate the exact, minimum and maximum lengths of the values of cells.
+            The <code>length</code>, <code>minLength</code> and <code>maxLength</code> properties indicate the exact, minimum and maximum lengths of values of a datatype.
           </p>
           <p>
-            Applications MUST raise an error if both <code>length</code> and <code>minLength</code> are specified and they do not have the same value. Similarly, applications MUST raise an error if both <code>length</code> and <code>maxLength</code> are specified and they do not have the same value. Applications MUST raise an error if <code>length</code>, <code>maxLength</code> or <code>minLength</code> are specified and the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">cell value</a> is not a list (ie <code>separator</code> is not specified), a string or one of its subtypes, or a binary value.
+            Applications MUST raise an error if both <code>length</code> and <code>minLength</code> are specified and they do not have the same value. Similarly, applications MUST raise an error if both <code>length</code> and <code>maxLength</code> are specified and they do not have the same value. Applications MUST raise an error if <code>length</code>, <code>maxLength</code> or <code>minLength</code> are specified and the <a href="#datatype-base"><code>base</code></a> datatype is not <code>string</code> or one of its subtypes, or a binary type.
           </p>
           <p>
-            The length of a value of a cell is determined as follows:
+            The length of a value is determined as follows:
           </p>
           <ul>
-            <li>if the cell is <code>null</code> its length is zero</li>
-            <li>if the value is a list, its length is the number of items in the list</li>
+            <li>if the value is <code>null</code>, its length is zero</li>
             <li>if the value is a string or one of its subtypes, its length is the number of characters in the value</li>
             <li>if the value is of a binary type, its length is the number of bytes in the binary value</li>
           </ul>
@@ -1605,7 +1629,16 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
         <section>
           <h3>Value Constraints</h3>
           <p>
-            The <code>minimum</code>, <code>maximum</code>, <code>minInclusive</code>, <code>maxInclusive</code>, <code>minExclusive</code> and <code>maxExclusive</code> properties indicate limits on the values of cells. These apply to numeric and date/time types. The <code>minimum</code> property is equivalent to the <code>minInclusive</code> property and the <code>maximum</code> property is equivalent to the <code>maxInclusive</code> property.
+            The <code>minimum</code>, <code>maximum</code>, <code>minInclusive</code>, <code>maxInclusive</code>, <code>minExclusive</code> and <code>maxExclusive</code> properties indicate limits on values of a datatype. These apply to numeric, date/time and duration types.
+          </p>
+          <p>
+            In all ways, including the errors described below, the <code>minimum</code> property is equivalent to the <code>minInclusive</code> property and the <code>maximum</code> property is equivalent to the <code>maxInclusive</code> property. Applications MUST raise an error if both <code>minimum</code> and <code>minInclusive</code> are specified and they do not have the same value. Similarly, applications MUST raise an error if both <code>maximum</code> and <code>maxInclusive</code> are specified and they do not have the same value.
+          </p>
+          <p>
+            Applications MUST raise an error if both <code>minInclusive</code> and <code>minExclusive</code> are specified, or if both <code>maxInclusive</code> and <code>maxExclusive</code> are specified. Applications MUST raise an error if both <code>minInclusive</code> and <code>maxInclusive</code> are specified and <code>maxInclusive</code> is less than <code>minInclusive</code>, or if both <code>minInclusive</code> and <code>maxExclusive</code> are specified and <code>maxExclusive</code> is less than or equal to <code>minInclusive</code>. Similarly, applications MUST raise an error if both <code>minExclusive</code> and <code>maxExclusive</code> are specified and <code>maxExclusive</code> is less than <code>minExclusive</code>, or if both <code>minExclusive</code> and <code>maxInclusive</code> are specified and <code>maxInclusive</code> is less than or equal to <code>minExclusive</code>.
+          </p>
+          <p>
+            Applications MUST raise an error if <code>minimum</code>, <code>minInclusive</code>, <code>maximum</code>, <code>maxInclusive</code>, <code>minExclusive</code> or <code>maxExclusive</code> are specified and the <a href="#datatype-base"><code>base</code></a> datatype is not a numeric, date/time or duration type.
           </p>
           <p>
             Validation against these properties is as defined in [[!xmlschema11-2]].
@@ -1615,7 +1648,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
       <section>
         <h2>Parsing cells</h2>
         <p>
-          Unlike many other data formats, tabular data is designed to be read by humans. For that reason, it's common for data to be represented within tabular data in a human-readable way. The <a href="#cell-null"><code>null</code></a>, <a href="#cell-default"><code>default</code></a>, <a href="#cell-separator"><code>separator</code></a>, <a href="#cell-datatype"><code>datatype</code></a>, <a href="#cell-format"><code>format</code></a> and <a href="#cell-lang"><code>lang</code></a> properties provide the information needed to parse the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-string-value" class="externalDFN">string value</a> of a cell into its (semantic) <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">value</a>. This is used:
+          Unlike many other data formats, tabular data is designed to be read by humans. For that reason, it's common for data to be represented within tabular data in a human-readable way. The <a href="#cell-null"><code>null</code></a>, <a href="#cell-default"><code>default</code></a>, <a href="#cell-separator"><code>separator</code></a>, <a href="#cell-datatype"><code>datatype</code></a>, <a href="#datatype-format"><code>format</code></a> and <a href="#cell-lang"><code>lang</code></a> properties provide the information needed to parse the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-string-value" class="externalDFN">string value</a> of a cell into its (semantic) <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">value</a>. This is used:
         </p>
         <ul>
           <li>by <strong>validators</strong> to check that the data in the table is in the expected format</li>
@@ -1646,8 +1679,8 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             </ol>
           </li>
           <li>if the string is the same as any one of the values of the <a href="#cell-null"><code>null</code></a> property, then the resulting value is <code>null</code></li>
-          <li>validate the string based on the datatype, using the <a href="#cell-format"><code>format</code></a> property if one is specified, as described below, and then against the constraints described in <a href="#datatypes" class="sectionRef"></a>; if there are any errors, add them to the list of <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-errors" class="externalDFN">errors</a> for the cell; the resulting value is typed as a <code>string</code> with the language provided by the <a href="#cell-lang"><code>lang</code></a> property</li>
-          <li>otherwise, if there are no errors, parse the string using the <a href="#cell-format"><code>format</code></a> if one is specified, as described below; the resulting value is typed according to the <a href="#cell-datatype"><code>datatype</code></a> and if the <code>datatype</code> is <code>string</code> it has the language provided by the <a href="#cell-lang"><code>lang</code></a> property</li>
+          <li>validate the string based on the datatype, using the <a href="#datatype-format"><code>format</code></a> property if one is specified, as described below, and then against the constraints described in <a href="#datatypes" class="sectionRef"></a>; if there are any errors, add them to the list of <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-errors" class="externalDFN">errors</a> for the cell; the resulting value is typed as a <code>string</code> with the language provided by the <a href="#cell-lang"><code>lang</code></a> property</li>
+          <li>otherwise, if there are no errors, parse the string using the <a href="#datatype-format"><code>format</code></a> if one is specified, as described below; the resulting value is typed according to the <a href="#cell-datatype"><code>datatype</code></a> and if the <code>datatype</code> is <code>string</code> it has the language provided by the <a href="#cell-lang"><code>lang</code></a> property</li>
         </ol>
         <section class="informative">
           <h3>Parsing examples</h3>
@@ -1667,9 +1700,11 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             Sometimes data uses special codes to indicate unknown or null values. For example, a particular column might contain a number that is expected to be between <code>1</code> and <code>10</code>, with the string <code>99</code> used in the original tabular data file to indicate a null value. The metadata for such a column would include:
           </p>
           <pre class="example highlight">
-"datatype": "integer",
-"minimum": 1,
-"maximum": 10,
+"datatype": {
+  "base": "integer",
+  "minimum": 1,
+  "maximum": 10
+},
 "null": "99"
           </pre>
           <p>
@@ -1679,9 +1714,11 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             Similarly, a cell may be assigned a default value if the string value for the cell is empty. A configuration such as:
           </p>
           <pre class="example highlight">
-"datatype": "integer",
-"minimum": 1,
-"maximum": 10,
+"datatype": {
+  "base": "integer",
+  "minimum": 1,
+  "maximum": 10
+},
 "default": "5"
           </pre>
           <p>
@@ -1691,9 +1728,11 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             Cells can contain sequences of values. For example, a cell might have the string value <code>"1 5 7.0"</code>. In this case, the separator is a space character. The appropriate configuration would be:
           </p>
           <pre class="example highlight">
-"datatype": "integer",
-"minimum": 1,
-"maximum": 10,
+"datatype": {
+  "base": "integer",
+  "minimum": 1,
+  "maximum": 10
+},
 "default": "5",
 "separator": " "
           </pre>
@@ -1721,7 +1760,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             It is not uncommon for numbers within tabular data to be formatted for human consumption, which may involve using commas for decimal points, grouping digits in the number using commas, or adding currency symbols or percent signs to the number.
           </p>
           <p>
-            If the <a href="#cell-datatype"><code>datatype</code></a> is a numeric type, the <a href="#cell-format"><code>format</code></a> property indicates the expected format for that number. Its value MUST be either a single string or an object with one or more of the properties:
+            If the <a href="#cell-datatype"><code>datatype</code></a> is a numeric type, the <a href="#datatype-format"><code>format</code></a> property indicates the expected format for that number. Its value MUST be either a single string or an object with one or more of the properties:
           </p>
           <dl>
             <dt id="decimalChar"><code>decimalChar</code></dt>
@@ -1732,7 +1771,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             <dd>A regular expression string, in the syntax and interpreted as defined by [[!ECMASCRIPT]].</dd>
           </dl>
           <p>
-            If the <a href="#cell-format"><code>format</code></a> property is a single string, this is interpreted in the same way as if it were an object with a <code>pattern</code> property whose value is that string.
+            If the <a href="#datatype-format"><code>format</code></a> property is a single string, this is interpreted in the same way as if it were an object with a <code>pattern</code> property whose value is that string.
           </p>
           <p>
             When parsing the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-string-value" class="externalDFN">string value</a> of a cell against this format specification, implementations MUST recognise and parse numbers that consist of:
@@ -1774,7 +1813,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             Boolean values may be represented in many ways aside from the standard <code>1</code> and <code>0</code> or <code>true</code> and <code>false</code>.
           </p>
           <p>
-            If the <a href="#cell-datatype"><code>datatype</code></a> for a cell is <code>boolean</code>, the <a href="#cell-format"><code>format</code></a> property provides the true and false values expected, separated by <code>|</code>. For example if <code>format</code> is <code>Y|N</code> then cells must hold either <code>Y</code> or <code>N</code> with <code>Y</code> meaning <code>true</code> and <code>N</code> meaning <code>false</code>.
+            If the <a href="#cell-datatype"><code>datatype</code></a> for a cell is <code>boolean</code>, the <a href="#datatype-format"><code>format</code></a> property provides the true and false values expected, separated by <code>|</code>. For example if <code>format</code> is <code>Y|N</code> then cells must hold either <code>Y</code> or <code>N</code> with <code>Y</code> meaning <code>true</code> and <code>N</code> meaning <code>false</code>.
           </p>
           <p>
             The resulting <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">cell value</a> will be one or more boolean <code>true</code> or <code>false</code> values.
@@ -1786,7 +1825,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             Dates and times are commonly represented in tabular data in formats other than those defined in [[!xmlschema11-2]].
           </p>
           <p>
-            If the <a href="#cell-datatype"><code>datatype</code></a> is a date or time type, the <a href="#cell-format"><code>format</code></a> property indicates the expected format for that date or time.
+            If the <a href="#cell-datatype"><code>datatype</code></a> is a date or time type, the <a href="#datatype-format"><code>format</code></a> property indicates the expected format for that date or time.
           </p>
           <p>
             The following date formats MUST be recognised by implementations:
