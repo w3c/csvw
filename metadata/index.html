@@ -252,7 +252,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           A cell may be assigned annotations based on properties on the description objects for the group of tables, table, column or row that it appears in. These properties are known as <dfn title="inherited property">inherited properties</dfn> and are listed in <a href="#inherited-properties-1" class="sectionRef"></a>. To ascertain a value for these annotations, an application MUST identify the relevant property in the descriptions of the table or column.
         </p>
         <p>
-          Applications MUST raise an error if the value of a property in a table description is not <a>compatible with</a> the value of that property on the group of tables. Applications MUST raise an error if the value of a property in a column description is not <a>compatible with</a> the value of that property on the table. Applications MUST raise an error if the value of a property on a cell is not <a>compatible with</a> the values of that property on the column that the cell is associated with.
+          Applications MUST raise an error if the value of a property in a table description is not <a>compatible with</a> the value of that property on the group of tables. Applications MUST raise an error if the value of a property in a <a>column description</a> is not <a>compatible with</a> the value of that property on the table. Applications MUST raise an error if the value of a property on a cell is not <a>compatible with</a> the values of that property on the column that the cell is associated with.
         </p>
         <p>
           A value for a cell, column or table is <dfn>compatible with</dfn> with a value on a column, table or group of tables if they are the same value or if the first value is a sub-value of the second value. The definitions of individual <a title="inherited property">inherited properties</a> indicate what values count as sub-values of others.
@@ -348,7 +348,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           </p>
           <ol>
             <li>applying the template against the cell in that column in the row that is currently being processed</li>
-            <li>expanding any prefixes as if the value were the name of a common property, as described in <a href="#common-properties" class="sectionRef"></a></li>
+            <li>expanding any prefixes as if the value were the name of a <a>common property</a>, as described in <a href="#common-properties" class="sectionRef"></a></li>
             <li>resolving the resulting URL against the base URL of the <a href="http://w3c.github.io/csvw/syntax/#dfn-table-url" class="externalDFN">table url</a> if not null</ol>
           </ol>
           <p>
@@ -432,10 +432,10 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         <section>
           <h4>Column Reference Properties</h4>
           <p>
-            <dfn title="column reference property">Column reference properties</dfn> hold one or more references to other column description objects. The referenced description object must have an <code>name</code> property. Column reference properties can then reference column description objects through values that are:
+            <dfn title="column reference property">Column reference properties</dfn> hold one or more references to other <a>column description</a> objects. The referenced description object must have an <code>name</code> property. Column reference properties can then reference column description objects through values that are:
           </p>
           <ul>
-            <li><strong>strings</strong> &mdash; which MUST match the <code>name</code> on a column description object within the metadata document</li>
+            <li><strong>strings</strong> &mdash; which MUST match the <code>name</code> on a <a>column description</a> object within the metadata document</li>
             <li><strong>arrays</strong> &mdash; lists of strings as above</li>
           </ul>
           <p>
@@ -466,7 +466,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         <section>
           <h4>Object Properties</h4>
           <p>
-            <dfn title="object property">Object properties</dfn> hold one or more objects or references to objects by URL. Their values may be:
+            <dfn title="object property">Object properties</dfn> hold a single object or reference to an object by URL. Their values may be:
           </p>
           <ul>
             <li><strong>strings</strong> &mdash; resolved as URLs against the <a>base URL</a></li>
@@ -547,13 +547,11 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <li><strong>numbers</strong> &mdash; interpreted as integers or doubles</li>
             <li><strong>booleans</strong> &mdash; interpreted as booleans (<code>true</code> or <code>false</code>)</li>
             <li><strong>strings</strong> &mdash; interpreted as defined by the property</li>
-            <li><strong>arrays</strong> &mdash; lists of numbers, booleans or strings</li>
+            <li><strong>objects</strong> &mdash; interpreted as defined by the property</li>
+            <li><strong>arrays</strong> &mdash; lists of numbers, booleans, strings, or objects</li>
           </ul>
           <p class="note">
             JSON does not have date or time types. Where a property takes a date as a value, this MUST be a string in the format <code>YYYY-MM-DD</code>.
-          </p>
-          <p class="issue" data-number="136">
-            Having <strong>arrays</strong> as an atomic property creates issues when merging. We may consider the difference between an <a>atomic property</a> and an <a>atomic value</a>, where an atomic property takes an <a>atomic value</a> or an array of <a title="atomic value">atomic values</a>. However, the only case of an <a>atomic property</a> which accepts an array of values is <code>null</code>, which may not be required, so we may just restrict <code>null</code> to taking a single <a>atomic value</a>, and re-define an <a>atomic value</a> to be <strong>numbers</strong>, <strong>booleans</strong> or <strong>strings</strong>.
           </p>
         </section>
       </section>
@@ -641,7 +639,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
   "foaf:age": 18.5,
   "schema:description": ["first value", "second value"]
 }</code></pre>
-          <p>Alternatively, value expansion may be determined through custom JSON-LD Context mappings, or by pre-defining specific mappings in the default context. This also has merge considerations, where the <a>object property</a> allowing arrays is not appropriate.</p>
+          <p>Alternatively, value expansion may be determined through custom JSON-LD Context mappings, or by pre-defining specific mappings in the default context.</p>
           <p>Merge should be that of <a>atomic property</a> allowing arrays, not presently defined; i.e., coerce values to array, and concatenate unique values in order.</p>
         </div>
       </section>
@@ -685,9 +683,9 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             </dd>
             <dt id="table-group-conversions"><code>conversions</code></dt>
             <dd>
-              <p>An <a>array property</a> of <a title="conversion specification">conversion specifications</a> that provide mechanisms to transform the tabular data into other formats. See <a href="#conversion-specifications" class="sectionRef"></a> for more details. When an array of conversion specifications B is <a>merged</a> into an original array of conversion specifications A, each conversion specification within B is combined into the original array A by:</p>
+              <p>An <a>array property</a> of <a title="conversion specification">conversion specifications</a> that provide mechanisms to transform the tabular data into other formats. When an array of conversion specifications B is <a>merged</a> into an original array of conversion specifications A, each conversion specification within B is combined into the original array A by:</p>
               <ul>
-                <li>if there is a conversion specification with the same <code>url</code>, <code>targetFormat</code> and <code>scriptFormat</code> in A, the conversion specification from B is <a>merged</a> into the matching conversion specification in A</li>
+                <li>if there is a conversion specification with the same <code>url</code> in A, the conversion specification from B is <a>merged</a> into the matching conversion specification in A</li>
                 <li>otherwise, the conversion specification from B is appended to the array of conversion specifications A</li>
               </ul>
             </dd>
@@ -737,7 +735,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <dt id="table-notes"><code>notes</code></dt>
             <dd>
               <p>
-                An <a>array property</a> that provides an array of objects representing arbitrary annotations on the annotated tabular data model. This specification does not place any constraints on the structure of these objects.
+                A <a>common property</a> that provides one or more objects representing arbitrary annotations on the annotated tabular data model. This specification does not place any constraints on the structure of these objects.
               </p>
               <p class="note">
                 The <a href="http://www.w3.org/annotation/">Web Annotation Working Group</a> is developing a vocabulary for expressing annotations. In future versions of this specification, we anticipate referencing that vocabulary.
@@ -974,8 +972,8 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               When an array of column descriptions B is <a>merged</a> into an original array of column descriptions A, each column description within B is combined into the original array A, based on the index of each column description, as follows:
             </p>
             <ol>
-              <li>if the column descriptions at the same index within A and B have the same <a href="#column-name"><code>name</code></a>, the column description from B is <a>merged</a> into the matching column description in A</li>
-              <li>otherwise, if the column descriptions at the same index within A and B have matching <a href="#column-title"><code>title</code></a>s (both titles are the same and either they both have the same language or one of them has an undefined language (<code>und</code>)), the column description from B is <a>merged</a> into the matching column description in A</li>
+              <li>if the column description at the same index within A and B have the same <a href="#column-name"><code>name</code></a>, the column description from B is <a>merged</a> into the matching column description in A</li>
+              <li>otherwise, if the column description at the same index within A and B have matching <a href="#column-title"><code>title</code></a>s (both titles are the same and either they both have the same language or one of them has an undefined language (<code>und</code>)), the column description from B is <a>merged</a> into the matching column description in A</li>
               <li>otherwise, if there are column descriptions at the same index within A and B, a validator MUST generate an error</li>
               <li>otherwise, if at a given index there is no column description within A, but there is a column description within B, then:
                 <ol>
@@ -994,7 +992,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           <dt id="table-primaryKey"><code>primaryKey</code></dt>
           <dd>
             <p>
-              A <a>column reference property</a> that holds either a single reference to a column description object or an array of references.
+              A <a>column reference property</a> that holds either a single reference to a <a>column description</a> object or an array of references.
             </p>
             <p>
               <a>Validators</a> MUST check that each row has a unique combination of cells in the indicated columns. For example, if <code>primaryKey</code> is set to <code>["familyName", "givenName"]</code> then every row must have a unique value for the combination of the <code>familyName</code> and <code>givenName</code> columns.
@@ -1008,7 +1006,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <dl>
               <dt id="foreign-key-columns"><code>columns</code></dt>
               <dd>
-                <p>A <a>column reference property</a> that holds either a single reference to a column description object within this schema, or an array of references. These form the <dfn>referencing columns</dfn> for the <a>foreign key definition</a>.</p>
+                <p>A <a>column reference property</a> that holds either a single reference to a <a>column description</a> object within this schema, or an array of references. These form the <dfn>referencing columns</dfn> for the <a>foreign key definition</a>.</p>
               </dd>
               <dt id="foreign-key-reference"><code>reference</code></dt>
               <dd>
@@ -1026,7 +1024,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
                   </dd>
                   <dt id="foreign-key-reference-columns"><code>columns</code></dt>
                   <dd>
-                    <p>A <a>column reference property</a> that holds either a single reference to a column description object within the <a href="#table-tableSchema"><code>tableSchema</code></a> of the <a>referenced table</a>, or an array of such references.</p>
+                    <p>A <a>column reference property</a> that holds either a single reference to a <a>column description</a> object within the <a href="#table-tableSchema"><code>tableSchema</code></a> of the <a>referenced table</a>, or an array of such references.</p>
                   </dd>
                 </dl>
                 <p>
@@ -1472,7 +1470,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           <dt id="cell-datatype"><code>datatype</code></dt>
           <dd>
             <p>
-              An <a>object property</a> that contains either a single string that is the main datatype of the values of the cell or a <a>datatype description</a> object. If the value of this property is a string, it is a term defined in the default context representing a built-in datatype URL; if it is an object then it describes a more specialised datatype. If a cell contains a sequence (ie the <code>separator</code> property is specified and not <code>null</code>) then this property specifies the datatype of each value within that sequence. See <a href="#datatypes"></a> for more details.
+              An <a>atomic property</a> that contains either a single string that is the main datatype of the values of the cell or a <a>datatype description</a> object. If the value of this property is a string, it is a term defined in the default context representing a built-in datatype URL; if it is an object then it describes a more specialised datatype. If a cell contains a sequence (ie the <code>separator</code> property is specified and not <code>null</code>) then this property specifies the datatype of each value within that sequence. See <a href="#datatypes"></a> for more details.
             </p>
           </dd>
           <dt id="cell-aboutUrl"><code>aboutUrl</code></dt>
@@ -1920,9 +1918,9 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
       <p>Prior to merging, each description object is expanded relative to its <code>@context</code> and values are normalized as follows:</p>
       <ul>
         <li>If the property is a <a>link property</a> the value is turned into an absolute URL using the <a>base URL</a>.</li>
-        <li>If the property is a <a>URI template property</a>, the value is turned into an absolute <a>URI template property</a> by expanding using the <a>base URL</a>.</li>
-        <li>If the property is an <a>object property</a> accepting arrays, then an object value is turned into an array containing that object.</li>
+        <li>If the property is an <a>object property</a> with a string value, the string is a URL referencing a JSON document containing a single object. Dereference this URL and replace the string value with that object.</li>
         <li>If the property is a <a>natural language property</a> and the value is not already an object, it is turned into an object whose properties are language codes and where the values of those properties are arrays. The suitable language code for the values is determined through the <a>default language</a>; if it can't be determined the language code <code>und</code> MUST be used.</li>
+        <li>If the property is an <a>atomic property</a> accepting strings or objects, normalize to the object form as described for that property.</a>
         <li>If the property is a <a>common property</a> the values are expended using using <code>@context</code>.</li>
       </ul>
       <p>
@@ -1930,25 +1928,10 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
       </p>
       <ul>
         <li>If the property is an <a>array property</a>, the way in which values are merged depends on the property; see the relevant property for this definition.</li>
-        <li>If the property is a <a>link property</a>, <a>URI template property</a>, or <a>column reference property</a>, the value from A overrides that from B.</li>
-        <li>If the property is an <a>object property</a>, then if the property only accepts single objects:
-          <ol>
-            <li>if the value of the property in A is a string or the value from B is a string then the value from A overrides that from B</li>
-            <li>otherwise (if both values as objects) the objects are merged as described here</li>
-          </ol>
-          If the property accepts arrays, the result is an array of objects or strings: those from A followed by those from B that were not already a value in A.</li>
+        <li>If the property is an <a>object property</a> the objects are merged as described here.</li>
         <li>If the property is a <a>natural language property</a>, the result is an object whose properties are language codes and where the values of those properties are arrays. The arrays MUST provide the values from A followed by those from B that were not already a value in A. If a value exists in <code>und</code> and any other language</code> the value from <code>und</code> MUST be removed, ensuring that the <code>und</code> property is removed if it's value becomes an empty array.</li>
-        <li>If the property is an <a>atomic property</a>, then if the property only accepts single values, the value from A overrides that from B; otherwise the result is an array of values: those from A followed by those from B that were not already a value in A.</li>
         <li>If the property is a <a>common property</a>, the result is an array containing values from A followed by values from B not already in A.</li>
-      </ul>
-      <p>
-        If the type of the property cannot be determined, because it is not defined in this specification (ie because it is an extension property), the type of the property is determined based on its values in A and B, as follows, and merged accordingly:
-      </p>
-      <ul>
-        <li>If the value of the property in A and the value of the property in B are both objects, they are treated as if the property is an <a>object property</a> that only accepts single objects.</li>
-        <li>If one of the values is an array and the other is an object, they are treated as if the property is an <a>object property</a> that accepts arrays.</li>
-        <li>If the value of the property in A and the value of the property in B are <a title="atomic value">atomic values</a>, they are treated as if the property is an <a>atomic property</a> that only accepts single values.</li>
-        <li>If one of the values is an array and the other is an <a>atomic value</a>, they are treated as if the property is an <a>atomic property</a> that accepts arrays.</li>
+        <li>Otherwise, the value from A overrides that from B.</li>
       </ul>
       <p>For example, consider the following two Metadata documents to be merged:</p>
       <pre class="example highlight" title="Metadata A to be merged">
