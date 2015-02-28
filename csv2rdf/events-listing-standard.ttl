@@ -1,0 +1,65 @@
+# prefixes as defined in RDFa 1.1 initial context; only include those actually referenced within the data
+# as there is only one table, default prefix `:` is set to the value of the `url` property for that table
+
+# >> arguably it's the triples themselves that are important - not the syntax or how the output is structured ... conversion document simply needs to talk in terms of "triples"
+
+# note that the table `T` ({ "url": "http://example.org/countries.csv"}) has not been explicitly identified; the table resource is treated as a blank node
+# note that only a subset of table annotation types may be included in the output (`url`, `notes`, `title`, `@id`, `@type` and common properties); all others are ignored, including information about table schema and columns defined therein, dialects, primaryKeys etc.
+# note that the type of the table resource is specifically declared: `[] rdf:type csvw:Table .`
+# note that the `url` annotation on the table is included in order to refer back to the original CSV+ file
+# note that each row within the table is explictly described in the output; however, as the rows are not explicitly identified, these row resources are treated as blank nodes
+# note that the row number for each row is specifically declared: e.g. for row `R1` we state `[] csvw:rownum 1 .`
+# note that the source row within the original CSV+ file, identified using a fragment identifier from [RFC 7111], is specified for each row: e.g. for row `R1` we state `[] rdfs:idDefinedBy :row\=2 .` - noting the offset between the row number and the source row number due to the presence of a header line (noting the use of the backslash `\` to escape the TTL reserved character `=`)
+# note that the resources described by each row are explcitly defined using the `aboutUrl` property - in this case three resources per row (event, location and offer); the relationship between the row and subject resource is asserted using the `rel:describes` property; e.g. for row `R1` we state `[] rel:describes :event-1, :place-1, :offer-1 .`
+# note that each column explicitly defines both `aboutUrl` and `propertyUrl` inherited properties for each of its cells
+# note that column `C2` ({ "name": "start-date" }) has been declared as holding date-time values, { "datatype": "datetime" } - the output explicitly declares the data type
+# note that [virtual] column `C6` ({ "name": "type-event"}) defined the semantic type of the event resource: `schema:MusicEvent`
+# note that [virtual] column `C7` ({ "name": "type-place"}) defined the semantic type of the location resource: `schema:Place`  
+# note that [virtual] column `C8` ({ "name": "type-offer"}) defined the semantic type of the offer resource: `schema:Offer`  
+# note that [virtual] column `C9` ({ "name": "location"}) uses the `aboutUrl` and `valueUrl` to assert the relationship between the event and location resources
+# note that [virtual] column `C10` ({ "name": "offer"}) uses the `aboutUrl` and `valueUrl` to assert the relationship between the event and offer resources
+
+@prefix csvw: <http://www.w3.org/ns/csvw#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rel: <http://www.iana.org/assignments/link-relations/> .
+@prefix schema: <http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix : <http://example.org/events-listing.csv#> .
+
+_:95cc7970-ce99-44b0-900c-e2c2c028bbd3 a csvw:Table ;
+	csvw:url <http://example.org/events-listing.csv> ;
+	csvw:row [
+		csvw:rownum 1 ;
+		rdfs:isDefinedBy :row\=2 ;
+		rel:describes :event-1, :place-1, :offer-1
+	], [
+		csvw:rownum 2 ;
+		rdfs:isDefinedBy :row\=3 ;
+		rel:describes :event-2, :place-2, :offer-2
+	] .
+
+:event-1 a schema:MusicEvent ;
+	schema:name "B.B. King" ;
+	schema:startDate "2014-04-12T19:30:00"^^xsd:dateTime ;
+	schema:location :place-1 ;
+	schema:offer :offer-1 .
+
+:place-1 a schema:Place ;
+	schema:name "Lupo’s Heartbreak Hotel" ;
+	schema:address "79 Washington St., Providence, RI" .
+
+:offer-1 a schema:Offer ;
+	schema:offer <https://www.etix.com/ticket/1771656> .
+
+:event-2 a schema:MusicEvent ;
+	schema:name "B.B. King" ;
+	schema:startDate "2014-04-13T20:00:00"^^xsd:dateTime ;
+	schema:location :place-2 ;
+	schema:offer :offer-2 .
+
+:place-2 a schema:Place ;
+	schema:name "Lynn Auditorium" ;
+	schema:address "Lynn, MA, 01901" .
+
+:offer-2 a schema:Offer ;
+	schema:offer <http://frontgatetickets.com/venue.php?id=11766> .

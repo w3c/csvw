@@ -1,0 +1,97 @@
+# prefixes as defined in RDFa 1.1 initial context; only include those actually referenced within the data
+# each of the tables are allocated a prefix based on the order that they occur within the table group ...
+#    `t1:` for table `Ta` ({ "url": "http://example.org/conf/professions.csv" }) - albeit that output for this table is suppressed
+#    `t2:` for table `Tb` ({ "url": "http://example.org/senior-roles.csv" })
+#    `t3:` for table `Tc` ({ "url": "http://example.org/junior-roles.csv"})
+# >> are these (somewhat arbitrary) prefixes appropriate? ... eitherway, choice of prefixes is implementation dependent ... or must it be standardised for non-JSON-LD-aware JSON applications?
+
+# >> arguably it's the triples themselves that are important - not the syntax or how the output is structured ... conversion document simply needs to talk in terms of "triples"
+
+# note that the table group `G` has not been explicitly identified; the table resource is treated as a blank node
+# note that only a subset of table group annotation types may be included in the output (`resources`, `@id`, `@type` and common properties); all others are ignored - however, note that the `resources` annotation is provided using the property `csvw:table`
+# note that the type of the table group resource is specifically declared: `[] rdf:type csvw:TableGroup .`
+# note that each of the tables are related to the table group using the property `csvw:table` - however, the output for table `Ta` ({ "url": "http://example.org/conf/professions.csv" }) is ignored due to table annotation { "suppressOutput": true }
+# note that none of the tables have been explicitly identified; each of the table resources is treated as a blank node
+# note that only a subset of table annotation types may be included in the output (`url`, `notes`, `title`, `@id`, `@type` and common properties); all others are ignored, including information about table schema and columns defined therein, dialects, primaryKeys etc.
+# note that the type of the table resource is specifically declared: `[] rdf:type csvw:Table .`
+# note that the `url` annotation on the table is included in order to refer back to the original CSV+ file
+# note that each row within a table is explictly described in the output; however, as the rows are not explicitly identified, these row resources are treated as blank nodes
+# note that the row number for each row is specifically declared: e.g. for row `Rb1` we state `[] csvw:rownum 1 .`
+# note that the source row within the original CSV+ file, identified using a fragment identifier from [RFC 7111], is specified for each row: e.g. for row `Rb1` we state `[] rdfs:idDefinedBy t2:row\=2 .` - noting the offset between the row number and the source row number due to the presence of a header line (noting the use of the backslash `\` to escape the TTL reserved character `=`)
+# note that the relationship between each row and the subject resource it describes is asserted using the `rel:describes` property
+# note that where the property `aboutUrl` is not explicitly defined for a cell, the subject resource of the statements inferred from that cell is taken as the (unidentified) resource described by the row within which the cell is located - such unidentified resources are treated as blank nodes
+# note that the resources described by each row of table `Tb` ({ "url": "http://example.org/senior-roles.csv"}) are explcitly defined using the `aboutUrl` property; therefore, say, for row `Rb1` we state `[] rel:describes t2:post-90115 .`; whilst the property `aboutUrl` has not been defined for resources described by each row of table `Tc` ({ "url": "http://example.org/junior-roles.csv"}); therefore blank nodes are used, e.g. for row `Rc1` we state `[] rel:describes _:d8b8e40c-8c74-458b-99f7-64d1cf5c65f2 .`
+# note that column `Cb5` ({ "name": "reportsTo" }) uses the `aboutUrl`, `proprtyUrl` and `valueUrl` to assert the relationship between the given senior post and the post it reports to
+# note that cell `Cb2.5` (table `Tb`, row `Rb2`; column `Cb5`, { "name": "reportsTo" }) is `null` (empty) - no triple is generated in the output
+# note that column `Cc1` ({ "name": "reportsToSenior" }) uses the `propertyUrl` and `valueUrl` to assert the relationship between the given junior post and the senior post it reports to
+# note that column `Cc3` ({ "name": "min-pay" }) has been declared as holding integer values ({ "datatype": "integer" }) - the output explicitly declares the data type
+# note that column `Cc4` ({ "name": "max-pay" }) has been declared as holding integer values ({ "datatype": "integer" }) - the output explicitly declares the data type
+# note that column `Cc6` ({ "name": "number" }) has been declared as holding number values ({ "datatype": "number" }); equivalent to `xsd:double` - the output explicitly declares the data type
+
+@prefix csvw: <http://www.w3.org/ns/csvw#> .
+@prefix dc: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rel: <http://www.iana.org/assignments/link-relations/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix t1: <http://example.org/conf/professions.csv#> .
+@prefix t2: <http://example.org/senior-roles.csv#> .
+@prefix t3: <http://example.org/junior-roles.csv#> .
+
+_:3d36cfbb-d2d5-4573-a1a7-3bf817062db8 a csvw:TableGroup ;
+	csvw:table [ a csvw:Table ;
+		csvw:url <http://example.org/senior-roles.csv> ;
+		csvw:row [
+			csvw:rownum 1 ;
+			rdfs:isDefinedBy t2:row\=2 ;
+			rel:describes t2:post-90115
+		], [
+			csvw:rownum 2 ;
+			rdfs:isDefinedBy t2:row\=3 ;
+			rel:describes t2:post-90334
+		]
+	], [ a csvw:Table ;
+		csvw:url <http://example.org/junior-roles.csv> ;
+		csvw:row [
+			csvw:rownum 1 ;
+			rdfs:isDefinedBy t3:row\=2 ;
+			rel:describes _:d8b8e40c-8c74-458b-99f7-64d1cf5c65f2
+		], [
+			csvw:rownum 2 ;
+			rdfs:isDefinedBy t3:row\=3 ;
+			rel:describes _:fa1fa954-dd5f-4aa1-b2bc-20bf9867fac6
+		]
+	] .
+
+t2:post-90115
+	dc:identifier "90115" ;
+	foaf:name "Steve Egan" ;
+	<http://example.org/def/grade> "SCS1A" ;
+	<http://example.org/def/job> "Deputy Chief Executive" ;
+	<http://example.org/def/reportsTo> t2:post-90334 ;
+	<http://example.org/def/profession> "Finance" .
+
+t2:post-90334
+	dc:identifier "90334" ;
+	foaf:name "Sir Alan Langlands" ;
+	<http://example.org/def/grade> "SCS4" ;
+	<http://example.org/def/job> "Chief Executive" ;
+	<http://example.org/def/profession> "Policy" .
+
+_:d8b8e40c-8c74-458b-99f7-64d1cf5c65f2
+	<http://example.org/def/reportsTo> t2:post-90115 ;
+	<http://example.org/def/grade> "4" ;
+	<http://example.org/def/min-pay> "17426"^^xsd:integer ;
+	<http://example.org/def/max-pay> "20002"^^xsd:integer ;
+	<http://example.org/def/job> "Administrator" ;
+	<http://example.org/def/number-of-posts> "8.67"^^xsd:double ;
+	<http://example.org/def/profession> "Operational Delivery" .
+
+_:fa1fa954-dd5f-4aa1-b2bc-20bf9867fac6
+	<http://example.org/def/reportsTo> t2:post-90115 ;
+	<http://example.org/def/grade> "5" ;
+	<http://example.org/def/min-pay> "19546"^^xsd:integer ;
+	<http://example.org/def/max-pay> "22478"^^xsd:integer ;
+	<http://example.org/def/job> "Administrator" ;
+	<http://example.org/def/number-of-posts> "0.5"^^xsd:double ;
+	<http://example.org/def/profession> "Operational Delivery" .

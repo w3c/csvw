@@ -1,0 +1,83 @@
+# prefixes as defined in RDFa 1.1 initial context; only include those actually referenced within the data
+# as there is only one table, default prefix `:` is set to the value of the `url` property for that table
+
+# >> arguably it's the triples themselves that are important - not the syntax or how the output is structured ... conversion document simply needs to talk in terms of "triples"
+
+# note that the table `T` ({ "url": "http://example.org/tree-ops-ext.csv"}) has been explicitly identified; { "@id": "<http://exmple.org/tree-ops-ext>"}
+# note that only a subset of table annotation types may be included in the output (`url`, `notes`, `title`, `@id`, `@type` and common properties); all others are ignored, including information about table schema and columns defined therein, dialects, primaryKeys etc.
+# note that the type of the table resource is specifically declared: `<http://exmple.org/tree-ops-ext> rdf:type csvw:Table .`
+# note that the `url` annotation on the table is included in order to refer back to the original CSV+ file
+# note that the common property annotations on the table are included in the output, recursing into objects and arrays as necessary; `dc:title`, `dc:keywords`, `dc:publisher`, `dc:license` and `dc:modified`
+# note that each row within the table is explictly described in the output; however, as the rows are not explicitly identified, these row resources are treated as blank nodes
+# note that the row number for each row is specifically declared: e.g. for row `R1` we state `[] csvw:rownum 1 .`
+# note that the source row within the original CSV+ file, identified using a fragment identifier from [RFC 7111], is specified for each row: e.g. for row `R1` we state `[] rdfs:idDefinedBy :row\=2 .` - noting the offset between the row number and the source row number due to the presence of a header line (noting the use of the backslash `\` to escape the TTL reserved character `=`)
+# note that the resource described by each row is explcitly defined using the `aboutUrl` property; the relationship between the row and subject resource is asserted using the `rel:describes` property; e.g. for row `R1` we state `[] rel:describes <http://example.org/tree-ops-ext#gid-1> .`
+# note that output for column `C1` ({ "name": "GID" }) is not included due to column annotation { "suppressOutput": true }
+# note that a language has been specified ({ "lang": "en" }) for column `C4` ({ "name": "trim_cycle" }) - the appropriate language tag (as defined in [rdf11-concepts]) is included in the output
+# note that column `C5` ({ "name": "dbh"}) has been declared as holding integer values ({ "datatype": "integer" }) - the output explicitly declares the data type
+# note that column `C6` ({ "name": "inventory_date" }) has been declared as holding date values, { "datatype": "date" } - the output explicitly declares the data type
+# note that cells `C1.7` and `C2.7` (rows `R1` and `R2`; column `C7`, { "name": "comments" }) is `null` (empty) - no triple is generated in the output
+# note that cell `C3.7` (row `R3`; column `C7`, { "name": "comments" }) contains an ordered list of values; these is expressed as an rdf:List within the output
+# note that column `C8` ({ "name": "protected" }) has been declared as holding boolean values, { "datatype": "boolean" } - the output explictly declares the data type
+# note that column `C9` ({ "name": "kml" }) has been declared as holding XML content, { "datatype": "xml" } - no attempt is made to parse the XML, but the data type is explicitly declared
+
+@prefix csvw: <http://www.w3.org/ns/csvw#> .
+@prefix dc: <http://purl.org/dc/terms/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rel: <http://www.iana.org/assignments/link-relations/> .
+@prefix schema: <http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix : <http://example.org/tree-ops-ext.csv#> .
+
+<http://example.org/tree-ops-ext> a csvw:Table ;
+	csvw:url <http://example.org/tree-ops-ext.csv> ;
+	dc:title "Tree Operations" ;
+	dc:keywords "tree", "street", "maintenance" ;
+	dc:publisher [
+		schema:name "Example Municipality" ;
+		schema:url <http://example.org>
+	] ;
+	dc:license <http://opendefinition.org/licenses/cc-by/> ;
+	dc:modified "2010-12-31"^^xsd:date ;
+	csvw:row [
+		csvw:rownum 1 ;
+		rdfs:isDefinedBy :row\=2 ;
+		rel:describes <http://example.org/tree-ops-ext#gid-1>
+	], [
+		csvw:rownum 2 ;
+		rdfs:isDefinedBy :row\=3 ;
+		rel:describes <http://example.org/tree-ops-ext#gid-2>
+	], [
+		csvw:rownum 3 ;
+		rdfs:isDefinedBy :row\=4 ;
+		rel:describes <http://example.org/tree-ops-ext#gid-6>
+	] .
+
+<http://example.org/tree-ops-ext#gid-1>
+	:on_street "ADDISON AV" ;
+	:species "Celtis australis" ;
+	:trim_cycle "Large Tree Routine Prune"@en ;
+	:dbh "11"^^xsd:integer ;
+	:inventory_date "2010-10-18"^^xsd:date ;
+	:protected false ;
+	:kml "<Point><coordinates>-122.156485,37.440963</coordinates></Point>"^^rdf:XMLLiteral .
+
+<http://example.org/tree-ops-ext#gid-2>
+	:on_street "EMERSON ST" ;
+	:species "Liquidambar styraciflua" ;
+	:trim_cycle "Large Tree Routine Prune"@en ;
+	:dbh "11"^^xsd:integer ;
+	:inventory_date "2010-06-02"^^xsd:date ;
+	:protected false ;
+	:kml "<Point><coordinates>-122.156749,37.440958</coordinates></Point>"^^rdf:XMLLiteral .
+
+<http://example.org/tree-ops-ext#gid-6>
+	:on_street "ADDISON AV" ;
+	:species "Robinia pseudoacacia" ;
+	:trim_cycle "Large Tree Routine Prune"@en ;
+	:dbh "29"^^xsd:integer ;
+	:inventory_date "2010-06-01"^^xsd:date ;
+	:comments ( "cavity or decay" "trunk decay" "codominant leaders" "included bark" "large leader or limb decay" "previous failure root damage" "root decay" "beware of BEES" ) ;
+	:protected true ;
+	:kml "<Point><coordinates>-122.156299,37.441151</coordinates></Point>"^^rdf:XMLLiteral .

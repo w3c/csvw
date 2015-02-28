@@ -1,0 +1,64 @@
+# prefixes as defined in RDFa 1.1 initial context; only include those actually referenced within the data
+# as there is only one table, default prefix `:` is set to the value of the `url` property for that table
+
+# >> arguably it's the triples themselves that are important - not the syntax or how the output is structured ... conversion document simply needs to talk in terms of "triples"
+
+# note that the table `T` ({ "url": "http://example.org/countries.csv"}) has not been explicitly identified; the table resource is treated as a blank node
+# note that only a subset of table annotation types may be included in the output (`url`, `notes`, `title`, `@id`, `@type` and common properties); all others are ignored, including information about table schema and columns defined therein, dialects, primaryKeys etc.
+# note that the type of the table resource is specifically declared: `[] rdf:type csvw:Table .`
+# note that the `url` annotation on the table is included in order to refer back to the original CSV+ file
+# note that each row within the table is explictly described in the output; however, as the rows are not explicitly identified, these row resources are treated as blank nodes
+# note that the row number for each row is specifically declared: e.g. for row `R1` we state `[] csvw:rownum 1 .`
+# note that the source row within the original CSV+ file, identified using a fragment identifier from [RFC 7111], is specified for each row: e.g. for row `R1` we state `[] rdfs:idDefinedBy :row\=2 .` - noting the offset between the row number and the source row number due to the presence of a header line (noting the use of the backslash `\` to escape the TTL reserved character `=`)
+# note that each of the resources described within each row are referenced using the property `rel:describes`
+# >> it would be possible, although verbose, to explictly call out each cell within the row and then define what each specific cell describes; e.g. 
+#		[] csvw:row [
+#			csvw:rownum 1 ;
+#			rdfs:isDefinedBy :row\=2 ;
+#			csvw:cell [
+#				csvw:colnum 1 ;
+#				rdfs:isDefinedBy :cell\=2,1 ;
+#				rel:describes _:8228a149-8efe-448d-b15f-8abf92e7bd17
+#			], { ... etc. ... }
+#		]
+# ... but I felt that this was not necessary and complicates things because multiple cells will refer to the same resource, which may be a blank node (note that properties `csvw:cell` and `csvw:colnum` don't exist in the CSVW namespace - I added these for illustrative purposes)
+# note that the `aboutUrl` property has not been set for cells in table `T` ({ "url": "http://example.org/countries.csv"}) - for a given row, all cells where `aboutUrl` has not been specified are assumed to refer to the same subject; this unspecified subject resource is treated as a blank node (identified using a UUID in this case)
+
+@prefix csvw: <http://www.w3.org/ns/csvw#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rel: <http://www.iana.org/assignments/link-relations/> .
+@prefix : <http://example.org/countries.csv#> .
+
+_:d4f8e548-9601-4e41-aadb-09a8bce32625 a csvw:Table ;
+	csvw:url <http://example.org/countries.csv> ;
+	csvw:row [
+		csvw:rownum 1 ;
+		rdfs:isDefinedBy :row\=2 ;
+		rel:describes _:8228a149-8efe-448d-b15f-8abf92e7bd17
+	], [
+		csvw:rownum 2 ;
+		rdfs:isDefinedBy :row\=3 ;
+		rel:describes _:ec59dcfc-872a-4144-822b-9ad5e2c6149c
+	], [
+		csvw:rownum 3 ;
+		rdfs:isDefinedBy :row\=4 ;
+		rel:describes _:e8f2e8e9-3d02-4bf5-b4f1-4794ba5b52c9
+	] .
+
+_:8228a149-8efe-448d-b15f-8abf92e7bd17
+	:countryCode "AD" ;
+	:latitude "42.546245" ;
+	:longitude "1.601554" ;
+	:name "Andorra" .
+
+_:ec59dcfc-872a-4144-822b-9ad5e2c6149c
+	:countryCode "AE" ;
+	:latitude "23.424076" ;
+	:longitude "53.847818" ;
+	:name "United Arab Emirates" .
+
+_:e8f2e8e9-3d02-4bf5-b4f1-4794ba5b52c9
+	:countryCode "AF" ;
+	:latitude "33.93911" ;
+	:longitude "67.709953" ;
+	:name "Afghanistan" .
