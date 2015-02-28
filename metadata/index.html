@@ -558,13 +558,13 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       <section>
         <h3>Top-Level Properties</h3>
         <p>
-          The top-level object (whether it is a <a>table group description</a> or a <a>table description</a>) MUST have a <code>@context</code> property, an <a>array property</a>, as defined in <cite><a href="http://www.w3.org/TR/json-ld/#context-definitions">Section 8.7</a></cite> of [[!JSON-LD]]. The <code>@context</code> MUST contain one of the following:</p>
+          The top-level object (whether it is a <a>table group description</a> or a <a>table description</a>) MUST have a <code id="context">@context</code> property, an <a>array property</a>, as defined in <cite><a href="http://www.w3.org/TR/json-ld/#context-definitions">Section 8.7</a></cite> of [[!JSON-LD]]. The <code>@context</code> MUST contain one of the following:</p>
         <ul>
           <li>A string value of <code>http://www.w3.org/ns/csvw</code>, or</li>
           <li>An array composed of a string and an object, where the string is <code>http://www.w3.org/ns/csvw</code> and the object representing a local context definition, which is restricted to contain either or both of the following members.</li>
         </ul>
         <dl>
-          <dt><code>@language</code></dt>
+          <dt id="context-language"><code>@language</code></dt>
           <dd>
             <p>
               indicates the default language for the values of properties in the metadata document; if present, its value MUST be a language code [[!BCP47]] which is the <dfn>default language</dfn> for the values of other properties in the metadata document
@@ -573,43 +573,16 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               Note that the <code>@language</code> property of the <code>@context</code> object, which gives the default language used within the metadata file, is distinct from the <code>lang</code> property on a <a>description object</a>, which gives the language used in the data within a group of tables, table or column.
             </p>
           </dd>
-          <dt><code>@base</code></dt>
+          <dt id="context-base"><code>@base</code></dt>
           <dd>
             <p>
               indicates the base URL against which other URLs within the description are resolved; if present, its value MUST be a URL which is resolved against the location of the metadata document to provide the <dfn>base URL</dfn> for other URLs in the metadata document; if unspecified, the base URL used for interpreting relative URLs within the metadata document is the location of the metadata document itself
             </p>
             <p class="note">
-              Note that the <code>@base</code> property of the <code>@context</code> object provides the base URL used for URLs within the metadata document, not the URLs that appear within the group of tables or table it describes.
+              Note that the <code>@base</code> property of the <code>@context</code> object provides the base URL used for URLs within the metadata document, not the URLs that appear as data within the group of tables or table it describes.
             </p>
           </dd>
         </dl>
-        <p>
-          A <code>@context</code> <code>B</code> is <a>merged</a> into an original <code>@context</code> <code>A</code> by:
-        </p>
-        <ol>
-          <li><a title="merged">merge</a> the object value of <code>A</code> with <code>B</code> using empty objects if none exists.</li>
-          <li>If the resulting object is empty, the merged value is the string <code>http://www.w3.org/ns/csvw</code>.</li>
-          <li>Otherwise, the merged value is an array of <code>http://www.w3.org/ns/csvw</code> and the merged object.</li>
-        </ol>
-<pre class="example highlight" title="TableGroup definition with string @context">
-{
-  "@context": "http://www.w3.org/ns/csvw",
-  "@type": "TableGroup",
-  "resources": []
-}
-</pre>
-<pre class="example highlight" title="TableGroup definition with local @context">
-{
-  "@context": [
-    "http://www.w3.org/ns/csvw",
-    {
-      "@language": "en"
-    }
-  ],
-  "@type": "TableGroup",
-  "resources": []
-}
-</pre>
       </section>
       <section>
         <h3>Common Properties</h3>
@@ -1922,8 +1895,11 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
         <li>If the property is an <a>object property</a> with a string value, the string is a URL referencing a JSON document containing a single object. Dereference this URL and replace the string value with that object.</li>
         <li>If the property is a <a>natural language property</a> and the value is not already an object, it is turned into an object whose properties are language codes and where the values of those properties are arrays. The suitable language code for the values is determined through the <a>default language</a>; if it can't be determined the language code <code>und</code> MUST be used.</li>
         <li>If the property is an <a>atomic property</a> accepting strings or objects, normalize to the object form as described for that property.</li>
-        <li>If the property is a <a>common property</a> or <a href="#table-nodes"><code>notes</code></a> the values are expended using using <code>@context</code>.</li>
+        <li>If the property is a <a>common property</a> or <a href="#table-nodes"><code>notes</code></a> the values are expanded using <code>@context</code>.</li>
       </ul>
+      <p>
+        Following this normalization process, the <code>@context</code> can be removed.
+      </p>
       <p>
         A description object <code>B</code> is <dfn>merged</dfn> into an original description object <code>A</code> by merging each property of <code>B</code> into <code>A</code>. If the property from <code>B</code> does not exist on <code>A</code>, it is simply added to <code>A</code>. If <code>A</code> does have the property, the way the values are merged depends on the type of the property, as follows:
       </p>
@@ -1944,10 +1920,13 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
     "tableDirection": "ltr",
     "tableSchema": {
       "aboutUrl": "{#foo}",
-      "columns": [
-        {"name": "foo", "title": "Foo", "required": true},
-        {"name": "bar"}
-      ]
+      "columns": [{
+        "name": "foo", 
+        "title": "Foo", 
+        "required": true
+      }, {
+        "name": "bar"
+      }]
     }
   }, {
     "url": "doc2.csv"
@@ -1956,55 +1935,84 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
       </pre>
       <pre class="example highlight" title="Metadata B to be merged">
 {
-  "@context": ["http://www.w3.org/ns/csvw", {"@base": "http://example.org/foo"}],
+  "@context": "http://www.w3.org/ns/csvw",
   "url": "http://example.com/doc1.csv",
   "dc:description": "bar",
   "tableSchema": {
     "propertyUrl": "{#_name}",
-    "columns": [
-      {"title": "Foo", "required": false},
-      {"name": "bar"},
-      {}
-    ]
+    "columns": [{
+      "title": "Foo",
+      "required": false
+    }, {
+      "name": "bar"
+    }, {
+    }]
   }
 }
       </pre>
       <p>The process of merging performs the following steps:</p>
       <ol>
-        <li>Transform <code>B</code> from <code>Table</code> metadata to <code>TableGroup</code> metadata:
-      <pre class="example highlight" title="Metadata B as a TableGroup">
+        <li>
+          Normalize <code>A</code> to use the language specified in the <code>@context</code> within the <a>natural language property</a> <a href="#column-title"><code>title</code></a> and to expand the <a>link property</a> <a href="#table-url"><code>url</code></a> against the <a>base URL</a> for <code>A</code>, <code>http://example.com/metadata.json</code>:
+      <pre class="example highlight" title="Metadata A after normalization">
 {
-  "@context": ["http://www.w3.org/ns/csvw", {"@base": "http://example.org/foo"}],
+  "resources": [{
+    "url": "<strong>http://example.com/doc1.csv</strong>",
+    "dc:title": "foo",
+    "tableDirection": "ltr",
+    "tableSchema": {
+      "aboutUrl": "{#foo}",
+      "columns": [{
+        "name": "foo", 
+        "title": <strong>{ "en": [ "Foo" ] }</strong>, 
+        "required": true
+      }, {
+        "name": "bar"
+      }]
+    }
+  }, {
+    "url": "<strong>http://example.com/doc2.csv</strong>"
+  }]
+}
+      </pre>
+        </li>
+        <li>Normalize <code>B</code> from a <a>table description</a> to a <a>table group description</a> by embedding the table description in a <code>resources</code> property, resolve the <a>link property</a> <a href="#table-url"><code>url</code></a> (which is already an absolute URL), and normalize the <a href="#column-title"><code>title</code></a> property to use the <code>und</code> language:
+      <pre class="example highlight" title="Metadata B after normalization">
+{
   "resources": [{
     "url": "http://example.com/doc1.csv",
     "dc:description": "bar",
     "tableSchema": {
       "propertyUrl": "{#_name}",
-      "columns": [
-        {"title": "Foo", "required": false},
-        {"name": "bar"},
-        {}
-      ]
+      "columns": [{
+        "title": <strong>{ "und": [ "Foo" ] }</strong>,
+        "required": false
+      }, {
+        "name": "bar"
+      }, {
+      }]
     }
   }]
 }
       </pre>
         </li>
-        <li>The <code>@context</code> is merged as defined in <a href="top-level-properties" class="sectionRef"></a> with <code>@base</code> imported into the value in <code>A</code>.</li>
         <li><code>resources</code> is an <a>array property</a> with rules specified in <a href="#table-groups" class="sectionRef"></a> and each value is merged accordingly:
           <ol>
             <li>The first value from <code>A</code> and <code>B</code> are now the following:
-              <pre class="example highlight" title="first resources values A' and B'">
+              <pre class="example highlight" title="first resources values from A and B">
 {
-  "url": "doc1.csv",
+  "url": "http://example.com/doc1.csv",
   "dc:title": "foo",
   "tableDirection": "ltr",
   "tableSchema": {
     "aboutUrl": "{#foo}",
-    "columns": [
-      {"name": "foo", "title": "Foo", "required": true},
-      {"name": "bar"}
-    ]
+    "columns": [{
+      "name": "foo", 
+      "title": { "en": [ "Foo" ] }, 
+      "required": true
+    }, {
+      "name": "bar"
+    }]
   }
 }
 
@@ -2013,52 +2021,26 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
   "dc:description": "bar",
   "tableSchema": {
     "propertyUrl": "{#_name}",
-    "columns": [
-      {"title": "Foo", "required": false},
-      {"name": "bar"},
-      {}
-    ]
+    "columns": [{
+      "title": { "und": [ "Foo" ] },
+      "required": false
+    }, {
+      "name": "bar"
+    }, {
+    }]
   }
 }
               </pre>
-              The properties of these are expanded relative to the original metadata and context resulting in the following:
-              <pre class="example highlight" title="first resources values A' and B'">
-{
-  "url": "http://example.com/doc1.csv",
-  "dc:title": {"@value": "foo", "@language": "en"},
-  "tableDirection": "ltr",
-  "tableSchema": {
-    "aboutUrl": "http://example.com/metadata-a{#foo}",
-    "columns": [
-      {"name": "foo", "title": {"en": ["Foo"]}, "required": true},
-      {"name": "bar"}
-    ]
-  }
-}
-
-{
-  "url": "http://example.com/doc1.csv",
-  "dc:description": {"@value": "bar"},
-  "tableSchema": {
-    "propertyUrl": "http://example.org/foo{#_name}",
-    "columns": [
-      {"title": {"en": ["Foo"]}, "required": false},
-      {"name": "bar"},
-      {}
-    ]
-  }
-}
-              </pre>
-              Next each property from <code>B'</code> is considered:
+              As these have the same <a href="#table-url"><code>url</code></a>, these are merged. Each property from <code>B</code> is considered:
               <ol>
-                <li><code>url</code> is a <code>link property</code> so the value from <code>A'</code> overrides <code>B'</code> (although they are the same value after normalizing the relative-URL in A')</li>
-                <li><code>dc:description</code> does not exist in <em>A'</em> so it is added to <code>A'</code></li>
-                <li>Each has <code>tableSchema</code> merged as an <a>object property</a> <code>A''</code> and <code>B''</code>:
+                <li><code>url</code> is the same (otherwise the two <a title="table description">table descriptions</a> would not be being merged</li>
+                <li><code>dc:description</code> does not exist in <code>A</code> so it is added to <code>A</code></li>
+                <li>The objects held by the <a>object property</a> <code>tableSchema</code> properties are merged:
                   <ol>
-                    <li><code>B''</code> has a <code>propertyUrl</code> which is added to <code>A''</code>.</li>
+                    <li><code>B</code> has a <code>propertyUrl</code> which is added to <code>A</code>.</li>
                     <li>Each has <code>columns</code> which is merged as described in <a href="#schemas"></a>:
                       <ol>
-                        <li>The first column matches on <code>title</code> because they each have the value <code>"Foo"</code> and the language tag <code>en</code> matches <code>und</code>. The value of <code>required</code> in <em>A''</em> is retained</li>
+                        <li>The first column matches on <code>title</code> because they each have the value <code>"Foo"</code> and the language tag <code>en</code> matches <code>und</code>. Because the <code>und</code> value is present in the <code>en</code> array, that value is removed from the <code>und</code> array, and because the array is now empty the <code>und</code> property is removed. The value of <code>required</code> in <em>A</em> is retained, as is the value of <code>name</code></li>
                         <li>The second column has a match on <code>name</code></li>
                       </ol>
                     </li>
@@ -2069,50 +2051,45 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
               <pre class="example highlight" title="first resources values merged">
 {
   "url": "http://example.com/doc1.csv",
-  "dc:title": {"@value": "foo", "@language": "en"},
-  "dc:description": {"@value": "bar}",
+  "dc:title": "foo",
+  "dc:description": "bar",
   "tableDirection": "ltr",
   "tableSchema": {
-    "aboutUrl": "http://example.com/metadata-a{#foo}",
-    "propertyUrl": "http://example.org/foo{#_name}",
-    "columns": [
-      {"name": "foo", "title": {"en": ["Foo"]}, "required": true},
-      {"name": "bar"}
-    ]
+    "aboutUrl": "{#foo}",
+    "propertyUrl": "{#_name}",
+    "columns": [{
+      "name": "foo", 
+      "title": { "en": [ "Foo" ]}, 
+      "required": true
+    },{
+      "name": "bar"
+    }]
   }
 }
               </pre>
             </li>
-            <li>The second resources value from <code>A</code> is normalized by expanding <code>url</code> relative to the metadata location:
-              <pre class="example highlight" title="second resources value normalized">
-{
-  "url": "http://example.com/doc2.csv"
-}
-              </pre>
-            </li>
-            <li>As <code>B</code> has no second <code>resource</code> value, the value from <code>A</code> is retained.
+            <li>The second resources value from <code>A</code> is retained as is.
           </ol>
         </li>
       </ol>
       <p>The resulting merged metadata is now the following:</p>
       <pre class="example highlight" title="Fully merged metadata">
 {
-  "@context": ["http://www.w3.org/ns/csvw", {
-    "@language": "en",
-    "@base": "http://example.org/foo"
-  }],
   "resources": [{
     "url": "http://example.com/doc1.csv",
-    "dc:title": {"@value": "foo", "@language": "en"},
-    "dc:description":{"@value": "bar"},
+    "dc:title": "foo",
+    "dc:description": "bar",
     "tableDirection": "ltr",
     "tableSchema": {
-      "aboutUrl": "http://example.com/metadata-a{#foo}",
-      "propertyUrl": "http://example.org/foo{#_name}",
-      "columns": [
-        {"name": "foo", "title": {"en": ["Foo"]}, "required": true},
-        {"name": "bar"}
-      ]
+      "aboutUrl": "{#foo}",
+      "propertyUrl": "{#_name}",
+      "columns": [{
+        "name": "foo", 
+        "title": { "en": [ "Foo" ]}, 
+        "required": true
+      },{
+        "name": "bar"
+      }]
     }
   }, {
     "url": "http://example.com/doc2.csv"
