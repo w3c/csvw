@@ -1,0 +1,60 @@
+# prefixes as defined in RDFa 1.1 initial context; only include those actually referenced within the data
+# each of the tables are allocated a prefix based on the order that they occur within the table group ...
+#    `t1:` for table `Ta` ({ "url": "http://example.org/schema/professions.csv" }) - albeit that output for this table is suppressed
+#    `t2:` for table `Tb` ({ "url": "http://example.org/senior-roles.csv" })
+#    `t3:` for table `Tc` ({ "url": "http://example.org/junior-roles.csv"})
+# >> are these (somewhat arbitrary) prefixes appropriate? ... eitherway, choice of prefixes is implementation dependent ... or must it be standardised for non-JSON-LD-aware JSON applications?
+
+# >> arguably it's the triples themselves that are important - not the syntax or how the output is structured ... conversion document simply needs to talk in terms of "triples"
+
+# minimal mode does not contain any information about the table; only information gleaned from the cells of the table
+
+# note that output for table `Ta` ({ "url": "http://example.org/schema/professions.csv" }) is not included due to table annotation { "suppressOutput": true }
+# note that column `Cb5` ({ "name": "reportsTo" }) uses the `aboutUrl` and `valueUrl` to assert the relationship between the given senior post and the post it reports to
+# note that cell `Cb2.5` (table `Tb`, row `Rb2`; column `Cb5`, { "name": "reportsTo" }) is `null` (empty) - no triple is generated in the output
+# note that the `aboutUrl` property has not been set for cells in table `Tc` ({ "url": "http://example.org/junior-roles.csv"}) - for a given row, all cells where `aboutUrl` has not been specified are assumed to refer to the same subject; this unspecified subject resource is treated as a blank node (identified using a UUID in this case)
+# >> is it appropriate to use blank nodes like this?
+# note that column `Cc1` ({ "name": "reportsToSenior" }) uses the `aboutUrl` and `valueUrl` to assert the relationship between the given junior post and the senior post it reports to
+# note that column `Cc3` ({ "name": "min-pay" }) has been declared as holding integer values ({ "datatype": "integer" }) - the output explicitly declares the data type
+# note that column `Cc4` ({ "name": "max-pay" }) has been declared as holding integer values ({ "datatype": "integer" }) - the output explicitly declares the data type
+# note that column `Cc6` ({ "name": "number" }) has been declared as holding number values ({ "datatype": "number" }); equivalent to `xsd:double` - the output explicitly declares the data type
+
+@prefix dc: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix t1: <http://example.org/schema/professions.csv#> .
+@prefix t2: <http://example.org/senior-roles.csv#> .
+@prefix t3: <http://example.org/junior-roles.csv#> .
+
+t2:post-90115
+	dc:identifier "90115" ;
+	foaf:name "Steve Egan" ;
+	<http://example.org/def/grade> "SCS1A" ;
+	<http://example.org/def/job> "Deputy Chief Executive" ;
+	<http://example.org/def/reportsTo> t2:post-90334 ;
+	<http://example.org/def/profession> "Finance" .
+
+t2:post-90334
+	dc:identifier "90334" ;
+	foaf:name "Sir Alan Langlands" ;
+	<http://example.org/def/grade> "SCS4" ;
+	<http://example.org/def/job> "Chief Executive" ;
+	<http://example.org/def/profession> "Policy" .
+
+_:d8b8e40c-8c74-458b-99f7-64d1cf5c65f2
+	<http://example.org/def/reportsTo> t2:post-90115 ;
+	<http://example.org/def/grade> "4" ;
+	<http://example.org/def/min-pay> "17426"^^xsd:integer ;
+	<http://example.org/def/max-pay> "20002"^^xsd:integer ;
+	<http://example.org/def/job> "Administrator" ;
+	<http://example.org/def/number-of-posts> "8.67"^^xsd:double ;
+	<http://example.org/def/profession> "Operational Delivery" .
+
+_:fa1fa954-dd5f-4aa1-b2bc-20bf9867fac6
+	<http://example.org/def/reportsTo> t2:post-90115 ;
+	<http://example.org/def/grade> "5" ;
+	<http://example.org/def/min-pay> "19546"^^xsd:integer ;
+	<http://example.org/def/max-pay> "22478"^^xsd:integer ;
+	<http://example.org/def/job> "Administrator" ;
+	<http://example.org/def/number-of-posts> "0.5"^^xsd:double ;
+	<http://example.org/def/profession> "Operational Delivery" .
