@@ -1669,19 +1669,20 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           The process of parsing the string value of a cell into a single value or a list of values is as follows:
         </p>
         <ol>
-          <li>unless the <a href="#cell-datatype"><code>datatype</code></a> is <code>string</code> or <code>anyAtomicType</code> or <code>any</code>, strip leading and trailing whitespace from the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-string-value" class="externalDFN">string value</a></li>
-          <li>if the resulting string is an empty string, apply the remaining steps to the string given by the <a href="#cell-default"><code>default</code></a> property</li>
-          <li>if the <a href="#cell-separator"><code>separator</code></a> property is not <code>null</code> and the resulting string is an empty string, the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">cell value</a> is an empty list</li>
-          <li>if the <a href="#cell-separator"><code>separator</code></a> property is not <code>null</code>, the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">cell value</a> is a list of values created by:
+          <li>unless the <a href="#cell-datatype"><code>datatype</code></a> is <code>string</code> or <code>anyAtomicType</code> or <code>any</code>, strip leading and trailing whitespace from the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-string-value" class="externalDFN">string value</a> to give a normalized string</li>
+          <li>if the <a href="#cell-separator"><code>separator</code></a> property is not <code>null</code>, the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">cell value</a> is either a list of values or <code>null</code>, created as follows:
             <ol>
-              <li>splitting the resulting string at the character specified by the <code>separator</code> property</li>
-              <li>unless the <a href="#cell-datatype"><code>datatype</code></a> is <code>string</code> or <code>anyAtomicType</code> or <code>any</code>, stripping leading and trailing whitespace from these strings</li>
+              <li>if the normalized string is an empty string, apply the remaining steps to the string given by the <a href="#cell-default"><code>default</code></a> property</li>
+              <li>if the normalized string is the same as any one of the values of the <a href="#cell-null"><code>null</code></a> property, then the resulting value is <code>null</code></li>
+              <li>split the normalized string at the character specified by the <code>separator</code> property</li>
+              <li>unless the <a href="#cell-datatype"><code>datatype</code></a> is <code>string</code> or <code>anyAtomicType</code> or <code>any</code>, strip leading and trailing whitespace from these strings</li>
               <li>applying the remaining steps to each of the strings in turn</li>
             </ol>
           </li>
+          <li>if the string is an empty string, apply the remaining steps to the string given by the <a href="#cell-default"><code>default</code></a> property</li>
           <li>if the string is the same as any one of the values of the <a href="#cell-null"><code>null</code></a> property, then the resulting value is <code>null</code></li>
           <li>validate the string based on the datatype, using the <a href="#datatype-format"><code>format</code></a> property if one is specified, as described below, and then against the constraints described in <a href="#datatypes" class="sectionRef"></a>; if there are any errors, add them to the list of <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-errors" class="externalDFN">errors</a> for the cell; the resulting value is typed as a <code>string</code> with the language provided by the <a href="#cell-lang"><code>lang</code></a> property</li>
-          <li>otherwise, if there are no errors, parse the string using the <a href="#datatype-format"><code>format</code></a> if one is specified, as described below; the resulting value is typed according to the <a href="#cell-datatype"><code>datatype</code></a> and if the <code>datatype</code> is <code>string</code> it has the language provided by the <a href="#cell-lang"><code>lang</code></a> property</li>
+          <li>otherwise, if there are no errors, parse the string using the <a href="#datatype-format"><code>format</code></a> if one is specified, as described below; the resulting value is typed according to the <a href="#cell-datatype"><code>datatype</code></a> and if the <code>datatype</code> is <code>string</code>, or there is no <code>datatype</code>, it has the language provided by the <a href="#cell-lang"><code>lang</code></a> property</li>
         </ol>
         <section class="informative">
           <h3>Parsing examples</h3>
