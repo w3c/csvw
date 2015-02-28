@@ -1307,7 +1307,7 @@ GID,On Street,Species,Trim Cycle,Diameter at Breast Ht,Inventory Date,Comments,P
         </pre>
         <pre class="example highlight" id="example-tree-ops-ext-metadata">
 {
-  "url": "http://example.org/tree-ops-ext.csv",
+  "url": "tree-ops-ext.csv",
   "@context": ["http://www.w3.org/ns/csvw", {"@language": "en"}],
   "@id": "http://example.org/tree-ops-ext",
   "dc:title": "Tree Operations",
@@ -1493,12 +1493,12 @@ GID,On Street,Species,Trim Cycle,Diameter at Breast Ht,Inventory Date,Comments,P
         </p>
         <pre class="example" id="example-events-listing-csv+">
 Name, Start Date, Location Name, Location Address, Ticket Url
-B.B. King,2014-04-12T19:30,"Lupo’s Heartbreak Hotel", "79 Washington St., Providence, RI",https://www.etix.com/ticket/1771656
+B.B. King,2014-04-12T19:30,"Lupo’s Heartbreak Hotel","79 Washington St., Providence, RI",https://www.etix.com/ticket/1771656
 B.B. King,2014-04-13T20:00,"Lynn Auditorium","Lynn, MA, 01901",http://frontgatetickets.com/venue.php?id=11766
         </pre>
         <pre class="example highlight" id="example-events-listing-metadata">
 {
-  "url": "http://example.org/events-listing.csv",
+  "url": "events-listing.csv",
   "@context": ["http://www.w3.org/ns/csvw", {"@language": "en"}],
   "tableSchema": {
     "columns": [{
@@ -1668,7 +1668,7 @@ B.B. King,2014-04-13T20:00,"Lynn Auditorium","Lynn, MA, 01901",http://frontgatet
         <p> 
           The input CSV+ files and the associated metadata description are provided below:
         </p>
-        <pre class="example" id="example-public-sector-roles-and-salaries-csv+-professions" title="http://example.org/schema/professions.csv">
+        <pre class="example" id="example-public-sector-roles-and-salaries-csv+-professions" title="http://example.org/conf/professions.csv">
 Profession
 Finance
 Information Technology
@@ -1690,7 +1690,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
   "@type": "TableGroup",
   "@context": ["http://www.w3.org/ns/csvw", {"@language": "en"}],
   "resources": [{
-    "url": "http://example.org/schema/professions.csv",
+    "url": "professions.csv",
     "tableSchema": {
       "columns": [{
         "name": "name",
@@ -1698,11 +1698,11 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
         "datatype": "string",
         "required": true
       }],
-      "primaryKey": "name",
+      "primaryKey": "name"
     },
     "suppressOutput": true
   }, {
-    "url": "./senior-roles.csv",
+    "url": "senior-roles.csv",
     "tableSchema": {
       "columns": [{
         "name": "ref",
@@ -1743,19 +1743,19 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
       "foreignKeys": [{
         "columns": "reportsTo",
         "reference": {
-          "resource": "./senior-roles.csv",
+          "resource": "senior-roles.csv",
           "columns": "ref"
         }
       }, {
         "columns": "profession",
         "reference": {
-          "resource": "http://example.org/conf/professions.csv",
+          "resource": "professions.csv",
           "columns": "name"
         }
       }]
     }
   }, {
-    "url": "./junior-roles.csv",
+    "url": "junior-roles.csv",
     "tableSchema": {
       "columns": [{
         "name": "reportsToSenior",
@@ -1798,13 +1798,13 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
       "foreignKeys": [{
         "columns": "reportsToSenior",
         "reference": {
-          "resource": "./senior-roles.csv",
+          "resource": "senior-roles.csv",
           "columns": "ref"
         }
       }, {
         "columns": "profession",
         "reference": {
-          "resource": "http://example.org/conf/professions.csv",
+          "resource": "professions.csv",
           "columns": "name"
         }
       }]
@@ -1812,6 +1812,11 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
   }]
 }
         </pre>
+
+        <div class="issue">
+          <p>Currently <code>professions.csv</code> is identified using a relative URL; it is supposed to be centrally published at a remote address (e.g. <code>http://example.org/conf/professions.csv</code>) and referenced from the metadata description file which is in the same directory as the <code>senior-roles.csv</code> and <code>junior-roles.csv</code> files published by the government department.</p>
+          <p><strong>@gkellogg</strong> says: "<em>Need to pervasively use relative URLs as, at least for my implementation, using a separate local location vs. declared location doesn't work."</em></p>
+        </div>
 
         <p class="note">The metadata description, <code>http://example.org/metadata.json</code>, need not be modified by the government departments publishing information about their senior roles and junior roles. The CSV+ files containing this information are <em>assumed</em> to be in the same directory as the metadata description and named <code>senior-roles.csv</code> and <code>junior-roles.csv</code>.</p>
 
@@ -1838,7 +1843,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             <tr><th><code>columns</code></th><th><code>reference</code></th></tr>
           </thead>
           <tbody>
-            <tr><td><var>Ta</var></td><td><code>http://example.org/schema/professions.csv</code></td><td><var>Ca1</var></td><td><var>Ra1</var>, <var>Ra2</var>, <var>Ra3</var>, <var>Ra4</var></td><td><var>Ca1</var></td><td><code>true</code></td><td></td><td></td></tr>
+            <tr><td><var>Ta</var></td><td><code>http://example.org/conf/professions.csv</code></td><td><var>Ca1</var></td><td><var>Ra1</var>, <var>Ra2</var>, <var>Ra3</var>, <var>Ra4</var></td><td><var>Ca1</var></td><td><code>true</code></td><td></td><td></td></tr>
 
             <tr><td><var>Tb</var></td><td><code>http://example.org/senior-roles.csv</code></td><td><var>Cb1</var>, <var>Cb2</var>, <var>Cb3</var>, <var>Cb4</var>, <var>Cb5</var>, <var>Cb6</var></td><td><var>Rb1</var>, <var>Rb2</var></td><td><var>Cb1</var></td><td></td><td><var>Cb5</var></td><td><var>Cb1</var></td></tr>
             <tr><td></td><td></td><td></td><td></td><td></td><td></td><td><var>Cb6</var></td><td><var>Ca1</var></td></tr>
@@ -1848,7 +1853,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           </tbody>
         </table>
 
-        <p class="note">In this example, output for the centrally published list of professions, table <var>Ta</var> (<code>http://example.org/schema/professions.csv</code>), is not required; only information from the departmental submissions is to be translated to RDF. Note the <code>suppressOuput</code> annotation on this table.</p>
+        <p class="note">In this example, output for the centrally published list of professions, table <var>Ta</var> (<code>http://example.org/conf/professions.csv</code>), is not required; only information from the departmental submissions is to be translated to RDF. Note the <code>suppressOuput</code> annotation on this table.</p>
 
         <p>Annotations for the <a>columns</a>, <a>rows</a> and <a>cells</a> in <a>table</a> <var>T</var> are shown in the tables below.</p>
 
