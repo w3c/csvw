@@ -349,10 +349,10 @@ var respecConfig = {
         the validator would validate all the listed resources, using the locally defined schema at <code>government-spending.csv</code>. It would still use the metadata located from the referenced CSV files; for example, when processing <code>http://example.org/east-sussex-2015-03.csv</code>, it would use embedded metadata within that file, referenced from any <code>Link</code> header found when retrieving that file, and at <code>http://example.org/east-sussex-2015-03.csv-metadata.json</code> and <code>http://example.org/metadata.json</code>.
       </p>
       <section>
-        <h2>Create Annotated Table</h2>
-        <p>After locating metadata, all metadata documents discovered are <a href="http://w3c.github.io/csvw/metadata/#dfn-merged" class="externalDFN">merged</a> into a single descriptor containing all <a title="annotation">annotations</a>. When starting with a metadata file, this involves merging overriding metadata with that metadata file and using this to process referenced tabular data files. When starting with a tabular data file this involves locating all metadata as described in <a href="#locating-metadata" class="sectionRef"></a> and merging all relevant metadata into a single descriptor.
+        <h2>Creating Annotated Tables</h2>
+        <p>After locating metadata, all metadata documents discovered are <a href="http://w3c.github.io/csvw/metadata/#dfn-merged" class="externalDFN">merged</a> into a single description containing all <a title="annotation">annotations</a>. When starting with a metadata file, this involves merging any metadata located about the referenced tabular data files into that metadata file. When starting with a tabular data file this involves locating all metadata as described in <a href="#locating-metadata" class="sectionRef"></a> and merging all relevant metadata into a single descriptor.
         </p>
-        <p>If processing starts with a tabular data file:</p>
+        <p>If processing starts with a tabular data file, implementations:</p>
         <ol>
           <li>Retrieve the tabular data file.</li>
           <li>Retrieve the metadata files described in <a href="#locating-metadata" class="sectionRef"></a>:
@@ -363,18 +363,16 @@ var respecConfig = {
               <li>directory-specific metadata in a document located based on the location of the tabular data file  (<code>DM</code>) (see <a href="#standard-directory-metadata" class="sectionRef"></a>)</li>
             </ul>
           </li>
-          <li>Extract the <em>first available</em> <a href="http://www.w3.org/TR/tabular-metadata/#dialect-descriptions">dialect description</a> from the metadata files <code>UM</code>, <code>LM</code>, <code>FM</code>, <code>DM</code> (in this order) for the table description associated with the tabular data file, or the table group description, otherwise,  or an empty dialect description, yielding the final dialect description (<code>DD</code>). Missing dialiect values are added from the default dialect description.</li>
+          <li>Extract the <em>first available</em> <a href="http://www.w3.org/TR/tabular-metadata/#dialect-descriptions">dialect description</a> (<code>DD</code>) from the metadata files <code>UM</code>, <code>LM</code>, <code>FM</code>, <code>DM</code> (in this order) for the table description associated with the tabular data file. If there is no such dialect description, extract the first available dialect description from a table group description in which the tabular data file is described. Otherwise use the default dialect description.</li>
           <li>If the tabular data file was retrieved with <code>Content-Type</code> including the <code>header=absent</code> parameter set <code>header</code> to <code>false</code> in <code>DD</code>.</li>
-          <li>Parse the tabular data file using <code>DD</code> to retrieve the <a>header line</a>. Extract embedded metadata from the <a>header line</a> (<code>EM</code>). <span class="note">Note: This specification does not define the syntax of that embedded metadata, if any, unless <code>DD</code> defines a single <a>header line</a> providing title values for the corresponding column objects in no language.</span></li>
+          <li>Parse the tabular data file using <code>DD</code> to create a basic tabular data model (<code>T</code>) with core annotations. Extract embedded metadata (<code>EM</code>), for example from the <a>header line</a>. <span class="note">Note: This specification provides a non-normative definition of how embedded metadata may be extracted from tabular data files in <a href="#parsing-tabular-data" class="sectionRef"></a>.</span></li>
           <li>Create the merged metadata <code>M = merge(UM, EM, LM, FM, DM)</code> using the <a href="http://w3c.github.io/csvw/metadata/#dfn-merged" class="externalDFN">merge algorithm</a> defined in [[!tabular-metadata]].</li>
-          <li>Update the dialect description of table description in <code>M</code> for the tabular data file with <code>DD</code>.</li>
-          <li>Parse the tabular data file using <code>M</code> as defined in <a href="#parsing-tabular-data" class="sectionRef"></a> to create the <a>annotated table</a>.</li>
+          <li>Use the metadata <code>M</code> to add annotations to the tabular data model <code>T</code> as described in <a href="http://w3c.github.io/csvw/metadata/#annotating-tables">Section 2 Annotating Tables</a> in [[!tabular-metadata]].</li>
         </ol>
         <p>If the process starts with a Metadata file:</p>
         <ol>
-          <li>Retrieve the metadata file yielding the metadata <code>SM</code></li>
-          <li>Generate <code>UMS = merge(UM, SM)</code>, where <code>UM</code> is the metadata supplied by the user (see <a href="#overriding-metadata" class="sectionRef"></a>)</li>
-          <li>For each table description in <code>UMS</code>, run the steps for a tabular data file using the <code>url</code> from the table description with <code>UMS</code> playing the role of <code>UM</code> to create one or more <a title="annotated table">annotated tables</a></li>
+          <li>Retrieve the metadata file yielding the metadata <code>UM</code> (which is treated as overriding metadata, see <a href="#overriding-metadata" class="sectionRef"></a>).</li>
+          <li>For each table description in <code>UM</code>, run the steps for a tabular data file using the <code>url</code> from the table description with <code>UM</code> playing the role of <code>UM</code> to create one or more <a title="annotated table">annotated tables</a>.</li>
         </ol>
       </section>
       <section>
