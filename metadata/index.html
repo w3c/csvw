@@ -219,8 +219,8 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       </p>
       <ul>
         <li>properties that are used to identify the table or column that the annotations should appear on; these match up to core annotations on those objects in the annotated tabular data model defined in [[!tabular-data-model]] and do not create new annotations</li>
-        <li>properties that map directly to annotations that appear directly on the group of tables, table, column, row or cell whose description they appear on, such as the <code>name</code> of a column or the <code>dc:provenance</code> of a table</li>
-        <li>properties that are specified on the description of a group of tables, table or column to provide a default value for the equivalent annotation on each of the cells that appear in that table or column</li>
+        <li>properties that are used to create annotations that appear directly on the group of tables, table, column, row or cell whose description they appear on, such as the <code>name</code> of a column or the <code>dc:provenance</code> of a table</li>
+        <li>properties that are inherited, for example by being specified on the description of a group of tables and being inherited by each table in that group, or being specified for a table or column but being used to create or affect the values of annotations on each of the cells that appear in that table or column</li>
       </ul>
       <p>
         For example, in the <a>column description</a>
@@ -237,27 +237,9 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 }
       </pre>
       <p>
-        the properties <code>name</code>, <code>title</code> and <code>dc:description</code> are <a title="direct property">direct properties</a> that become <code>name</code>, <code>title</code> and <code>dc:description</code> properties on the column in the data model. The <code>datatype</code> and <code>format</code> properties are <a title="inherited property">inherited properties</a> that become <code>datatype</code> and <code>format</code> properties on the cells within the column.
+        the properties <code>name</code>, <code>title</code> and <code>dc:description</code> are used to create the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-name" class="externalDFN">name</a>, <a href="http://w3c.github.io/csvw/syntax/#dfn-column-titles" class="externalDFN">titles</a> and <code>dc:description</code> annotations on the <a href="http://w3c.github.io/csvw/syntax/#dfn-column" class="externalDFN">column</a> in the data model. The <code>datatype</code> and <code>format</code> properties are <a title="inherited property">inherited properties</a> that affect the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">value</a> of each <a href="http://w3c.github.io/csvw/syntax/#dfn-cell" class="externalDFN">cell</a> in that column.
       </p>
       <p>The <dfn>property value</dfn> of an annotation is that defined in the metadata, unless otherwise noted.</p>
-      <section>
-        <h3>Direct Properties</h3>
-        <p>
-          <dfn title="direct property">Direct properties</dfn> are properties on the description object for a given table group, table, column, row or cell which map directly to annotations on the described table group, table, column, row or cell. The name of the annotation is the same as the name of the property. The value of the annotation is the same as the <a>property value</a>.
-        </p>
-      </section>
-      <section>
-        <h3>Inherited Properties</h3>
-        <p>
-          A cell may be assigned annotations based on properties on the description objects for the group of tables, table, column or row that it appears in. These properties are known as <dfn title="inherited property">inherited properties</dfn> and are listed in <a href="#inherited-properties-1" class="sectionRef"></a>. To ascertain a value for these annotations, an application MUST identify the relevant property in the descriptions of the table or column.
-        </p>
-        <p>
-          Applications MUST raise an error if the value of a property in a table description is not <a>compatible with</a> the value of that property on the group of tables. Applications MUST raise an error if the value of a property in a <a>column description</a> is not <a>compatible with</a> the value of that property on the table. Applications MUST raise an error if the value of a property on a cell is not <a>compatible with</a> the values of that property on the column that the cell is associated with.
-        </p>
-        <p>
-          A value for a cell, column or table is <dfn>compatible with</dfn> with a value on a column, table or group of tables if they are the same value or if the first value is a sub-value of the second value. The definitions of individual <a title="inherited property">inherited properties</a> indicate what values count as sub-values of others.
-        </p>
-      </section>
     </section>
     <section>
       <h2>Metadata Format</h2>
@@ -1408,37 +1390,43 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
       <section>
         <h2>Inherited Properties</h2>
         <p>
-          Cell descriptions may override <a title="inherited property">inherited properties</a>, as described in <a href="#annotating-tables" class="sectionRef"></a>. It is good practice to define these properties on columns, so that all cells within a given column are handled in the same way, or on tables if appropriate. These properties are:
+          A <a href="http://w3c.github.io/csvw/syntax/#dfn-cell" class="externalDFN">cell</a> may be assigned annotations based on properties on the description objects for the <a title="table group description">group of tables</a>, <a title="table description">table</a>, <a title="schema description">schema</a> or <a title="column description">column</a> that it appears in. These properties are known as <dfn title="inherited property">inherited properties</dfn> and are listed below. To ascertain a value for certain annotations on cells, an application MUST identify the relevant property in the descriptions of the group of tables, table, schema or column.
+        </p>
+        <p>
+          Applications MUST raise an error if the value of a property in a <a>table description</a> is not <a>compatible with</a> the value of that property on the <a>table group description</a> it appears in. Applications MUST raise an error if the value of a property in a <a>schema description</a> is not <a>compatible with</a> the value of that property on the <a>table description</a> and <a>table group description</a> it appears in. Applications MUST raise an error if the value of a property in a <a>column description</a> is not <a>compatible with</a> the value of that property in the <a>schema description</a>, <a>table description</a> and/or <a>table group description</a> it appears in.
+        </p>
+        <p>
+          A value for an <a>inherited property</a> on a column or table description is <dfn>compatible with</dfn> with an inherited value on the same property on a table or table group description if they are the same value or if the first value is a sub-value of the second value. The definitions of individual <a title="inherited property">inherited properties</a> indicate what values count as sub-values of others.
         </p>
         <dl>
           <dt id="cell-null"><code>null</code></dt>
           <dd>
             <p>
-              An <a>atomic property</a> giving the string or strings used for null values within the data. If the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-string-value" class="externalDFN">string value</a> of the cell is equal to any one of these values, the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">cell value</a> is <code>null</code>. If not specified, the default for the <code>null</code> property is the empty string.
+              An <a>atomic property</a> giving the string or strings used for null values within the data. If the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-string-value" class="externalDFN">string value</a> of the cell is equal to any one of these values, the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">cell value</a> is <code>null</code>. If not specified, the default for the <code>null</code> property is the empty string. A value for this property is <a>compatible with</a> an inherited value if it is a subset of the inherited value.
             </p>
           </dd>
           <dt id="cell-language"><code>lang</code></dt>
           <dd>
             <p>
-              An <a>atomic property</a> giving a single string language code as defined by [[!BCP47]]. Indicates the language of the value within the cell.
+              An <a>atomic property</a> giving a single string language code as defined by [[!BCP47]]. Indicates the language of the value within the cell. A value for this property is <a>compatible with</a> an inherited value if it is a sub-language of the inherited value; for example <code>en-US</code> is compatible with <code>en</code> but not <code>fr</code>.
             </p>
           </dd>
           <dt id="cell-textDirection"><code>textDirection</code></dt>
           <dd>
             <p>
-              An <a>atomic property</a> that MUST have a single string value that is one of <code>"rtl"</code> or <code>"ltr"</code> (the default). Indicates whether the text within cells should be displayed by default as left-to-right or right-to-left text. See <a href="#bidirectional-tables" class="sectionRef"></a> for more details.
+              An <a>atomic property</a> that MUST have a single string value that is one of <code>"rtl"</code> or <code>"ltr"</code> (the default). Indicates whether the text within cells should be displayed by default as left-to-right or right-to-left text. See <a href="#bidirectional-tables" class="sectionRef"></a> for more details. A value for this property is <a>compatible with</a> an inherited value only if they are identical.
             </p>
           </dd>
           <dt id="cell-separator"><code>separator</code></dt>
           <dd>
             <p>
-              An <a>atomic property</a> that MUST have a single string value that is the character used to separate items in the string value of the cell. If <code>null</code> or unspecified, the cell does not contain a list. Otherwise, application MUST split the string value of the cell on the specified separator character and parse each of the resulting strings separately. The cell's value will then be a list. Conversion specifications MUST use the separator to determine the conversion of a cell into the target format. See <a href="#parsing-cells"></a> for more details.
+              An <a>atomic property</a> that MUST have a single string value that is the character used to separate items in the string value of the cell. If <code>null</code> or unspecified, the cell does not contain a list. Otherwise, application MUST split the string value of the cell on the specified separator character and parse each of the resulting strings separately. The cell's value will then be a list. Conversion specifications MUST use the separator to determine the conversion of a cell into the target format. See <a href="#parsing-cells"></a> for more details. A value for this property is <a>compatible with</a> an inherited value only if they are identical.
             </p>
           </dd>
           <dt id="cell-default"><code>default</code></dt>
           <dd>
             <p>
-              An <a>atomic property</a> holding a single string that is used to create a default <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">value</a> for the cell in cases where the original <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-string-value" class="externalDFN">string value</a> is an empty string. This default value MAY be used when converting the table into other formats, or when the table is displayed. If not specified, the default for the <code>default</code> property is the empty string, <code>""</code>.
+              An <a>atomic property</a> holding a single string that is used to create a default <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">value</a> for the cell in cases where the original <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-string-value" class="externalDFN">string value</a> is an empty string. This default value MAY be used when converting the table into other formats, or when the table is displayed. If not specified, the default for the <code>default</code> property is the empty string, <code>""</code>. A value for this property is <a>compatible with</a> an inherited value only if they are identical.
             </p>
           </dd>
           <dt id="cell-datatype"><code>datatype</code></dt>
@@ -1446,23 +1434,26 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             <p>
               An <a>atomic property</a> that contains either a single string that is the main datatype of the values of the cell or a <a>datatype description</a> object. If the value of this property is a string, it is a term defined in the default context representing a built-in datatype URL; if it is an object then it describes a more specialised datatype. If a cell contains a sequence (ie the <code>separator</code> property is specified and not <code>null</code>) then this property specifies the datatype of each value within that sequence. See <a href="#datatypes"></a> for more details.
             </p>
+            <p>
+              A value for this property is <a>compatible with</a> an inherited value if they are identical, or if the value is a subtype within the datatype hierarchy defined in <a href="#datatypes" class="sectionRef"></a>, including if the inherited value is explicitly specified as the <a href="#datatype-base"><code>base</code></a> of this value.
+            </p>
           </dd>
           <dt id="cell-aboutUrl"><code>aboutUrl</code></dt>
           <dd>
-            <p>A <a>URI template property</a> that MAY be used to create a unique identifier for each cell within a row when mapping data to other formats.</p>
-            <p class="note"><code>aboutUrl</code> is typically defined on a Schema or Table. If defined on individual Columns, care must be taken to ensure that transformed cell values maintain a semantic relationship.</p>
+            <p>A <a>URI template property</a> that MAY be used to create a unique identifier for each cell within a row when mapping data to other formats. A value for this property is <a>compatible with</a> an inherited value only if they are identical.</p>
+            <p class="note"><code>aboutUrl</code> is typically defined on a <a>schema description</a> or <a>table description</a>. If defined on individual <a title="column description">column descriptions</a>, care must be taken to ensure that transformed cell values maintain a semantic relationship.</p>
           </dd>
           <dt id="cell-propertyUrl"><code>propertyUrl</code></dt>
           <dd>
-            <p>An <a>URI template property</a> that MAY be used to create a URI for a property if the table is mapped to another format. The default value of <code>propertyUrl</code> is <code>"{#_name}"</code>.</p>
-            <p class="note"><code>propertyUrl</code> is typically defined on a Column. If defined on a Schema, Table or Table Group, care must be taken to ensure that transformed cell values maintain an appropriate semantic relationship. For example by including the <code>name</code> of the column in the generated URL by using <code>_name</code> in the template.</p>
+            <p>An <a>URI template property</a> that MAY be used to create a URI for a property if the table is mapped to another format. The default value of <code>propertyUrl</code> is <code>"{#_name}"</code>. A value for this property is <a>compatible with</a> an inherited value only if they are identical.</p>
+            <p class="note"><code>propertyUrl</code> is typically defined on a <a title="column description">column description</a>. If defined on a <a>schema description</a>, <a>table description</a> or <a>table group description</a>, care must be taken to ensure that transformed cell values maintain an appropriate semantic relationship, for example by including the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-name" class="externalDFN">name</a> of the column in the generated URL by using <code>_name</code> in the template.</p>
           </dd>
           <dt id="cell-valueUrl"><code>valueUrl</code></dt>
           <dd>
-            <p>An <a>URI template property</a> that is used to map the values to the cells into URLs. See <a href="#parsing-cells" class="sectionRef"></a> for details.</p>
+            <p>An <a>URI template property</a> that is used to map the values to the cells into URLs. See <a href="#parsing-cells" class="sectionRef"></a> for details. A value for this property is <a>compatible with</a> an inherited value only if they are identical.</p>
             <p class="note">
               This allows a <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">cell value</a> to define one or more RDF <cite><a href="http://www.w3.org/TR/rdf11-concepts/#dfn-resource">resources</a></cite> value of a cell instead of a literal values, as defined in [[rdf-concepts]]. For example, if the value were <code>"{#reference}"</code>, each cell value of a column named <em>reference</em> would be used to create a URI such as <code>http://example.com/#1234</code>, if <code>1234</code> were a cell value of that column.</p>
-            <p class="note"><code>valueUrl</code> is typically defined on a Column. If defined on a Schema, Table or Table Group, care must be taken to ensure that transformed cell values maintain an appropriate semantic relationship.</p>
+            <p class="note"><code>valueUrl</code> is typically defined on a <a title="column description">column description</a>. If defined on a <a>schema description</a>, <a>table description</a> or <a>table group description</a>, care must be taken to ensure that transformed cell values maintain an appropriate semantic relationship.</p>
           </dd>
         </dl>
         <p>The <a>property value</a> of an <a>inherited property</a> is the first value, if any, found by looking in the current description object through all of its containing objects: a <a>inherited property</a> defined in a <a>column description</a> takes precedence of one defined in a <a>schema description</a>, which in turn takes precedence of one defined in a <a>table description</a>, which in turn takes precedence of one defined in a <a>table group description</a>.</p>
