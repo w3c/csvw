@@ -1641,8 +1641,11 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           The process of parsing the string value of a cell into a single value or a list of values is as follows:
         </p>
         <ol>
-          <li>unless the <a href="#cell-datatype"><code>datatype</code></a> is <code>string</code> or <code>anyAtomicType</code> or <code>any</code>, strip leading and trailing whitespace from the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-string-value" class="externalDFN">string value</a> to give a normalized string</li>
-          <li>if the <a href="#cell-separator"><code>separator</code></a> property is not <code>null</code>, the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">cell value</a> is either a list of values or <code>null</code>, created as follows:
+          <li>unless the <a href="#cell-datatype"><code>datatype</code></a> is <code>string</code>, <code>json</code>, <code>xml</code>, <code>html</code>, <code>anyAtomicType</code> or <code>any</code>, replace all carriage return (<code>#xD</code>), line feed (<code>#xA</code>) and tab (<code>#x9</code>) characters with space characters</li>
+          <li>unless the <a href="#cell-datatype"><code>datatype</code></a> is <code>string</code>, <code>json</code>, <code>xml</code>, <code>html</code>, <code>anyAtomicType</code>, <code>any</code> or <code>normalizedString</code>, strip leading and trailing whitespace from the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-string-value" class="externalDFN">string value</a> and replace all instances of two or more whitespace characters with a single space character</li>
+          <li>if the resulting string is an empty string, apply the remaining steps to the string given by the <a href="#cell-default"><code>default</code></a> property</li>
+          <li>if the <a href="#cell-separator"><code>separator</code></a> property is not <code>null</code> and the resulting string is an empty string, the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">cell value</a> is an empty list</li>
+          <li>if the <a href="#cell-separator"><code>separator</code></a> property is not <code>null</code>, the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">cell value</a> is a list of values created by:
             <ol>
               <li>if the normalized string is an empty string, apply the remaining steps to the string given by the <a href="#cell-default"><code>default</code></a> property</li>
               <li>if the normalized string is the same as any one of the values of the <a href="#cell-null"><code>null</code></a> property, then the resulting value is <code>null</code></li>
@@ -1744,6 +1747,9 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             <dt id="number-pattern"><code>pattern</code></dt>
             <dd>A regular expression string, in the syntax and interpreted as defined by [[!ECMASCRIPT]].</dd>
           </dl>
+          <p class="note">
+            Authors are encouraged to be conservative in the regular expressions that they use, sticking to the basic features of regular expressions that are likely to be supported across implementations.
+          </p>
           <p>
             If the <a href="#datatype-format"><code>format</code></a> property is a single string, this is interpreted in the same way as if it were an object with a <code>pattern</code> property whose value is that string.
           </p>
@@ -1802,6 +1808,9 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             If the <a href="#cell-datatype"><code>datatype</code></a> is a date or time type, the <a href="#datatype-format"><code>format</code></a> property indicates the expected format for that date or time.
           </p>
           <p>
+            The supported date and time formats listed here are expressed in terms of the <a href="http://www.unicode.org/reports/tr35/tr35-dates.html#Date_Field_Symbol_Table">date field symbols</a> defined in [[!UAX35]] and MUST be interpreted by implementations as defined in that specification.
+          </p>
+          <p>
             The following date formats MUST be recognised by implementations:
           </p>
           <ul>
@@ -1835,13 +1844,21 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           <ul>
             <li><code>yyyy-MM-ddTHH:mm:ss</code> eg <code>2015-03-15T15:02:37</code></li>
             <li><code>yyyy-MM-ddTHH:mm</code> eg <code>2015-03-15T15:02</code></li>
-            <li>any of the date formats above, followed by a space, followed by any of the time formats above, eg <code>M/d/yyyy HH:mm</code> for <code>3/22/2015 15:02</code> or <code>dd.MM.yyyy HH:mm:ss</code> for <code>22.03.2015 15:02:37</code></li>
+            <li>any of the date formats above, followed by a single space, followed by any of the time formats above, eg <code>M/d/yyyy HH:mm</code> for <code>3/22/2015 15:02</code> or <code>dd.MM.yyyy HH:mm:ss</code> for <code>22.03.2015 15:02:37</code></li>
           </ul>
           <p>
-            Implementations MUST also recognise date, time and date/time formats that end with timezone markers consisting of between one and five <code>x</code>s or <code>X</code>s. For example, <code>yyyy-MM-ddTHH:mm:ssXXX</code> for <code>2015-03-15T15:02:37Z</code> or <code>2015-03-15T15:02:37-05:00</code>, or <code>HH:mm x</code> for <code>15:02 -0500</code>.
+            Implementations MUST also recognise date, time and date/time formats that end with timezone markers consisting of between one and three <code>x</code>s or <code>X</code>s, possibly after a single space. These MUST be interpreted as follows:
           </p>
+          <ul>
+            <li><code>X</code> eg <code>-08</code>, <code>+0530</code> or <code>Z</code> (minutes are optional)</li>
+            <li><code>XX</code> eg <code>-0800</code>, <code>+0530</code> or <code>Z</code></li>
+            <li><code>XXX</code> eg <code>-08:00</code>, <code>+05:30</code> or <code>Z</code></li>
+            <li><code>x</code> eg <code>-08</code> or <code>+0530</code> (<code>Z</code> is not permitted)</li>
+            <li><code>xx</code> eg <code>-0800</code> or <code>+0530</code> (<code>Z</code> is not permitted)</li>
+            <li><code>xxx</code> eg <code>-08:00</code> or <code>+05:30</code> (<code>Z</code> is not permitted)</li>
+          </ul>
           <p>
-            The supported date and time formats listed above are expressed in terms of the <a href="http://www.unicode.org/reports/tr35/tr35-dates.html#Date_Field_Symbol_Table">date field symbols</a> defined in [[!UAX35]] and MUST be interpreted by implementations as defined in that specification.
+            For example, formats could include <code>yyyy-MM-ddTHH:mm:ssXXX</code> for <code>2015-03-15T15:02:37Z</code> or <code>2015-03-15T15:02:37-05:00</code>, or <code>HH:mm x</code> for <code>15:02 -05</code>.
           </p>
           <p>
             The <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">cell value</a> will one or more dates/time values extracted using the <code>format</code>.
@@ -1853,7 +1870,13 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
         <section>
           <h3>Formats for durations</h3>
           <p>
-            Durations MUST be formatted and interpreted as defined in [[!xmlschema11-2]], using the [[!ISO8601]] format <code>P<var>n</var>Y<var>n</var>M<var>n</var>DT<var>n</var>H<var>n</var>M<var>n</var>S</code>.
+            Durations MUST be formatted and interpreted as defined in [[!xmlschema11-2]], using the [[!ISO8601]] format <code>-?P<var>n</var>Y<var>n</var>M<var>n</var>DT<var>n</var>H<var>n</var>M<var>n</var>S</code>. For example, the duration <code>P1Y1D</code> is used for a year and a day; the duration <code>PT2H30M</code> for 2 hours and 30 minutes.
+          </p>
+          <p>
+            If the <a href="#cell-datatype"><code>datatype</code></a> is a duration type, the <a href="#datatype-format"><code>format</code></a> property provides a regular expression for the string values, in the syntax and processed as defined by [[!ECMASCRIPT]].
+          </p>
+          <p class="note">
+            Authors are encouraged to be conservative in the regular expressions that they use, sticking to the basic features of regular expressions that are likely to be supported across implementations.
           </p>
           <p>
             The <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">cell value</a> will be one or more durations extracted using the <code>format</code>.
