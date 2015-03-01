@@ -487,10 +487,10 @@ Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
           Conversion specifications MUST use the <a href="http://w3c.github.io/csvw/metadata/#dfn-inherited-property" class="externalDFN">property value</a> of the <a href="http://w3c.github.io/csvw/metadata/#cell-propertyUrl"><code>propertyUrl</code></a> of a column as the basis for naming machine-readable fields in the target format, such as the name of the equivalent element or attribute in XML, property in JSON or property URI in RDF.
         </p>
         <p>
-          Conversion specifications MAY use any of the properties defined in this specification to adjust the mapping of an annotated table into another format.
+          Conversion specifications MAY use any of the annotations defined in [[!tabular-metadata]] to adjust the mapping of an annotated table into another format.
         </p>
         <p>
-          Conversion specifications MAY define additional properties, not defined in this specification, which are specifically used when converting to the target format of the conversion. For example, a conversion to XML might specify a <code>element-or-attribute</code> property on columns that determines whether a particular column is represented through an element or an attribute in the data.
+          Conversion specifications MAY define additional annotations, not defined in [[!tabular-metadata]], which are specifically used when converting to the target format of the conversion. For example, a conversion to XML might specify a <code>http://example.org/conversion/xml/element-or-attribute</code> property on columns that determines whether a particular column is represented through an element or an attribute in the data.
         </p>
         <p>
           Conversion specifications SHOULD specify format-specific properties specifying external processing steps to provide more control to people defining conversions. If these are specified, the conversion specification MUST specify at what point in the processing this external processing takes place, and what it takes place on. Examples might be:
@@ -503,37 +503,31 @@ Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
       </section>
     </section>
     <section id="syntax" class="informative">
-      <h2>CSV+ Syntax</h2>
+      <h2>Best Practice CSV</h2>
       <p>
-        There is no standard for CSV, and there are many variants of CSV used on the web today. This section defines a method for outputting tabular data adhering to the <a>annotated tabular data model</a> described in <a href="#annotated-tabular-data-model" class="sectionRef"></a> into a standard, CSV-based, syntax. Compliant applications that output this format must meet each of the constraints.
-      </p>
-      <p class="note">
-        We are actively working with the IETF to develop a standard for CSV, which is outside the scope of the Working Group. The details here aim to help shape that standard based on our requirements.
-      </p>
-      <p>
-        This section does not seek to describe how applications that <em>input</em> textual tabular data should interpret it, except that any data that is in the format defined here should be understood as defined here.
+        There is no standard for CSV, and there are many variants of CSV used on the web today. This section defines a method for expressing tabular data adhering to the <a>annotated tabular data model</a> defined in <a href="#annotated-tabular-data-model" class="sectionRef"></a> in CSV. Authors are encouraged to adhere to the constraints described in this section as implementations should process such CSV files consistently.
       </p>
       <div class="note">
         <p>
-          This syntax is not compliant with <code>text/csv</code> as defined in [[!RFC4180]] in that it permits line endings other than <code>CRLF</code>. Supporting <code>LF</code> line endings are important characteristics for data formats that are used on non-Windows platforms. However, all files that adhere to [[!RFC4180]]'s definition of CSV are compliant CSV+ files.
+          This syntax is not compliant with <code>text/csv</code> as defined in [[!RFC4180]] in that it permits line endings other than <code>CRLF</code>. Supporting <code>LF</code> line endings are important characteristics for data formats that are used on non-Windows platforms. However, all files that adhere to [[!RFC4180]]'s definition of CSV meet the constraints described in this section.
+        </p>
+        <p>
+          We are actively working with the IETF to develop a standard for CSV, which is outside the scope of the Working Group. The details here aim to help shape that standard based on our requirements.
         </p>
       </div>
       <section id="content-type">
         <h3>Content Type</h3>
         <p>
-          The appropriate content type for a CSV+ file is <code>text/csv</code>. For example, when a CSV+ file is transmitted via HTTP, the HTTP response MUST include a <code>Content-Type</code> header with the value <code>text/csv</code>:
+          The appropriate content type for a CSV file is <code>text/csv</code>. For example, when a CSV file is transmitted via HTTP, the HTTP response MUST include a <code>Content-Type</code> header with the value <code>text/csv</code>:
         </p>
         <pre>
 Content-Type: text/csv
         </pre>
-        <p class="issue">
-          See below for issues relating to whether we should instead define a different content type.
-        </p>
       </section>
       <section id="encoding">
         <h3>Encoding</h3>
         <p>
-          CSV+ files SHOULD be encoded using UTF-8. If a CSV+ file is not encoded using UTF-8, the encoding MUST be specified through the <code>charset</code> parameter in the <code>Content-Type</code> header:
+          CSV files SHOULD be encoded using UTF-8. If a CSV file is not encoded using UTF-8, the encoding MUST be specified through the <code>charset</code> parameter in the <code>Content-Type</code> header:
         </p>
         <pre>
 Content-Type: text/csv;charset=ISO-8859-1
@@ -542,13 +536,13 @@ Content-Type: text/csv;charset=ISO-8859-1
       <section id="line-endings">
         <h3>Line Endings</h3>
         <p>
-          The ends of rows in a CSV+ file MUST be either <code>CRLF</code> (<code>U+000D U+000A</code>) or <code>LF</code> (<code>U+000A</code>). Line endings within escaped <a title="cell">cells</a> are not normalised.
+          The ends of rows in a CSV file MUST be either <code>CRLF</code> (<code>U+000D U+000A</code>) or <code>LF</code> (<code>U+000A</code>). Line endings within escaped <a title="cell">cells</a> are not normalised.
         </p>
       </section>
       <section id="lines">
         <h3>Lines</h3>
         <p>
-          Each line of a CSV+ file MUST contain the same number of comma-separated values.
+          Each line of a CSV file MUST contain the same number of comma-separated values.
         </p>
         <p>
           Values that contain commas, line endings or double quotes MUST be escaped by having the entire value wrapped in double quotes. There MUST NOT be whitespace before or after the double quotes. Within these escaped cells, any double quotes MUST be escaped with two double quotes (<code>""</code>).
@@ -556,19 +550,19 @@ Content-Type: text/csv;charset=ISO-8859-1
         <section id="headers">
           <h4>Headers</h4>
           <p>
-            The first line of a CSV+ file SHOULD contain a comma-separated list of names of <a title="column">columns</a>. This is known as the <dfn>header line</dfn> and provides names for the columns. There are no constraints on these names.
+            The first line of a CSV file SHOULD contain a comma-separated list of names of <a title="column">columns</a>. This is known as the <dfn>header line</dfn> and provides names for the columns. There are no constraints on these names.
           </p>
           <p>
-            If a CSV+ file does not include a header line, this MUST be specified using the <code>header</code> parameter of the media type:
+            If a CSV file does not include a header line, this MUST be specified using the <code>header</code> parameter of the media type:
           </p>
           <pre>
 Content-Type: text/csv;header=absent
           </pre>
         </section>
         <section>
-          <h4>Bidirectionality in CSV+ Files</h4>
+          <h4>Bidirectionality in CSV Files</h4>
           <p>
-            Bidirectional content does not alter the definition of rows or the assignment of cells to columns. Whether or not a CSV+ file contains right-to-left characters, the first column's content is the first cell of each row, which is the text prior to the first occurrence of a comma within that row.
+            Bidirectional content does not alter the definition of rows or the assignment of cells to columns. Whether or not a CSV file contains right-to-left characters, the first column's content is the first cell of each row, which is the text prior to the first occurrence of a comma within that row.
           </p>
           <div class="example" title="Bidirectional CSV file">
             <p>
@@ -617,19 +611,19 @@ Content-Type: text/csv;header=absent
               </thead>
               <tbody>
                 <tr>
-                  <th>row 1 (header)</th><th>المحافظة</th><th>نسبة موافق</th><th>نسبة غير موافق</th><th>عدد الناخبين</th><th>الأصوات الصحيحة</th><th>الأصوات الباطلة</th><th>نسبة المشاركة</th><th>موافق</th><th>غير موافق</th>
+                  <th>column names</th><th>المحافظة</th><th>نسبة موافق</th><th>نسبة غير موافق</th><th>عدد الناخبين</th><th>الأصوات الصحيحة</th><th>الأصوات الباطلة</th><th>نسبة المشاركة</th><th>موافق</th><th>غير موافق</th>
                 </tr>
                 <tr>
-                  <th>row 2</th><td>القليوبية</td><td>60.0</td><td>40.0</td><td>2,639,808</td><td>853,125</td><td>15,224</td><td>32.9</td><td>512,055</td><td>341,070</td>
+                  <th>row 1</th><td>القليوبية</td><td>60.0</td><td>40.0</td><td>2,639,808</td><td>853,125</td><td>15,224</td><td>32.9</td><td>512,055</td><td>341,070</td>
                 </tr>
                 <tr>
-                  <th>row 3</th><td>الجيزة</td><td>66.7</td><td>33.3</td><td>4,383,701</td><td>1,493,092</td><td>24,105</td><td>34.6</td><td>995,417</td><td>497,675</td>
+                  <th>row 2</th><td>الجيزة</td><td>66.7</td><td>33.3</td><td>4,383,701</td><td>1,493,092</td><td>24,105</td><td>34.6</td><td>995,417</td><td>497,675</td>
                 </tr>
                 <tr>
-                  <th>row 4</th><td>القاهرة</td><td>43.2</td><td>56.8</td><td>6,580,478</td><td>2,254,698</td><td>36,342</td><td>34.8</td><td>974,371</td><td>1,280,327</td>
+                  <th>row 3</th><td>القاهرة</td><td>43.2</td><td>56.8</td><td>6,580,478</td><td>2,254,698</td><td>36,342</td><td>34.8</td><td>974,371</td><td>1,280,327</td>
                 </tr>
                 <tr>
-                  <th>row 5</th><td>قنا</td><td>84.5</td><td>15.5</td><td>1,629,713</td><td>364,509</td><td>6,743</td><td>22.8</td><td>307,839</td><td>56,670</td>
+                  <th>row 4</th><td>قنا</td><td>84.5</td><td>15.5</td><td>1,629,713</td><td>364,509</td><td>6,743</td><td>22.8</td><td>307,839</td><td>56,670</td>
                 </tr>
               </tbody>
             </table>
@@ -637,7 +631,7 @@ Content-Type: text/csv;header=absent
               The fragment identifier <code>#col=3</code> identifies the third of the columns, named <code>نسبة غير موافق</code> (appearing as <code><bdo dir="ltr">&#8204;ن&#8204;س&#8204;ب&#8204;ة&#8204; &#8204;غ&#8204;ي&#8204;ر&#8204; &#8204;م&#8204;و&#8204;ا&#8204;ف&#8204;ق&#8204;</bdo></code> in the example).
             </p>
             <p>
-              [[!tabular-metadata]] defines how this table model should be displayed by compliant applications, and how metadata can affect the display. The default is for the display to be determined by the content of the table. For example, if this CSV were turned into an HTML table for display into a web page, it should be displayed with the first column on the right and the last on the left, as follows:
+              <a href="#bidirectional-tables" class="sectionRef"></a> defines how this table model should be displayed by compliant applications, and how metadata can affect the display. The default is for the display to be determined by the content of the table. For example, if this CSV were turned into an HTML table for display into a web page, it should be displayed with the first column on the right and the last on the left, as follows:
             </p>
             <table style="width: 100%; text-align: right">
               <thead>
@@ -792,7 +786,7 @@ Content-Type: text/csv;header=absent
         Standardising the parsing of CSV is outside the chartered scope of the Working Group. This non-normative section is intended to help the creators of parsers handle the wide variety of CSV-based formats that they may encounter due to the current lack of standardisation of the format.
       </p>
       <p>
-        This section describes an algorithm for parsing formats other than the plain CSV+ format specified in <a href="#syntax" class="sectionRef"></a> and extracting <a>embedded metadata</a>. The parsing algorithm uses the following flags. These may be set by metadata properties found while <a href="#locating-metadata" class="sectionRef">Locating Metadata</a>, including through user input (see <a href="overriding-metadata" class="sectionRef">Overriding Metadata</a>) or through the inclusion of a <a href="http://w3c.github.io/csvw/metadata/#dialect-descriptions">dialect description</a> within a metadata file:
+        This section describes an algorithm for parsing formats that do not adhere to the constraints described in <a href="#syntax" class="sectionRef"></a>, as well as those that do, and extracting <a>embedded metadata</a>. The parsing algorithm uses the following flags. These may be set by metadata properties found while <a href="#locating-metadata" class="sectionRef">Locating Metadata</a>, including through user input (see <a href="overriding-metadata" class="sectionRef">Overriding Metadata</a>) or through the inclusion of a <a href="http://w3c.github.io/csvw/metadata/#dialect-descriptions">dialect description</a> within a metadata file:
       </p>
       <dl>
         <dt><dfn>encoding</dfn></dt>
@@ -851,7 +845,7 @@ Content-Type: text/csv;header=absent
         <section>
           <h4>Simple Example</h4>
           <p>
-            A simple CSV+ file at <code>http://example.org/tree-ops.csv</code> might look like:
+            A simple CSV file that complies to the constraints described in <a href="#syntax" class="sectionRef"></a>, at <code>http://example.org/tree-ops.csv</code>, might look like:
           </p>
           <pre class="example" title="Simple CSV file">
 GID,On Street,Species,Trim Cycle,Inventory Date
@@ -874,7 +868,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               <tr><td><var>C5</var></td><td><var>T</var></td><td>5</td><td>5</td><td><var>C1.5</var>, <var>C2.5</var></td><td><code>Inventory Date</code></td></tr>
             </tbody>
           </table>
-          <p>Expressed as Table Metadata:</p>
+          <p>The extracted embedded metadata, as defined in [[!tabular-metadata]], would look like:</p>
           <pre class="highlight">
 {
   "@type": "Table",
@@ -904,7 +898,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             </tbody>
           </table>
           <p class="note">
-            The <a title="row source number">source number</a> of each row is offset by one from the <a title="row number">number</a> of each row because in the source CSV+ file, the header line is the first line. It is possible to reconstruct a [[RFC7111]] compliant reference to the first record in the original CSV+ file (<code>http://example.org/tree-ops.csv#row=2</code>) using the value of the row's source number. This enables implementations to retain provenance between the table model and the original file.
+            The <a title="row source number">source number</a> of each row is offset by one from the <a title="row number">number</a> of each row because in the source CSV file, the header line is the first line. It is possible to reconstruct a [[RFC7111]] compliant reference to the first record in the original CSV file (<code>http://example.org/tree-ops.csv#row=2</code>) using the value of the row's source number. This enables implementations to retain provenance between the table model and the original file.
           </p>
           <p>
             The cells have the annotations shown in the following table (note that the <a title="cell value">values</a> of all the cells in the table are strings, denoted by the double quotes in the table below):
@@ -932,15 +926,80 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           	<p>
           		The tools that the consumer of this data uses may provide a mechanism for overriding the metadata that has been provided within the file itself. For example, they might enable the consumer to add machine-readable names to the columns, or to mark the fifth column as holding a date in the format <code>M/D/YYYY</code>. These facilities are implementation defined; the code for a Javascript-based parser might look like:
           	</p>
-          	<pre class="highlight example">
+          	<pre class="highlight example" title="Javascript implementation configuration">
 data.parse({
   "column-names": ["GID", "on_street", "species", "trim_cycle", "inventory_date"],
   "datatypes": ["string", "string", "string", "string", "date"],
   "formats": [null,null,null,null,"M/D/YYYY"]
 });
           	</pre>
+            <p>
+              This is equivalent to a metadata file expressed in the syntax defined in [[!tabular-metadata]], looking like:
+            </p>
+            <pre class="example highlight" title="Equivalent metadata syntax">
+{
+  "@type": "Table",
+  "url": "http://example.org/tree-ops.csv",
+  "tableSchema": {
+    "columns": [{
+      "name": "GID",
+      "datatype": "string"
+    }, {
+      "name": "on_street",
+      "datatype": "string"
+    }, {
+      "name": "species",
+      "datatype": "string"
+    }, {
+      "name": "trim_cycle",
+      "datatype": "string"
+    }, {
+      "name": "inventory_date",
+      "datatype": {
+        "base": "date",
+        "format": "M/d/yyyy"
+      }
+    }]
+  }
+}
+            </pre>
+            <p>
+              This would be merged with the <a>embedded metadata</a> found in the CSV file, providing the titles for the columns to create:
+            </p>
+            <pre class="example highlight" title="Merged metadata">
+{
+  "@type": "Table",
+  "url": "http://example.org/tree-ops.csv",
+  "tableSchema": {
+    "columns": [{
+      "name": "GID", 
+      "title": "GID", 
+      "datatype": "string"
+    }, {
+      "name": "on_street", 
+      "title": "On Street", 
+      "datatype": "string"
+    }, {
+      "name": "species", 
+      "title": "Species", 
+      "datatype": "string"
+    }, {
+      "name": "trim_cycle", 
+      "title": "Trim Cycle", 
+      "datatype": "string"
+    }, {
+      "name": "inventory_date",
+      "title": "Inventory Date",
+      "datatype": {
+        "base": "date", 
+        "format": "M/d/yyyy"
+      }
+    }]
+  }
+}
+            </pre>
           	<p>
-          		The parser could then create an <a>annotated tabular data model</a> that included <code>name</code> annotations on the columns, <code>datatype</code> and <code>format</code> annotations on the cells, and created cells whose <a title="cell value">values</a> were of appropriate types (in the case of this Javascript implementation, the cells in the last column would be <code>Date</code> objects, for example).
+          		The processor can then create an <a>annotated tabular data model</a> that included <code>name</code> annotations on the columns, <code>datatype</code> and <code>format</code> annotations on the cells, and created cells whose <a title="cell value">values</a> were of appropriate types (in the case of this Javascript implementation, the cells in the last column would be <code>Date</code> objects, for example).
           	</p>
 						<p>
 							Assuming this kind of implementation-defined parsing, the columns would then have the annotations shown in the following table:
@@ -958,26 +1017,6 @@ data.parse({
 	              <tr><td><var>C5</var></td><td><var>T</var></td><td>5</td><td>5</td><td><var>C1.5</var>, <var>C2.5</var></td><td><code>inventory_date</code></td><td><code>Inventory Date</code></td></tr>
 	            </tbody>
 	          </table>
-          <p>After creating <a>embedded metadata</a> and merging with overriding metadata:</p>
-          <pre class="highlight">
-{
-  "@type": "Table",
-  "url": "http://example.org/tree-ops.csv",
-  "tableSchema": {
-    "columns": [
-      {"name": "GID", "title": "GID", "datatype": "string"},
-      {"name": "on_street", "title": "On Street", "datatype": "string"},
-      {"name": "species", "title": "Species", "datatype": "string"},
-      {"name": "trim_cycle", "title": "Trim Cycle", "datatype": "string"},
-      {
-        "name": "inventory_date",
-        "title": "Inventory Date",
-        "datatype": {"base": "date", "format": "M/d/yyyy"}
-      }
-    ]
-  }
-}
-          </pre>
 	          <p>
 	            The cells have the annotations shown in the following table. Because of the overrides provided by the consumer to guide the parsing, and the way the parser works, these include additional annotations but also, for the <code>Inventory Date</code> column (cells <var>C1.5</var> and <var>C2.5</var>), have a <a title="cell value">value</a> that is a parsed date rather than an unparsed string.
 	          </p>
@@ -1286,12 +1325,48 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 	        		<li>The remaining rows make up the data of the table.</li>
 	        	</ul>
 	        	<p>
-							Parsers that recognised the format could then build a more sophisticated annotated tabular data model using only the embedded information in the tabular data file. As before, the result would be a single <a>table</a> <var>T</var> with five columns and two rows. The table itself would have two annotations:
+							Parsers that recognised the format could then build a more sophisticated annotated tabular data model using only the embedded information in the tabular data file. They would extract metadata looking like:
+            </p>
+{
+  "@context": "http://www.w3.org/ns/csvw",
+  "url": "tree-ops.csv",
+  "dc:publisher": "City of Palo Alto",
+  "dc:updated": "12/31/2010",
+  "tableSchema": {
+    "columns": [{
+      "name": "GID",
+      "title": "GID",
+      "datatype": "string",
+    }, {
+      "name": "on_street",
+      "title": "On Street",
+      "datatype": "string"
+    }, {
+      "name": "species",
+      "title": "Species",
+      "datatype": "string"
+    }, {
+      "name": "trim_cycle",
+      "title": "Trim Cycle",
+      "datatype": "string"
+    }, {
+      "name": "inventory_date",
+      "title": "Inventory Date",
+      "datatype": {
+        "base": "date", 
+        "format": "M/d/yyyy"
+      }
+    }]
+  }
+}
+            </pre>
+            <p>
+              As before, the result would be a single <a>table</a> <var>T</var> with five columns and two rows. The table itself would have two annotations:
 						</p>
 						<dl>
-							<dt><code>publisher</code></dt>
+							<dt><code>dc:publisher</code></dt>
 							<dd><code>City of Palo Alto</code></dd>
-							<dt><code>updated</code></dt>
+							<dt><code>dc:updated</code></dt>
 							<dd><code>12/31/2010</code></dd>
 						</dl>
 						<p>
