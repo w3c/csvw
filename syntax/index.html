@@ -193,9 +193,8 @@ var respecConfig = {
           <li><dfn title="table url">url</dfn> &mdash; the URL of the source of the data in the table, or <code>null</code> if this is undefined</li>
           <li><dfn title="table direction">direction</dfn> &mdash; the direction in which the columns in the table should be displayed, as described in <a href="#bidirectional-tables" class="sectionRef"></a></li>
           <li><dfn title="table suppress output">suppress output</dfn> &mdash; a boolean that indicates whether or not this table should be suppressed in any output generated from the converting the table group that this table belongs to into another format, as described in <a href="#converting-tables" class="sectionRef"></a></li>
-          <li><dfn title="table primary key">primary key</dfn> &mdash; a possibly empty list of <a title="column">columns</a> that together provide a unique identifier for each <a>row</a> in the table</li>
-          <li><dfn title="table foreign keys">foreign keys</dfn> &mdash; a possibly empty list of pairs of lists: a list of <dfn>referencing columns</dfn> in this table and a list of <dfn>referenced columns</dfn> in another table within the same table group (which may be this table)</li>
-          <li><dfn title="table notes">notes</dfn> &mdash; the list of notes on the table, as described in [[!tabular-metadata]], which may be an empty list</li>
+          <li><dfn title="table notes">notes</dfn> &mdash; a list of notes on the table, as described in [[!tabular-metadata]], which may be an empty list</li>
+          <li><dfn title="table foreign keys">foreign keys</dfn> &mdash; a list of foreign keys on the table, as defined in [[!tabular-metadata]], which may be an empty list</li>
         </ul>
         <p>
           The table MAY in addition have any number of other <a title="annotation">annotations</a>. Annotations on a table may include:
@@ -239,6 +238,8 @@ var respecConfig = {
           <li><dfn title="row table">table</dfn> &mdash; the <a>table</a> that the row appears in</li>
           <li><dfn title="row number">number</dfn> &mdash; the position of the row amongst the <a title="table rows">rows</a> for the <a title="row table">table</a>, starting from 1</li>
           <li><dfn title="row source number">source number</dfn> &mdash; the position of the row in the original <a title="table url">url</a> of the table, or <code>null</code></li>
+          <li><dfn title="row primary key">primary key</dfn> &mdash; a possibly empty list of <a title="cell">cells</a> whose values together provide a unique identifier for this row</li>
+          <li><dfn title="row referenced rows">referenced rows</dfn> &mdash; a possibly empty list of pairs of a <a title="table foreign keys">foreign key</a> and a row in a table within the same table group (which may be another row in the table that this row appears in)</li>
           <li><dfn title="row cells">cells</dfn> &mdash; the list of <a title="cell">cells</a> in the row. A row MUST contain one cell from each <a>column</a> in the table. The order of the cells in the list MUST match the order of the columns in which they appear within the <a>table columns</a> for the row's table.</li>
         </ul>
         <p>
@@ -514,10 +515,16 @@ Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
       <section>
         <h3>Validating Tables</h3>
         <p>
-          <a href="http://w3c.github.io/csvw/metadata/#dfn-validators" class="externalDFN">Validators</a> test whether given tabular data files adhere to the structure defined within a <a href="http://w3c.github.io/csvw/metadata/#dfn-schema" class="externalDFN">schema</a>.
+          <a href="http://w3c.github.io/csvw/metadata/#dfn-validators" class="externalDFN">Validators</a> test whether given tabular data files adhere to the structure defined within a <a href="http://w3c.github.io/csvw/metadata/#dfn-schema" class="externalDFN">schema</a>. Validators MUST raise errors as defined in [[!tabular-metadata]] and in the following situations:
         </p>
-        <p class="issue">
-          We intend to detail how to validate groups of tabular data files against metadata. This would be normative: compliant validators would have to report the errors and warnings that we define. We invite comment on whether this is a useful thing to specify.
+        <ul>
+          <li>if there is more than one <a>row</a> with the same <a title="row primary key">primary key</a>, that is where the <a title="cell">cells</a> listed for the primary key for the row have the same <a title="cell value">values</a> as the cells listed for the primary key for another row</li>
+          <li>for each <a>row</a> that does not have a <a title="row referenced rows">referenced row</a> for each of the <a title="table foreign keys">foreign keys</a> on the <a>table</a> the row appears in</li>
+          <li>for each <a>cell</a> in a <a>column</a> whose <a title="column required">required</a> annotation is <code>true</code></li>
+          <li>for each <a title="cell errors">error</a> on each <a>cell</a></li>
+        </ul>
+        <p class="note">
+          There is no obligation for processors to halt processing at the first error.
         </p>
       </section>
       <section>
@@ -1150,12 +1157,7 @@ data.parse({
           		<dd><code>"http://opendefinition.org/licenses/cc-by/"</code></dd>
           		<dt><code>dc:modified</code></dt>
           		<dd><code>"2010-12-31"</code></dd>
-          		<dt><a title="table primary key">primary key</a></dt>
-          		<dd><var>C1</var></dd>
           	</dl>
-          	<p>
-          		Note that the value of the <a title="table primary key">primary key</a> annotation is a pointer to the <a>column</a> <var>C1</var> within the annotated tabular data model.
-          	</p>
 						<p>
 							The columns would have the annotations shown in the following table:
 	          </p>
@@ -1172,6 +1174,19 @@ data.parse({
 	              <tr><td><var>C5</var></td><td><var>T</var></td><td>5</td><td>5</td><td><var>C1.5</var>, <var>C2.5</var></td><td><code>inventory_date</code></td><td><code>Inventory Date</code></td><td><code>The date of the operation that was performed.</code></td></tr>
 	            </tbody>
 	          </table>
+            <p>
+              The rows have an additional <a title="row primary key">primary key</a> annotation, as shown in the following table:
+            </p>
+            <table style="width: 100%; text-align: left">
+              <thead>
+                <tr><th rowspan="2">id</th><th colspan="5">core annotations</th></tr>
+                <tr><th>table</th><th>number</th><th>source number</th><th>cells</th><th>primary key</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><var>R1</var></td><td><var>T</var></td><td>1</td><td>2</td><td><var>C1.1</var>, <var>C1.2</var>, <var>C1.3</var>, <var>C1.4</var>, <var>C1.5</var></td><td>C1.1</td></tr>
+                <tr><td><var>R2</var></td><td><var>T</var></td><td>2</td><td>3</td><td><var>C2.1</var>, <var>C2.2</var>, <var>C2.3</var>, <var>C2.4</var>, <var>C2.5</var></td><td>C2.1</td></tr>
+              </tbody>
+            </table>
 	          <p>
 	            Thanks to the provided metadata, the cells again have the annotations shown in the following table. The metadata file has provided the information to supplement the model with additional annotations but also, for the <code>Inventory Date</code> column (cells <var>C1.5</var> and <var>C2.5</var>), have a <a title="cell value">value</a> that is a parsed date rather than an unparsed string.
 	          </p>
