@@ -47,6 +47,10 @@ csvw:Column a rdfs:Class;
   rdfs:label "Column Description"@en;
   rdfs:comment """A Column Description describes a single column."""@en;
   rdfs:isDefinedBy csvw: .
+csvw:Datatype a rdfs:Class;
+  rdfs:label "Datatype"@en;
+  rdfs:comment """Describes facets of a datatype."""@en;
+  rdfs:isDefinedBy csvw: .
 csvw:Dialect a rdfs:Class;
   rdfs:label "Dialect Description"@en;
   rdfs:comment """A Dialect Description provides hints to parsers about how to parse a linked file."""@en;
@@ -79,6 +83,12 @@ csvw:aboutUrl a rdf:Property;
   rdfs:domain [ owl:unionOf (csvw:TableGroup csvw:Table csvw:Schema csvw:Column)];
   rdfs:range csvw:uriTemplate;
   rdfs:isDefinedBy csvw: .
+csvw:base a rdf:Property;
+  rdfs:label "base"@en;
+  rdfs:comment """An atomic property that contains a single string: a term defined in the default context representing a built-in datatype URL"""@en;
+  rdfs:domain csvw:Datatype;
+  rdfs:range rdfs:Datatype;
+  rdfs:isDefinedBy csvw: .
 csvw:columns a rdf:Property;
   rdfs:label "columns"@en;
   rdfs:comment """An array of Column Descriptions."""@en;
@@ -93,9 +103,15 @@ csvw:commentPrefix a rdf:Property;
   rdfs:isDefinedBy csvw: .
 csvw:datatype a rdf:Property;
   rdfs:label "datatype"@en;
-  rdfs:comment """The main datatype of the values of the cell. If the cell contains a list (ie separator is specified and not null) then this is the datatype of each value within the list."""@en;
+  rdfs:comment """An object property that contains either a single string that is the main datatype of the values of the cell or a datatype description object."""@en;
   rdfs:domain [ owl:unionOf (csvw:TableGroup csvw:Table csvw:Schema csvw:Column)];
-  rdfs:range rdfs:Datatype;
+  rdfs:range rdfs:Datatype Datatype;
+  rdfs:isDefinedBy csvw: .
+csvw:decimalChar a rdf:Property;
+  rdfs:label "decimal character"@en;
+  rdfs:comment """A single character string whose value is used to represent a decimal point within the number. The default value is "."."""@en;
+  rdfs:domain csvw:Datatype;
+  rdfs:range xsd:string;
   rdfs:isDefinedBy csvw: .
 csvw:default a rdf:Property;
   rdfs:label "default"@en;
@@ -136,12 +152,18 @@ csvw:foreignKeys a rdf:Property;
 csvw:format a rdf:Property;
   rdfs:label "format"@en;
   rdfs:comment """A definition of the format of the cell, used when parsing the cell."""@en;
-  rdfs:domain [ owl:unionOf (csvw:TableGroup csvw:Table csvw:Schema csvw:Column)];
+  rdfs:domain csvw:Datatype;
+  rdfs:range xsd:string;
+  rdfs:isDefinedBy csvw: .
+csvw:groupChar a rdf:Property;
+  rdfs:label "group character"@en;
+  rdfs:comment """A single character string whose value is used to group digits within the number. The default value is ","."""@en;
+  rdfs:domain csvw:Datatype;
   rdfs:range xsd:string;
   rdfs:isDefinedBy csvw: .
 csvw:header a rdf:Property;
   rdfs:label "header"@en;
-  rdfs:comment """"""@en;
+  rdfs:comment """A single boolean atomic property that, if true, sets the header row count flag to 1, and if false to 0, unless headerRowCount is provided, in which case the value provided for the header property is ignored."""@en;
   rdfs:domain csvw:Dialect;
   rdfs:range xsd:boolean;
   rdfs:isDefinedBy csvw: .
@@ -167,7 +189,7 @@ csvw:language a rdf:Property;
 csvw:length a rdf:Property;
   rdfs:label "length"@en;
   rdfs:comment """The exact length of the value of the cell."""@en;
-  rdfs:domain [ owl:unionOf (csvw:TableGroup csvw:Table csvw:Schema csvw:Column)];
+  rdfs:domain csvw:Datatype;
   rdfs:range xsd:nonNegativeInteger;
   rdfs:isDefinedBy csvw: .
 csvw:lineTerminator a rdf:Property;
@@ -179,37 +201,37 @@ csvw:lineTerminator a rdf:Property;
 csvw:maxExclusive a rdf:Property;
   rdfs:label "max exclusive"@en;
   rdfs:comment """The maximum value for the cell (exclusive)."""@en;
-  rdfs:domain [ owl:unionOf (csvw:TableGroup csvw:Table csvw:Schema csvw:Column)];
+  rdfs:domain csvw:Datatype;
   rdfs:range xsd:integer;
   rdfs:isDefinedBy csvw: .
 csvw:maxInclusive a rdf:Property;
   rdfs:label "max inclusive"@en;
   rdfs:comment """The maximum value for the cell (inclusive). """@en;
-  rdfs:domain [ owl:unionOf (csvw:TableGroup csvw:Table csvw:Schema csvw:Column)];
+  rdfs:domain csvw:Datatype;
   rdfs:range xsd:integer;
   rdfs:isDefinedBy csvw: .
 csvw:maxLength a rdf:Property;
   rdfs:label "max length"@en;
   rdfs:comment """The maximum length of the value of the cell."""@en;
-  rdfs:domain [ owl:unionOf (csvw:TableGroup csvw:Table csvw:Schema csvw:Column)];
+  rdfs:domain csvw:Datatype;
   rdfs:range xsd:nonNegativeInteger;
   rdfs:isDefinedBy csvw: .
 csvw:minExclusive a rdf:Property;
   rdfs:label "min exclusive"@en;
   rdfs:comment """The minimum value for the cell (exclusive)."""@en;
-  rdfs:domain [ owl:unionOf (csvw:TableGroup csvw:Table csvw:Schema csvw:Column)];
+  rdfs:domain csvw:Datatype;
   rdfs:range xsd:integer;
   rdfs:isDefinedBy csvw: .
 csvw:minInclusive a rdf:Property;
   rdfs:label "min inclusive"@en;
   rdfs:comment """The minimum value for the cell (inclusive)."""@en;
-  rdfs:domain [ owl:unionOf (csvw:TableGroup csvw:Table csvw:Schema csvw:Column)];
+  rdfs:domain csvw:Datatype;
   rdfs:range xsd:integer;
   rdfs:isDefinedBy csvw: .
 csvw:minLength a rdf:Property;
   rdfs:label "min length"@en;
   rdfs:comment """The minimum length of the value of the cell."""@en;
-  rdfs:domain [ owl:unionOf (csvw:TableGroup csvw:Table csvw:Schema csvw:Column)];
+  rdfs:domain csvw:Datatype;
   rdfs:range xsd:nonNegativeInteger;
   rdfs:isDefinedBy csvw: .
 csvw:name a rdf:Property;
@@ -227,6 +249,12 @@ csvw:null a rdf:Property;
   rdfs:label "null"@en;
   rdfs:comment """The string used for null values. If not specified, the default for this is the empty string."""@en;
   rdfs:domain [ owl:unionOf (csvw:TableGroup csvw:Table csvw:Schema csvw:Column)];
+  rdfs:range xsd:string;
+  rdfs:isDefinedBy csvw: .
+csvw:pattern a rdf:Property;
+  rdfs:label "pattern"@en;
+  rdfs:comment """A regular expression string, in the syntax and interpreted as defined by [ECMASCRIPT]."""@en;
+  rdfs:domain csvw:Datatype;
   rdfs:range xsd:string;
   rdfs:isDefinedBy csvw: .
 csvw:primaryKey a rdf:Property;
@@ -264,6 +292,11 @@ csvw:row a rdf:Property;
   rdfs:comment """Relates a Table to each Row output."""@en;
   rdfs:subPropertyOf rdfs:member;
   rdfs:domain csvw:Table;
+  rdfs:isDefinedBy csvw: .
+csvw:rownum a rdf:Property;
+  rdfs:label "row number"@en;
+  rdfs:comment """The position of the row amongst the rows of the Annotated Tabl, starting from 1 """@en;
+  rdfs:range xsd:integer;
   rdfs:isDefinedBy csvw: .
 csvw:separator a rdf:Property;
   rdfs:label "separator"@en;
