@@ -118,18 +118,21 @@ var respecConfig = {
   <body>
     <section id="abstract">
       <p>
-        Tabular data is routinely transferred on the web as "CSV", but the definition of "CSV" in practice is very loose. This document outlines a basic data model or infoset for tabular data and metadata about that tabular data. It also contains some non-normative information about a best practice syntax for tabular data, for mapping into that data model, to contribute to the standardisation of CSV syntax by IETF. Various methods of locating metadata are also provided.
+        Tabular data is routinely transferred on the web in a variety of formats, including variants on CSV, tab-delimited files, fixed field formats, spreadsheets, HTML tables and SQL dumps. This document outlines a data model or infoset for tabular data and metadata about that tabular data that can be used as a basis for validation, display or creating other formats. It also contains some non-normative guidance for publishing tabular data as CSV and how that maps into the tabular data model.
+      </p>
+      <p>
+        Creating an annotated model of tabular data relies on the provision of separate metadata about the table. This specification defines how implementations should locate that metadata, given a file containing tabular data. The syntax for that metadata is defined in [[!tabular-metadata]].
       </p>
     </section>
     <section id="sotd">
       <p>
-        The CSV on the Web Working Group was chartered to produce a Recommendation "Access methods for CSV Metadata" as well as Recommendations for "Metadata vocabulary for CSV data" and "Mapping mechanism to transforming CSV into various Formats (e.g., RDF, JSON, or XML)". This document aims to primarily satisfy the first of those Recommendations (see <a href="#locating-metadata" class="sectionRef"></a>), though it also specifies an underlying model and therefore starting point for the other chartered Recommendations.
+        The CSV on the Web Working Group was chartered to produce a Recommendation "Access methods for CSV Metadata" as well as Recommendations for "Metadata vocabulary for CSV data" and "Mapping mechanism to transforming CSV into various Formats (e.g., RDF, JSON, or XML)". This document aims to primarily satisfy the first of those Recommendations (see <a href="#locating-metadata" class="sectionRef"></a>), though it also specifies an underlying model and is therefore a basis for the other chartered Recommendations.
       </p>
       <p>
-        This document is based on IETF's [[!RFC4180]] which is an Informational RFC. The working group's expectation is that future suggestions to refine RFC 4180 will be relayed to the IETF (e.g. around I18N and multi-part packaging) and contribute to its discussions about moving CSV to the Standards track.
+        This definition of CSV used in this document is based on IETF's [[!RFC4180]] which is an Informational RFC. The working group's expectation is that future suggestions to refine RFC 4180 will be relayed to the IETF (e.g. around I18N and multi-part packaging) and contribute to its discussions about moving CSV to the Standards track.
       </p>
       <p>
-        Many "CSV" files embed metadata, for example in lines before the header row of the CSV document. This specification does not define any formats for embedding metadata within CSV files, aside from the names of columns in the header row.
+        Many files containing tabular data embed metadata, for example in lines before the header row of an otherwise standard CSV document. This specification does not define any formats for embedding metadata within CSV files, aside from the names of columns in the header row which is defined in CSV. We would encourage groups that define tabular data formats to also define a mapping into the annotated tabular data model defined in this document.
       </p>
     </section>
     <section id="intro">
@@ -139,6 +142,18 @@ var respecConfig = {
       </p>
     	<p>
         Tabular data is routinely transferred on the web in a textual format called "CSV", but the definition of "CSV" in practice is very loose. Some people use the term to mean any delimited text file. Others stick more closely to the most standard definition of CSV that there is, [[!RFC4180]]. <a href="#standards" class="sectionRef">Appendix A</a> describes the various ways in which CSV is defined.
+      </p>
+      <p>
+        Tabular data is also transferred on the web in tab-delimited files, fixed field formats, spreadsheets, HTML tables and SQL dumps.
+      </p>
+      <p>
+        In <a href="#model" class="sectionRef"></a>, this document defines a model for tabular data that abstracts away from the varying syntaxes that are used for when exchanging tabular data. The model includes annotations, or metadata, about collections of and individual tables, rows, columns and cells. These annotations are typically supplied through separate metadata files; <a href="#locating-metadata" class="sectionRef"></a> defines how these metadata files can be located, while [[!tabular-metadata]] defines what they contain.
+      </p>
+      <p>
+        Once an <a>annotated table</a> has been created, it can be processed in various ways, such as display, validation or conversion into other formats. This processing is described in <a href="#processing-tables" class="sectionRef"></a>.
+      </p>
+      <p>
+        This specification does not normatively define a format for exchanging tabular data. However, it does provide some best practice guidelines for publishing tabular data as CSV, in section <a href="#syntax" class="sectionRef"></a>, and for parsing both this syntax and those similar to it, in <a href="#parsing" class="sectionRef"></a>.
       </p>
     </section>
     <section id="model">
@@ -237,25 +252,34 @@ var respecConfig = {
           A <dfn>group of tables</dfn> comprises a set of <a title="annotated table">annotated tables</a> and a set of annotations that relate to the set. The core annotation of a group of tables is:
         </p>
         <ul>
-          <li><dfn title="table group resources">resources</dfn> &mdash; the list of <a title="table">tables</a> in the group of tables. A group of tables MUST have one or more tables</li>
+          <li><dfn title="table group resources">resources</dfn> &mdash; the list of <a title="table">tables</a> in the group of tables. A group of tables MUST have one or more tables.</li>
+        </ul>
+        <p>
+          Groups of tables MAY in addition have any number of <a title="annotation">annotations</a> which provide information about the group of tables. Annotations on a group of tables may include:
+        </p>
+        <ul>
+          <li>information about the source or provenance of the group of tables</li>
+          <li>links to other groups of tables (eg to those that provide similar data from a different time period)</li>
+        </ul>
       </section>
     </section>
     <section>
       <h2>Locating Metadata</h2>
       <p>
-        As described in <a href="#annotated-tabular-data-model" class="sectionRef"></a>, tabular data may have a number of annotations associated with it. Here we describe the different methods that can be used to locate those annotations given a link to a CSV file.
+        As described in <a href="#annotated-tabular-data-model" class="sectionRef"></a>, tabular data may have a number of annotations associated with it. Here we describe the different methods that can be used to locate metadata that provides those annotations.
       </p>
       <p>
-        In most methods of locating metadata described here, metadata is provided within a separate document. The syntax of this document is defined in the <a href="http://www.w3.org/TR/tabular-metadata/">Metadata Vocabulary for Tabular Data</a> specification. These documents can include things like:
+        In most methods of locating metadata described here, metadata is provided within separate documents. The syntax of these documents is defined in [[!tabular-metadata]]. These documents can include things like:
       </p>
       <ul>
-        <li>metadata about the table, such as titles, descriptions, provenance, and links to other tables</li>
+        <li>metadata about groups of tables, such as provenance, and links to other groups of tables</li>
+        <li>metadata about tables, such as titles, descriptions, provenance, and links to other tables</li>
         <li>metadata about columns in the table, such as titles, data types and other constraints, or flags to indicate values in the column are unique</li>
         <li>metadata about rows in the table, such as certainty or provenance</li>
         <li>metadata about values in the table, such as notes or type annotations</li>
       </ul>
       <p>
-        When creating a set of annotations from metadata, if the same property is specified in two locations then information "closer" to the end user or interpreter of the document should override other information, and information "closer" to the document itself should override information "further" from the document. Explicitly, the order of preference is:
+        When creating a set of annotations from metadata, if the same property is specified in two locations then information "closer" to the end user or interpreter of the document overrides other information, and information "closer" to the document itself overrides information "further" from the document. Explicitly, the order of precedence is:
       </p>
       <ol>
         <li>metadata supplied by the user of the implementation that is processing the tabular data, see <a href="#overriding-metadata" class="sectionRef"></a></li>
@@ -287,35 +311,93 @@ var respecConfig = {
           <li>by enabling the user to select an existing metadata file, which may be local or remote</li>
           <li>by enabling the user to specify a series of metadata files, which are merged by the processor and handled as if they were a single file</li>
         </ul>
+        <p>
+          For example, a processor might be invoked with:
+        </p>
+        <pre class="example">
+$ csvlint data.csv --datatypes:string,float,string,string
+        </pre>
+        <p>
+          to enable the testing of the types of values in the columns of a CSV file, or with:
+        </p>
+        <pre class="example">
+$ csvlint data.csv --schema:schema.json
+        </pre>
+        <p>
+          to supply a schema that describes the contents of the file, against which it can be validated.
+        </p>
+        <p>
+          Metadata supplied in this way is called overriding, or user-supplied, metadata. Implementations should define how this is mapped into the vocabulary defined in [[!tabular-metadata]].
+        </p>
       </section>
       <section>
         <h3>Embedded Metadata</h3>
         <p>
-          Most syntaxes for tabular data provide a facility for <dfn title="embedded metadata">embedding metadata</dfn> within the tabular data file itself. The definition of a syntax for tabular data SHOULD include a description of how the syntax maps to an annotated data model. See <a href="#parsing" class="sectionRef"></a> for a description of this for CSV files.
+          Most syntaxes for tabular data provide a facility for <dfn title="embedded metadata">embedding metadata</dfn> within the tabular data file itself. The definition of a syntax for tabular data SHOULD include a description of how the syntax maps to an annotated data model, and in particular how any embedded metadata is mapped into the vocabulary defined in [[!tabular-metadata]]. For example, the following tab-delimited file contains embedded metadata:
+        </p>
+        <pre class="example">
+# publisher City of Palo Alto
+# updated 12/31/2010
+#name GID on_street species trim_cycle  inventory_date
+#datatype string  string  string  string  date:M/D/YYYY
+  GID On Street Species Trim Cycle  Inventory Date
+  1 ADDISON AV  Celtis australis  Large Tree Routine Prune  10/18/2010
+  2 EMERSON ST  Liquidambar styraciflua Large Tree Routine Prune  6/2/2010
+        </pre>
+        <p>
+          A processor that recognises this format may be able to extract and make sense of this embedded metadata. <a href="#parsing" class="sectionRef"></a> provides an informative guide on how embedded metadata commonly used within "CSV" files can be extracted.
         </p>
       </section>
       <section>
         <h3>Link Header</h3>
         <p>
-          When retrieving a tabular data file via HTTP, the response MAY include a <code>Link</code> header with <code>rel=describedby</code> and <code>type=application/csv-metadata+json</code> that points to a metadata file that describes the tabular data file. If there is more than one valid metadata file linked to through multiple <code>Link</code> headers, then the metadata referenced by <code>Link</code> headers that appear later in the response are used in preference to those referenced by earlier <code>Link</code> headers.
+          When retrieving a tabular data file via HTTP, the response MAY include a <code>Link</code> header with <code>rel="describedby"</code> and <code>type="application/csvm+json"</code> that points to a metadata file that describes the tabular data file. If there is more than one valid metadata file linked to through multiple <code>Link</code> headers, then the metadata referenced by <code>Link</code> headers that appear later in the response are used instead of those referenced by earlier <code>Link</code> headers.
+        </p>
+        <p>
+          For example, when the response to requesting a tab-separated file looks like:
+        </p>
+        <pre class="example highlight">
+HTTP/1.1 200 OK
+Content-Type: text/tab-separated-values
+...
+Link: &lt;metadata.ttl&gt;; rel="describedBy"; type="text/turtle"
+Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
+        </pre>
+        <p>
+          an implementation should use the referenced <code>metadata.json</code> to supply metadata for processing the file.
+        </p>
+        <p>
+          If the metadata file found at this location does not explicitly include a reference to the relevant tabular data file then it MUST be ignored.
         </p>
       </section>
       <section>
         <h3>Standard File Metadata</h3>
         <p>
-          If no metadata document has been located through higher-priority mechanisms, processors MUST attempt to locate a file-specific metadata document. This method is only used if the URL of the tabular data file does not contain a query component.
+          Processors MUST also attempt to locate a file-specific metadata document. This method MUST NOT be used if the URL of the tabular data file contains a query component.
         </p>
         <p>
-          In this case, the file-specific metadata document should be located at <code><var>location</var>-metadata.json</code>, where <var>location</var> is the base URL of the tabular data file with the fragment component of the URL removed, if applicable. For example, if the tabular data file is at <code>http://example.org/south-west/devon.csv</code> then processors should attempt to locate a metadata document at <code>http://example.org/south-west/devon.csv-metadata.json</code>. If the metadata file found at this location does not explicitly point to the relevant tabular data file then it MUST be ignored.
+          In this case, the file-specific metadata document should be located at <code><var>location</var>-metadata.json</code>, where <var>location</var> is the base URL of the tabular data file with the fragment component of the URL removed, if applicable.
+        </p>
+        <p>
+          For example, if the tabular data file is at <code>http://example.org/south-west/devon.csv</code> then processors should attempt to locate a metadata document at <code>http://example.org/south-west/devon.csv-metadata.json</code>. On the other hand, if the tabular data file is at <code>http://example.com/index.php?file=43178.csv</code> then, because the URL of the tabular data file includes a query component, the processor should not attempt to look for a file-specific metadata document.
+        </p>
+        <p>
+          If the metadata file found at this location does not explicitly include a reference to the relevant tabular data file then it MUST be ignored.
         </p>
       </section>
       <section>
         <h3>Standard Directory Metadata</h3>
         <p>
-          If no metadata document has been located through higher-priority mechanisms, processors MUST attempt to locate a directory-level metadata document. This method is only used if the URL of the tabular data file does not contain a query component.
+          Processors MUST attempt to locate a directory-level metadata document. This method MUST NOT be used if the URL of the tabular data file contains a query component.
         </p>
         <p>
-          The common metadata document for a directory can be located by resolving the relative URL <code>metadata.json</code> against the base URL of the tabular data file. For example, if the tabular data file is at <code>http://example.org/south-west/devon.csv</code> then processors should attempt to locate a metadata file at <code>http://example.org/south-west/metadata.json</code>. If the metadata file found at this location does not explicitly point to the relevant tabular data file then it MUST be ignored.
+          The common metadata document for a directory can be located by resolving the relative URL <code>metadata.json</code> against the base URL of the tabular data file.
+        </p>
+        <p>
+          For example, if the tabular data file is at <code>http://example.org/south-west/devon.csv</code> then processors should attempt to locate a metadata file at <code>http://example.org/south-west/metadata.json</code>. On the other hand, if the tabular data file is at <code>http://example.com/index.php?file=43178.csv</code> then, because the URL of the tabular data file includes a query component, the processor should not attempt to look for a directory-level metadata document.
+        </p>
+        <p>
+          If the metadata file found at this location does not explicitly include a reference to the relevant tabular data file then it MUST be ignored.
         </p>
       </section>
     </section>
