@@ -430,6 +430,36 @@ Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
         the validator would validate all the listed resources, using the locally defined schema at <code>government-spending.csv</code>. It would still use the metadata located from the referenced CSV files; for example, when processing <code>http://example.org/east-sussex-2015-03.csv</code>, it would use embedded metadata within that file, referenced from any <code>Link</code> header found when retrieving that file, and at <code>http://example.org/east-sussex-2015-03.csv-metadata.json</code> and <code>http://example.org/metadata.json</code>.
       </p>
       <section>
+        <h2>Creating Annotated Tables</h2>
+        <p>After locating metadata, all metadata documents discovered are <a href="http://w3c.github.io/csvw/metadata/#dfn-merged" class="externalDFN">merged</a> into a single description containing all <a title="annotation">annotations</a>. When starting with a metadata file, this involves merging any metadata located about the referenced tabular data files into that metadata file. When starting with a tabular data file this involves locating all metadata as described in <a href="#locating-metadata" class="sectionRef"></a> and merging all relevant metadata into a single descriptor.
+        </p>
+        <p>If processing starts with a tabular data file, implementations:</p>
+        <ol>
+          <li><p>Retrieve the tabular data file.</p></li>
+          <li><p>Retrieve the metadata files described in <a href="#locating-metadata" class="sectionRef"></a>:</p>
+            <ul>
+              <li>metadata supplied by the user (<code>UM</code>) (see <a href="#overriding-metadata" class="sectionRef"></a>)</li>
+              <li>metadata referenced from a <em>Link Header</em> that may be returned when retrieving the tabular data file (<code>LM</code>) (see <a href="#link-header" class="sectionRef"></a>)</li>
+              <li>file-specific metadata in a document located based on the location of the tabular data file (<code>FM</code>) (see <a href="#standard-file-metadata" class="sectionRef"></a>)</li>
+              <li>directory-specific metadata in a document located based on the location of the tabular data file  (<code>DM</code>) (see <a href="#standard-directory-metadata" class="sectionRef"></a>)</li>
+            </ul>
+          </li>
+          <li><p>Extract the <em>first available</em> <a href="http://www.w3.org/TR/tabular-metadata/#dialect-descriptions">dialect description</a> (<code>DD</code>) from the metadata files <code>UM</code>, <code>LM</code>, <code>FM</code>, <code>DM</code> (in this order) for the table description associated with the tabular data file. If there is no such dialect description, extract the first available dialect description from a table group description in which the tabular data file is described. Otherwise use the default dialect description.</p></li>
+          <li><p>If the tabular data file was retrieved with <code>Content-Type</code> including the <code>header=absent</code> parameter set <code>header</code> to <code>false</code> in <code>DD</code>.</p></li>
+          <li>
+            <p>Parse the tabular data file, using <code>DD</code> as a guide, to create a basic tabular data model (<code>T</code>) with core annotations. Extract embedded metadata (<code>EM</code>), for example from the <a>header line</a>.</p>
+            <p class="note">Note: This specification provides a non-normative definition for parsing tabular data files, including the extraction of embedded metadata, in <a href="#parsing-tabular-data" class="sectionRef"></a>. No definition of the format of embedded metadata is given here; whatever syntax is used, it's assumed that metadata can be mapped to the vocabulary defined in [[!tabular-metadata]].</p>
+          </li>
+          <li><p>Create the merged metadata <code>M = merge(UM, EM, LM, FM, DM)</code> using the <a href="http://w3c.github.io/csvw/metadata/#dfn-merged" class="externalDFN">merge algorithm</a> defined in [[!tabular-metadata]].</p></li>
+          <li><p>Use the metadata <code>M</code> to add annotations to the tabular data model <code>T</code> as described in <a href="http://w3c.github.io/csvw/metadata/#annotating-tables">Section 2 Annotating Tables</a> in [[!tabular-metadata]].</p></li>
+        </ol>
+        <p>If the process starts with a Metadata file:</p>
+        <ol>
+          <li>Retrieve the metadata file yielding the metadata <code>UM</code> (which is treated as overriding metadata, see <a href="#overriding-metadata" class="sectionRef"></a>).</li>
+          <li>For each table description in <code>UM</code>, run the steps for a tabular data file using the <code>url</code> from the table description with <code>UM</code> playing the role of <code>UM</code> to create one or more <a title="annotated table">annotated tables</a>.</li>
+        </ol>
+      </section>
+      <section>
         <h3>Displaying Tables</h3>
         <div class="issue">
           <p>
@@ -550,7 +580,7 @@ Content-Type: text/csv;charset=ISO-8859-1
         <section id="headers">
           <h4>Headers</h4>
           <p>
-            The first line of a CSV file SHOULD contain a comma-separated list of names of <a title="column">columns</a>. This is known as the <dfn>header line</dfn> and provides names for the columns. There are no constraints on these names.
+            The first line of a CSV file SHOULD contain a comma-separated list of names of <a title="column">columns</a>. This is known as the <dfn>header line</dfn> and provides titles for the columns. There are no constraints on these titles.
           </p>
           <p>
             If a CSV file does not include a header line, this MUST be specified using the <code>header</code> parameter of the media type:
@@ -585,16 +615,16 @@ Content-Type: text/csv;header=absent
               The CSV translates to a table model that looks like:
             </p>
             <table style="width: 100%; text-align: right">
-              <col style="width: 10%"></col>
-              <col style="width: 10%"></col>
-              <col style="width: 10%"></col>
-              <col style="width: 10%"></col>
-              <col style="width: 10%"></col>
-              <col style="width: 10%"></col>
-              <col style="width: 10%"></col>
-              <col style="width: 10%"></col>
-              <col style="width: 10%"></col>
-              <col style="width: 10%"></col>
+              <col style="width: 10%"/>
+              <col style="width: 10%"/>
+              <col style="width: 10%"/>
+              <col style="width: 10%"/>
+              <col style="width: 10%"/>
+              <col style="width: 10%"/>
+              <col style="width: 10%"/>
+              <col style="width: 10%"/>
+              <col style="width: 10%"/>
+              <col style="width: 10%"/>
               <thead>
                 <tr style="text-align: center">
                   <th>Column / Row</th>
@@ -709,16 +739,16 @@ Content-Type: text/csv;header=absent
              In the example above, if the CSV were served with <code>bidi=rtl</code>, or the table was detected as being a right-to-left table, then the column numbering in the model would be reversed:
             </p>
             <table style="width: 100%; text-align: right">
-              <col style="width: 10%"></col>
-              <col style="width: 10%"></col>
-              <col style="width: 10%"></col>
-              <col style="width: 10%"></col>
-              <col style="width: 10%"></col>
-              <col style="width: 10%"></col>
-              <col style="width: 10%"></col>
-              <col style="width: 10%"></col>
-              <col style="width: 10%"></col>
-              <col style="width: 10%"></col>
+              <col style="width: 10%"/>
+              <col style="width: 10%"/>
+              <col style="width: 10%"/>
+              <col style="width: 10%"/>
+              <col style="width: 10%"/>
+              <col style="width: 10%"/>
+              <col style="width: 10%"/>
+              <col style="width: 10%"/>
+              <col style="width: 10%"/>
+              <col style="width: 10%"/>
               <thead>
                 <tr style="text-align: center">
                   <th>Column / Row</th>
@@ -1585,7 +1615,7 @@ TEXTDATA =  %x20-21 / %x23-2B / %x2D-7E
           </p>
         </section>
       </section>
-      <section id="">
+      <section>
         <h3>CSV Files in a Tabular Data Package</h3>
         <p>
           <a href="http://dataprotocols.org/tabular-data-package/#csv-files">Tabular Data Packages</a> place the following restrictions on CSV files:
