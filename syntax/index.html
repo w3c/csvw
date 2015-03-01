@@ -159,33 +159,58 @@ var respecConfig = {
     <section id="model">
       <h2>Tabular Data Models</h2>
       <p>
-        There are different levels of data models for tabular data:
+        This section defines an <dfn>annotated tabular data model</dfn>: a model for tables that are annotated with metadata. <dfn title="annotation">Annotations</dfn> provide information about the cells, rows, columns, tables and groups of tables with which they are associated. The <dfn title="value">values</dfn> of these annotations may be lists, structured objects, or atomic values.
       </p>
-      <ul>
-        <li>The <dfn>annotated tabular data model</dfn> described in <a href="#annotated-tabular-data-model" class="sectionRef"></a> defines a model for tables that are annotated with metadata.</li>
-        <li>The <dfn>grouped tabular data model</dfn> described in <a href="#grouped-tabular-data-model" class="sectionRef"></a> defines a model for tables that are related to each other in some way.</li>
-      </ul>
+      <p class="note">
+        In this document, the term <a>annotation</a> refers to any metadata associated with an object in the annotated tabular data model. These are not necessarily web annotations in the sense of [[annotation-model]].
+      </p>
       <section>
-        <h3>Annotated Tabular Data Model</h3>
+        <h3>Table groups</h3>
+        <p>
+          A <dfn>group of tables</dfn> comprises a set of <a title="annotated table">annotated tables</a> and a set of annotations that relate to those tables. The core annotations of a group of tables are:
+        </p>
+        <ul>
+          <li><dfn title="table group resources">resources</dfn> &mdash; the list of <a title="table">tables</a> in the group of tables. A group of tables MUST have one or more tables.</li>
+          <li><dfn title="table group conversions">conversions</dfn> &mdash; a (possibly empty) list of specifications for converting this table group into other formats, as defined in [[!tabular-metadata]].</li>
+        </ul>
+        <p>
+          Groups of tables MAY in addition have any number of <a title="annotation">annotations</a> which provide information about the group of tables. Annotations on a group of tables may include:
+        </p>
+        <ul>
+          <li>information about the source or provenance of the group of tables</li>
+          <li>links to other groups of tables (eg to those that provide similar data from a different time period)</li>
+        </ul>
+      </section>
+      <section>
+        <h3>Tables</h3>
         <p>
           An <dfn>annotated table</dfn> is a <dfn>table</dfn> that is annotated with additional metadata. The core annotations of a table are:
         </p>
         <ul>
           <li><dfn title="table columns">columns</dfn> &mdash; the list of <a title="column">columns</a> in the table. A table MUST have one or more columns and the order of the columns within the list is significant and MUST be preserved by applications</li>
-          <li><dfn title="table rows">rows</dfn> &mdash; the list of rows in the table</li>
+          <li><dfn title="table rows">rows</dfn> &mdash; the list of <a title="row">rows</a> in the table</li>
+          <li><dfn title="table id">id</dfn> &mdash; an identifier for this table, or <code>null</code> if this is undefined</li>
           <li><dfn title="table url">url</dfn> &mdash; the URL of the source of the data in the table, or <code>null</code> if this is undefined</li>
+          <li><dfn title="table direction">direction</dfn> &mdash; the direction in which the columns in the table should be displayed, as described in <a href="#bidirectional-tables" class="sectionRef"></a></li>
+          <li><dfn title="table suppress output">suppress output</dfn> &mdash; a boolean that indicates whether or not this table should be suppressed in any output generated from the converting the table group that this table belongs to into another format, as described in <a href="#converting-tables" class="sectionRef"></a></li>
+          <li><dfn title="table primary key">primary key</dfn> &mdash; a possibly empty list of <a title="column">columns</a> that together provide a unique identifier for each <a>row</a> in the table</li>
+          <li><dfn title="table foreign keys">foreign keys</dfn> &mdash; a possibly empty list of pairs of lists: a list of <dfn>referencing columns</dfn> in this table and a list of <dfn>referenced columns</dfn> in another table within the same table group (which may be this table)</li>
+          <li><dfn title="table notes">notes</dfn> &mdash; the list of notes on the table, as described in [[!tabular-metadata]], which may be an empty list</li>
         </ul>
         <p>
-          The table MAY in addition have any number of <dfn title="annotation">annotations</dfn> which provide information about the table as a whole. The <dfn title="value">values</dfn> of these annotations may be lists, structured objects, or atomic values. Annotations on a table may include:
+          The table MAY in addition have any number of other <a title="annotation">annotations</a>. Annotations on a table may include:
         </p>
         <ul>
           <li>titles or descriptions of the table</li>
           <li>information about the source or provenance of the data in the table</li>
           <li>links to other tables (eg to indicate tables that include related information)</li>
         </ul>
-        <p class="note">
-          In this document, the term <a>annotation</a> refers to any metadata associated with an object in the annotated tabular data model. These are not necessarily web annotations in the sense of [[annotation-model]].
+        <p>
+          These arise from <a href="http://w3c.github.io/csvw/metadata/#dfn-common-property" class="externalDFN">common properties</a> defined within metadata documents, as defined in [[!tabular-metadata]].
         </p>
+      </section>
+      <section>
+        <h3>Columns</h3>
         <p>
           A <dfn>column</dfn> represents a vertical arrangement of <a title="cell">cells</a> within a <a>table</a>. The core annotations of a column are:
         </p>
@@ -193,17 +218,20 @@ var respecConfig = {
           <li><dfn title="column table">table</dfn> &mdash; the <a>table</a> that the column appears in</li>
           <li><dfn title="column number">number</dfn> &mdash; the position of the column amongst the <a title="table columns">columns</a> for the associated <a title="column table">table</a>, starting from 1</li>
           <li><dfn title="column source number">source number</dfn> &mdash; the position of the column in the original <a title="table url">url</a> of the table, or <code>null</code></li>
-          <li><dfn title="column cells">cells</dfn> &mdash; the list of <a title="cell">cells</a> in the column. A column MUST contain one cell from each <a>row</a> in the table. The order of the cells in the list MUST match the order of the rows in which they appear within the <a title="table rows">rows</a> for the associated <a title="column table">table</a>.</li>
+          <li><dfn title="column name">name</dfn> &mdash; the name of the column</li>
+          <li><dfn title="column titles">titles</dfn> &mdash; any number of human-readable titles for the column, each of which has an associated language</li>
+          <li><dfn title="column required">required</dfn> &mdash; a boolean that indicates whether cells within the column can be <code>null</code>; if <code>false</code> then they cannot be</li>
+          <li><dfn title="column datatype">datatype</dfn> &mdash; the expected datatype for the <a title="cell value">values</a> of <a title="cell">cells</a> in this column, as defined in [[!tabular-metadata]]</li>
           <li><dfn title="column virtual">virtual</dfn> &mdash; a boolean that indicates whether the column is a <a>virtual column</a>. <dfn title="virtual column">Virtual columns</dfn> are used to extend the source data with additional empty columns to support more advanced conversions; when this annotation is <code>false</code>, the column is a <dfn>real column</dfn>, which exists in the source data for the table.</li>
+          <li><dfn title="column suppress output">suppress output</dfn> &mdash; a boolean that indicates whether or not this column should be suppressed in any output generated from converting the table, as described in <a href="#converting-tables" class="sectionRef"></a></li>
+          <li><dfn title="column cells">cells</dfn> &mdash; the list of <a title="cell">cells</a> in the column. A column MUST contain one cell from each <a>row</a> in the table. The order of the cells in the list MUST match the order of the rows in which they appear within the <a title="table rows">rows</a> for the associated <a title="column table">table</a>.</li>
         </ul>
         <p>
-          Columns MAY in addition have any number of <a title="annotation">annotations</a>. The annotations on a column might provide information about how to interpret the <a title="cell">cells</a> in the column or information about the column as a whole. Examples of annotations might be:
+          Columns MAY in addition have any number of other <a title="annotation">annotations</a>. These arise from <a href="http://w3c.github.io/csvw/metadata/#dfn-common-property" class="externalDFN">common properties</a> defined within metadata documents, as defined in [[!tabular-metadata]].
         </p>
-        <ul>
-          <li>a name or title for the column</li>
-          <li>the expected type of values in that column</li>
-          <li>an indication of whether the column contains unique values</li>
-        </ul>
+      </section>
+      <section>
+        <h3>Rows</h3>
         <p>
           A <dfn>row</dfn> represents a horizontal arrangement of <a title="cell">cells</a> within a <a>table</a>. The core annotations of a row are:
         </p>
@@ -220,6 +248,9 @@ var respecConfig = {
           <li>the certainty of the information in that row</li>
           <li>information about the source or provenance of the data in that row</li>
         </ul>
+      </section>
+      <section>
+        <h3>Cells</h3>
         <p>
           A <dfn>cell</dfn> represents a cell at the intersection of a <a>row</a> and a <a>column</a> within a <a>table</a>. The core annotations of a cell are:
         </p>
@@ -227,9 +258,13 @@ var respecConfig = {
           <li><dfn title="cell table">table</dfn> &mdash; the <a>table</a> that the cell appears in</li>
           <li><dfn title="cell column">column</dfn> &mdash; the <a>column</a> that the cell appears in; the cell MUST be in the <a title="column cells">cells</a> for that column</li>
           <li><dfn title="cell row">row</dfn> &mdash; the <a>row</a> that the cell appears in; the cell MUST be in the <a title="row cells">cells</a> for that row</li>
-          <li><dfn>string value</dfn> &mdash; a string that is the original syntactic representation of the value of the cell, ie how the cell appears within a CSV file; this may be an empty string</li>
+          <li><dfn>string value</dfn> &mdash; a string that is the original syntactic representation of the value of the cell, eg how the cell appears within a CSV file; this may be an empty string</li>
           <li><dfn title="cell value">value</dfn> &mdash; the semantic value of the cell; this MAY be of a datatype other than a string and MAY be <code>null</code>. For example, annotations might enable a processor to understand the <a>string value</a> of the cell as representing a number or a date. By default, if the <a>string value</a> is an empty string, the semantic value of the cell is <code>null</code>. See <a href="http://w3c.github.io/csvw/metadata/#parsing-cells">Parsing Cells</a> in [[!tabular-metadata]] for further requirements on obtaining a cell value.</li>
-          <li><dfn title="cell errors">errors</dfn> &mdash; a (possibly empty) list of validation errors on the cell</li>
+          <li><dfn title="cell errors">errors</dfn> &mdash; a (possibly empty) list of validation errors generated while parsing the value of the cell</li>
+          <li><dfn title="cell text direction">text direction</dfn> &mdash; which direction the text within the cell should be displayed, as described in <a href="#bidirectional-tables" class="sectionRef"></a></li>
+          <li><dfn title="cell about URL">about URL</dfn> &mdash; a URL for the entity that this cell provides information about</li>
+          <li><dfn title="cell property URL">property URL</dfn> &mdash; a URL for the property that this cell provides</li>
+          <li><dfn title="cell value URL">value URL</dfn> &mdash; a URL for this cell's value</li>
         </ul>
         <p class="note">
           There presence or absence of quotes around a value within a CSV file is a syntactic detail that is not reflected in the tabular data model. In other words, there is no distinction in the model between the second value in <code>a,,z</code> and the second value in <code>a,"",z</code>.
@@ -239,27 +274,7 @@ var respecConfig = {
         </p>
         <ul>
           <li>notes to aid the interpretation of the value</li>
-          <li>type annotations for the value</li>
-          <li>a flag that indicates the value is a null value</li>
-        </ul>
-        <p class="issue" data-number="41">
-          The permitted types of names and values of annotations need to be spelled out here.
-        </p>
-      </section>
-      <section>
-        <h3>Grouped Tabular Data Model</h3>
-        <p>
-          A <dfn>group of tables</dfn> comprises a set of <a title="annotated table">annotated tables</a> and a set of annotations that relate to the set. The core annotation of a group of tables is:
-        </p>
-        <ul>
-          <li><dfn title="table group resources">resources</dfn> &mdash; the list of <a title="table">tables</a> in the group of tables. A group of tables MUST have one or more tables.</li>
-        </ul>
-        <p>
-          Groups of tables MAY in addition have any number of <a title="annotation">annotations</a> which provide information about the group of tables. Annotations on a group of tables may include:
-        </p>
-        <ul>
-          <li>information about the source or provenance of the group of tables</li>
-          <li>links to other groups of tables (eg to those that provide similar data from a different time period)</li>
+          <li>information about the source or provenance of the data in that cell</li>
         </ul>
       </section>
     </section>
