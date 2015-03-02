@@ -4,7 +4,7 @@
 # >> arguably it's the triples themselves that are important - not the syntax or how the output is structured ... conversion document simply needs to talk in terms of "triples"
 
 # note that the table `T` ({ "url": "http://example.org/countries.csv"}) has not been explicitly identified; the table resource is treated as a blank node
-# note that only a subset of table annotation types may be included in the output (`url`, `notes`, `title`, `@id`, `@type` and common properties); all others are ignored, including information about table schema and columns defined therein, dialects, primaryKeys etc.
+# note that only a subset of table annotation types may be included in the output (`url`, `notes`, `@id`, `@type` and common properties); all others are ignored, including information about table schema and columns defined therein, dialects, primaryKeys etc.
 # note that the type of the table resource is specifically declared: `[] rdf:type csvw:Table .`
 # note that the `url` annotation on the table is included in order to refer back to the original CSV+ file
 # note that each row within the table is explictly described in the output; however, as the rows are not explicitly identified, these row resources are treated as blank nodes
@@ -13,9 +13,9 @@
 # note that the resources described by each row are explcitly defined using the `aboutUrl` property - in this case three resources per row (event, location and offer); the relationship between the row and subject resource is asserted using the `rel:describes` property; e.g. for row `R1` we state `[] rel:describes :event-1, :place-1, :offer-1 .`
 # note that each column explicitly defines both `aboutUrl` and `propertyUrl` inherited properties for each of its cells
 # note that column `C2` ({ "name": "start-date" }) has been declared as holding date-time values, { "datatype": "datetime" } - the output explicitly declares the data type
-# note that [virtual] column `C6` ({ "name": "type-event"}) defined the semantic type of the event resource: `schema:MusicEvent`
-# note that [virtual] column `C7` ({ "name": "type-place"}) defined the semantic type of the location resource: `schema:Place`  
-# note that [virtual] column `C8` ({ "name": "type-offer"}) defined the semantic type of the offer resource: `schema:Offer`  
+# note that [virtual] column `C6` ({ "name": "type-event"}) defines the semantic type of the event resource: `schema:MusicEvent`
+# note that [virtual] column `C7` ({ "name": "type-place"}) defines the semantic type of the location resource: `schema:Place`  
+# note that [virtual] column `C8` ({ "name": "type-offer"}) defines the semantic type of the offer resource: `schema:Offer`  
 # note that [virtual] column `C9` ({ "name": "location"}) uses the `aboutUrl` and `valueUrl` to assert the relationship between the event and location resources
 # note that [virtual] column `C10` ({ "name": "offer"}) uses the `aboutUrl` and `valueUrl` to assert the relationship between the event and offer resources
 
@@ -25,16 +25,18 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix : <http://example.org/events-listing.csv#> .
 
-_:95cc7970-ce99-44b0-900c-e2c2c028bbd3 a csvw:Table ;
-	csvw:url <http://example.org/events-listing.csv> ;
-	csvw:row [
-		csvw:rownum 1 ;
-		csvw:url :row\=2 ;
-		rel:describes :event-1, :place-1, :offer-1
-	], [
-		csvw:rownum 2 ;
-		csvw:url :row\=3 ;
-		rel:describes :event-2, :place-2, :offer-2
+_:95cc7970-ce99-44b0-900c-e2c2c028bbd3 a csvw:TableGroup ;
+	csvw:table [ a csvw:Table ;
+		csvw:url <http://example.org/events-listing.csv> ;
+		csvw:row [
+			csvw:rownum 1 ;
+			csvw:url :row\=2 ;
+			rel:describes :event-1, :place-1, :offer-1
+		], [
+			csvw:rownum 2 ;
+			csvw:url :row\=3 ;
+			rel:describes :event-2, :place-2, :offer-2
+		]
 	] .
 
 :event-1 a schema:MusicEvent ;
