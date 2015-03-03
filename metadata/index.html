@@ -599,7 +599,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         </p>
         <section>
           <h3>Examples</h3>
-          <p>The following are examples of common properties along with their interpretations.</p>
+          <p>The following are examples of common properties along the result of normalizing using <a href="#json-ld-normalization" class="sectionRef"></a>.</p>
           <pre class="example highlight" title="Giving a title to a Table">
 {
   "@type": "Table",
@@ -1979,7 +1979,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
         <li>If the property is an <a>object property</a> with a string value, the string is a URL referencing a JSON document containing a single object. Dereference this URL and replace the string value with that object.</li>
         <li>If the property is a <a>natural language property</a> and the value is not already an object, it is turned into an object whose properties are language codes and where the values of those properties are arrays. The suitable language code for the values is determined through the <a>default language</a>; if it can't be determined the language code <code>und</code> MUST be used.</li>
         <li>If the property is an <a>atomic property</a> accepting strings or objects, normalize to the object form as described for that property.</li>
-        <li>If the property is a <a>common property</a> or <a href="#table-nodes"><code>notes</code></a> the values are expanded using <code>@context</code>.</li>
+        <li>If the property is a <a>common property</a> or <a href="#table-nodes"><code>notes</code></a> the values MUST be normalized as described in <a href="#json-ld-normalization" class="sectionRef"></a>.</li>
       </ul>
       <p>
         Following this normalization process, set the <code>@context</code> to <code>http://www.w3.org/ns/csvw</code>.
@@ -2042,7 +2042,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
 {
   "resources": [{
     "url": "<strong>http://example.com/doc1.csv</strong>",
-    "dc:title": "foo",
+    "dc:title": <strong>{"@value": "foo", "@language": "en"}</strong>,
     "tableDirection": "ltr",
     "tableSchema": {
       "aboutUrl": "{#foo}",
@@ -2065,7 +2065,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
 {
   "resources": [{
     "url": "http://example.com/doc1.csv",
-    "dc:description": "bar",
+    "dc:description": <strong>{"@value": "bar"}</strong>,
     "tableSchema": {
       "propertyUrl": "{#_name}",
       "columns": [{
@@ -2086,7 +2086,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
               <pre class="example highlight" title="first resources values from A and B">
 {
   "url": "http://example.com/doc1.csv",
-  "dc:title": "foo",
+  "dc:title": {"@value": "foo", "@language": "en"},
   "tableDirection": "ltr",
   "tableSchema": {
     "aboutUrl": "{#foo}",
@@ -2102,7 +2102,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
 
 {
   "url": "http://example.com/doc1.csv",
-  "dc:description": "bar",
+  "dc:description": {"@value": "bar"},
   "tableSchema": {
     "propertyUrl": "{#_name}",
     "columns": [{
@@ -2135,8 +2135,8 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
               <pre class="example highlight" title="first resources values merged">
 {
   "url": "http://example.com/doc1.csv",
-  "dc:title": "foo",
-  "dc:description": "bar",
+  "dc:title": {"@value": "foo", "@language": "en"},
+  "dc:description": {"@value": "bar"},
   "tableDirection": "ltr",
   "tableSchema": {
     "aboutUrl": "{#foo}",
@@ -2161,8 +2161,8 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
 {
   "resources": [{
     "url": "http://example.com/doc1.csv",
-    "dc:title": "foo",
-    "dc:description": "bar",
+    "dc:title": {"@value": "foo", "@language": "en"},
+    "dc:description": {"@value": "bar"},
     "tableDirection": "ltr",
     "tableSchema": {
       "aboutUrl": "{#foo}",
@@ -2202,13 +2202,33 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
         <li><p>A metadata document MUST NOT add a new context, or extend the top-level context in anyway other than as specifically allowed in <a href="#top-level-properties" class="sectionRef"></a>.</p></li>
         <li><p>Common properties and notes may contain arbitrary JSON-LD with the following restrictions:</p>
           <ul>
-            <li><p>The value of any member of <code>@type</code> MUST be either a <a href="http://www.w3.org/TR/json-ld/#dfn-term" class="externalDFN">term</a> defined in the JSON-LD context, a <a href="http://www.w3.org/TR/json-ld/#dfn-compact-iri" class="externalDFN">prefixed name</a>, or an absolute URL.</p></li>
+            <li><p>The value of any member of <code>@type</code> MUST be either a <a href="http://www.w3.org/TR/json-ld/#dfn-term" class="externalDFN">term</a> defined in the JSON-LD context, a <a href="http://www.w3.org/TR/json-ld/#dfn-compact-iri" class="externalDFN">prefixed name</a> where the prefix is a <a href="http://www.w3.org/TR/json-ld/#dfn-term" class="externalDFN">term</a> defined in the JSON-LD context, or an absolute URL.</p></li>
             <li><p>Values MAY be a <a href="http://www.w3.org/TR/json-ld/#dfn-string" class="externalDFN">string</a>, native JSON type (such as <a href="http://www.w3.org/TR/json-ld/#dfn-number" class="externalDFN">number</a>, <code>true</code>, or <code>false</code>.), <a href="http://www.w3.org/TR/json-ld/#dfn-value-object" class="externalDFN">value object</a>, <a href="http://www.w3.org/TR/json-ld/#dfn-node-object" class="externalDFN">node object</a> or an array of zero or more any of these.</p></li>
             <li><p>Values MUST NOT use <a href="http://www.w3.org/TR/json-ld/#dfn-list-object" class="externalDFN">list objects</a> or <a href="http://www.w3.org/TR/json-ld/#dfn-set-object" class="externalDFN">set objects</a>.</p></li>
             <li><p>Keys of <a href="http://www.w3.org/TR/json-ld/#dfn-node-object" class="externalDFN">node objects</a> MUST NOT include <code>@graph</code>,  <code>@context</code>, <a href="http://www.w3.org/TR/json-ld/#dfn-term" class="externalDFN">terms</a>, or <a href="http://www.w3.org/TR/json-ld/#dfn-blank-node" class="externalDFN">blank nodes</a>.</p></li>
           </ul>
         </li>
       </ul>
+      <section>
+        <h3>JSON-LD Normalization</h3>
+        <p>Content included in metadata documents within <a title="common property">common properties</a> and <a href="#table-nodes"><code>notes</code></a> is partially affected by the <code>@context</code> defined for the metadata document, as well as the location of the metadata document (see <a href="#top-level-properties" class="sectionRef"></a>). During the <a title="merged">merge process</a>, the <code>@context</code> may change, so certain normalization of these properties is necessary to ensure that their meaning remains the same even after an update to <code>@context</code>.</p>
+        <p>After merging metadata documents, the <a>default language</a> and <a>base URL</a> of the merged metadata may be different than that of either pre-merged metadata document. This algorithm creates a normalized form for property values which is independent of both <a>default language</a> and <a>base URL</a>. The process turns <a href="http://www.w3.org/TR/json-ld/#dfn-string" class="externalDFN">string</a> values into a <a href="http://www.w3.org/TR/json-ld/#dfn-value-object" class="externalDFN">value object</a> making the language of the string invariant, and ensures that all relative URLs are made absolute.</p>
+        <p>To normalize the <em>value</em> of a property:</p>
+        <ol class="algorithm">
+          <li>If <em>value</em> is an array, replace <em>value</em> with a new array constructed by replacing each element of the array with a new element which is the result of running this algorithm on that element.</li>
+          <li>If <em>value</em> is a <a href="http://www.w3.org/TR/json-ld/#dfn-string" class="externalDFN">string</a>, replace <em>value</em> with a new <a href="http://www.w3.org/TR/json-ld/#dfn-value-object" class="externalDFN">value object</a> constructed using <em>value</em> as the value of <code>@value</code>. If <a>default language</a> is specified, use it as the value of <code>@language</code>.</li>
+          <li>If <em>value</em> is a <a href="http://www.w3.org/TR/json-ld/#dfn-value-object" class="externalDFN">value object</a>, <em>value</em> is already in normalized form and no further processing is necessary.</li>
+          <li>If <em>value</em> is an <a href="http://www.w3.org/TR/json-ld/#dfn-node-object" class="externalDFN">node object</a>, replace with a new object containing all the keys <em>k</em> from <em>value</em> with values <em>v</em> construct as follows:
+            <ol class="algorithm">
+              <li>If <em>k</em> is <code>@id</code>, <em>v</em> MUST be a string representing an absolute- or relative-URL. Replace <em>v</em> with the result of expanding <em>v</em> against the <a>base URL</a>.</li>
+              <li>If <em>k</em> is <code>@type</code>, <em>v</em> MUST be either a string or an array of strings representing either a <a href="http://www.w3.org/TR/json-ld/#dfn-term" class="externalDFN">term</a> defined in the JSON-LD context, a <a href="http://www.w3.org/TR/json-ld/#dfn-compact-iri" class="externalDFN">prefixed name</a> where the prefix is a <a href="http://www.w3.org/TR/json-ld/#dfn-term" class="externalDFN">term</a> defined in the JSON-LD context, or an absolute URL; <em>value</em> is already in normalized form and no further processing is necessary.
+              <li>If <em>k</em> is any other <a href="http://www.w3.org/TR/json-ld-api/#dfn-keyword" class="externalDFN">JSON-LD keyword</a>, the <em>k</em> is not allowed in this dialect and a validator MUST issue a warning. As <em>value</em> cannot be further processed it is used as is.</li>
+              <li>Otherwise, the <em>v</em> is expanded using this algorithm.</li>
+            </ol>
+          </li>
+          <li>Otherwise, <em>value</em> is already in normalized form and no further processing is necessary.</li>
+        </ol>
+      </section>
     </section>
     <section class="appendix">
       <h2>Acknowledgements</h2>
