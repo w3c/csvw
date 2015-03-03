@@ -95,6 +95,18 @@ var respecConfig = {
     <style>
       td, th { padding-left: 1em; padding-right: 1em; }
       tbody tr th { text-align: left; }
+      ol.algorithm {
+        counter-reset: numsection;
+        list-style-type: none;
+      }
+      ol.algorithm li {
+        margin: 0.5em 0;
+      }
+      ol.algorithm li:before {
+        font-weight: bold;
+        counter-increment: numsection;
+        content: counters(numsection, ".") ") ";
+      }
     </style>
   </head>
   <body>
@@ -330,7 +342,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           <p>
             The <a>property value</a> of a <a>URI template property</a> is only available when processing individual cells in a table, usually while converting tables as defined in [[!tabular-data-model]]. The value is the result of:
           </p>
-          <ol>
+          <ol class="algorithm">
             <li>applying the template against the cell in that column in the row that is currently being processed</li>
             <li>expanding any prefixes as if the value were the name of a <a>common property</a>, as described in <a href="#common-properties" class="sectionRef"></a></li>
             <li>resolving the resulting URL against the base URL of the <a href="http://w3c.github.io/csvw/syntax/#dfn-table-url" class="externalDFN">table url</a> if not null</li>
@@ -929,7 +941,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             </dd>
             <dt id="conversion-source"><code>source</code></dt>
             <dd>
-              <p>A single string <a>atomic property</a> that provides, if included, the format to which the tabular data should be transformed prior to the transformation using the script or template. If the value is <code>json</code>, the tabular data should first be transformed first to JSON based on the simple mapping defined in <a href="http://www.w3.org/TR/csv2json/">Generating JSON from Tabular Data on the Web</a>. If the value is <code>rdf</code>, it should similarly first be transformed to to an RDF graph based on the simple mapping defined in <a href="http://www.w3.org/TR/csv2rdf/">Generating RDF from Tabular Data on the Web</a>. If the <code>source</code> property is missing or <code>null</code> then the source of the transformation is the annotated tabular data model. No other values are valid.
+              <p>A single string <a>atomic property</a> that provides, if included, the format to which the tabular data should be transformed prior to the transformation using the script or template. If the value is <code>json</code>, the tabular data should first be transformed first to JSON based on the simple mapping defined in <a href="http://www.w3.org/TR/csv2json/">Generating JSON from Tabular Data on the Web</a>. If the value is <code>rdf</code>, it should similarly first be transformed to to an RDF graph based on the simple mapping defined in <a href="http://www.w3.org/TR/csv2rdf/">Generating RDF from Tabular Data on the Web</a>. If the <code>source</code> property is missing or <code>null</code> then the source of the transformation is the annotated tabular data model. No other values are valid.</p>
             </dd>
             <dt id="conversion-ld-id"><code>@id</code></dt>
             <dd>
@@ -980,18 +992,18 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <p>
               When an array of column descriptions <code>B</code> is <a>merged</a> into an original array of column descriptions <code>A</code>, each column description within <code>B</code> is combined into the original array <code>A</code>, based on the index of each column description, as follows:
             </p>
-            <ol>
+            <ol class="algorithm">
               <li>if the column descriptions at the same index within <code>A</code> and <code>B</code> have the same <a href="#column-name"><code>name</code></a>, the column description from <code>B</code> is <a>merged</a> into the matching column description in A</li>
               <li>otherwise, if the column descriptions at the same index within <code>A</code> and <code>B</code> have matching <a href="#column-title"><code>title</code></a>s (both titles are the same and either they both have the same language or one of them has an undefined language (<code>und</code>)), the column description from <code>B</code> is <a>merged</a> into the matching column description in <code>A</code></li>
               <li>otherwise, if there are column descriptions at the same index within <code>A</code> and <code>B</code>, a validator MUST generate an error</li>
               <li>otherwise, if at a given index there is no column description within A, but there is a column description within <code>B</code>, then:
-                <ol>
+                <ol class="algorithm">
                   <li>if the <a href="#column-virtual"><code>virtual</code></a> property of the column description in <code>B</code> is <code>true</code>, then the column description is appended to <code>A</code></li>
                   <li>otherwise, a validator MUST generate an error</li>
                 </ol>
               </li>
               <li>otherwise, if at a given index there is no column description within B, but there is a column description within <code>A</code>, then:
-                <ol>
+                <ol class="algorithm">
                   <li>if the <a href="#column-virtual"><code>virtual</code></a> property of the column description in <code>A</code> is <code>true</code>, then the column description is retained</li>
                   <li>otherwise, a validator MUST generate an error</li>
                 </ol>
@@ -1548,7 +1560,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             <li>the datatype <code>json</code>, a sub-type of <code>string</code> which indicates the value is serialized JSON</li>
           </ul>
           <figure id="fig-datatypes">
-            <img src="http://www.w3.org/TR/xmlschema11-2/type-hierarchy-201104.png" width="810" height="1060" alt="Built-in Datatype Hierarchy diagram" longdesc="http://www.w3.org/TR/xmlschema11-2/type-hierarchy-201104.longdesc.html">
+            <img src="http://www.w3.org/TR/xmlschema11-2/type-hierarchy-201104.png" width="810" height="1060" alt="Built-in Datatype Hierarchy diagram" longdesc="http://www.w3.org/TR/xmlschema11-2/type-hierarchy-201104.longdesc.html"/>
             <figcaption>Diagram showing the built-in datatypes from [[!xmlschema11-2]]</figcaption>
           </figure>
         </section>
@@ -1687,13 +1699,13 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
         <p>
           The process of parsing the string value of a cell into a single value or a list of values is as follows:
         </p>
-        <ol>
+        <ol class="algorithm">
           <li>unless the <a href="#cell-datatype"><code>datatype</code></a> is <code>string</code>, <code>json</code>, <code>xml</code>, <code>html</code>, <code>anyAtomicType</code> or <code>any</code>, replace all carriage return (<code>#xD</code>), line feed (<code>#xA</code>) and tab (<code>#x9</code>) characters with space characters</li>
           <li>unless the <a href="#cell-datatype"><code>datatype</code></a> is <code>string</code>, <code>json</code>, <code>xml</code>, <code>html</code>, <code>anyAtomicType</code>, <code>any</code> or <code>normalizedString</code>, strip leading and trailing whitespace from the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-string-value" class="externalDFN">string value</a> and replace all instances of two or more whitespace characters with a single space character</li>
           <li>if the resulting string is an empty string, apply the remaining steps to the string given by the <a href="#cell-default"><code>default</code></a> property</li>
           <li>if the <a href="#cell-separator"><code>separator</code></a> property is not <code>null</code> and the resulting string is an empty string, the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">cell value</a> is an empty list</li>
           <li>if the <a href="#cell-separator"><code>separator</code></a> property is not <code>null</code>, the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">cell value</a> is a list of values created by:
-            <ol>
+            <ol class="algorithm">
               <li>if the normalized string is an empty string, apply the remaining steps to the string given by the <a href="#cell-default"><code>default</code></a> property</li>
               <li>if the normalized string is the same as any one of the values of the <a href="#cell-null"><code>null</code></a> property, then the resulting value is <code>null</code></li>
               <li>split the normalized string at the character specified by the <code>separator</code> property</li>
@@ -2023,7 +2035,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
 }
       </pre>
       <p>The process of merging performs the following steps:</p>
-      <ol>
+      <ol class="algorithm">
         <li>
           Normalize <code>A</code> to use the language specified in the <code>@context</code> within the <a>natural language property</a> <a href="#column-title"><code>title</code></a> and to expand the <a>link property</a> <a href="#table-url"><code>url</code></a> against the <a>base URL</a> for <code>A</code>, <code>http://example.com/metadata.json</code>:
       <pre class="example highlight" title="Metadata A after normalization">
@@ -2069,7 +2081,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
       </pre>
         </li>
         <li><code>resources</code> is an <a>array property</a> with rules specified in <a href="#table-groups" class="sectionRef"></a> and each value is merged accordingly:
-          <ol>
+          <ol class="algorithm">
             <li>The first value from <code>A</code> and <code>B</code> are now the following:
               <pre class="example highlight" title="first resources values from A and B">
 {
@@ -2104,14 +2116,14 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
 }
               </pre>
               As these have the same <a href="#table-url"><code>url</code></a>, these are merged. Each property from <code>B</code> is considered:
-              <ol>
+              <ol class="algorithm">
                 <li><code>url</code> is the same (otherwise the two <a title="table description">table descriptions</a> would not be being merged</li>
                 <li><code>dc:description</code> does not exist in <code>A</code> so it is added to <code>A</code></li>
                 <li>The objects held by the <a>object property</a> <code>tableSchema</code> properties are merged:
-                  <ol>
+                  <ol class="algorithm">
                     <li><code>B</code> has a <code>propertyUrl</code> which is added to <code>A</code>.</li>
                     <li>Each has <code>columns</code> which is merged as described in <a href="#schemas"></a>:
-                      <ol>
+                      <ol class="algorithm">
                         <li>The first column matches on <code>title</code> because they each have the value <code>"Foo"</code> and the language tag <code>en</code> matches <code>und</code>. Because the <code>und</code> value is present in the <code>en</code> array, that value is removed from the <code>und</code> array, and because the array is now empty the <code>und</code> property is removed. The value of <code>required</code> in <em>A</em> is retained, as is the value of <code>name</code></li>
                         <li>The second column has a match on <code>name</code></li>
                       </ol>
@@ -2140,7 +2152,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
 }
               </pre>
             </li>
-            <li>The second resources value from <code>A</code> is retained as is.
+            <li>The second resources value from <code>A</code> is retained as is.</li>
           </ol>
         </li>
       </ol>
