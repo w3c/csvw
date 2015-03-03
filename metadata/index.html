@@ -130,7 +130,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
   "dc:keywords": ["tree", "street", "maintenance"],
   "dc:publisher": {
     "schema:name": "Example Municipality",
-    "schema:url": "http://example.org"
+    "schema:url": {"@id": "http://example.org"}
   },
   "dc:license": {"@id": "http://opendefinition.org/licenses/cc-by/"},
   "dc:modified": {"@value": "2010-12-31", "@type": "xsd:date"},
@@ -190,7 +190,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         The <a href="http://www.w3.org/TR/tabular-data-model/">Model for Tabular Data and Metadata on the Web</a> specification defines an <a href="http://w3c.github.io/csvw/syntax/#annotated-tabular-data-model">Annotated Tabular Data Model</a> in which tables, columns, rows and cells can be annotated with annotations, and a <a href="http://w3c.github.io/csvw/syntax/#grouped-tabular-data-model">Grouped Tabular Data Model</a> in which a group of tables is annotated. That specification also describes <a href="http://w3c.github.io/csvw/syntax/#locating-metadata">how to locate metadata</a> about a given CSV file.
       </p>
       <p>
-        This document defines the format and structure of metadata documents, and how these are interpreted to create an Annotated Tabular Data Model. It also defines how to validate tabular data based on some of these annotations. This metadata can be expressed as an RDF graph. However, all applications that conform to this specification (including validators and applications that read or convert tabular data) MUST read the JSON-based format described in this document.
+        This document defines the format and structure of metadata documents, and how these are interpreted to create an Annotated Tabular Data Model. It also defines how to validate tabular data based on some of these annotations. The metadata format is based on a dialect of [[!JSON-LD]] as defined in <a href="#json-ld-dialect" class="sectionRef"></a>. This metadata can be expressed as an RDF graph. However, all applications that conform to this specification (including validators and applications that read or convert tabular data) MUST read the JSON-based format described in this document.
       </p>
     </section>
     <section>
@@ -199,10 +199,12 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         The metadata defined in this specification is used to provide annotations on an <a href="http://w3c.github.io/csvw/syntax/#dfn-annotated-table" class="externalDFN">annotated table</a> or <a href="http://w3c.github.io/csvw/syntax/#dfn-group-of-tables" class="externalDFN">group of tables</a>, as defined in [[!tabular-data-model]]. Annotated tables form the basis for all further processing, such as validating, converting or displaying the tables.
       </p>
       <p>
+      <p>
         All compliant applications MUST create annotated tables based on the algorithm defined here. All compliant applications MUST generate errors if a metadata document does not conform to this specification, such as:
       </p>
       <ul>
         <li>not being compliant with JSON syntax</li>
+        <li>using any JSON outside of the restrictions defined in <a href="#json-ld-dialect" class="sectionRef"></a></li>
         <li>not specifying a property that it is required to specify</li>
         <li>including properties (aside from <a title="common property">common properties</a>) which are not defined in this specification</li>
         <li>having invalid values for a given property</li>
@@ -569,34 +571,83 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       <section>
         <h3>Common Properties</h3>
         <p>
-          Descriptions of groups of tables, tables, schemas, columns, rows and cells MAY contain any <dfn title="common property">properties</dfn> whose names are either absolute URLs or prefixed names. For example, a table description may contain <code>dc:description</code>, <code>dcat:keyword</code> or <code>schema:copyrightHolder</code> properties to provide a description, keywords or the name of the copyright holder, as defined in <a href="http://dublincore.org/documents/2010/10/11/dcmi-terms/#elements-description">Dublin Core Terms</a>, <a href="http://www.w3.org/TR/vocab-dcat/#Property:dataset_keyword">DCAT</a> or <a href="http://schema.org/copyrightHolder">schema.org</a>.
+          Descriptions of groups of tables, tables, schemas, columns, rows and cells MAY contain any <dfn title="common property">properties</dfn> whose names are either absolute URLs or <a href="http://www.w3.org/TR/json-ld/#dfn-compact-iri" class="externalDFN">prefixed names</a>. For example, a table description may contain <code>dc:description</code>, <code>dcat:keyword</code> or <code>schema:copyrightHolder</code> properties to provide a description, keywords or the name of the copyright holder, as defined in <a href="http://dublincore.org/documents/2010/10/11/dcmi-terms/#elements-description">Dublin Core Terms</a>, <a href="http://www.w3.org/TR/vocab-dcat/#Property:dataset_keyword">DCAT</a> or <a href="http://schema.org/copyrightHolder">schema.org</a>. See <a href="#json-ld-dialect" class="sectionRef"></a> for specific restrictions on the use of JSON-LD within common properties.
         </p>
         <p>
           The same prefixes are pre-defined as for [[rdfa-core]] within the <a href="http://www.w3.org/2011/rdfa-context/rdfa-1.1">RDFa 1.1 Initial Context</a> and MUST NOT be overridden. Properties from other vocabularies MUST be defined using full URLs.
         </p>
         <p>
-          Prefixed names MAY be expanded into URLs, for example during conversion, using the associations between <a href="http://www.w3.org/TR/json-ld-api/#dfn-term" class="externalDFN">terms</a> and URLs in the context definition at <code>http://www.w3.org/ns/csvw</code> (see <a href="#json-ld-context" class="sectionRef"></a>). When the name of a common property property starts with a term followed by <code>":"</code>, the expanded URL is string concatenation of the URL associated with the term and the portion of the prefixed name following the <code>":"</code>. Expansion is intended to be entirely consistent with <cite><a href="http://www.w3.org/TR/json-ld-api/#iri-expansion">Section 6.3 IRI Expansion</a></cite> in [[!JSON-LD-API]] and implementations MAY use a JSON-LD processor for performing prefixed name and IRI expansion.
+          <a href="http://www.w3.org/TR/json-ld/#dfn-compact-iri" class="externalDFN">Prefixed names</a> MAY be expanded into URLs, for example during conversion, using the associations between <a href="http://www.w3.org/TR/json-ld-api/#dfn-term" class="externalDFN">terms</a> and URLs in the context definition at <code>http://www.w3.org/ns/csvw</code> (see <a href="#json-ld-context" class="sectionRef"></a>). When the name of a common property property starts with a term followed by <code>":"</code>, the expanded URL is string concatenation of the URL associated with the term and the portion of the prefixed name following the <code>":"</code>. Expansion is intended to be entirely consistent with <cite><a href="http://www.w3.org/TR/json-ld-api/#iri-expansion">Section 6.3 IRI Expansion</a></cite> in [[!JSON-LD-API]] and implementations MAY use a JSON-LD processor for performing prefixed name and IRI expansion.
         </p>
         <p>
-          Implementations SHOULD treat the prefixed names for common properties and the URLs that they expand into in the same way. For example, if an implementation recognises and displays the value of the <code>dc:description</code> property, it should also recognise and display the value of the <code>http://purl.org/dc/terms/description</code> property in the same way.
+          Implementations SHOULD treat the <a href="http://www.w3.org/TR/json-ld/#dfn-compact-iri" class="externalDFN">prefixed names</a> for common properties and the URLs that they expand into in the same way. For example, if an implementation recognises and displays the value of the <code>dc:description</code> property, it should also recognise and display the value of the <code>http://purl.org/dc/terms/description</code> property in the same way.
         </p>
         <p class="note">
           Forbidding the declaration of new prefixes ensures consistent processing between JSON-LD-aware and non-JSON-LD-aware processors.
         </p>
-        <div class="issue" data-number="142">
-          <p>The values of <a title="common property">common properties</a> may be represented as a string, native JSON type, <cite><a href="">JSON-LD Value Object</a></cite> [[!JSON-LD]], or an array of any of these. Otherwise, if used as strings, when represented as RDF, values will take on the result of <cite><a href="http://www.w3.org/TR/rdf11-concepts/#dfn-simple-literal" class="externalDFN">simple literal</a></cite> or <cite><a href="http://www.w3.org/TR/rdf11-concepts/#dfn-language-tagged-string" class="externalDFN">language-tagged string</a></cite> [[rdf-concepts]]. For example:</p>
-<pre><code>{
-  "dc:title": "String value with possible language from `@context`",
-  "dc:description": {"@value": "String value with no language"},
-  "schema:name": {"@value": "String value with explicit language", "@language": "en"},
-  "schema:url": {"@id": "http://example.com/"},
-  "schema:valueRequired": true,
-  "foaf:age": 18.5,
-  "schema:description": ["first value", "second value"]
-}</code></pre>
-          <p>Alternatively, value expansion may be determined through custom JSON-LD Context mappings, or by pre-defining specific mappings in the default context.</p>
-          <p>Merge should be that of <a>atomic property</a> allowing arrays, not presently defined; i.e., coerce values to array, and concatenate unique values in order.</p>
-        </div>
+        <section>
+          <h3>Examples</h3>
+          <p>The following are examples of common properties along with their interpretations.</p>
+          <pre class="example highlight" title="Giving a title to a Table">
+{
+  "@type": "Table",
+  "url": "http://example.com/table.csv",
+  "tableSchema": [...],
+  <strong>"dc:title": "The title of this Table"</strong>
+}
+          </pre>
+          <p>The preceeding example uses a simple string to give a title to a <code>Table</code>. If there is a <a>default language</a>, it is the language of that string.</p>
+          <pre class="example highlight" title="Giving a title to a Table">
+{
+  "@type": "Table",
+  "url": "http://example.com/table.csv",
+  "tableSchema": [...],
+  <strong>"dc:title": {"@value": "Der Titel dieser Tabelle", "@language": "de"}</strong>
+}
+          </pre>
+          <p>The preceeding example uses a <a href="http://www.w3.org/TR/json-ld/#dfn-value-object" class="externalDFN">value object</a> to give a title to a <code>Table</code> using an explicit language.</p>
+          <pre class="example highlight" title="Giving a label to a Table">
+{
+  "@type": "Table",
+  "tableSchema": [...],
+  <strong>"rdfs:label": {"@value": "The label of this Table"}</strong>
+}
+          </pre>
+          <p>The preceeding example uses a simple <a href="http://www.w3.org/TR/json-ld/#dfn-value-object" class="externalDFN">value object</a> to give a label to a <code>Table</code> without using the <a>default language</a>.</p>
+          <pre class="example highlight" title="Giving a title to a Table">
+{
+  "@type": "Table",
+  "url": "http://example.com/table.csv",
+  "tableSchema": [...],
+  <strong>"dc:title": [
+    "The title of this Table",
+    {"@value": "Der Titel dieser Tabelle", "@language": "de"}
+  ]</strong>
+}
+          </pre>
+          <p>The preceeding example uses an array of a string and a value object.</p>
+          <pre class="example highlight" title="Referencing a URL">
+{
+  "@type": "Table",
+  "url": "http://example.com/table.csv",
+  "tableSchema": [...],
+  <strong>"schema:url": {"@id": "http://example.com/table.csv"}</strong>
+}
+          </pre>
+          <p>The preceeding example uses an array of a string and a node object used as a reference to another URL.</p>
+          <pre class="example highlight" title="Embedded object">
+{
+  "@type": "Table",
+  "url": "http://example.com/table.csv",
+  "tableSchema": [...],
+  <strong>"dc:publisher": [{
+    "schema:name": "Example Municipality",
+    "schema:url": {"@id": "http://example.org"}
+  }]</strong>,
+}
+          </pre>
+          <p>The preceeding example has an array with a single node object containing two properties.</p>
+        </section>
       </section>
       <section>
         <h3>Table Groups</h3>
@@ -2129,6 +2180,23 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
       <p>
         <a title="conversion specification">Conversion specifications</a> are a possible security risk as they enable the creators of metadata to reference arbitrary code that may be executed to convert tabular data into other formats. Implementations should run this arbitrary code in a sandboxed environment to reduce the security risk.
       </p>
+    </section>
+    <section class="appendix">
+      <h2>JSON-LD Dialect</h2>
+      <p>The Metadata Vocabulary for Tabular Data uses a format based on JSON-LD [[!JSON-LD]] with some restrictions.</p>
+      <ul>
+        <li>All <a href="http://www.w3.org/TR/json-ld/#dfn-term" class="externalDFN">terms</a> used within a metadata document MUST be defined in the JSON-LD context defined for this specification (see <a href="#json-ld-context" class="sectionRef"></a>).</li>
+        <li><p>The value of any <code>@id</code> of <code>@type</code> contained within a metadata document MUST NOT be a <a href="http://www.w3.org/TR/json-ld/#dfn-blank-node" class="externalDFN">blank node</a></p></li>
+        <li><p>A metadata document MUST NOT add a new context, or extend the top-level context in anyway other than as specifically allowed in <a href="#top-level-properties" class="sectionRef"></a>.</p></li>
+        <li><p>Common properties and notes may contain arbitrary JSON-LD with the following restrictions:</p>
+          <ul>
+            <li><p>The value of any member of <code>@type</code> MUST be either a <a href="http://www.w3.org/TR/json-ld/#dfn-term" class="externalDFN">term</a> defined in the JSON-LD context, a <a href="http://www.w3.org/TR/json-ld/#dfn-compact-iri" class="externalDFN">prefixed name</a>, or an absolute URL.</p></li>
+            <li><p>Values MAY be a <a href="http://www.w3.org/TR/json-ld/#dfn-string" class="externalDFN">string</a>, native JSON type (such as <a href="http://www.w3.org/TR/json-ld/#dfn-number" class="externalDFN">number</a>, <code>true</code>, or <code>false</code>.), <a href="http://www.w3.org/TR/json-ld/#dfn-value-object" class="externalDFN">value object</a>, <a href="http://www.w3.org/TR/json-ld/#dfn-node-object" class="externalDFN">node object</a> or an array of zero or more any of these.</p></li>
+            <li><p>Values MUST NOT use <a href="http://www.w3.org/TR/json-ld/#dfn-list-object" class="externalDFN">list objects</a> or <a href="http://www.w3.org/TR/json-ld/#dfn-set-object" class="externalDFN">set objects</a>.</p></li>
+            <li><p>Keys of <a href="http://www.w3.org/TR/json-ld/#dfn-node-object" class="externalDFN">node objects</a> MUST NOT include <code>@graph</code>,  <code>@context</code>, <a href="http://www.w3.org/TR/json-ld/#dfn-term" class="externalDFN">terms</a>, or <a href="http://www.w3.org/TR/json-ld/#dfn-blank-node" class="externalDFN">blank nodes</a>.</p></li>
+          </ul>
+        </li>
+      </ul>
     </section>
     <section class="appendix">
       <h2>Acknowledgements</h2>
