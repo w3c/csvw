@@ -146,84 +146,34 @@ var respecConfig = {
     <section id="sotd">
       <p>The CSV on the Web Working Group was chartered to produce Recommendations for "Access methods for CSV Metadata", "Metadata vocabulary for CSV data" and "Mapping mechanism to transforming CSV into various Formats (e.g., RDF, JSON, or XML)". This document aims to satisfy the JSON variant of the mapping Recommendation.</p>
     </section>
-    
+
     <section id="intro">
       <h2>Introduction</h2>
-      <p>This document describes the processing of 
-        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-tabular-data">tabular data</a>
-        to create a set of nested objects referred to as the <dfn title="output graph">
-        output graph</dfn>. The <a title="output graph">output graph</a> SHALL be serialized 
-        as JSON [[!json]].</p>
-      <p class="note">The JSON encoding is intended for web developers who need 
-        not care about the complexities of RDF [[!rdf11-concepts]].</p>
-      <p> 
-        The Tabular Data Model [[!tabular-data-model]] defines a 
-        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-core-tabular-data-model">
-        core tabular data model</a> consisting of 
-        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table">tables</a>, 
-        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column">columns</a>,
-        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">rows</a> and 
-        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell">cells</a>.</p>
-      <p>Tabular data may be enriched with metadata that describes its structure and
-        the meaning of its content. These metadata <em>annotations</em> are described 
-        in [[!tabular-metadata]] and may be embedded within the CSV encoding itself as a
-        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-header-line">header line</a>
-        or provided within a separate metadata document. The resulting 
-        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-table">annotated 
-        table</a> conforms to the 
-        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-tabular-data-model">
-        annotated tabular data model</a>.
-      <p>The metadata annotations may describe how a 
-        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table">table</a> relates to a 
-        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-group-of-tables">
-        group of tables</a>. Such collections conform to the 
-        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-grouped-tabular-data-model">
-        grouped tabular data model</a>.</p>
-      <p>The mapping procedure operates on the <em>abstract</em> tabular data model; 
-        <em>core</em>, <em>annotated</em> or <em>grouped</em>. No discussion is given to 
-        the processes needed to convert CSV-encoded data into tabular data form. Please 
-        refer to [[!tabular-data-model]] for details of 
-        <a href="http://www.w3.org/TR/tabular-data-model/#parsing">parsing tabular data</a>. 
-        Further details on <a href="http://www.w3.org/TR/tabular-metadata/#parsing-cells">
-        parsing cells</a> within tabular data is provided in [[!tabular-metadata]].</p>
-      <div class="note">
-        <p>Adopting terminology from the Data Catalog Vocabulary [[vocab-dcat]], the
-          tabular data is considered to be a <em>dataset</em>, whilst the CSV file within
-          which that tabular data is encoded is considered to be a <em>distribution</em> 
-          of that tabular data.</p>
-      </div>
-      <p class="issue" data-number="177">Is the DCAT block useful in the RDF output?</p>
-      <p>The mapping procedure is intended to be simple; encouraging the provision of 
-        compliant mapping applications. The limitation of this <dfn title="simple mapping">
-        simple mapping</dfn> is that a single object is created for each 
-        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row">row</a> of tabular 
-        data that contains a single property per 
-        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell">cell</a>.</p>
-      <div class="note">
-        <p>An 
-          <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-table">annotated 
-          table</a> may include a reference to a
-          <a href="http://www.w3.org/TR/tabular-data-model/#dfn-template-specification">
-          template specification</a> (see [[!tabular-metadata]]) that describes how tabular
-          data can be transformed into another format using a template-based approach. 
-          <em>Templating</em> facilitates far more sophisticated transformations than are 
-          possible using the <a title="simple mapping">simple mapping</a>.</p>
-        <p>There is no standard template syntax, therefore template specifications may be 
-          written using existing template languages, such as 
-          <a href="http://mustache.github.io">Mustache</a>.</p>
-        <p>The processing of template specifications during the mapping is yet to be 
-          determined by the Working Group and is, at least for the interim, beyond the scope
-          of this document.</p>
-      </div>
-      <p>Finally, note that the mapping procedure is considered to be <em>entirely textual</em>. 
-        There is no requirement on compliant mapping applications to check the semantic
-        consistency of the data during the mapping, nor validate the 
-        <a href="http://www.w3.org/TR/tabular-data-model/#dfn-string-value">cell values</a> against
-        JSON syntax rules. Where cell values within CSV encoded content are improperly formatted, 
-        the output from the mapping is likely to include syntax errors. Downstream applications 
-        should be aware of this and take appropriate action.</p>
-      <p class="issue" data-number="62">Should the RDF/JSON transformation check the values?</p>
+      <p>This document describes the processing of <a href="http://www.w3.org/TR/tabular-data-model/#dfn-tabular-data">tabular data</a> to create a set of nested objects referred to as the <dfn title="output graph"> output graph</dfn>. The <a title="output graph">output graph</a> SHALL be serialized as JSON [[!json]].</p>
+
+      <p class="note">The JSON encoding is intended for web developers who need not care about the complexities of RDF [[!rdf11-concepts]].</p>
+
+      <p> The [[!tabular-data-model]] defines an <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-tabular-data-model" class="externalDFN">annotated tabular data model</a> consisting of <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table" class="externalDFN">tables</a>, <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column" class="externalDFN">columns</a>, <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row" class="externalDFN">rows</a> and <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell" class="externalDFN">cells</a>, enriched with <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotation" class="externalDFN">annotations</a> that describe the structure of the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-tabular-data" class="externalDFN">tabular data</a> and the meaning of its content.</p>
+
+      <p>The <a href="http://www.w3.org/TR/tabular-data-model/#dfn-grouped-tabular-data-model" class="externalDFN">grouped tabular data model</a> describes a <a href="http://www.w3.org/TR/tabular-data-model/#dfn-group-of-tables" class="externalDFN">table group</a> that is a collection of <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table" class="externalDFN">tables</a> published as a single atomic unit.</p>
+
+      <p>The conversion procedure described in this specification operates on the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-tabular-data" class="externalDFN">tabular data</a>. No discussion is given to the processes needed to convert CSV-encoded data into tabular data form. Please refer to [[!tabular-data-model]] for details of <a href="http://www.w3.org/TR/tabular-data-model/#parsing">parsing tabular data</a>.</p>
+
+      <p>Conversion applications MUST provide at least two modes of operation: <a title="standard mode">standard</a> and <a title="minimal mode">minimal</a>.</p>
+
+      <p><dfn title="standard mode">Standard mode</dfn> conversion frames the information gleaned from the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell" class="externalDFN">cells</a> of the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-tabular-data" class="externalDFN">tabular data</a> with details of the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row" class="externalDFN">rows</a>, <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table" class="externalDFN">tables</a> and, optionally, <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table-group" class="externalDFN">table group</a> within which that information is provided.</p>
+
+      <p><dfn title="minimal mode">Minimal mode</dfn> conversion includes <em>only</em> the information gleaned from the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell" class="externalDFN">cells</a> of the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-tabular-data" class="externalDFN">tabular data</a> within the <a>output graph</a>.</p>
+
+      <p><a title="standard mode">Standard</a> and <a title="minimal mode">minimal</a> conversion are described normatively <a href="#conversion-algorithm">below</a>.</p>
+
+      <p>Conversion applications MAY offer additional implementation specific conversion modes.</p>
+
+      <p><a href="http://www.w3.org/TR/tabular-metadata/#dfn-conversion-specification" class="externalDFN">Conversion specifications</a>, as defined in [[!tabular-metadata]] MAY be used to specify how <a href="http://www.w3.org/TR/tabular-data-model/#dfn-tabular-data" class="externalDFN">tabular data</a> can be transformed into another format using a script or template. Such a <a href="http://www.w3.org/TR/tabular-metadata/#dfn-conversion-specification" class="externalDFN">conversion specification</a> MAY use the JSON output described in this specification as input.</p>
+
+      <p>The conversion procedure described in this specification is considered to be <em>entirely textual</em>. There is no requirement on conversion applications to check the semantic consistency of the data during the conversion, nor validate the <a>output graph</a> against JSON syntax rules. Downstream applications SHOULD be aware of the potential for syntax errors and take appropriate action.</p>
     </section>
+
     <section id="conformance">
       <p><a href="http://www.w3.org/TR/tabular-data-model/#dfn-tabular-data">Tabular data</a> 
         MUST conform to the description from [[!tabular-data-model]]. In particular note
@@ -234,6 +184,7 @@ var respecConfig = {
       <p>This document relies on terms (e.g. group, table, column, row, cell) defined in 
         [[!tabular-data-model]].</p>
     </section>
+    
     <section id="map-core-tab">
       <h2>Mapping Core Tabular Data</h2>
         <p>The procedures and rules for mapping tabular data compliant with the
