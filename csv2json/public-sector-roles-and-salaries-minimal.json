@@ -1,0 +1,101 @@
+# >> BE CONSISTENT WITH USE OF 'ANNOTATION' AND 'PROPERTY' ... PREFER PROPERTY
+
+# minimal mode does not contain any information about the table; only information gleaned from the cells of the table
+
+# in minimal mode JSON output comprises an array of objects `A`
+# each row is processed sequentially in turn
+#
+# the subject(s) described by each row are determined according to the `aboutUrl` property for each cell in the current row; where `aboutUrl` is undefined, a default subject for the row is used
+# a row MAY describe multiple interrelated subjects; where the value of the `valueUrl` property for one cell matches the value of the `aboutUrl` property for another cell in the same row
+#
+# determine the unique subjects for the current row - including a default subject if `aboutUrl` is unspecified for any cells in the row
+# for each unique subject `S` (including default subject) in the row:
+# i) create object `O`
+# ii) if the subject identity has been specified using the `aboutUrl` property a name-value pair is inserted into object `O`: `"@id": "[_value_]"`, where [_value_] is the value of the `aboutUrl` property 
+# iii) each cell referring to the current subject is then processed sequentially in turn according to the order of the columns (e.g. `1` to `n`)
+# iv) for each cell referring to the current subject, if the value of the `suppressOutput` property from the column associated with the current cell is not `true`, then insert a name value pair (name `N`, value `V`) into object `O`
+# iv.a) the name `N` is determined from the `propertyUrl` property: 
+# 		if a default property is used (e.g. the `propertyUrl` is a concatenation of the CSV+ file URL, `#` [unicode-ref] character and the value of 
+#		... the `name` property from the column associated with the current cell) then only the fragment identifier of the value of `propertyUrl` is used [this is to create 'cleaner' output]
+#		else the full value of `propertyUrl` is used
+#
+# iv.b) the value `V` is detemined according to the `valueUrl` property:
+#		if the `valueUrl` property has been specified for the current cell, then the value of `valueUrl` is assigned to value `V`, expressed as a `string`; 
+# 		else value `V` is derived from the value of the current cell according to section [REF] below
+#
+# for each identified subject `S` described by the row (e.g. determined from the `aboutUrl` property):
+# i) recurse through the name-value pairs in each of the objects created for the row to determine if the subject `S` is referenced (excluding name-value pairs where name `N` is equal to "@id");
+#		if subject `S` is referenced once and only once, the object associated with that subject shall replace the reference as the value in the name-value pair creating a nested object
+#		else the object associated with subject `S` remains a top-level object
+# top-level objects, potentially including nested objects, are inserted into array `A` 
+#
+## processing cell values
+# processing of cell values assumes that no errors were encountered during the parsing of the cell-values; any such errors will be listed in the cell's `error` annotation
+# -- null values --
+# where the value of the cell is null, no name-value pair SHALL be included in the JSON output for that cell
+# -- sequences of values --
+# where the value of the cell is sequence of values, the value `V` of the name-value pair SHALL be an array comprising the sequence of values from the cell
+# each value from the sequence will be expressed according to the `datatype` property of the cell 
+# given that arrays in JSON are implicitly ordered, the value of the `ordered` property has no effect on the output
+
+# >> PROBABLY BETTER EXPRESSED AS A TABLE <<
+# DATATYPES
+# -- strings --
+# if the value of property `datatype` for the cell is `string`, or the property `datatype` has not been set, then the value inserted into the JSON output will be expressed as a `string`
+# language tags have no effect on JSON output
+# -- numbers --
+# where the value of the property `datatype` for the cell is one of the list below, the value of the cell inserted into the JSON output will be expressed as a number
+# [list]
+# where the value of the property `datatype` for the cell is `boolean`, the value of the cell inserted into the JSON output will be the boolean value from the cell value (`true` or `false`) 
+# -- dates, times and date-times --
+# where the value of the property `datatype` for the cell is one of the list below, the value for the cell inserted into the JSON output will be expressed as a `string` as JSON does not natively support dates, times and date-times
+# [list]
+# -- structured datatypes --
+# where the value of the property `datatype` for the cell is `xml`, `html` or `json`, the value for the cell inserted into the JSON output will be expressed as a `string`
+
+# ---
+
+# note that output for table `Ta` ({ "url": "http://example.org/conf/professions.csv" }) is not included due to table annotation { "suppressOutput": true }
+# # note that prefixes defined in [RDFa 1.1 Initial Context] are not expanded; e.g. `dc:` for <http://purl.org/dc/terms/>
+# note that column `Cb5` ({ "name": "reportsTo" }) uses the `aboutUrl`, `propertyUrl` and `valueUrl` to assert the relationship between the given senior post and the post it reports to
+# ... however, the senior posts are described on different rows within table `Tb` so it is not possible to create nested tables
+# note that cell `Cb2.5` (table `Tb`, row `Rb2`; column `Cb5`, { "name": "reportsTo" }) is `null` (empty) - no triple is generated in the output
+# note that the `aboutUrl` property has not been set for cells in table `Tc` ({ "url": "http://example.org/junior-roles.csv"}) - the rows in table `Tc` are deemed to describe a _default_ subject
+# note that column `Cc1` ({ "name": "reportsToSenior" }) uses the `propertyUrl` and `valueUrl` to assert the relationship between the given junior post and the senior post it reports to
+# ... however, senior posts and junior posts are described in different tables so it is not possible to create nested tables
+# note that column `Cc3` ({ "name": "min-pay" }) has been declared as holding integer values ({ "datatype": "integer" }) - the output is expressed as a number
+# note that column `Cc4` ({ "name": "max-pay" }) has been declared as holding integer values ({ "datatype": "integer" }) - the output is expressed as a number
+# note that column `Cc6` ({ "name": "number" }) has been declared as holding number values ({ "datatype": "number" }) - the output is expressed as a number
+
+[{
+	"@id": "http://example.org/senior-roles.csv#post-90115",
+	"dc:identifier": "90115",
+	"foaf:name": "Steve Egan",
+	"http://example.org/def/grade": "SCS1A",
+	"http://example.org/def/job": "Deputy Chief Executive",
+	"http://example.org/def/reportsTo": "http://example.org/senior-roles.csv#post-90334",
+	"http://example.org/def/profession": "Finance"
+}, {
+	"@id": "http://example.org/senior-roles.csv#post-90334",
+	"dc:identifier": "90334",
+	"foaf:name": "Sir Alan Langlands",
+	"http://example.org/def/grade": "SCS4",
+	"http://example.org/def/job": "Chief Executive",
+	"http://example.org/def/profession": "Policy"
+}, {
+	"http://example.org/def/reportsTo": "http://example.org/senior-roles.csv#post-90115",
+	"http://example.org/def/grade": "4",
+	"http://example.org/def/min-pay": 17426,
+	"http://example.org/def/max-pay": 20002,
+	"http://example.org/def/job": "Administrator",
+	"http://example.org/def/number-of-posts": 8.67,
+	"http://example.org/def/profession": "Operational Delivery"
+}, {
+	"http://example.org/def/reportsTo": "http://example.org/senior-roles.csv#post-90115",
+	"http://example.org/def/grade": "5",
+	"http://example.org/def/min-pay": 19546,
+	"http://example.org/def/max-pay": 22478,
+	"http://example.org/def/job": "Administrator",
+	"http://example.org/def/number-of-posts": 0.5,
+	"http://example.org/def/profession": "Operational Delivery"
+}]

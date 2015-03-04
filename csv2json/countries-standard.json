@@ -1,0 +1,120 @@
+# >> BE CONSISTENT WITH USE OF 'ANNOTATION' AND 'PROPERTY' ... PREFER PROPERTY
+
+# MINIMAL mode JSON output comprises an array of objects that serialise the information from the cells of the CSV+ file only
+# in contrast, STANDARD mode JSON output frames the information from the CSV+ cells with details of the rows, tables and, optionally, table groups within which that information is provided 
+#
+# -- IN MINIMAL MODE --
+# i) create an array `A` within which the sequence of objects described by the table are inserted
+#
+# -- IN STANDARD MODE --
+# >> TABLE GROUPS <<
+#
+# -- IN STANDARD MODE --
+# for each table:
+# i) create an object `OT` to represent the table
+# ii) if the table has been explicitly identified using the `@id` property, then a name-value pair is inserted into object `OT`: `"@id": "[_value_]"`, where [_value_] is the value of the table's `@id` property
+# iii) insert a name-value pair into object `OT` indicating the URL of the source CSV+ file: `"url": "[_URL_]"`, where [_URL_] is the URL of the source CSV+ file
+# iv) insert `notes` and common properties, if specified, into object `OT` - there are copied verbatim from the metadata description; prefixes defined in [RDFa 1.1 Initial Context] are not expanded
+# ... note that all other table annotations are ignored; including information about table schema and columns defined therein, dialects, primaryKeys etc.
+# v) insert a name-value pair into object `OT` which has name `"rows"` and whose value is an empty array `AT` into which objects that describe each of the table's rows will be inserted
+#
+# -- IN ALL MODES --
+# each row within the table is processed sequentially in order
+# for each row:
+#
+# -- IN STANDARD MODE --
+# i) insert an object `OR` into array `AT` 
+# ii) insert a name-value pair into object `OR` specifying the row number of the current row: `"rownum": [_rowrum_]`, where [_rowrum_] is the number of the current row   
+# iii) insert a name-value pair into object `OR` identifying the source row in the CSV+ file (using a fragment identifier for the row as specified in [RFC 7111]): `"url"`: "[_URL_]#[_sourcenum_]"`, where [_URL_] is the URL of the source CSV+ file and [_sourcenum_] is the row number within the CSV+ file
+# iv) insert a name-value pair into object `OR` which has name `"describes"` and whose value is an empty array `A` into which the sequence of objects described by the row will be inserted
+#
+# -- IN ALL MODES --
+# the subject(s) described by each row are determined according to the `aboutUrl` property for each cell in the current row; where `aboutUrl` is undefined, a default subject for the row is used
+# ... noting that a row MAY describe multiple interrelated subjects; where the value of the `valueUrl` property for one cell matches the value of the `aboutUrl` property for another cell in the same row
+# i) determine the unique subjects for the current row - including a default subject if `aboutUrl` is unspecified for any cells in the row
+# ii) for each unique subject `S` (including default subject) in the row:
+# ii.a) create an object `O`
+# ii.b) if the subject identity has been specified using the `aboutUrl` property, then a name-value pair is inserted into object `O`: `"@id": "[_value_]"`, where [_value_] is the value of the `aboutUrl` property 
+# ii.c) each cell referring to the current subject is then processed sequentially in turn according to the order of the columns (e.g. `1` to `n`)
+# ii.d) for each cell referring to the current subject, if the value of the `suppressOutput` property from the column associated with the current cell is not `true`, then insert a name value pair (name `N`, value `V`) into object `O`
+# ii.d.a) the name `N` is determined from the `propertyUrl` property: 
+# 		if a default property is used (e.g. the `propertyUrl` is a concatenation of the CSV+ file URL, `#` [unicode-ref] character and the value of 
+#		... the `name` property from the column associated with the current cell) then only the fragment identifier of the value of `propertyUrl` is used [this is to create 'cleaner' output]
+#		else the full value of `propertyUrl` is used
+# ii.d.b) the value `V` is detemined according to the `valueUrl` property:
+#		if the `valueUrl` property has been specified for the current cell, then the value of `valueUrl` is assigned to value `V`, expressed as a `string`; 
+# 		else value `V` is derived from the value of the current cell according to section [REF] below
+# iii) for each identified subject `S` described by the current row (e.g. determined from the `aboutUrl` property):
+# iii.a) recurse through the name-value pairs in each of the objects created for the row to determine if the subject `S` is referenced (excluding name-value pairs where name `N` is equal to "@id");
+#		if subject `S` is referenced once and only once, the object associated with that subject shall replace the reference as the value in the name-value pair creating a nested object
+#		else the object associated with subject `S` remains a top-level object
+# iv) insert top-level objects, potentially including nested objects, into array `A` 
+#
+# -- PROCESSING CELL VALUES --
+# -- null values --
+# where the value of the cell is null, no name-value pair SHALL be included in the JSON output for that cell
+# -- sequences of values --
+# where the value of the cell is sequence of values, the value `V` of the name-value pair SHALL be an array comprising the sequence of values from the cell
+# each value from the sequence will be expressed according to the `datatype` property of the cell 
+# given that arrays in JSON are implicitly ordered, the value of the `ordered` property has no effect on the output
+# -- typed values -- 
+# cell values are expressed according to the `datatype` property (section [REF] refers)
+# in the event that the `datatype` property is not specified for a cell, then the cell value will be expressed as a `string`
+
+# >> PROBABLY BETTER EXPRESSED AS A TABLE <<
+# DATATYPES
+# expression of typed values from cells assumes that no errors were encountered during the parsing of those cell-values; any such errors will be listed in the cell's `error` annotation
+# response to the occurence of errors is implementation dependent
+# -- strings --
+# if the value of property `datatype` for the cell is `string`, or the property `datatype` has not been set, then the value inserted into the JSON output will be expressed as a `string`
+# language tags have no effect on JSON output
+# -- numbers --
+# where the value of the property `datatype` for the cell is one of the list below, the value of the cell inserted into the JSON output will be expressed as a number
+# [list]
+# where the value of the property `datatype` for the cell is `boolean`, the value of the cell inserted into the JSON output will be the boolean value from the cell value (`true` or `false`) 
+# -- dates, times and date-times --
+# where the value of the property `datatype` for the cell is one of the list below, the value for the cell inserted into the JSON output will be expressed as a `string` as JSON does not natively support dates, times and date-times
+# [list]
+# -- structured datatypes --
+# where the value of the property `datatype` for the cell is `xml`, `html` or `json`, the value for the cell inserted into the JSON output will be expressed as a `string`
+
+# ---
+
+# note that for cells in table `T` ({ "url": "http://example.org/countries.csv"})  the `aboutUrl` property has not been set - 
+# ... therefore each row describes a single subject and only one object is created for each row
+
+{
+	"table": [{
+		"url": "http://example.org/countries.csv",
+		"row": [{
+			"rownum": 1,
+			"url": "http://example.org/countries.csv#row=2",
+			"describes": [{ 
+				"countryCode": "AD", 
+				"latitude": "42.546245", 
+				"longitude": "1.601554", 
+				"name": "Andorra" 
+			}]
+		}, {
+			"rownum": 2,
+			"url": "http://example.org/countries.csv#row=3",
+			"describes": [{ 
+				"countryCode": "AE", 
+				"latitude": "23.424076", 
+				"longitude": "53.847818", 
+				"name": "United Arab Emirates"
+			}]
+		}, {
+			"rownum": 3,
+			"url": "http://example.org/countries.csv#row=4",
+			"describes": [{  
+				"countryCode": "AF", 
+				"latitude": "33.93911", 
+				"longitude": "67.709953", 
+				"name": "Afghanistan" 
+			}]
+		}]
+	}]
+}
+
+

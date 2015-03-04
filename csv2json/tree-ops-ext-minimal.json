@@ -1,0 +1,100 @@
+# >> BE CONSISTENT WITH USE OF 'ANNOTATION' AND 'PROPERTY' ... PREFER PROPERTY
+
+# minimal mode does not contain any information about the table; only information gleaned from the cells of the table
+
+# in minimal mode JSON output comprises an array of objects `A`
+# each row is processed sequentially in turn
+# the subject(s) described by each row are determined according to the `aboutUrl` property for each cell in the current row; where `aboutUrl` is undefined, a default subject for the row is used
+# for each unique subject (including default subject) in the row:
+# i) an object `O` is inserted into array `A`
+# ii) if the subject identity has been specified using the `aboutUrl` property a name-value pair is inserted into object `O`: `"@id": "[_value_]"`, where [_value_] is the value of the `aboutUrl` property 
+# iii) each cell referring to the current subject is then processed sequentially in turn according to the order of the columns (e.g. `1` to `n`)
+# iv) for each cell referring to the current subject, if the value of the `suppressOutput` property from the column associated with the current cell is not `true`, then:
+# iv.a) a name value pair (name `N`, value `V`) is into object `O`
+# iv.b) the name `N` is determined from the `propertyUrl`: 
+# 			if a default property is used (e.g. the `propertyUrl` is a concatenation of the CSV+ file URL, `#` [unicode-ref] character and the value of 
+#			the `name` property from the column associated with the current cell) then only the fragment identifier of the value of `propertyUrl` is used [this is to create 'cleaner' output]
+#
+#			else the value of `propertyUrl` is used
+#
+# iv.c) the value `V` is determined according to section [REF] below.
+
+# [dealing with recursive graphs?]
+
+## processing cell values
+# processing of cell values assumes that no errors were encountered during the parsing of the cell-values; any such errors will be listed in the cell's `error` annotation
+# -- null values --
+# where the value of the cell is null, no name-value pair SHALL be included in the JSON output for that cell
+# -- sequences of values --
+# where the value of the cell is sequence of values, the value `V` of the name-value pair SHALL be an array comprising the sequence of values from the cell
+# each value from the sequence will be expressed according to the `datatype` property of the cell 
+# given that arrays in JSON are implicitly ordered, the value of the `ordered` property has no effect on the output
+
+# >> PROBABLY BETTER EXPRESSED AS A TABLE <<
+# DATATYPES
+# -- strings --
+# if the value of property `datatype` for the cell is `string`, or the property `datatype` has not been set, then the value inserted into the JSON output will be expressed as a `string`
+# language tags have no effect on JSON output
+# -- numbers --
+# where the value of the property `datatype` for the cell is one of the list below, the value of the cell inserted into the JSON output will be expressed as a number
+# [list]
+# where the value of the property `datatype` for the cell is `boolean`, the value of the cell inserted into the JSON output will be the boolean value from the cell value (`true` or `false`) 
+# -- dates, times and date-times --
+# where the value of the property `datatype` for the cell is one of the list below, the value for the cell inserted into the JSON output will be expressed as a `string` as JSON does not natively support dates, times and date-times
+# [list]
+# -- structured datatypes --
+# where the value of the property `datatype` for the cell is `xml`, `html` or `json`, the value for the cell inserted into the JSON output will be expressed as a `string`
+
+# ---
+
+# note that for cells in table `T` ({ "url": "http://example.org/tree-ops-ext.csv"}) the `aboutUrl` property has been specified
+# ... all the cells in a given row refer to the same subject therefore only one object is created for each row
+# note that output for column `C1` ({ "name": "GID" }) is not included due to column annotation { "suppressOutput": true }
+# note that column `C5` ({ "name": "dbh"}) has been declared as holding integer values ({ "datatype": "integer" }) - the output is expressed as a number
+# note that column `C6` ({ "name": "inventory_date" }) has been declared as holding date values, { "datatype": "date" } - the output is expressed as a string because JSON does not natively support date types
+# note that cells `C1.7` and `C2.7` (rows `R1` and `R2`; column `C7`, { "name": "comments" }) is `null` (empty) - no output is provided for these cells
+# note that cell `C3.7` (row `R3`; column `C7`, { "name": "comments" }) contains an unordered sequence of values; the sequence of values are expressed as an array
+# note that column `C8` ({ "name": "protected" }) has been declared as holding boolean values, { "datatype": "boolean" } - the output is expressed as a boolean type
+# note that column `C9` ({ "name": "kml" }) has been declared as holding XML content, { "datatype": "xml" } - no attempt is made to parse the XML and the cell value is expressed as a simple string
+
+[{
+  	"@id": "http://example.org/tree-ops-ext#gid-1",
+  	"on_street": "ADDISON AV",
+	"species": "Celtis australis",
+	"trim_cycle": "Large Tree Routine Prune",
+	"dbh": 11,
+	"inventory_date": "2010-10-18",
+	"protected": false,
+	"kml": "<Point><coordinates>-122.156485,37.440963</coordinates></Point>"
+}, {
+  	"@id": "http://example.org/tree-ops-ext#gid-2",
+	"on_street": "EMERSON ST",
+	"species": "Liquidambar styraciflua",
+	"trim_cycle": "Large Tree Routine Prune",
+	"dbh": 11,
+	"inventory_date": "2010-06-02",
+	"protected": false,
+	"kml": "<Point><coordinates>-122.156749,37.440958</coordinates></Point>"
+}, {
+  	"@id": "http://example.org/tree-ops-ext#gid-6",
+	"on_street": "ADDISON AV",
+	"species": "Robinia pseudoacacia",
+	"trim_cycle": "Large Tree Routine Prune",
+	"dbh": 29,
+	"inventory_date": "2010-06-01",
+	"comments": [ "cavity or decay", 
+		"trunk decay", 
+		"codominant leaders", 
+		"included bark",
+		"large leader or limb decay", 
+		"previous failure root damage", 
+		"root decay", 
+		"beware of BEES" ],
+	"protected": true,
+	"kml": "<Point><coordinates>-122.156299,37.441151</coordinates></Point>"
+}]
+
+
+
+
+
