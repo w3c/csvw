@@ -196,13 +196,13 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         <li><dfn>Data Aggregators</dfn> can use the indicated metadata, such as descriptions, titles, modification dates and licences, to enable more intelligent retrieval of relevant data on the web.</li>
       </ul>
       <p class="note">
-        Implementations may fulfil one or more of these functions. In particular, <a>Converters</a> may or may not act as a <a title="Validators">Validator</a> (perhaps through the setting of a flag), and check the data that they are converting to ensure that it is complant with the schema. If a Converter does not also act as a Validator it may produce invalid output.
+        Implementations may fulfil one or more of these functions. In particular, <a>Converters</a> may or may not act as a <a title="Validators">Validator</a> (perhaps through the setting of a flag), and check the data that they are converting to ensure that it is complant with the schema. If a Converter does not also act as a <a title="validators">Validator</a> it may produce invalid output.
       </p>
       <p>
         The <a href="http://www.w3.org/TR/tabular-data-model/">Model for Tabular Data and Metadata on the Web</a> specification defines an <a href="http://w3c.github.io/csvw/syntax/#annotated-tabular-data-model">Annotated Tabular Data Model</a> in which tables, columns, rows and cells can be annotated with annotations, and a <a href="http://w3c.github.io/csvw/syntax/#grouped-tabular-data-model">Grouped Tabular Data Model</a> in which a group of tables is annotated. That specification also describes <a href="http://w3c.github.io/csvw/syntax/#locating-metadata">how to locate metadata</a> about a given CSV file.
       </p>
       <p>
-        This document defines the format and structure of metadata documents, and how these are interpreted to create an Annotated Tabular Data Model. It also defines how to validate tabular data based on some of these annotations. The metadata format is based on a dialect of [[!JSON-LD]] as defined in <a href="#json-ld-dialect" class="sectionRef"></a>. This metadata can be expressed as an RDF graph. However, all applications that conform to this specification (including validators and applications that read or convert tabular data) MUST read the JSON-based format described in this document.
+        This document defines the format and structure of metadata documents, and how these are interpreted to create an Annotated Tabular Data Model. It also defines how to validate tabular data based on some of these annotations. The metadata format is based on a dialect of [[!JSON-LD]] as defined in <a href="#json-ld-dialect" class="sectionRef"></a>. This metadata can be expressed as an RDF graph. However, all applications that conform to this specification (including <a>validators</a> and applications that read or convert tabular data) MUST read the JSON-based format described in this document.
       </p>
     </section>
     <section>
@@ -596,7 +596,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         <p class="note">
           Forbidding the declaration of new prefixes ensures consistent processing between JSON-LD-aware and non-JSON-LD-aware processors.
         </p>
-        <section>
+        <section class="informative">
           <h3>Examples</h3>
           <p>The following are examples of how common properties are normalized as described in <a href="#json-ld-normalization" class="sectionRef"></a>. In this example, a simple string is used as the title for a <a href="http://w3c.github.io/csvw/syntax/#dfn-table" class="externalDFN">table</a>.</p>
           <pre class="example highlight" title="Giving a title to a Table">
@@ -970,7 +970,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             The conversion specification MAY contain any <a title="common property">common properties</a> to provide extra metadata about the transformation.
           </p>
         </section>
-        <section>
+        <section class="informative">
           <h4>Example</h4>
           <p>
             The following conversion specification will enable a processor that supports it to generate an iCalendar document using a <a href="https://mustache.github.io/">Mustache template</a> based on the JSON created from the simple mapping to JSON.
@@ -1009,17 +1009,17 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <ol class="algorithm">
               <li>if the column descriptions at the same index within <code>A</code> and <code>B</code> have the same <a href="#column-name"><code>name</code></a>, the column description from <code>B</code> is <a>merged</a> into the matching column description in A</li>
               <li>otherwise, if the column descriptions at the same index within <code>A</code> and <code>B</code> have matching <a href="#column-title"><code>title</code></a>s (both titles are the same and either they both have the same language or one of them has an undefined language (<code>und</code>)), the column description from <code>B</code> is <a>merged</a> into the matching column description in <code>A</code></li>
-              <li>otherwise, if there are column descriptions at the same index within <code>A</code> and <code>B</code>, a validator MUST generate an error</li>
+              <li>otherwise, if there are column descriptions at the same index within <code>A</code> and <code>B</code>, <a>validators</a> and <a>converters</a> MUST generate an error</li>
               <li>otherwise, if at a given index there is no column description within A, but there is a column description within <code>B</code>, then:
                 <ol class="algorithm">
                   <li>if the <a href="#column-virtual"><code>virtual</code></a> property of the column description in <code>B</code> is <code>true</code>, then the column description is appended to <code>A</code></li>
-                  <li>otherwise, a validator MUST generate an error</li>
+                  <li>otherwise, <a>validators</a> and <a>converters</a> MUST generate an error</li>
                 </ol>
               </li>
               <li>otherwise, if at a given index there is no column description within B, but there is a column description within <code>A</code>, then:
                 <ol class="algorithm">
                   <li>if the <a href="#column-virtual"><code>virtual</code></a> property of the column description in <code>A</code> is <code>true</code>, then the column description is retained</li>
-                  <li>otherwise, a validator MUST generate an error</li>
+                  <li>otherwise, <a>validators</a> and <a>converters</a> MUST generate an error</li>
                 </ol>
               </li>
             </ol>
@@ -1163,7 +1163,7 @@ AF,1962,9989846
 }
             </pre>
             <p>
-              When the population data in <code>country_slice.csv</code> is validated, the validator must check that every <code>countryRef</code> within <code>country_slice.csv</code> has a matching <code>countryCode</code> within <code>countries.csv</code>.
+              When the population data in <code>country_slice.csv</code> is validated, the <a title="validators">validator</a> must check that every <code>countryRef</code> within <code>country_slice.csv</code> has a matching <code>countryCode</code> within <code>countries.csv</code>.
             </p>
           </section>
           <section>
@@ -1255,7 +1255,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
 }
             </pre>
             <p>
-              In the first line of <code>HEFCE_organogram_junior_data_31032011.csv</code>, the <code>reportsTo</code> (<code>Reporting Senior Post</code>) column contains the value <code>90284</code>. When validating that file, a validator will check that there is a single row within the table generated from <code>HEFCE_organogram_senior_data_31032011.csv</code> whose <code>ref</code> column contains the value <code>90284</code>.
+              In the first line of <code>HEFCE_organogram_junior_data_31032011.csv</code>, the <code>reportsTo</code> (<code>Reporting Senior Post</code>) column contains the value <code>90284</code>. When validating that file, <a>validators</a> will check that there is a single row within the table generated from <code>HEFCE_organogram_senior_data_31032011.csv</code> whose <code>ref</code> column contains the value <code>90284</code>.
             </p>
           </section>
           <section>
@@ -1316,7 +1316,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
                 For ease of reference within <a title="URI template property">URI template properties</a>, column names MUST consist only of alphanumeric characters, underscores, or <code>"."</code> (matching <code>[a-zA-Z0-9][a-zA-Z0-9_\.]*</code>). Names beginning with <code>"_"</code> are reserved by this specification and MUST NOT be used.
               </p>
               <p>
-                During validation, if there is no <code>title</code> property and the column already has a <code>title</code> annotation then a validator MUST issue a warning if the existing <code>title</code> annotation does not match the <code>name</code> specified in the column description.
+                During validation, if there is no <code>title</code> property and the column already has a <code>title</code> annotation then <a>validators</a> MUST issue a warning if the existing <code>title</code> annotation does not match the <code>name</code> specified in the column description.
               </p>
             </dd>
             <dt id="column-title"><code>title</code></dt>
@@ -2008,6 +2008,30 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
         <li>If the property is a <a>common property</a>, the result is an array containing values from <code>A</code> followed by values from <code>B</code>.</li>
         <li>Otherwise, the value from <code>A</code> overrides that from <code>B</code>.</li>
       </ul>
+      <section>
+        <h3>JSON-LD Normalization</h3>
+        <p>Content included in metadata documents within <a title="common property">common properties</a> and <a href="#table-nodes"><code>notes</code></a> is partially affected by the <code>@context</code> defined for the metadata document, as well as the location of the metadata document (see <a href="#top-level-properties" class="sectionRef"></a>). During the <a title="merged">merge process</a>, the <code>@context</code> may change, so certain normalization of these properties is necessary to ensure that their meaning remains the same even after an update to <code>@context</code>.</p>
+        <p>After merging metadata documents, the <a>default language</a> and <a>base URL</a> of the merged metadata may be different than that of either pre-merged metadata document. This algorithm creates a normalized form for property values which is independent of both <a>default language</a> and <a>base URL</a>. The process turns <a href="http://www.w3.org/TR/json-ld/#dfn-string" class="externalDFN">string</a> values into a <a href="http://www.w3.org/TR/json-ld/#dfn-value-object" class="externalDFN">value object</a> making the language of the string invariant, and ensures that all relative URLs are made absolute.</p>
+        <p>To normalize the <em>value</em> of a property:</p>
+        <ol class="algorithm">
+          <li>If <em>value</em> is an array, replace <em>value</em> with a new array constructed by replacing each element of the array with a new element which is the result of running this algorithm on that element.</li>
+          <li>If <em>value</em> is a <a href="http://www.w3.org/TR/json-ld/#dfn-string" class="externalDFN">string</a>, replace <em>value</em> with a new <a href="http://www.w3.org/TR/json-ld/#dfn-value-object" class="externalDFN">value object</a> constructed using <em>value</em> as the value of <code>@value</code>. If <a>default language</a> is specified, use it as the value of <code>@language</code>.</li>
+          <li>If <em>value</em> is a <a href="http://www.w3.org/TR/json-ld/#dfn-value-object" class="externalDFN">value object</a>, <em>value</em> is already in normalized form and no further processing is necessary. If <em>value</em> is not valid according to <cite><a href="http://www.w3.org/TR/json-ld/#value-objects">Value Objects</a></cite> in [[!JSON-LD]], a processor MUST raise an error.</li>
+          <li>If <em>value</em> is a <a href="http://www.w3.org/TR/json-ld/#dfn-list-object" class="externalDFN">list object</a> or <a href="http://www.w3.org/TR/json-ld/#dfn-set-object" class="externalDFN">set object</a> (i.e., an object containing <code>@list</code> or <code>@set</code>), <em>value</em> is not allowed in this dialect and a processor MUST raise an error.</li>
+          <li>If <em>value</em> is an <a href="http://www.w3.org/TR/json-ld/#dfn-node-object" class="externalDFN">node object</a> (i.e., any other JSON object), replace with a new object containing all the keys <em>k</em> from <em>value</em> with values <em>v</em> construct as follows:
+            <ol class="algorithm">
+              <li>If <em>k</em> is <code>@id</code>, <em>v</em> MUST be a string representing an absolute- or relative-URL. Replace <em>v</em> with the result of expanding <em>v</em> against the <a>base URL</a>, otherwise, <a>validators</a> and <a>converters</a> MUST raise an error.</li>
+              <li>If <em>k</em> is <code>@type</code>, <em>v</em> MUST be either a string or an array of strings either in the form of a <a href="http://www.w3.org/TR/json-ld/#dfn-compact-iri" class="externalDFN">prefixed name</a> where the prefix is a <a href="http://www.w3.org/TR/json-ld/#dfn-term" class="externalDFN">term</a> defined in the JSON-LD context, or an absolute URL; <em>value</em> is already in normalized form and no further processing is necessary. If <em>v</em> or any element of <em>v</em> is not in this form, a processor MUST raise an error.
+              <li>If <em>k</em> is any other <a href="http://www.w3.org/TR/json-ld-api/#dfn-keyword" class="externalDFN">JSON-LD keyword</a>, the <em>k</em> is not allowed in this dialect and a processor MUST raise an error.</li>
+              <li>If <em>k</em> is not a <a href="http://www.w3.org/TR/json-ld/#dfn-compact-iri" class="externalDFN">prefixed name</a> where the prefix is a <a href="http://www.w3.org/TR/json-ld/#dfn-term" class="externalDFN">term</a> defined in the JSON-LD context, or an absolute URL; a processor MUST raise an error.</li>
+              <li>Otherwise, the <em>v</em> is expanded using this algorithm.</li>
+            </ol>
+          </li>
+          <li>Otherwise, <em>value</em> is already in normalized form and no further processing is necessary.</li>
+        </ol>
+      </section>
+      <section class="informative">
+        <h3>Example</h3>
       <p>For example, consider the following two Metadata documents to be merged (located at <code>http://example.com/metadata.json</code> and <code>http://example.com/doc1.csv-metadata.json</code>):</p>
       <pre class="example highlight" title="Metadata A to be merged">
 {
@@ -2195,6 +2219,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
 }
       </pre>
     </section>
+    </section>
     <section>
       <h2>Security Considerations</h2>
       <p>
@@ -2223,28 +2248,6 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           </ul>
         </li>
       </ul>
-      <section>
-        <h3>JSON-LD Normalization</h3>
-        <p>Content included in metadata documents within <a title="common property">common properties</a> and <a href="#table-nodes"><code>notes</code></a> is partially affected by the <code>@context</code> defined for the metadata document, as well as the location of the metadata document (see <a href="#top-level-properties" class="sectionRef"></a>). During the <a title="merged">merge process</a>, the <code>@context</code> may change, so certain normalization of these properties is necessary to ensure that their meaning remains the same even after an update to <code>@context</code>.</p>
-        <p>After merging metadata documents, the <a>default language</a> and <a>base URL</a> of the merged metadata may be different than that of either pre-merged metadata document. This algorithm creates a normalized form for property values which is independent of both <a>default language</a> and <a>base URL</a>. The process turns <a href="http://www.w3.org/TR/json-ld/#dfn-string" class="externalDFN">string</a> values into a <a href="http://www.w3.org/TR/json-ld/#dfn-value-object" class="externalDFN">value object</a> making the language of the string invariant, and ensures that all relative URLs are made absolute.</p>
-        <p>To normalize the <em>value</em> of a property:</p>
-        <ol class="algorithm">
-          <li>If <em>value</em> is an array, replace <em>value</em> with a new array constructed by replacing each element of the array with a new element which is the result of running this algorithm on that element.</li>
-          <li>If <em>value</em> is a <a href="http://www.w3.org/TR/json-ld/#dfn-string" class="externalDFN">string</a>, replace <em>value</em> with a new <a href="http://www.w3.org/TR/json-ld/#dfn-value-object" class="externalDFN">value object</a> constructed using <em>value</em> as the value of <code>@value</code>. If <a>default language</a> is specified, use it as the value of <code>@language</code>.</li>
-          <li>If <em>value</em> is a <a href="http://www.w3.org/TR/json-ld/#dfn-value-object" class="externalDFN">value object</a>, <em>value</em> is already in normalized form and no further processing is necessary. If <em>value</em> is not valid according to <cite><a href="http://www.w3.org/TR/json-ld/#value-objects">Value Objects</a></cite> in [[!JSON-LD]], a validator MUST issue a warning.</li>
-          <li>If <em>value</em> is a <a href="http://www.w3.org/TR/json-ld/#dfn-list-object" class="externalDFN">list object</a> or <a href="http://www.w3.org/TR/json-ld/#dfn-set-object" class="externalDFN">set object</a> (i.e., an object containing <code>@list</code> or <code>@set</code>), <em>value</em> is not allowed in this dialect and a validator MUST issue a warning and replace <em>value</em> with <code>null</code>.</li>
-          <li>If <em>value</em> is an <a href="http://www.w3.org/TR/json-ld/#dfn-node-object" class="externalDFN">node object</a> (i.e., any other JSON object), replace with a new object containing all the keys <em>k</em> from <em>value</em> with values <em>v</em> construct as follows:
-            <ol class="algorithm">
-              <li>If <em>k</em> is <code>@id</code>, <em>v</em> MUST be a string representing an absolute- or relative-URL. Replace <em>v</em> with the result of expanding <em>v</em> against the <a>base URL</a>.</li>
-              <li>If <em>k</em> is <code>@type</code>, <em>v</em> MUST be either a string or an array of strings either in the form of a <a href="http://www.w3.org/TR/json-ld/#dfn-compact-iri" class="externalDFN">prefixed name</a> where the prefix is a <a href="http://www.w3.org/TR/json-ld/#dfn-term" class="externalDFN">term</a> defined in the JSON-LD context, or an absolute URL; <em>value</em> is already in normalized form and no further processing is necessary. If <em>v</em> or any element of <em>v</em> is not in this form, a validator MUST issue a warning.
-              <li>If <em>k</em> is any other <a href="http://www.w3.org/TR/json-ld-api/#dfn-keyword" class="externalDFN">JSON-LD keyword</a>, the <em>k</em> is not allowed in this dialect and a validator MUST issue a warning. As <em>value</em> cannot be further processed it is used as is.</li>
-              <li>If <em>k</em> is not a <a href="http://www.w3.org/TR/json-ld/#dfn-compact-iri" class="externalDFN">prefixed name</a> where the prefix is a <a href="http://www.w3.org/TR/json-ld/#dfn-term" class="externalDFN">term</a> defined in the JSON-LD context, or an absolute URL; both <em>k</em> and <em>v</em> MUST be eliminated from the new object and a validator MUST issue a warning.</li>
-              <li>Otherwise, the <em>v</em> is expanded using this algorithm.</li>
-            </ol>
-          </li>
-          <li>Otherwise, <em>value</em> is already in normalized form and no further processing is necessary.</li>
-        </ol>
-      </section>
     </section>
     <section class="appendix">
       <h2>Acknowledgements</h2>
