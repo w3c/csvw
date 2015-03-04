@@ -58,7 +58,7 @@ var respecConfig = {
           "publisher" : "IETF",
           "href" : "http://www.ietf.org/rfc/rfc6570.txt"
       },
-      "json" : {
+      "RFC7159" : {
           "authors" : [
             "T. Bray",
           ],
@@ -149,7 +149,7 @@ var respecConfig = {
 
     <section id="intro">
       <h2>Introduction</h2>
-      <p>This document describes the processing of <a href="http://www.w3.org/TR/tabular-data-model/#dfn-tabular-data">tabular data</a> to create a set of nested objects referred to as the <dfn title="output graph"> output graph</dfn>. The <a title="output graph">output graph</a> SHALL be serialized as JSON [[!json]].</p>
+      <p>This document describes the processing of <a href="http://www.w3.org/TR/tabular-data-model/#dfn-tabular-data">tabular data</a> to create a set of nested objects referred to as the <dfn title="output graph"> output graph</dfn>. The <a title="output graph">output graph</a> SHALL be serialized as JSON [[!RFC7159]].</p>
 
       <p class="note">The JSON encoding is intended for web developers who need not care about the complexities of RDF [[!rdf11-concepts]].</p>
 
@@ -176,6 +176,149 @@ var respecConfig = {
 
     <section id="conformance">
       <p><a href="http://www.w3.org/TR/tabular-data-model/#dfn-tabular-data" class="externalDFN">Tabular data</a> MUST conform to the description from [[!tabular-data-model]]. In particular note that each <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row" class="externalDFN">row</a> MUST contain the same number of <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell" class="externalDFN">cells</a> (although some of these <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell" class="externalDFN">cells</a> may be empty). Given this constraint, not all CSV-encoded data can be considered to be tabular data. As such, the conversion proceduredescribed in this specification cannot be applied to all CSV files.</p>
+    </section>
+
+    <section id="conversion">
+      <h2>Converting Tabular Data to JSON</h2>
+
+      <p>The procedures for converting <a href="http://www.w3.org/TR/tabular-data-model/#dfn-tabular-data" class="externalDFN">tabular data</a> into JSON are described below for both <a title="standard mode">standard</a> and <a title="minimal mode">minimal</a> modes.</p>
+
+      <section id="algorithm-terms">
+        <h3>Algorithm terms</h3>
+        <dl>
+          <dt><dfn>aboutUrl</dfn></dt>
+          <dd>The <a>aboutUrl</a> is the evaluation of the <code>aboutUrl</code> property of the current <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell" class="externalDFN">cell</a> as defined in <cite><a href="http://www.w3.org/TR/tabular-metadata/#dfn-uri-template-property">URI template properties</a></cite> in [[!tabular-metadata]].</dd>
+
+          <dt><dfn>annotated table</dfn></dt>
+          <dd>The <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-table" class="externalDFN">annotated table</a> is defined in [[!tabular-data-model]] as describing a particular <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table-description" class="externalDFN">table</a> and its metadata.</dd>
+
+          <dt><dfn>array</dfn></dt>
+          <dd>An <a>array</a> is defined in [[!RFC7159]] as an ordered sequence of zero or more values, where a value is a string, number, boolean, null, <a>object</a>, or <a>array</a>.</dd>
+
+          <dt><dfn>cell</dfn></dt>
+          <dd>A <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell" class="externalDFN">cell</a> is defined in [[!tabular-data-model]] as the intersection of a <a>row</a> and a <a>column</a> within a <a title="annotated table">table</a>.</dd>
+
+          <dt><dfn>cell errors</dfn></dt>
+          <dd><a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-errors" class="externalDFN">Cell errors</a> are defined in [[!tabular-data-model]] as a (possibly empty) list of validation errors generated while parsing the literal content of a <a>cell</a> to generate the <a title="cell value">semantic value</a>.</dd>
+
+          <dt><dfn>cell value</dfn></dt>
+          <dd>A <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">cell value</a> is defined in [[!tabular-data-model]] as the semantic value of the <a>cell</a>; this MAY be <code>null</code> or, the event that the <a>cell</a> specifies a <a href="http://www.w3.org/TR/tabular-metadata/#cell-separator"><code>separator</code></a> property, a sequence of values.</dd>
+
+          <dt><dfn>column</dfn></dt>
+          <dd>A <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column" class="externalDFN">column</a> is defined in [[!tabular-data-model]] as a vertical arrangement of <a title="cell">cells</a> within a <a title="annotated table">table</a>.</dd>
+
+          <dt><dfn>common properties</dfn></dt>
+          <dd>The <a>common properties</a> of a metadata resource are defined in <a href="http://www.w3.org/TR/tabular-metadata/#common-properties">Section 3.3 Common Properties</a> of [[!tabular-metadata]]). The RDF values of these properties are the result of running the [[!json-ld-api]] <cite><a href="http://www.w3.org/TR/json-ld-api/#deserialize-json-ld-to-rdf-algorithm">toRdf</a></cite> algorithm over the <a>common properties</a> defined within the metadata description.</dd>
+
+          <dt><dfn>identifier</dfn></dt>
+          <dd>The identifier is the evaluation of the <code>@id</code> property for the current resource. As defined in [[!tabular-data-model]], the <a>identifier</a> is <code>null</code> if the <code>@id</code> property is undefined. The <a>identifier</a> MAY be applied to either a <a href="http://www.w3.org/TR/tabular-data-model/#dfn-group-of-tables" class="externalDFN">table group</a> or a <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-table" class="externalDFN">table</a>.</dd>
+
+          <dt><dfn>notes</dfn></dt>
+          <dd>A list of <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table-notes" class="externalDFN">notes</a>, as defined in [[!tabular-data-model]], attached to an <a title="annotated table">annotated table</a> using the <code>notes</code> property. This may be an empty list.</dd>
+
+          <dt><dfn>object</dfn></dt>
+          <dd>An <a>object</a> is defined in [[!RFC7159]] as unordered collection of zero or more name/value pairs, where a where a name is a string and a value is a string, number, boolean, null, <a>object</a>, or <a>array</a>.</dd>
+
+          <dt><dfn>propertyUrl</dfn></dt>
+          <dd>The <a>propertyUrl</a> is the evaluation of the <code>propertyUrl</code> property of the current <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell" class="externalDFN">cell</a> as defined in <cite><a href="http://www.w3.org/TR/tabular-metadata/#dfn-uri-template-property">URI template properties</a></cite> in [[!tabular-metadata]].</dd>
+
+          <dt><dfn>row</dfn></dt>
+          <dd>The <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row" class="externalDFN">row</a> is defined in [[!tabular-data-model]] as a horizontal arrangement of <a title="cell">cells</a> within a <a title="annotated table">table</a>.</dd>
+
+          <dt><dfn>row number</dfn></dt>
+          <dd>A <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row-number" class="externalDFN">row number</a> is defined in [[!tabular-data-model]] as the position of the <a>row</a> within the <a title="annotated table">table</a>, starting from 1.</dd>
+
+          <dt><dfn>row source number</dfn></dt>
+          <dd>A <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row-source-number" class="externalDFN">row source number</a> is defined in [[!tabular-data-model]] as the position of the <a>row</a> within the source CSV+ file.</dd>
+
+          <dt><dfn>subject</dfn></dt>
+          <dd>Within this algorithm, a <a>subject</a> is the resource that the value of a given <a>cell</a> refers to. This may be specified using the <a>aboutUrl</a> property.</dd>
+
+          <dt><dfn>table group</dfn></dt>
+          <dd>The <a href="http://www.w3.org/TR/tabular-data-model/#dfn-group-of-tables" class="externalDFN">table group</a> is defined in [[!tabular-data-model]] as comprising a set of <a title="annotated table">annotated tables</a> and a set of annotations that relate to those tables.</dd>
+          
+          <dt><dfn>table group description</dfn></dt>
+          <dd>The <a href="http://www.w3.org/TR/tabular-metadata/#dfn-table-group-description" class="externalDFN">table group</a> <a href="http://www.w3.org/TR/tabular-metadata/#dfn-description-object" class="externalDFN">description object</a> as defined in [[!tabular-data-model]].</dd>
+
+          <dt><dfn>valueUrl</dfn></dt>
+          <dd>The <a>valueUrl</a> is the evaluation of the <code>valueUrl</code> property of the current <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell" class="externalDFN">cell</a> as defined in <cite><a href="http://www.w3.org/TR/tabular-metadata/#dfn-uri-template-property">URI template properties</a></cite> in [[!tabular-metadata]].</dd>
+        </dl>
+      </section>
+
+      <section id="generating-rdf">
+        <h3>Generating RDF</h3>
+      </section>
+
+      <section id="datatypes">
+        <h3>Interpretting datatypes</h3>
+        <p><a title="cell value">Cell values</a> are expressed in the <a>output graph</a> according to the cell's <a href="http://www.w3.org/TR/tabular-metadata/#cell-datatype"><code>datatype</code></a> property. The relationship between the value of the <a href="http://www.w3.org/TR/tabular-metadata/#cell-datatype"><code>datatype</code></a> property and the primitive types supported by JSON (as specified in [[!RFC7159]]) is provided in the table below.</p>
+
+        <div class="note">
+          <p>Instances of JSON reserved characters within string values MUST be escaped as defined in [[!RFC7159]].</p>
+          <p>JSON has no native support for expressing language information; therefore the <a href="http://www.w3.org/TR/tabular-metadata/#cell-language"><code>lang</code></a> property has no effect on the JSON outut.</p>
+        </div>
+        
+        <div class="note">
+          <p>A cell's <a href="http://www.w3.org/TR/tabular-metadata/#datatype-format"><code>format</code></a> property is irrelevant to the conversion procedure defined in this specification; the <a>cell value</a> has already been parsed from the contents the <a>cell</a> according to the <a href="http://www.w3.org/TR/tabular-metadata/#datatype-format"><code>format</code></a> property.</p>
+          <p>Where the contents of the <a>cell</a> cannot be parsed, or other validation errors occur, <a>cell errors</a> will be provided. It is an implementation decision to determine how conversion applications should proceed in the event that <a>cell errors</a> are encountered.</p>
+        </div>
+
+        <table style="width: 100%; text-align: left">
+          <thead>
+            <tr><th><code>datetype</code></th><th>JSON primitive type</th><th>Remarks</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>number</code></td><td>number</td><td></td></tr>
+            <tr><td><code>binary</code></td><td>string</td><td><code>binary</code> is considered to be equivalent to <code>xsd:base64Binary</code></td></tr>
+            <tr><td><code>datetime</code></td><td>string</td><td></td></tr>
+            <tr><td><code>any</code></td><td>string</td><td></td></tr>
+            <tr><td><code>xml</code></td><td>string</td><td></td></tr>
+            <tr><td><code>html</code></td><td>string</td><td></td></tr>
+            <tr><td><code>json</code></td><td>string</td><td></td></tr>
+            <tr><td><code>anyAtomicType</code></td><td>string</td><td></td></tr>
+            <tr><td><code>anyURI</code></td><td>string</td><td></td></tr>
+            <tr><td><code>base64Binary</code></td><td>string</td><td></td></tr>
+            <tr><td><code>boolean</code></td><td>boolean</td><td></td></tr>
+            <tr><td><code>date</code></td><td>string</td><td></td></tr>
+            <tr><td><code>dateTime</code></td><td>string</td><td></td></tr>
+            <tr><td><code>dateTimeStamp</code></td><td>string</td><td></td></tr>
+            <tr><td><code>decimal</code></td><td>number</td><td></td></tr>
+            <tr><td><code>integer</code></td><td>number</td><td></td></tr>
+            <tr><td><code>long</code></td><td>number</td><td></td></tr>
+            <tr><td><code>int</code></td><td>number</td><td></td></tr>
+            <tr><td><code>short</code></td><td>number</td><td></td></tr>
+            <tr><td><code>byte</code></td><td>number</td><td></td></tr>
+            <tr><td><code>nonNegativeInteger</code></td><td>number</td><td></td></tr>
+            <tr><td><code>positiveInteger</code></td><td>number</td><td></td></tr>
+            <tr><td><code>unsignedLong</code></td><td>number</td><td></td></tr>
+            <tr><td><code>unsignedInt</code></td><td>number</td><td></td></tr>
+            <tr><td><code>unsignedShort</code></td><td>number</td><td></td></tr>
+            <tr><td><code>unsignedByte</code></td><td>number</td><td></td></tr>
+            <tr><td><code>nonPositiveInteger</code></td><td>number</td><td></td></tr>
+            <tr><td><code>negativeInteger</code></td><td>number</td><td></td></tr>
+            <tr><td><code>double</code></td><td>number</td><td></td></tr>
+            <tr><td><code>duration</code></td><td>string</td><td></td></tr>
+            <tr><td><code>dayTimeDuration</code></td><td>string</td><td></td></tr>
+            <tr><td><code>yearMonthDuration</code></td><td>string</td><td></td></tr>
+            <tr><td><code>float</code></td><td>number</td><td></td></tr>
+            <tr><td><code>gDay</code></td><td>string</td><td></td></tr>
+            <tr><td><code>gMonth</code></td><td>string</td><td></td></tr>
+            <tr><td><code>gMonthDay</code></td><td>string</td><td></td></tr>
+            <tr><td><code>gYear</code></td><td>string</td><td></td></tr>
+            <tr><td><code>gYearMonth</code></td><td>string</td><td></td></tr>
+            <tr><td><code>hexBinary</code></td><td>string</td><td></td></tr>
+            <tr><td><code>QName</code></td><td>string</td><td></td></tr>
+            <tr><td><code>string</code></td><td>string</td><td></td></tr>
+            <tr><td><code>normalizedString</code></td><td>string</td><td></td></tr>
+            <tr><td><code>token</code></td><td>string</td><td></td></tr>
+            <tr><td><code>langauge</code></td><td>string</td><td></td></tr>
+            <tr><td><code>Name</code></td><td>string</td><td></td></tr>
+            <tr><td><code>NCName</code></td><td>string</td></td></tr>
+            <tr><td><code>time</code></td><td>string</td><td></td></tr>
+          </tbody>
+        </table>
+      </section>
+
     </section>
 
     <section id="map-core-tab">
@@ -614,7 +757,7 @@ var respecConfig = {
               <p>The value of <em>name</em> for the <em>name/value pair</em> SHALL be provided by the 
                 <code>propertyUrl</code> metadata property within the <a title="column description object">
                 column description object</a>.</p>
-              <p>In accordance with [[!json]], all unicode characters may be used. However, the
+              <p>In accordance with [[!RFC7159]], all unicode characters may be used. However, the
                 following characters SHALL be <em>escaped</em>:</p>
               <ul>
                 <li>quotation mark; <code>"</code> (<code>U+0022</code>)</li>
