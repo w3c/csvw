@@ -1,130 +1,33 @@
-# >> BE CONSISTENT WITH USE OF 'ANNOTATION' AND 'PROPERTY' ... PREFER PROPERTY
-
-# minimal mode does not contain any information about the table; only information gleaned from the cells of the table
-
-# in minimal mode JSON output comprises an array of objects `A`
-# each row is processed sequentially in turn
-#
-# the subject(s) described by each row are determined according to the `aboutUrl` property for each cell in the current row; where `aboutUrl` is undefined, a default subject for the row is used
-# a row MAY describe multiple interrelated subjects; where the value of the `valueUrl` property for one cell matches the value of the `aboutUrl` property for another cell in the same row
-#
-# determine the unique subjects for the current row - including a default subject if `aboutUrl` is unspecified for any cells in the row
-# for each unique subject `S` (including default subject) in the row:
-# i) create object `O`
-# ii) if the subject identity has been specified using the `aboutUrl` property a name-value pair is inserted into object `O`: `"@id": "[_value_]"`, where [_value_] is the value of the `aboutUrl` property 
-# iii) each cell referring to the current subject is then processed sequentially in turn according to the order of the columns (e.g. `1` to `n`)
-# iv) for each cell referring to the current subject, if the value of the `suppressOutput` property from the column associated with the current cell is not `true`, then insert a name value pair (name `N`, value `V`) into object `O`
-# iv.a) the name `N` is determined from the `propertyUrl` property: 
-# 		if a default property is used (e.g. the `propertyUrl` is a concatenation of the CSV+ file URL, `#` [unicode-ref] character and the value of 
-#		... the `name` property from the column associated with the current cell) then only the fragment identifier of the value of `propertyUrl` is used [this is to create 'cleaner' output]
-#		else the full value of `propertyUrl` is used
-#
-# iv.b) the value `V` is detemined according to the `valueUrl` property:
-#		if the `valueUrl` property has been specified for the current cell, then the value of `valueUrl` is assigned to value `V`, expressed as a `string`; 
-# 		else value `V` is derived from the value of the current cell according to section [REF] below
-#
-# for each identified subject `S` described by the row (e.g. determined from the `aboutUrl` property):
-# i) recurse through the name-value pairs in each of the objects created for the row to determine if the subject `S` is referenced (excluding name-value pairs where name `N` is equal to "@id");
-#		if subject `S` is referenced once and only once, the object associated with that subject shall replace the reference as the value in the name-value pair creating a nested object
-#		else the object associated with subject `S` remains a top-level object
-# top-level objects, potentially including nested objects, are inserted into array `A` 
-#
-## processing cell values
-# processing of cell values assumes that no errors were encountered during the parsing of the cell-values; any such errors will be listed in the cell's `error` annotation
-# -- null values --
-# where the value of the cell is null, no name-value pair SHALL be included in the JSON output for that cell
-# -- sequences of values --
-# where the value of the cell is sequence of values, the value `V` of the name-value pair SHALL be an array comprising the sequence of values from the cell
-# each value from the sequence will be expressed according to the `datatype` property of the cell 
-# given that arrays in JSON are implicitly ordered, the value of the `ordered` property has no effect on the output
-
-# >> PROBABLY BETTER EXPRESSED AS A TABLE <<
-# DATATYPES
-# -- strings --
-# if the value of property `datatype` for the cell is `string`, or the property `datatype` has not been set, then the value inserted into the JSON output will be expressed as a `string`
-# language tags have no effect on JSON output
-# -- numbers --
-# where the value of the property `datatype` for the cell is one of the list below, the value of the cell inserted into the JSON output will be expressed as a number
-# [list]
-# where the value of the property `datatype` for the cell is `boolean`, the value of the cell inserted into the JSON output will be the boolean value from the cell value (`true` or `false`) 
-# -- dates, times and date-times --
-# where the value of the property `datatype` for the cell is one of the list below, the value for the cell inserted into the JSON output will be expressed as a `string` as JSON does not natively support dates, times and date-times
-# [list]
-# -- structured datatypes --
-# where the value of the property `datatype` for the cell is `xml`, `html` or `json`, the value for the cell inserted into the JSON output will be expressed as a `string`
-
-# ---
-
-# note that 3 resources are defined for each row within the table; event, location and offer - therefore three objects are created for each row that is processed
-# note that each column explicitly defines both `aboutUrl` and `propertyUrl` inherited properties for each of its cells
-# note that prefixes defined in [RDFa 1.1 Initial Context] are not expanded; e.g. `schema:` for <http://schema.org/>
-# note that column `C2` ({ "name": "start-date" }) has been declared as holding date-time values, { "datatype": "datetime" } - the output explicitly declares the data type
-# note that [virtual] column `C6` ({ "name": "type-event"}) defines the semantic type of the event resource: `schema:MusicEvent`
-# note that [virtual] column `C7` ({ "name": "type-place"}) defines the semantic type of the location resource: `schema:Place`  
-# note that [virtual] column `C8` ({ "name": "type-offer"}) defines the semantic type of the offer resource: `schema:Offer`  
-# note that [virtual] column `C9` ({ "name": "location"}) uses the `aboutUrl` and `valueUrl` to assert the relationship between the event and location resources; the object describing the location is nested within the object describing the event
-# note that [virtual] column `C10` ({ "name": "offer"}) uses the `aboutUrl` and `valueUrl` to assert the relationship between the event and offer resources; the object describing the offer is nested within the object describing the event
-
-# OPTION 1: USE OF RECURSION TO CREATE NESTED OBJECTS
-# ...
-
-
 [{
-  	"@id": "http://example.org/events-listing.csv#event-1",
-	"schema:name": "B.B. King",
-	"schema:startDate": "2014-04-12T19:30:00",
-	"schema:location": {
-	  	"@id": "http://example.org/events-listing.csv#place-1",
-	  	"schema:name": "Lupo’s Heartbreak Hotel",
-		"schema:address": "79 Washington St., Providence, RI"
-	},
-	"schema:offer": {
-	  	"@id": "http://example.org/events-listing.csv#offer-1",
-	  	"schema:offer": "https://www.etix.com/ticket/1771656"
-	}
+  "@id": "http://example.org/events-listing.csv#event-1",
+  "rdf:type": "schema:MusicEvent",
+  "schema:name": "B.B. King",
+  "schema:startDate": "2014-04-12T19:30:00",
+  "schema:location": {
+    "@id": "http://example.org/events-listing.csv#place-1",
+    "rdf:type": "schema:Place",
+    "schema:name": "Lupo’s Heartbreak Hotel",
+    "schema:address": "79 Washington St., Providence, RI"
+  },
+  "schema:offer": {
+    "@id": "http://example.org/events-listing.csv#offer-1",
+    "rdf:type": "schema:Offer",
+    "schema:offer": "https://www.etix.com/ticket/1771656"
+  }
 }, {
-  	"@id": "http://example.org/events-listing.csv#event-2",
-	"schema:name": "B.B. King",
-	"schema:startDate": "2014-04-13T20:00:00",
-	"schema:location": {
-	  	"@id": "http://example.org/events-listing.csv#place-2",
-	  	"schema:name": "Lynn Auditorium",
-		"schema:address": "Lynn, MA, 01901"
-	},
-	"schema:offer": {
-	  	"@id": "http://example.org/events-listing.csv#offer-2",
-	  	"schema:offer": "http://frontgatetickets.com/venue.php?id=11766"
-	}
-}]
-
-# ---
-
-# OPTION 2: SIMPLE APPROACH WITHOUT RECURSION
-# ... all objects are inserted into array `A` at top level; does not take account of the `valueUrl` property to create nested objects
-[{
-  	"@id": "http://example.org/events-listing.csv#event-1",
-	"schema:name": "B.B. King",
-	"schema:startDate": "2014-04-12T19:30:00",
-	"schema:location": "http://example.org/events-listing.csv#place-1",
-	"schema:offer": "http://example.org/events-listing.csv#offer-1"
-}, {
-  	"@id": "http://example.org/events-listing.csv#place-1",
-  	"schema:name": "Lupo’s Heartbreak Hotel",
-	"schema:address": "79 Washington St., Providence, RI"
-}, {
-  	"@id": "http://example.org/events-listing.csv#offer-1",
-  	"schema:offer": "https://www.etix.com/ticket/1771656"
-}, {
-  	"@id": "http://example.org/events-listing.csv#event-2",
-	"schema:name": "B.B. King",
-	"schema:startDate": "2014-04-13T20:00:00",
-	"schema:location": "http://example.org/events-listing.csv#place-2",
-	"schema:offer": "http://example.org/events-listing.csv#offer-2"
-}, {
-  	"@id": "http://example.org/events-listing.csv#place-2",
-  	"schema:name": "Lynn Auditorium",
-	"schema:address": "Lynn, MA, 01901"
-}, {
-  	"@id": "http://example.org/events-listing.csv#offer-2",
-  	"schema:offer": "http://frontgatetickets.com/venue.php?id=11766"
+  "@id": "http://example.org/events-listing.csv#event-2",
+  "rdf:type": "schema:MusicEvent",
+  "schema:name": "B.B. King",
+  "schema:startDate": "2014-04-13T20:00:00",
+  "schema:location": {
+    "@id": "http://example.org/events-listing.csv#place-2",
+    "rdf:type": "schema:Place",
+    "schema:name": "Lynn Auditorium",
+    "schema:address": "Lynn, MA, 01901"
+  },
+  "schema:offer": {
+    "@id": "http://example.org/events-listing.csv#offer-2",
+    "rdf:type": "schema:Offer",
+    "schema:offer": "http://frontgatetickets.com/venue.php?id=11766"
+  }
 }]
