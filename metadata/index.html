@@ -211,7 +211,6 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         The metadata defined in this specification is used to provide annotations on an <a href="http://w3c.github.io/csvw/syntax/#dfn-annotated-table" class="externalDFN">annotated table</a> or <a href="http://w3c.github.io/csvw/syntax/#dfn-group-of-tables" class="externalDFN">group of tables</a>, as defined in [[!tabular-data-model]]. Annotated tables form the basis for all further processing, such as validating, converting or displaying the tables.
       </p>
       <p>
-      <p>
         All compliant applications MUST create annotated tables based on the algorithm defined here. All compliant applications MUST generate errors if a metadata document does not conform to this specification, such as:
       </p>
       <ul>
@@ -583,7 +582,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       <section>
         <h3>Common Properties</h3>
         <p>
-          Descriptions of groups of tables, tables, schemas, columns, rows and cells MAY contain any <dfn title="common property">properties</dfn> whose names are either absolute URLs or <a href="http://www.w3.org/TR/json-ld/#dfn-compact-iri" class="externalDFN">prefixed names</a>. For example, a table description may contain <code>dc:description</code>, <code>dcat:keyword</code> or <code>schema:copyrightHolder</code> properties to provide a description, keywords or the name of the copyright holder, as defined in <a href="http://dublincore.org/documents/2010/10/11/dcmi-terms/#elements-description">Dublin Core Terms</a>, <a href="http://www.w3.org/TR/vocab-dcat/#Property:dataset_keyword">DCAT</a> or <a href="http://schema.org/copyrightHolder">schema.org</a>. See <a href="#json-ld-dialect" class="sectionRef"></a> for specific restrictions on the use of JSON-LD within common properties.
+          Descriptions of groups of tables, tables, schemas, columns, rows and cells MAY contain any <dfn title="common property">properties</dfn> whose names are either absolute URLs or <a href="http://www.w3.org/TR/json-ld/#dfn-compact-iri" class="externalDFN">prefixed names</a>. For example, a table description may contain <code>dc:description</code>, <code>dcat:keyword</code> or <code>schema:copyrightHolder</code> properties to provide a description, keywords or the name of the copyright holder, as defined in <a href="http://dublincore.org/documents/2010/10/11/dcmi-terms/#elements-description">Dublin Core Terms</a>, <a href="http://www.w3.org/TR/vocab-dcat/#Property:dataset_keyword">DCAT</a> or <a href="http://schema.org/copyrightHolder">schema.org</a>. See <a href="#json-ld-dialect" class="sectionRef"></a> for specific restrictions on the JSON used for the values of common properties.
         </p>
         <p>
           The same prefixes are pre-defined as for [[rdfa-core]] within the <a href="http://www.w3.org/2011/rdfa-context/rdfa-1.1">RDFa 1.1 Initial Context</a> and MUST NOT be overridden. Properties from other vocabularies MUST be defined using full URLs.
@@ -599,35 +598,39 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         </p>
         <section>
           <h3>Examples</h3>
-          <p>The following are examples of common properties along the result of normalizing using <a href="#json-ld-normalization" class="sectionRef"></a>.</p>
+          <p>The following are examples of how common properties are normalized as described in <a href="#json-ld-normalization" class="sectionRef"></a>. In this example, a simple string is used as the title for a <a href="http://w3c.github.io/csvw/syntax/#dfn-table" class="externalDFN">table</a>.</p>
           <pre class="example highlight" title="Giving a title to a Table">
 {
+  "@context": { "http://www.w3.org/ns/csvw", { "@language": "en" } },
   "@type": "Table",
   "url": "http://example.com/table.csv",
   "tableSchema": [...],
   <strong>"dc:title": "The title of this Table"</strong>
 }
           </pre>
-          <p>The preceeding example uses a simple string to give a title to a <code>Table</code>. If there is a <a>default language</a>, it is the language of that string.</p>
+          <p>Since there is a <a>default language</a>, this is equivalent to explicitly specifying the language of that title:</p>
           <pre class="example highlight" title="Giving a title to a Table">
 {
   "@type": "Table",
   "url": "http://example.com/table.csv",
   "tableSchema": [...],
-  <strong>"dc:title": {"@value": "Der Titel dieser Tabelle", "@language": "de"}</strong>
+  <strong>"dc:title": {"@value": "The title of this Table", "@language": "en"}</strong>
 }
           </pre>
-          <p>The preceeding example uses a <a href="http://www.w3.org/TR/json-ld/#dfn-value-object" class="externalDFN">value object</a> to give a title to a <code>Table</code> using an explicit language.</p>
+          <p>It is also possible to use a simple <a href="http://www.w3.org/TR/json-ld/#dfn-value-object" class="externalDFN">value object</a> to give a title, which is again equivalent to the above two examples:</p>
           <pre class="example highlight" title="Giving a label to a Table">
 {
+  "@context": { "http://www.w3.org/ns/csvw", { "@language": "en" } },
   "@type": "Table",
+  "url": "http://example.com/table.csv",
   "tableSchema": [...],
-  <strong>"rdfs:label": {"@value": "The label of this Table"}</strong>
+  <strong>"dc:title": {"@value": "The title of this Table"}</strong>
 }
           </pre>
-          <p>The preceeding example uses a simple <a href="http://www.w3.org/TR/json-ld/#dfn-value-object" class="externalDFN">value object</a> to give a label to a <code>Table</code> without using the <a>default language</a>.</p>
+          <p>The next example uses an array of a string and a <a href="http://www.w3.org/TR/json-ld/#dfn-value-object" class="externalDFN">value object</a> to give two titles with different languages:</p>
           <pre class="example highlight" title="Giving a title to a Table">
 {
+  "@context": { "http://www.w3.org/ns/csvw", { "@language": "en" } },
   "@type": "Table",
   "url": "http://example.com/table.csv",
   "tableSchema": [...],
@@ -637,18 +640,30 @@ GID,On Street,Species,Trim Cycle,Inventory Date
   ]</strong>
 }
           </pre>
-          <p>The preceeding example uses an array of a string and a value object.</p>
+          <p>The next example demonstrates a <a href="http://www.w3.org/TR/json-ld/#dfn-node-object" class="externalDFN">node object</a>, in which the value of the <code>schema:url</code> property is a reference to another resource:</p>
           <pre class="example highlight" title="Referencing a URL">
 {
+  "@context": [ "http://www.w3.org/ns/csvw", { "@base": "http://example.com/" } ],
+  "@type": "Table",
+  "url": "table.csv",
+  "tableSchema": [...],
+  <strong>"schema:url": {"@id": "table.csv"}</strong>
+}
+          </pre>
+          <p>The value of the <code>@id</code> property is normalized as described in <a href="#json-ld-normalization" class="sectionRef"></a> against the <a>base URL</a> provided through the <code>@base</code> property, which means the above example is equivalent to:</p>
+          <pre class="example highlight" title="Referencing a URL">
+{
+  "@context": "http://www.w3.org/ns/csvw",
   "@type": "Table",
   "url": "http://example.com/table.csv",
   "tableSchema": [...],
   <strong>"schema:url": {"@id": "http://example.com/table.csv"}</strong>
 }
           </pre>
-          <p>The preceeding example uses an array of a string and a node object used as a reference to another URL.</p>
+          <p>The following example shows the <code>dc:publisher</code> property as an array that contains a single <a href="http://www.w3.org/TR/json-ld/#dfn-node-object" class="externalDFN">node object</a>:</p>
           <pre class="example highlight" title="Embedded object">
 {
+  "@context": "http://www.w3.org/ns/csvw",
   "@type": "Table",
   "url": "http://example.com/table.csv",
   "tableSchema": [...],
@@ -658,7 +673,6 @@ GID,On Street,Species,Trim Cycle,Inventory Date
   }]</strong>,
 }
           </pre>
-          <p>The preceeding example has an array with a single node object containing two properties.</p>
         </section>
       </section>
       <section>
