@@ -19,8 +19,8 @@ class Vocab
   DESCRIPTION = %(This document describes the RDFS vocabulary description used in the Metadata Vocabulary for Tabular Data [[tabular-metadata]] along with the default JSON-LD Context.).freeze
   attr_accessor :prefixes, :terms, :properties, :classes, :instances, :datatypes
 
-  def initialize(file)
-    csv = CSV.new(File.open(file))
+  def initialize
+    csv = CSV.new(File.open(File.expand_path("../_vocab.csv", __FILE__)))
     @prefixes, @terms, @properties, @classes, @datatypes, @instances = {}, {}, {}, {}, {}, {}
 
     columns = []
@@ -249,7 +249,6 @@ class Vocab
 end
 
 options = {
-  format: :jsonld,
   output: $stdout
 }
 
@@ -285,10 +284,15 @@ opts.each do |opt, arg|
   end
 end
 
-vocab = Vocab.new(ARGV[0])
+vocab = Vocab.new
 case options[:format]
 when :jsonld  then options[:output].puts(vocab.to_jsonld)
 when :ttl     then options[:output].puts(vocab.to_ttl)
 when :html    then options[:output].puts(vocab.to_html)
-else  STDERR.puts "Unknown format #{options[:format].inspect}"
+else
+  %w(jsonld ttl html).each do |format|
+    File.open(format == 'html' ? 'index.html' : "csvw.#{format}", "w") do |output|
+      output.puts(vocab.send("to_#{format}".to_sym))
+    end
+  end
 end
