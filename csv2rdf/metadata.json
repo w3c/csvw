@@ -1,0 +1,125 @@
+{
+  "@type": "TableGroup",
+  "@context": ["http://www.w3.org/ns/csvw", {"@language": "en"}],
+  "resources": [{
+    "url": "professions.csv",
+    "tableSchema": {
+      "columns": [{
+        "name": "name",
+        "title": "Profession",
+        "datatype": "string",
+        "required": true
+      }],
+      "primaryKey": "name"
+    },
+    "suppressOutput": true
+  }, {
+    "url": "senior-roles.csv",
+    "tableSchema": {
+      "columns": [{
+        "name": "ref",
+        "title": "Post Unique Reference",
+        "datatype": "string",
+        "required": true,
+        "propertyUrl": "dc:identifier"
+      }, {
+        "name": "name",
+        "title": "Name",
+        "datatype": "string",
+        "propertyUrl": "foaf:name"
+      }, {
+        "name": "grade",
+        "title": "Grade",
+        "datatype": "string",
+        "propertyUrl": "http://example.org/def/grade"
+      }, {
+        "name": "job",
+        "title": "Job Title",
+        "datatype": "string",
+        "propertyUrl": "http://example.org/def/job"
+      }, {
+        "name": "reportsTo",
+        "title": "Reports to Senior Post",
+        "datatype": "string",
+        "null": "xx",
+        "propertyUrl": "http://example.org/def/reportsTo",
+        "valueUrl": "senior-roles.csv#post-{reportsTo}"
+      }, {
+        "name": "profession",
+        "title": "Profession",
+        "datatype": "string",
+        "propertyUrl": "http://example.org/def/profession"
+      }],
+      "primaryKey": "ref",
+      "aboutUrl": "#post-{ref}",
+      "foreignKeys": [{
+        "columns": "reportsTo",
+        "reference": {
+          "resource": "senior-roles.csv",
+          "columns": "ref"
+        }
+      }, {
+        "columns": "profession",
+        "reference": {
+          "resource": "professions.csv",
+          "columns": "name"
+        }
+      }]
+    }
+  }, {
+    "url": "junior-roles.csv",
+    "tableSchema": {
+      "columns": [{
+        "name": "reportsToSenior",
+        "title": "Reporting Senior Post",
+        "datatype": "string",
+        "propertyUrl": "http://example.org/def/reportsTo",
+        "valueUrl": "senior-roles.csv#post-{reportsToSenior}",
+        "required": true
+      }, {
+        "name": "grade",
+        "title": "Grade",
+        "datatype": "string",
+        "propertyUrl": "http://example.org/def/grade"
+      }, {
+        "name": "min-pay",
+        "title": "Payscale Minimum (£)",
+        "datatype": "integer",
+        "propertyUrl": "http://example.org/def/min-pay"
+      }, {
+        "name": "max-pay",
+        "title": "Payscale Maximum (£)",
+        "datatype": "integer",
+        "propertyUrl": "http://example.org/def/max-pay"
+      }, {
+        "name": "job",
+        "title": "Generic Job Title",
+        "datatype": "string",
+        "propertyUrl": "http://example.org/def/job"
+      }, {
+        "name": "number",
+        "title": "Number of Posts (FTE)",
+        "datatype": "number",
+        "propertyUrl": "http://example.org/def/number-of-posts" 
+      }, {
+        "name": "profession",
+        "title": "Profession",
+        "datatype": "string",
+        "propertyUrl": "http://example.org/def/profession"
+      }],
+      "foreignKeys": [{
+        "columns": "reportsToSenior",
+        "reference": {
+          "resource": "senior-roles.csv",
+          "columns": "ref"
+        }
+      }, {
+        "columns": "profession",
+        "reference": {
+          "resource": "professions.csv",
+          "columns": "name"
+        }
+      }]
+    }
+  }]
+}
