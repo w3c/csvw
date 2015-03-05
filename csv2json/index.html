@@ -149,7 +149,7 @@ var respecConfig = {
 
     <section id="intro">
       <h2>Introduction</h2>
-      <p>This document describes the processing of <a href="http://www.w3.org/TR/tabular-data-model/#dfn-tabular-data">tabular data</a> to create a set of nested objects referred to as the <dfn title="output graph"> output graph</dfn>. The <a title="output graph">output graph</a> SHALL be serialized as JSON [[!RFC7159]].</p>
+      <p>This document describes the processing of <a href="http://www.w3.org/TR/tabular-data-model/#dfn-tabular-data">tabular data</a> to create a set of nested objects that MUST be serialized as JSON [[!RFC7159]].</p>
 
       <p class="note">The JSON encoding is intended for web developers who need not care about the complexities of RDF [[!rdf11-concepts]].</p>
 
@@ -163,7 +163,7 @@ var respecConfig = {
 
       <p><dfn title="standard mode">Standard mode</dfn> conversion frames the information gleaned from the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell" class="externalDFN">cells</a> of the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-tabular-data" class="externalDFN">tabular data</a> with details of the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row" class="externalDFN">rows</a>, <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table" class="externalDFN">tables</a> and, optionally, <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table-group" class="externalDFN">table group</a> within which that information is provided.</p>
 
-      <p><dfn title="minimal mode">Minimal mode</dfn> conversion includes <em>only</em> the information gleaned from the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell" class="externalDFN">cells</a> of the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-tabular-data" class="externalDFN">tabular data</a> within the <a>output graph</a>.</p>
+      <p><dfn title="minimal mode">Minimal mode</dfn> conversion includes <em>only</em> the information gleaned from the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell" class="externalDFN">cells</a> of the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-tabular-data" class="externalDFN">tabular data</a> within the output.</p>
 
       <p><a title="standard mode">Standard</a> and <a title="minimal mode">minimal</a> conversion are described normatively <a href="#conversion-algorithm">below</a>.</p>
 
@@ -171,7 +171,7 @@ var respecConfig = {
 
       <p><a href="http://www.w3.org/TR/tabular-metadata/#dfn-conversion-specification" class="externalDFN">Conversion specifications</a>, as defined in [[!tabular-metadata]] MAY be used to specify how <a href="http://www.w3.org/TR/tabular-data-model/#dfn-tabular-data" class="externalDFN">tabular data</a> can be transformed into another format using a script or template. Such a <a href="http://www.w3.org/TR/tabular-metadata/#dfn-conversion-specification" class="externalDFN">conversion specification</a> MAY use the JSON output described in this specification as input.</p>
 
-      <p>The conversion procedure described in this specification is considered to be <em>entirely textual</em>. There is no requirement on conversion applications to check the semantic consistency of the data during the conversion, nor validate the <a>output graph</a> against JSON syntax rules. Downstream applications SHOULD be aware of the potential for syntax errors and take appropriate action.</p>
+      <p>The conversion procedure described in this specification is considered to be <em>entirely textual</em>. There is no requirement on conversion applications to check the semantic consistency of the data during the conversion, nor validate the output against JSON syntax rules. Downstream applications SHOULD be aware of the potential for syntax errors and take appropriate action.</p>
     </section>
 
     <section id="conformance">
@@ -251,7 +251,7 @@ var respecConfig = {
       <section id="generating-json">
         <h3>Generating JSON</h3>
 
-        <p>A conformant JSON conversion application MUST produce an <a>output graph</a> conforming to this algorithm according to the chosen mode of conversion: <a title="standard mode">standard</a> or <a title="minimal mode">minimal</a>.</p>
+        <p>A conformant JSON conversion application MUST produce output conforming to this algorithm according to the chosen mode of conversion: <a title="standard mode">standard</a> or <a title="minimal mode">minimal</a>.</p>
 
         <p>Unless specified otherwise, the steps in the algorithm defined herein apply to both <a title="standard mode">standard</a> <em>and</em> <a title="minimal mode">minimal</a> modes.</p>
 
@@ -259,8 +259,8 @@ var respecConfig = {
 
         <ol>
           <li>
-            <p>In <strong><a>minimal mode</a></strong> only, insert an empty <a>array</a> <var>A</var> into the <a>output graph</a>. The <a title="object">objects</a> containing the name-value pairs associated with the <a title="cell value">cell values</a> will be subsequently inserted into this <a>array</a>.</p>
-            <p>In <strong><a>standard mode</a></strong> only, insert an empty <a>object</a> <var>G</var> into the <a>output graph</a> to represent the <a>table group</a>.</p>
+            <p>In <strong><a>minimal mode</a></strong> only, insert an empty <a>array</a> <var>A</var> into the JSON output. The <a title="object">objects</a> containing the name-value pairs associated with the <a title="cell value">cell values</a> will be subsequently inserted into this <a>array</a>.</p>
+            <p>In <strong><a>standard mode</a></strong> only, insert an empty <a>object</a> <var>G</var> into the JSON output which is associated with the <a>table group</a>.</p>
           </li>
           <li>
             <p>In <strong><a>standard mode</a></strong> only, if the <a>table group</a> has an <a>identifier</a> <var>I<sub>G</sub></var>; insert the following name-value pair into <a>object</a> <var>G</var>:
@@ -394,8 +394,8 @@ var respecConfig = {
                         <p>Each <a>cell</a> referring to <a>subject</a> <var>i</var> is then processed sequentially in turn according to the order of the <a title="column">columns</a> (e.g. <var>1</var> to <var>n</var>).</p>
                         <p>For each <a>cell</a> referring to <a>subject</a> <var>i</var> where the value of property <a href="http://www.w3.org/TR/tabular-metadata/#column-suppressOutput"><code>suppressOutput</code></a> for the <a>column</a> associated with that <a>cell</a> is not <var>true</var> insert a name-value pair into <a>object</a> <var>S<sub>i</sub></var> as described below.</p>
                         <p><a title="name">Name</a> <var>N</var> is determined from the <a>propertyUrl</a> property of the current <a>cell</a>.</p>
-                        <p>If the value of <a>propertyUrl</a> for the <a>cell</a> has not been explicitly specified in the metadata description (e.g. the value of <a>propertyUrl</a> is a concatenation of the CSV+ file <var>URL</var>, <code>#</code> (<code>U+0023</code>) and the value of the <a href="http://www.w3.org/TR/tabular-metadata/#column-name"><code>name</code></a> property for the column associated with the <a>cell</a>), then <a>name</a> <var>N</var> SHALL take the value of the only the fragment identifier of <a>propertyUrl</a>.</p>
-                        <p>Else, <a>name</a> <var>N</var> SHALL take the entire value of <a>propertyUrl</a>.</p>
+                        <p>If the value of <a>propertyUrl</a> for the <a>cell</a> has not been explicitly specified in the metadata description (e.g. the value of <a>propertyUrl</a> is a concatenation of the CSV+ file <var>URL</var>, <code>#</code> (<code>U+0023</code>) and the value of the <a href="http://www.w3.org/TR/tabular-metadata/#column-name"><code>name</code></a> property for the column associated with the <a>cell</a>), then <a>name</a> <var>N</var> MUST take the value of the only the fragment identifier of <a>propertyUrl</a>.</p>
+                        <p>Else, <a>name</a> <var>N</var> MUST take the entire value of <a>propertyUrl</a>.</p>
 
                         <p class="issue" data-number="298">Should JSON output truncate the propertyUrl in cases where propertyUrl is not specifically defined?</p>
 
@@ -409,7 +409,7 @@ var respecConfig = {
                         </p>
                         <p>where <var>V<sub>url</sub></var> is the value of <a>valueUrl</a> property for <a title="cell">cells</a> relating to this <a>subject</a> and is expressed as a string in the JSON output.</p>
 
-                        <p>Else, if the <a>cell</a> specifies a <a href="http://www.w3.org/TR/tabular-metadata/#cell-separator"><code>separator</code></a> property and the <a>cell value</a> is not an empty sequence, then the <a>cell value</a> provides a sequence of values for inclusion within the <a>output graph</a>; insert an <a>array</a> <var>A<sub>v</sub></var> into <a>object</a> <var>S<sub>i</sub></var> and then, for each value <var>V</var> in the sequence, insert the following name-value pair into <a>array</a> <var>A<sub>v</sub></var>:
+                        <p>Else, if the <a>cell</a> specifies a <a href="http://www.w3.org/TR/tabular-metadata/#cell-separator"><code>separator</code></a> property and the <a>cell value</a> is not an empty sequence, then the <a>cell value</a> provides a sequence of values for inclusion within the JSON output; insert an <a>array</a> <var>A<sub>v</sub></var> into <a>object</a> <var>S<sub>i</sub></var> and then, for each value <var>V</var> in the sequence, insert the following name-value pair into <a>array</a> <var>A<sub>v</sub></var>:
                           <dl class="nvp">
                             <dt>name</dt>
                             <dd><var>N</var></dd>
@@ -420,7 +420,7 @@ var respecConfig = {
 
                         <p class="note">Since <a title="array">arrays</a> are implicitly <em>ordered</em> in JSON, the <a href="http://www.w3.org/TR/tabular-metadata/#cell-ordered"><code>ordered</code></a> property, if specified, has no effect on the JSON output.</p>
 
-                        <p>Else, if the <a>cell value</a> is not <code>null</code>, then the <a>cell value</a> provides a single value <var>V</var> for inclusion within the <a>output graph</a>; insert the following name-value pair into <a>object</a> <var>S<sub>i</sub></var>:
+                        <p>Else, if the <a>cell value</a> is not <code>null</code>, then the <a>cell value</a> provides a single value <var>V</var> for inclusion within the JSON output; insert the following name-value pair into <a>object</a> <var>S<sub>i</sub></var>:
                           <dl class="nvp">
                             <dt>name</dt>
                             <dd><var>N</var></dd>
@@ -429,7 +429,7 @@ var respecConfig = {
                           </dl>
                         </p>
 
-                        <p>Value <var>V</var> derived from the <a title="cell value">cell values</a> SHALL be expressed in the <a>output graph</a> according to the <a href="http://www.w3.org/TR/tabular-metadata/#cell-datatype"><code>datatype</code></a> property of the cell as defined below: <a href="#datatypes">Interpretting datatypes</a>.</p> 
+                        <p>Value <var>V</var> derived from the <a title="cell value">cell values</a> MUST be expressed in the JSON output according to the <a href="http://www.w3.org/TR/tabular-metadata/#cell-datatype"><code>datatype</code></a> property of the cell as defined below: <a href="#datatypes">Interpretting datatypes</a>.</p> 
                         <p class="note">In the case where a sequence of values is provided, the <code>datatype</code> applies to all members of the sequence.</p>
                       </li>
                     </ol>
@@ -437,8 +437,8 @@ var respecConfig = {
                   <li>
                     <p>If more than one <a>subject</a> is associated with the current <a>row</a>, review each of the <a title="object">objects</a> associated with those <a title="subject">subjects</a> to determine whether they can be nested.</p>
                     <p>For each <a>subject</a> <var>i</var> associated with the current <a>row</a>, recurse through the name-value pairs in the <a title="object">objects</a> associated with that <a>row</a> to determine if <a>subject</a> <var>i</var> is referenced - excluding the <a>object</a> describing <a>subject</a> <var>i</var> itself (<a>object</a> <var>S<sub>i</sub></var>).</p>
-                    <p>If <a>subject</a> <var>i</var> is referenced once <em>and only once</em>, then <a>object</a> <var>S<sub>i</sub></var> SHALL be inserted into the value of the referring name-value pair in place of the reference in order to create a nested <a>object</a>.</p>
-                    <p>Else, <a>object</a> <var>S<sub>i</sub></var>, potentially including nested <a title="object">objects</a>, SHALL be inserted into <a>array</a> <var>A</var>.</p>
+                    <p>If <a>subject</a> <var>i</var> is referenced once <em>and only once</em>, then <a>object</a> <var>S<sub>i</sub></var> MUST be inserted into the value of the referring name-value pair in place of the reference in order to create a nested <a>object</a>.</p>
+                    <p>Else, <a>object</a> <var>S<sub>i</sub></var>, potentially including nested <a title="object">objects</a>, MUST be inserted into <a>array</a> <var>A</var>.</p>
                   </li>
                   <div class="issue" data-number="299">
                     <p>Do we want to create nested objects in the JSON output where a row describes multiple resources?</p>
@@ -453,7 +453,7 @@ var respecConfig = {
 
       <section id="datatypes">
         <h3>Interpretting datatypes</h3>
-        <p><a title="cell value">Cell values</a> are expressed in the <a>output graph</a> according to the cell's <a href="http://www.w3.org/TR/tabular-metadata/#cell-datatype"><code>datatype</code></a> property. The relationship between the value of the <a href="http://www.w3.org/TR/tabular-metadata/#cell-datatype"><code>datatype</code></a> property and the primitive types supported by JSON (as specified in [[!RFC7159]]) is provided in the table below.</p>
+        <p><a title="cell value">Cell values</a> are expressed in the JSON output according to the cell's <a href="http://www.w3.org/TR/tabular-metadata/#cell-datatype"><code>datatype</code></a> property. The relationship between the value of the <a href="http://www.w3.org/TR/tabular-metadata/#cell-datatype"><code>datatype</code></a> property and the primitive types supported by JSON (as specified in [[!RFC7159]]) is provided in the table below.</p>
 
         <div class="note">
           <p>Instances of JSON reserved characters within string values MUST be escaped as defined in [[!RFC7159]].</p>
