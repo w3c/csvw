@@ -193,7 +193,7 @@ var respecConfig = {
           <dd>The <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-table" class="externalDFN">annotated table</a> is defined in [[!tabular-data-model]] as describing a particular <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table-description" class="externalDFN">table</a> and its metadata.</dd>
 
           <dt><dfn>array</dfn></dt>
-          <dd>An <a>array</a> is defined in [[!RFC7159]] as an ordered sequence of zero or more values, where a value is a string, number, boolean, null, <a>object</a>, or <a>array</a>.</dd>
+          <dd>An <a>array</a> is defined in JSON ([[!RFC7159]]) as an ordered sequence of zero or more values, where a value is a string, number, boolean, null, <a>object</a>, or <a>array</a>.</dd>
 
           <dt><dfn>cell</dfn></dt>
           <dd>A <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell" class="externalDFN">cell</a> is defined in [[!tabular-data-model]] as the intersection of a <a>row</a> and a <a>column</a> within a <a title="annotated table">table</a>.</dd>
@@ -214,13 +214,13 @@ var respecConfig = {
           <dd>The identifier is the evaluation of the <code>@id</code> property for the current resource. As defined in [[!tabular-data-model]], the <a>identifier</a> is <code>null</code> if the <code>@id</code> property is undefined. The <a>identifier</a> MAY be applied to either a <a href="http://www.w3.org/TR/tabular-data-model/#dfn-group-of-tables" class="externalDFN">table group</a> or a <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-table" class="externalDFN">table</a>.</dd>
 
           <dt><dfn>name</dfn></dt>
-          <dd>In the context of this specification, <a>name</a> is used as defined in JSON ([[!RFC7159]]); that is that <a>name</a> is a string that provides a unique key within a set of name-value pairs within a JSON <a>object</a>.</dd>
+          <dd>In the context of this specification, <a>name</a> is used as defined in JSON ([[!RFC7159]]); that is, that <a>name</a> is a string that provides a unique key within a set of name-value pairs within a JSON <a>object</a>.</dd>
 
           <dt><dfn>notes</dfn></dt>
           <dd>A list of <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table-notes" class="externalDFN">notes</a>, as defined in [[!tabular-data-model]], attached to an <a title="annotated table">annotated table</a> using the <code>notes</code> property. This may be an empty list.</dd>
 
           <dt><dfn>object</dfn></dt>
-          <dd>An <a>object</a> is defined in [[!RFC7159]] as unordered collection of zero or more name/value pairs, where a where a name is a string and a value is a string, number, boolean, null, <a>object</a>, or <a>array</a>.</dd>
+          <dd>An <a>object</a> is defined in JSON ([[!RFC7159]]) as unordered collection of zero or more name/value pairs, where a where a name is a string and a value is a string, number, boolean, null, <a>object</a>, or <a>array</a>.</dd>
 
           <dt><dfn>propertyUrl</dfn></dt>
           <dd>The <a>propertyUrl</a> is the evaluation of the <code>propertyUrl</code> property of the current <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell" class="externalDFN">cell</a> as defined in <cite><a href="http://www.w3.org/TR/tabular-metadata/#dfn-uri-template-property">URI template properties</a></cite> in [[!tabular-metadata]].</dd>
@@ -367,7 +367,7 @@ var respecConfig = {
                     <p>where <var>A</var> is an <a>array</a>. The <a title="object">objects</a> containing the name-value pairs associated with the <a title="cell value">cell values</a> will be subsequently inserted into this <a>array</a>.</p>
                   </li>
                   <li>
-                    <p>The <a title="subject">subjects</a> described by each <a>row</a> are determined according to the <a>aboutUrl</a> property for each <a>cell</a> in the current <a>row</a>. Where <a>aboutUrl</a> is undefined, a default <a>subject</a> for the <a>row</a> is used.</p>
+                    <p>The <a title="subject">subject(s)</a> described by each <a>row</a> are determined according to the <a>aboutUrl</a> property for each <a>cell</a> in the current <a>row</a>. Where <a>aboutUrl</a> is undefined, a default <a>subject</a> for the <a>row</a> is used.</p>
 
                     <p class="note">A <a>row</a> MAY describe multiple interrelated <a title="subject">subjects</a>; where the <a>valueUrl</a> property for one cell matches the <a>aboutUrl</a> property for another <a>cell</a> in the same <a>row</a>.</p>
                     
@@ -409,14 +409,7 @@ var respecConfig = {
                         </p>
                         <p>where <var>V<sub>url</sub></var> is the value of <a>valueUrl</a> property for <a title="cell">cells</a> relating to this <a>subject</a> and is expressed as a string in the JSON output.</p>
 
-                        <p>Else, if the <a>cell</a> specifies a <a href="http://www.w3.org/TR/tabular-metadata/#cell-separator"><code>separator</code></a> property and the <a>cell value</a> is not an empty sequence, then the <a>cell value</a> provides a sequence of values for inclusion within the JSON output; insert an <a>array</a> <var>A<sub>v</sub></var> into <a>object</a> <var>S<sub>i</sub></var> and then, for each value <var>V</var> in the sequence, insert the following name-value pair into <a>array</a> <var>A<sub>v</sub></var>:
-                          <dl class="nvp">
-                            <dt>name</dt>
-                            <dd><var>N</var></dd>
-                            <dt>value</dt>
-                            <dd><var>V</var></dd>
-                          </dl>
-                        </p>
+                        <p>Else, if the <a>cell</a> specifies a <a href="http://www.w3.org/TR/tabular-metadata/#cell-separator"><code>separator</code></a> property and the <a>cell value</a> is not an empty sequence, then the <a>cell value</a> provides a sequence of values for inclusion within the JSON output; insert an <a>array</a> <var>A<sub>v</sub></var> containing each value <var>V</var> of the sequence into <a>object</a> <var>S<sub>i</sub></var>.</p>
 
                         <p class="note">Since <a title="array">arrays</a> are implicitly <em>ordered</em> in JSON, the <a href="http://www.w3.org/TR/tabular-metadata/#cell-ordered"><code>ordered</code></a> property, if specified, has no effect on the JSON output.</p>
 
