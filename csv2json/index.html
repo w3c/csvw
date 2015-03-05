@@ -157,7 +157,7 @@ var respecConfig = {
 
       <p>The <a href="http://www.w3.org/TR/tabular-data-model/#dfn-grouped-tabular-data-model" class="externalDFN">grouped tabular data model</a> describes a <a href="http://www.w3.org/TR/tabular-data-model/#dfn-group-of-tables" class="externalDFN">table group</a> that is a collection of <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table" class="externalDFN">tables</a> published as a single atomic unit.</p>
 
-      <p>The conversion procedure described in this specification operates on the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-tabular-data" class="externalDFN">tabular data</a>. No discussion is given to the processes needed to convert CSV-encoded data into tabular data form. Please refer to [[!tabular-data-model]] for details of <a href="http://www.w3.org/TR/tabular-data-model/#parsing">parsing tabular data</a>.</p>
+      <p>The conversion procedure described in this specification operates on the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-tabular-data" class="externalDFN">tabular data</a>. This specification does not specify the processes needed to convert CSV-encoded data into tabular data form. Please refer to [[!tabular-data-model]] for details of <a href="http://www.w3.org/TR/tabular-data-model/#parsing">parsing tabular data</a>.</p>
 
       <p>Conversion applications MUST provide at least two modes of operation: <a title="standard mode">standard</a> and <a title="minimal mode">minimal</a>.</p>
 
@@ -202,7 +202,7 @@ var respecConfig = {
           <dd><a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-errors" class="externalDFN">Cell errors</a> are defined in [[!tabular-data-model]] as a (possibly empty) list of validation errors generated while parsing the literal content of a <a>cell</a> to generate the <a title="cell value">semantic value</a>.</dd>
 
           <dt><dfn>cell value</dfn></dt>
-          <dd>A <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">cell value</a> is defined in [[!tabular-data-model]] as the semantic value of the <a>cell</a>; this MAY be <code>null</code> or, the event that the <a>cell</a> specifies a <a href="http://www.w3.org/TR/tabular-metadata/#cell-separator"><code>separator</code></a> property, a sequence of values.</dd>
+          <dd>A <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell-value" class="externalDFN">cell value</a> is defined in [[!tabular-data-model]] as the semantic value of the <a>cell</a>; this MAY be <code>null</code> or, in the case that the <a>cell</a> specifies a <a href="http://www.w3.org/TR/tabular-metadata/#cell-separator"><code>separator</code></a> property, a sequence of values.</dd>
 
           <dt><dfn>column</dfn></dt>
           <dd>A <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column" class="externalDFN">column</a> is defined in [[!tabular-data-model]] as a vertical arrangement of <a title="cell">cells</a> within a <a title="annotated table">table</a>.</dd>
@@ -376,7 +376,7 @@ var respecConfig = {
                     <p>For each <a>subject</a> that the current <a>row</a> describes where at least one of the <a title="cell">cells</a> that refers to that <a>subject</a> has a <a title="cell value">value</a> that is not <code>null</code> and is not associated with a <a>column</a> where the value of property <a href="http://www.w3.org/TR/tabular-metadata/#column-suppressOutput"><code>suppressOutput</code></a> has value <var>true</var>:</p>
                     <ol>
                       <li>
-                        <p>Create an empty <a>object</a> <var>S<sub>i</sub></var> to represent the <a>subject</a> <var>i</var> - but don't yet insert it einto the <a>array</a> <var>A</var>.</p>
+                        <p>Create an empty <a>object</a> <var>S<sub>i</sub></var> to represent the <a>subject</a> <var>i</var> - but don't insert it into the <a>array</a> <var>A</var> yet.</p>
                         <p>(<var>i</var> is the index number with values from <var>1</var> to <var>n</var>, where <var>n</var> is the number of <a title="subject">subjects</a> for the <a>row</a>)</p>
                         <p><a title="subject">Subject</a> <var>i</var> is identified according to the <a>aboutUrl</a> property of its associated <a title="cell">cells</a>: <var>@id<sub>s</sub></var>. For a <em>default</em> <a>subject</a> where <a>aboutUrl</a> is not specified by its <a title="cell">cells</a>, <var>@id<sub>s</sub></var> is <code>null</code>.</p>
                       </li>
@@ -407,7 +407,7 @@ var respecConfig = {
                             <dd><var>V<sub>url</sub></var></dd>
                           </dl>
                         </p>
-                        <p>where <var>V<sub>url</sub></var> is the value of <a>valueUrl</a> property for <a title="cell">cells</a> relating to this <a>subject</a> and is expressed as a string in the JSON output.</p>
+                        <p>where <var>V<sub>url</sub></var> is the value of <a>valueUrl</a> property for the current <a>cell</a>, is expressed as a string in the JSON output.</p>
 
                         <p>Else, if the <a>cell</a> specifies a <a href="http://www.w3.org/TR/tabular-metadata/#cell-separator"><code>separator</code></a> property and the <a>cell value</a> is not an empty sequence, then the <a>cell value</a> provides a sequence of values for inclusion within the JSON output; insert an <a>array</a> <var>A<sub>v</sub></var> containing each value <var>V</var> of the sequence into <a>object</a> <var>S<sub>i</sub></var>.</p>
 
@@ -422,7 +422,7 @@ var respecConfig = {
                           </dl>
                         </p>
 
-                        <p>Value <var>V</var> derived from the <a title="cell value">cell values</a> MUST be expressed in the JSON output according to the <a href="http://www.w3.org/TR/tabular-metadata/#cell-datatype"><code>datatype</code></a> property of the cell as defined below: <a href="#datatypes">Interpretting datatypes</a>.</p> 
+                        <p>Value <var>V</var> derived from the <a title="cell value">cell values</a> MUST be expressed in the JSON output according to the <a href="http://www.w3.org/TR/tabular-metadata/#cell-datatype"><code>datatype</code></a> property of the cell as defined below: <a href="#datatypes">Interpreting datatypes</a>.</p> 
                         <p class="note">In the case where a sequence of values is provided, the <code>datatype</code> applies to all members of the sequence.</p>
                       </li>
                     </ol>
@@ -430,8 +430,8 @@ var respecConfig = {
                   <li>
                     <p>If more than one <a>subject</a> is associated with the current <a>row</a>, review each of the <a title="object">objects</a> associated with those <a title="subject">subjects</a> to determine whether they can be nested.</p>
                     <p>For each <a>subject</a> <var>i</var> associated with the current <a>row</a>, recurse through the name-value pairs in the <a title="object">objects</a> associated with that <a>row</a> to determine if <a>subject</a> <var>i</var> is referenced - excluding the <a>object</a> describing <a>subject</a> <var>i</var> itself (<a>object</a> <var>S<sub>i</sub></var>).</p>
-                    <p>If <a>subject</a> <var>i</var> is referenced once <em>and only once</em>, then <a>object</a> <var>S<sub>i</sub></var> MUST be inserted into the value of the referring name-value pair in place of the reference in order to create a nested <a>object</a>.</p>
-                    <p>Else, <a>object</a> <var>S<sub>i</sub></var>, potentially including nested <a title="object">objects</a>, MUST be inserted into <a>array</a> <var>A</var>.</p>
+                    <p>If <a>subject</a> <var>i</var> is referenced once <em>and only once</em>, then <a>object</a> <var>S<sub>i</sub></var> becomes the value of the referring name-value pair in place of the reference in order to create a nested <a>object</a>.</p>
+                    <p>Else, insert <a>object</a> <var>S<sub>i</sub></var>, potentially including nested <a title="object">objects</a>, into <a>array</a> <var>A</var>.</p>
                   </li>
                   <div class="issue" data-number="299">
                     <p>Do we want to create nested objects in the JSON output where a row describes multiple resources?</p>
@@ -445,7 +445,7 @@ var respecConfig = {
       </section>
 
       <section id="datatypes">
-        <h3>Interpretting datatypes</h3>
+        <h3>Interpreting datatypes</h3>
         <p><a title="cell value">Cell values</a> are expressed in the JSON output according to the cell's <a href="http://www.w3.org/TR/tabular-metadata/#cell-datatype"><code>datatype</code></a> property. The relationship between the value of the <a href="http://www.w3.org/TR/tabular-metadata/#cell-datatype"><code>datatype</code></a> property and the primitive types supported by JSON (as specified in [[!RFC7159]]) is provided in the table below.</p>
 
         <div class="note">
@@ -460,7 +460,7 @@ var respecConfig = {
 
         <table style="width: 100%; text-align: left">
           <thead>
-            <tr><th><code>datetype</code></th><th>JSON primitive type</th><th>Remarks</th></tr>
+            <tr><th><code>datatype</code></th><th>JSON primitive type</th><th>Remarks</th></tr>
           </thead>
           <tbody>
             <tr><td><code>number</code></td><td>number</td><td></td></tr>
@@ -506,7 +506,7 @@ var respecConfig = {
             <tr><td><code>string</code></td><td>string</td><td></td></tr>
             <tr><td><code>normalizedString</code></td><td>string</td><td></td></tr>
             <tr><td><code>token</code></td><td>string</td><td></td></tr>
-            <tr><td><code>langauge</code></td><td>string</td><td></td></tr>
+            <tr><td><code>language</code></td><td>string</td><td></td></tr>
             <tr><td><code>Name</code></td><td>string</td><td></td></tr>
             <tr><td><code>NCName</code></td><td>string</td></td></tr>
             <tr><td><code>time</code></td><td>string</td><td></td></tr>
@@ -901,7 +901,7 @@ GID,On Street,Species,Trim Cycle,Diameter at Breast Ht,Inventory Date,Comments,P
           <p>The <a>subject</a> described by each <a>row</a> is explcitly defined using the <a href="http://www.w3.org/TR/tabular-metadata/#cell-aboutUrl"><code>aboutUrl</code></a> property; e.g. the <a>subject</a> of <a>row</a> <var>R1</var> is <code>http://example.org/tree-ops-ext#gid-1</code>.</p>
           <p>Output for <a>column</a> <var>C1</var> (<code>{ "name": "GID" }</code>) is not included as <a>column</a> property <a href="http://www.w3.org/TR/tabular-metadata/#column-suppressOutput"><code>suppressOutput</code></a> has value <var>true</var>.</p>
           <p><a Title="cell">Cells</a> <var>C1.7</var> and <var>C2.7</var> (<a title="row">rows</a> <var>R1</var> and <var>R2</var>; <a>column</a>, <code>{ "name": "comments" }</code>) have <code>null</code> <a title="cell value">values</a> - no output is included for these <a title="cell">cells</a>.</p>
-          <p><a Title="cell">Cell</a> <var>C3.7</var> (<a>row</a> <var>R3</var>; <a>column</a>, <code>{ "name": "comments" }</code>) contains an unordered sequence of values; the set of values are included in an <a>array</a> - noting that as <a title="array">arrays</a> are implicitly <em>ordered</em> in JSON, the <a href="http://www.w3.org/TR/tabular-metadata/#cell-ordered"><code>ordered</code></a> property has no effect on the JSON output.</p>
+          <p><a Title="cell">Cell</a> <var>C3.7</var> (<a>row</a> <var>R3</var>; <a>column</a>, <code>{ "name": "comments" }</code>) contains a sequence of values; the set of values are included in an <a>array</a>.</p>
         </div>
 
         <p><strong><a title="standard mode">Standard mode</a></strong> output for this example is provided below:</p>
