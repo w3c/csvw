@@ -596,8 +596,48 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         <p class="note">
           Forbidding the declaration of new prefixes ensures consistent processing between JSON-LD-aware and non-JSON-LD-aware processors.
         </p>
+        <section>
+          <h4>Values of Common Properties</h4>
+          <p>
+            Common properties can take any JSON value, so long as it adheres to the following restrictions, which are designed to ensure compatibility between JSON-LD-aware and non-JSON-LD-aware processors:
+          </p>
+          <ul>
+            <li>
+              <p>
+                If a <code>@value</code> property is used on an object, that object MUST NOT have any other properties aside from either <code>@type</code> or <code>@language</code>, and MUST NOT have both <code>@type</code> and <code>@language</code> as properties. The value of the <code>@value</code> property MUST be a string, number or boolean value.
+              </p>
+            </li>
+            <li>
+              <p>
+                If a <code>@type</code> property is used on an object, its value MUST be one of:
+              </p>
+              <ul>
+                <li>a built-in datatype, as defined in <a href="#built-in-datatypes" class="sectionRef"></a></li>
+                <li>one of the legitimate values for <code>@type</code> as defined for any of the description objects in this specification</li>
+                <li>a <a href="http://www.w3.org/TR/json-ld/#dfn-compact-iri" class="externalDFN">prefixed name</a> using any of the pre-defined prefixes as described in <a href="#common-properties" class="sectionRef"></a></li>
+                <li>a URL, which will be resolved against the <a>base URL</a> during normalization</li>
+              </ul>
+              <p>
+                A <code>@type</code> property can also have a value that is an array of such values.
+              </p>
+            </li>
+            <li>
+              <p>
+                If a <code>@language</code> property is used on an object, it MUST have a string value that adheres to the syntax defined in [[!BCP47]], or be <code>null</code>.
+              </p>
+            </li>
+            <li>
+              <p>
+                The values of <code>@id</code> properties are assumed to be URLs and will have any prefix expanded and the result resolved against the <a>base URL</a> during normalization. Therefore, if a <code>@id</code> property is used on an object, it MUST have a value that is a string and that string MUST NOT start with <code>_:</code>.
+              </p>
+            </li>
+            <li>
+              Aside from <code>@value</code>, <code>@type</code>, <code>@language</code> and <code>@id</code>, the properties used on an object MUST NOT start with <code>@</code>.
+            </li>
+          </ul>
+        </section>
         <section class="informative">
-          <h3>Examples</h3>
+          <h4>Examples</h4>
           <p>The following are examples of how common properties are normalized as described in <a href="#json-ld-normalization" class="sectionRef"></a>. In this example, a simple string is used as the title for a <a href="http://w3c.github.io/csvw/syntax/#dfn-table" class="externalDFN">table</a>.</p>
           <pre class="example highlight" title="Giving a title to a Table">
 {
@@ -770,7 +810,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <dt id="table-notes"><code>notes</code></dt>
             <dd>
               <p>
-                An <a>array property</a> that provides an array of objects representing arbitrary annotations on the annotated tabular data model.  The value of this property becomes the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-table-notes" class="externalDFN">direction</a> annotation for the table. The properties on these objects are interpreted equivalently to <a title="common property">common properties</a>. When an array of note objects <code>B</code> is <a>merged</a> into an original array of note objects <code>A</code>, each note object from <code>B</code> is appended into the array <code>A</code>.
+                An <a>array property</a> that provides an array of objects representing arbitrary annotations on the annotated tabular data model.  The value of this property becomes the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-table-notes" class="externalDFN">notes</a> annotation for the table. The properties on these objects are interpreted equivalently to <a title="common property">common properties</a> as described in <a href="#common-properties" class="sectionRef"></a>. When an array of note objects <code>B</code> is <a>merged</a> into an original array of note objects <code>A</code>, each note object from <code>B</code> is appended into the array <code>A</code>.
               </p>
               <p class="note">
                 The <a href="http://www.w3.org/annotation/">Web Annotation Working Group</a> is developing a vocabulary for expressing annotations. In future versions of this specification, we anticipate referencing that vocabulary.
