@@ -220,7 +220,7 @@ var respecConfig = {
           <dd>A list of <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table-notes" class="externalDFN">notes</a>, as defined in [[!tabular-data-model]], attached to an <a title="annotated table">annotated table</a> using the <code>notes</code> property. This may be an empty list.</dd>
 
           <dt><dfn>object</dfn></dt>
-          <dd>An <a>object</a> is defined in JSON ([[!RFC7159]]) as unordered collection of zero or more name/value pairs, where a where a name is a string and a value is a string, number, boolean, null, <a>object</a>, or <a>array</a>.</dd>
+          <dd>An <a>object</a> is defined in JSON ([[!RFC7159]]) as unordered collection of zero or more name-value pairs, where a where a name is a string and a value is a string, number, boolean, null, <a>object</a>, or <a>array</a>.</dd>
 
           <dt><dfn>propertyUrl</dfn></dt>
           <dd>The <a>propertyUrl</a> is the evaluation of the <code>propertyUrl</code> property of the current <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell" class="externalDFN">cell</a> as defined in <cite><a href="http://www.w3.org/TR/tabular-metadata/#dfn-uri-template-property">URI template properties</a></cite> in [[!tabular-metadata]].</dd>
@@ -257,6 +257,8 @@ var respecConfig = {
 
         <p class="note">Where an <a>annotated table</a> is defined in isolation (e.g. in the absence of a <a>table group description</a>), a default <a>table group description</a> is provided with a single <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table-group-resources" class="externalDFN"><code>resources</code></a> annotation that refers to that <a title="annotated table">table</a>.</p>
 
+         <p class="issue" data-number="293">“What metadata is used when processing starting with a CSV vs a Metadata file”: the structure of the algorithm may depend on the outcome of this issue; there may be a different entry point to the algorithm depending on whether the processing starts with a Metadata file or a CSV file.</p>
+
         <ol>
           <li>
             <p>In <strong><a>minimal mode</a></strong> only, insert an empty <a>array</a> <var>A</var> into the JSON output. The <a title="object">objects</a> containing the name-value pairs associated with the <a title="cell value">cell values</a> will be subsequently inserted into this <a>array</a>.</p>
@@ -273,7 +275,7 @@ var respecConfig = {
             </p>
           </li>
           <li>
-            <p>In <strong><a>standard mode</a></strong> only, insert any <a>common properties</a> specified for the <a>table group</a> into <a>object</a> <var>G</var>. Name-value pairs relating to <a>common properties</a> are copied verbatim from the metadata description - noting that prefixes defined within the <a href="http://www.w3.org/2011/rdfa-context/rdfa-1.1">RDFa 1.1 Initial Context</a> ([[rdfa-core]]) are not expanded.</p>
+            <p>In <strong><a>standard mode</a></strong> only, insert any <a>common properties</a> specified for the <a>table group</a> into <a>object</a> <var>G</var>. Name-value pairs relating to <a>common properties</a> are copied verbatim from the metadata description—noting that prefixes defined within the <a href="http://www.w3.org/2011/rdfa-context/rdfa-1.1">RDFa 1.1 Initial Context</a> ([[rdfa-core]]) are not expanded.</p>
           </li>
           <li>
             <p>In <strong><a>standard mode</a></strong> only, insert the following name-value pair into <a>object</a> <var>G</var>:
@@ -314,7 +316,7 @@ var respecConfig = {
                 </p>
               </li>
               <li>
-                <p>In <strong><a>standard mode</a></strong> only, insert any <a>notes</a> and <a>common properties</a> specified for the <a title="annotated table">table</a> into <a>object</a> <var>T</var>. Name-value pairs relating to <a>notes</a> and <a>common properties</a> are copied verbatim from the metadata description - noting that prefixes defined within the <a href="http://www.w3.org/2011/rdfa-context/rdfa-1.1">RDFa 1.1 Initial Context</a> ([[rdfa-core]]) are not expanded.</p>
+                <p>In <strong><a>standard mode</a></strong> only, insert any <a>notes</a> and <a>common properties</a> specified for the <a title="annotated table">table</a> into <a>object</a> <var>T</var>. Name-value pairs relating to <a>notes</a> and <a>common properties</a> are copied verbatim from the metadata description—noting that prefixes defined within the <a href="http://www.w3.org/2011/rdfa-context/rdfa-1.1">RDFa 1.1 Initial Context</a> ([[rdfa-core]]) are not expanded.</p>
                 <p class="note">All other annotations for the <a title="annotated table">table</a> are ignored during the conversion; including information about <a href="http://www.w3.org/TR/tabular-metadata/#dfn-tableSchema" class="externalDFN">table schemas</a> and <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description" class="externalDFN">column descriptions</a> specified therein, <a href="http://www.w3.org/TR/tabular-metadata/#dfn-dialect-description" class="externalDFN">dialect descriptions</a>, <a href="http://www.w3.org/TR/tabular-metadata/#dfn-foreign-key-definition" class="externalDFN">foreign-key-definitions</a> etc.</p>
               </li>
               <li>
@@ -351,7 +353,7 @@ var respecConfig = {
                         <dt>name</dt>
                         <dd><code>url</code></dd>
                         <dt>value</dt>
-                        <dd><var>URL</var><code>#</code><var>n<sub>source</sub></var></dd>
+                        <dd><var>URL</var><code>#row=</code><var>n<sub>source</sub></var></dd>
                       </dl>
                     </p>
                   </li>
@@ -371,12 +373,12 @@ var respecConfig = {
 
                     <p class="note">A <a>row</a> MAY describe multiple interrelated <a title="subject">subjects</a>; where the <a>valueUrl</a> property for one cell matches the <a>aboutUrl</a> property for another <a>cell</a> in the same <a>row</a>.</p>
                     
-                    <p>Determine the unique <a title="subject">subjects</a> for the current <a>row</a> - including a default <a>subject</a> if <a>aboutUrl</a> is unspecified for any <a title="cell">cells</a> in the <a>row</a>.</p>
+                    <p>Determine the unique <a title="subject">subjects</a> for the current <a>row</a>—including a default <a>subject</a> if <a>aboutUrl</a> is unspecified for any <a title="cell">cells</a> in the <a>row</a>.</p>
                     
-                    <p>For each <a>subject</a> that the current <a>row</a> describes where at least one of the <a title="cell">cells</a> that refers to that <a>subject</a> has a <a title="cell value">value</a> that is not <code>null</code> and is not associated with a <a>column</a> where the value of property <a href="http://www.w3.org/TR/tabular-metadata/#column-suppressOutput"><code>suppressOutput</code></a> has value <var>true</var>:</p>
+                    <p>For each <a>subject</a> that the current <a>row</a> describes where at least one of the <a title="cell">cells</a> that refers to that <a>subject</a> has a <a title="cell value">value</a> that is not <code>null</code>, and is not associated with a <a>column</a> where the value of property <a href="http://www.w3.org/TR/tabular-metadata/#column-suppressOutput"><code>suppressOutput</code></a> has value <var>true</var>:</p>
                     <ol>
                       <li>
-                        <p>Create an empty <a>object</a> <var>S<sub>i</sub></var> to represent the <a>subject</a> <var>i</var> - but don't insert it into the <a>array</a> <var>A</var> yet.</p>
+                        <p>Create an empty <a>object</a> <var>S<sub>i</sub></var> to represent the <a>subject</a> <var>i</var>—but don't insert it into the <a>array</a> <var>A</var> yet.</p>
                         <p>(<var>i</var> is the index number with values from <var>1</var> to <var>n</var>, where <var>n</var> is the number of <a title="subject">subjects</a> for the <a>row</a>)</p>
                         <p><a title="subject">Subject</a> <var>i</var> is identified according to the <a>aboutUrl</a> property of its associated <a title="cell">cells</a>: <var>@id<sub>s</sub></var>. For a <em>default</em> <a>subject</a> where <a>aboutUrl</a> is not specified by its <a title="cell">cells</a>, <var>@id<sub>s</sub></var> is <code>null</code>.</p>
                       </li>
@@ -391,8 +393,8 @@ var respecConfig = {
                         </p>
                       </li>
                       <li>
-                        <p>Each <a>cell</a> referring to <a>subject</a> <var>i</var> is then processed sequentially in turn according to the order of the <a title="column">columns</a> (e.g. <var>1</var> to <var>n</var>).</p>
-                        <p>For each <a>cell</a> referring to <a>subject</a> <var>i</var> where the value of property <a href="http://www.w3.org/TR/tabular-metadata/#column-suppressOutput"><code>suppressOutput</code></a> for the <a>column</a> associated with that <a>cell</a> is not <var>true</var> insert a name-value pair into <a>object</a> <var>S<sub>i</sub></var> as described below.</p>
+                        <p>Each <a>cell</a> referring to <a>subject</a> <var>i</var> is then processed sequentially according to the order of the <a title="column">columns</a> (e.g. <var>1</var> to <var>n</var>).</p>
+                        <p>For each <a>cell</a> referring to <a>subject</a> <var>i</var>, where the value of property <a href="http://www.w3.org/TR/tabular-metadata/#column-suppressOutput"><code>suppressOutput</code></a> for the <a>column</a> associated with that <a>cell</a> is not <var>true</var>, insert a name-value pair into <a>object</a> <var>S<sub>i</sub></var> as described below.</p>
                         <p><a title="name">Name</a> <var>N</var> is determined from the <a>propertyUrl</a> property of the current <a>cell</a>.</p>
                         <p>If the value of <a>propertyUrl</a> for the <a>cell</a> has not been explicitly specified in the metadata description (e.g. the value of <a>propertyUrl</a> is a concatenation of the CSV+ file <var>URL</var>, <code>#</code> (<code>U+0023</code>) and the value of the <a href="http://www.w3.org/TR/tabular-metadata/#column-name"><code>name</code></a> property for the column associated with the <a>cell</a>), then <a>name</a> <var>N</var> MUST take the value of the only the fragment identifier of <a>propertyUrl</a>.</p>
                         <p>Else, <a>name</a> <var>N</var> MUST take the entire value of <a>propertyUrl</a>.</p>
@@ -409,7 +411,14 @@ var respecConfig = {
                         </p>
                         <p>where <var>V<sub>url</sub></var> is the value of <a>valueUrl</a> property for the current <a>cell</a>, is expressed as a string in the JSON output.</p>
 
-                        <p>Else, if the <a>cell</a> specifies a <a href="http://www.w3.org/TR/tabular-metadata/#cell-separator"><code>separator</code></a> property and the <a>cell value</a> is not an empty sequence, then the <a>cell value</a> provides a sequence of values for inclusion within the JSON output; insert an <a>array</a> <var>A<sub>v</sub></var> containing each value <var>V</var> of the sequence into <a>object</a> <var>S<sub>i</sub></var>.</p>
+                        <p>Else, if the <a>cell</a> specifies a <a href="http://www.w3.org/TR/tabular-metadata/#cell-separator"><code>separator</code></a> property and the <a>cell value</a> is not an empty sequence, then the <a>cell value</a> provides a sequence of values for inclusion within the JSON output; insert an <a>array</a> <var>A<sub>v</sub></var> containing each value <var>V</var> of the sequence into <a>object</a> <var>S<sub>i</sub></var>:
+                          <dl class="nvp">
+                            <dt>name</dt>
+                            <dd><var>N</var></dd>
+                            <dt>value</dt>
+                            <dd><var>A<sub>v</sub></var></dd>
+                          </dl>
+                        </p
 
                         <p class="note">Since <a title="array">arrays</a> are implicitly <em>ordered</em> in JSON, the <a href="http://www.w3.org/TR/tabular-metadata/#cell-ordered"><code>ordered</code></a> property, if specified, has no effect on the JSON output.</p>
 
@@ -429,7 +438,7 @@ var respecConfig = {
                   </li>
                   <li>
                     <p>If more than one <a>subject</a> is associated with the current <a>row</a>, review each of the <a title="object">objects</a> associated with those <a title="subject">subjects</a> to determine whether they can be nested.</p>
-                    <p>For each <a>subject</a> <var>i</var> associated with the current <a>row</a>, recurse through the name-value pairs in the <a title="object">objects</a> associated with that <a>row</a> to determine if <a>subject</a> <var>i</var> is referenced - excluding the <a>object</a> describing <a>subject</a> <var>i</var> itself (<a>object</a> <var>S<sub>i</sub></var>).</p>
+                    <p>For each <a>subject</a> <var>i</var> associated with the current <a>row</a>, recurse through the name-value pairs in the <a title="object">objects</a> associated with that <a>row</a> to determine if <a>subject</a> <var>i</var> is referenced—excluding the <a>object</a> describing <a>subject</a> <var>i</var> itself (<a>object</a> <var>S<sub>i</sub></var>).</p>
                     <p>If <a>subject</a> <var>i</var> is referenced once <em>and only once</em>, then <a>object</a> <var>S<sub>i</sub></var> becomes the value of the referring name-value pair in place of the reference in order to create a nested <a>object</a>.</p>
                     <p>Else, insert <a>object</a> <var>S<sub>i</sub></var>, potentially including nested <a title="object">objects</a>, into <a>array</a> <var>A</var>.</p>
                   </li>
@@ -1189,7 +1198,7 @@ B.B. King,2014-04-13T20:00,"Lynn Auditorium","Lynn, MA, 01901",http://frontgatet
         <div class="note">
           <p>Three resources are defined for each row within the table; event, location and offer - therefore three <a title="object">objects</a> are created for each <a>row</a>.</p>
           <p>Each <a>column</a> explicitly defines both <a href="http://www.w3.org/TR/tabular-metadata/#cell-aboutUrl"><code>aboutUrl</code></a> and <a href="http://www.w3.org/TR/tabular-metadata/#cell-propertyUrl"><code>propertyUrl</code></a> properties which are inherited by the column's <a title="cell"></a>cells</a>.</p>
-          <p><a title="column">Columns</a> <var>C6</var>, <var>C7</var> and <var>C8</var> (<code>{ "name": "type-event"}</code>, <code>{ "name": "type-place"}</code> and <code>{ "name": "type-offer"}</code>) define the semantic types of the resources described by each <a>row</a>: <code>schema:MusicEvent</code>, <code>schema:Place</code> and <code>schema:Offer</code> respectively - noting that the use of <code>rdf:type</code> is not converted to the <a>name</a> <code>@type</code> (as used in [[json-ld]]) by this conversion application as it is not, and does not need to be, JSON-LD-aware.</p>
+          <p><a title="column">Columns</a> <var>C6</var>, <var>C7</var> and <var>C8</var> (<code>{ "name": "type-event"}</code>, <code>{ "name": "type-place"}</code> and <code>{ "name": "type-offer"}</code>) define the semantic types of the resources described by each <a>row</a>: <code>schema:MusicEvent</code>, <code>schema:Place</code> and <code>schema:Offer</code> respectively—noting that the use of <code>rdf:type</code> is not converted to the <a>name</a> <code>@type</code> (as used in [[json-ld]]) by this conversion application as it is not, and does not need to be, JSON-LD-aware.</p>
           <p><a title="column">Column</a> <var>C9</var> (<code>{ "name": "location"}</code>) uses the <a href="http://www.w3.org/TR/tabular-metadata/#cell-aboutUrl"><code>aboutUrl</code></a> and <a href="http://www.w3.org/TR/tabular-metadata/#cell-valueUrl"><code>valueUrl</code></a> to assert the relationship between the event and location resources.</p>
           <p><a title="column">Column</a> <var>C10</var> (<code>{ "name": "offer"}</code>) uses the <a href="http://www.w3.org/TR/tabular-metadata/#cell-aboutUrl"><code>aboutUrl</code></a> and <a href="http://www.w3.org/TR/tabular-metadata/#cell-valueUrl"><code>valueUrl</code></a> to assert the relationship between the event and offer resources.</p>
         </div>
