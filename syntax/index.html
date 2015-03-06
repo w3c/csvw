@@ -113,23 +113,38 @@ var respecConfig = {
     <style type="text/css">
       .grammar td { font-family: monospace; vertical-align: top; }
       .grammar-literal { color: gray;}
+      ol.algorithm {
+        counter-reset: numsection;
+        list-style-type: none;
+      }
+      ol.algorithm li {
+        margin: 0.5em 0;
+      }
+      ol.algorithm li:before {
+        font-weight: bold;
+        counter-increment: numsection;
+        content: counters(numsection, ".") ") ";
+      }
     </style>
   </head>
   <body>
     <section id="abstract">
       <p>
-        Tabular data is routinely transferred on the web as "CSV", but the definition of "CSV" in practice is very loose. This document outlines a basic data model or infoset for tabular data and metadata about that tabular data. It also contains some non-normative information about a best practice syntax for tabular data, for mapping into that data model, to contribute to the standardisation of CSV syntax by IETF. Various methods of locating metadata are also provided.
+        Tabular data is routinely transferred on the web in a variety of formats, including variants on CSV, tab-delimited files, fixed field formats, spreadsheets, HTML tables and SQL dumps. This document outlines a data model or infoset for tabular data and metadata about that tabular data that can be used as a basis for validation, display or creating other formats. It also contains some non-normative guidance for publishing tabular data as CSV and how that maps into the tabular data model.
+      </p>
+      <p>
+        Creating an annotated model of tabular data relies on the provision of separate metadata about the table. This specification defines how implementations should locate that metadata, given a file containing tabular data. The syntax for that metadata is defined in [[!tabular-metadata]].
       </p>
     </section>
     <section id="sotd">
       <p>
-        The CSV on the Web Working Group was chartered to produce a Recommendation "Access methods for CSV Metadata" as well as Recommendations for "Metadata vocabulary for CSV data" and "Mapping mechanism to transforming CSV into various Formats (e.g., RDF, JSON, or XML)". This document aims to primarily satisfy the first of those Recommendations (see <a href="#locating-metadata" class="sectionRef"></a>), though it also specifies an underlying model and therefore starting point for the other chartered Recommendations.
+        The CSV on the Web Working Group was chartered to produce a Recommendation "Access methods for CSV Metadata" as well as Recommendations for "Metadata vocabulary for CSV data" and "Mapping mechanism to transforming CSV into various Formats (e.g., RDF, JSON, or XML)". This document aims to primarily satisfy the first of those Recommendations (see <a href="#locating-metadata" class="sectionRef"></a>), though it also specifies an underlying model and is therefore a basis for the other chartered Recommendations.
       </p>
       <p>
-        This document is based on IETF's [[!RFC4180]] which is an Informational RFC. The working group's expectation is that future suggestions to refine RFC 4180 will be relayed to the IETF (e.g. around I18N and multi-part packaging) and contribute to its discussions about moving CSV to the Standards track.
+        This definition of CSV used in this document is based on IETF's [[!RFC4180]] which is an Informational RFC. The working group's expectation is that future suggestions to refine RFC 4180 will be relayed to the IETF (e.g. around I18N and multi-part packaging) and contribute to its discussions about moving CSV to the Standards track.
       </p>
       <p>
-        Many "CSV" files embed metadata, for example in lines before the header row of the CSV document. This specification does not define any formats for embedding metadata within CSV files, aside from the names of columns in the header row.
+        Many files containing tabular data embed metadata, for example in lines before the header row of an otherwise standard CSV document. This specification does not define any formats for embedding metadata within CSV files, aside from the names of columns in the header row which is defined in CSV. We would encourage groups that define tabular data formats to also define a mapping into the annotated tabular data model defined in this document.
       </p>
     </section>
     <section id="intro">
@@ -140,62 +155,104 @@ var respecConfig = {
     	<p>
         Tabular data is routinely transferred on the web in a textual format called "CSV", but the definition of "CSV" in practice is very loose. Some people use the term to mean any delimited text file. Others stick more closely to the most standard definition of CSV that there is, [[!RFC4180]]. <a href="#standards" class="sectionRef">Appendix A</a> describes the various ways in which CSV is defined.
       </p>
+      <p>
+        Tabular data is also transferred on the web in tab-delimited files, fixed field formats, spreadsheets, HTML tables and SQL dumps.
+      </p>
+      <p>
+        In <a href="#model" class="sectionRef"></a>, this document defines a model for tabular data that abstracts away from the varying syntaxes that are used for when exchanging tabular data. The model includes annotations, or metadata, about collections of and individual tables, rows, columns and cells. These annotations are typically supplied through separate metadata files; <a href="#locating-metadata" class="sectionRef"></a> defines how these metadata files can be located, while [[!tabular-metadata]] defines what they contain.
+      </p>
+      <p>
+        Once an <a>annotated table</a> has been created, it can be processed in various ways, such as display, validation or conversion into other formats. This processing is described in <a href="#processing-tables" class="sectionRef"></a>.
+      </p>
+      <p>
+        This specification does not normatively define a format for exchanging tabular data. However, it does provide some best practice guidelines for publishing tabular data as CSV, in section <a href="#syntax" class="sectionRef"></a>, and for parsing both this syntax and those similar to it, in <a href="#parsing" class="sectionRef"></a>.
+      </p>
     </section>
     <section id="model">
       <h2>Tabular Data Models</h2>
       <p>
-        There are different levels of data models for tabular data:
+        This section defines an <dfn>annotated tabular data model</dfn>: a model for tables that are annotated with metadata. <dfn title="annotation">Annotations</dfn> provide information about the cells, rows, columns, tables and groups of tables with which they are associated. The <dfn title="value">values</dfn> of these annotations may be lists, structured objects, or atomic values. <dfn>Core annotations</dfn> are those that affect the behavior of processors defined in this specification, but other annotations may also be present on any of the components of the model.
       </p>
-      <ul>
-        <li>The <dfn>annotated tabular data model</dfn> described in <a href="#annotated-tabular-data-model" class="sectionRef"></a> defines a model for tables that are annotated with metadata.</li>
-        <li>The <dfn>grouped tabular data model</dfn> described in <a href="#grouped-tabular-data-model" class="sectionRef"></a> defines a model for tables that are related to each other in some way.</li>
-      </ul>
+      <p class="note">
+        In this document, the term <a>annotation</a> refers to any metadata associated with an object in the annotated tabular data model. These are not necessarily web annotations in the sense of [[annotation-model]].
+      </p>
       <section>
-        <h3>Annotated Tabular Data Model</h3>
+        <h3>Table groups</h3>
         <p>
-          An <dfn>annotated table</dfn> is a <dfn>table</dfn> that is annotated with additional metadata. The core annotations of a table are:
+          A <dfn>group of tables</dfn> comprises a set of <a title="annotated table">annotated tables</a> and a set of annotations that relate to those tables. The <a>core annotations</a> of a group of tables are:
+        </p>
+        <ul>
+          <li><dfn title="table group id">id</dfn> &mdash; an identifier for this group of tables, or <code>null</code> if this is undefined</li>
+          <li><dfn title="table group resources">resources</dfn> &mdash; the list of <a title="table">tables</a> in the group of tables. A group of tables MUST have one or more tables.</li>
+        </ul>
+        <p>
+          Groups of tables MAY in addition have any number of <a title="annotation">annotations</a> which provide information about the group of tables. Annotations on a group of tables may include:
+        </p>
+        <ul>
+          <li>information about the source or provenance of the group of tables</li>
+          <li>links to other groups of tables (eg to those that provide similar data from a different time period)</li>
+        </ul>
+      </section>
+      <section>
+        <h3>Tables</h3>
+        <p>
+          An <dfn>annotated table</dfn> is a <dfn>table</dfn> that is annotated with additional metadata. The <a>core annotations</a> of a table are:
         </p>
         <ul>
           <li><dfn title="table columns">columns</dfn> &mdash; the list of <a title="column">columns</a> in the table. A table MUST have one or more columns and the order of the columns within the list is significant and MUST be preserved by applications</li>
-          <li><dfn title="table rows">rows</dfn> &mdash; the list of rows in the table</li>
+          <li><dfn title="table rows">rows</dfn> &mdash; the list of <a title="row">rows</a> in the table</li>
+          <li><dfn title="table id">id</dfn> &mdash; an identifier for this table, or <code>null</code> if this is undefined</li>
           <li><dfn title="table url">url</dfn> &mdash; the URL of the source of the data in the table, or <code>null</code> if this is undefined</li>
+          <li><dfn title="table direction">direction</dfn> &mdash; the direction in which the columns in the table should be displayed, as described in <a href="#bidirectional-tables" class="sectionRef"></a></li>
+          <li><dfn title="table suppress output">suppress output</dfn> &mdash; a boolean that indicates whether or not this table should be suppressed in any output generated from the converting the table group that this table belongs to into another format, as described in <a href="#converting-tables" class="sectionRef"></a></li>
+          <li><dfn title="table notes">notes</dfn> &mdash; a list of notes on the table, as described in [[!tabular-metadata]], which may be an empty list</li>
+          <li><dfn title="table foreign keys">foreign keys</dfn> &mdash; a list of foreign keys on the table, as defined in [[!tabular-metadata]], which may be an empty list</li>
+          <li><dfn title="table conversions">conversions</dfn> &mdash; a (possibly empty) list of specifications for converting this table into other formats, as defined in [[!tabular-metadata]].</li>
         </ul>
         <p>
-          The table MAY in addition have any number of <dfn title="annotation">annotations</dfn> which provide information about the table as a whole. The <dfn title="value">values</dfn> of these annotations may be lists, structured objects, or atomic values. Annotations on a table may include:
+          The table MAY in addition have any number of other <a title="annotation">annotations</a>. Annotations on a table may include:
         </p>
         <ul>
           <li>titles or descriptions of the table</li>
           <li>information about the source or provenance of the data in the table</li>
           <li>links to other tables (eg to indicate tables that include related information)</li>
         </ul>
-        <p class="note">
-          In this document, the term <a>annotation</a> refers to any metadata associated with an object in the annotated tabular data model. These are not necessarily web annotations in the sense of [[annotation-model]].
-        </p>
         <p>
-          A <dfn>column</dfn> represents a vertical arrangement of <a title="cell">cells</a> within a <a>table</a>. The core annotations of a column are:
+          These arise from <a href="http://w3c.github.io/csvw/metadata/#dfn-common-property" class="externalDFN">common properties</a> defined within metadata documents, as defined in [[!tabular-metadata]].
+        </p>
+      </section>
+      <section>
+        <h3>Columns</h3>
+        <p>
+          A <dfn>column</dfn> represents a vertical arrangement of <a title="cell">cells</a> within a <a>table</a>. The <a>core annotations</a> of a column are:
         </p>
         <ul>
           <li><dfn title="column table">table</dfn> &mdash; the <a>table</a> that the column appears in</li>
           <li><dfn title="column number">number</dfn> &mdash; the position of the column amongst the <a title="table columns">columns</a> for the associated <a title="column table">table</a>, starting from 1</li>
           <li><dfn title="column source number">source number</dfn> &mdash; the position of the column in the original <a title="table url">url</a> of the table, or <code>null</code></li>
-          <li><dfn title="column cells">cells</dfn> &mdash; the list of <a title="cell">cells</a> in the column. A column MUST contain one cell from each <a>row</a> in the table. The order of the cells in the list MUST match the order of the rows in which they appear within the <a title="table rows">rows</a> for the associated <a title="column table">table</a>.</li>
+          <li><dfn title="column name">name</dfn> &mdash; the name of the column</li>
+          <li><dfn title="column titles">titles</dfn> &mdash; any number of human-readable titles for the column, each of which has an associated language</li>
+          <li><dfn title="column required">required</dfn> &mdash; a boolean that indicates whether cells within the column can be <code>null</code>; if <code>false</code> then they cannot be</li>
+          <li><dfn title="column datatype">datatype</dfn> &mdash; the expected datatype for the <a title="cell value">values</a> of <a title="cell">cells</a> in this column, as defined in [[!tabular-metadata]]</li>
           <li><dfn title="column virtual">virtual</dfn> &mdash; a boolean that indicates whether the column is a <a>virtual column</a>. <dfn title="virtual column">Virtual columns</dfn> are used to extend the source data with additional empty columns to support more advanced conversions; when this annotation is <code>false</code>, the column is a <dfn>real column</dfn>, which exists in the source data for the table.</li>
+          <li><dfn title="column suppress output">suppress output</dfn> &mdash; a boolean that indicates whether or not this column should be suppressed in any output generated from converting the table, as described in <a href="#converting-tables" class="sectionRef"></a></li>
+          <li><dfn title="column cells">cells</dfn> &mdash; the list of <a title="cell">cells</a> in the column. A column MUST contain one cell from each <a>row</a> in the table. The order of the cells in the list MUST match the order of the rows in which they appear within the <a title="table rows">rows</a> for the associated <a title="column table">table</a>.</li>
         </ul>
         <p>
-          Columns MAY in addition have any number of <a title="annotation">annotations</a>. The annotations on a column might provide information about how to interpret the <a title="cell">cells</a> in the column or information about the column as a whole. Examples of annotations might be:
+          Columns MAY in addition have any number of other <a title="annotation">annotations</a>. These arise from <a href="http://w3c.github.io/csvw/metadata/#dfn-common-property" class="externalDFN">common properties</a> defined within metadata documents, as defined in [[!tabular-metadata]].
         </p>
-        <ul>
-          <li>a name or title for the column</li>
-          <li>the expected type of values in that column</li>
-          <li>an indication of whether the column contains unique values</li>
-        </ul>
+      </section>
+      <section>
+        <h3>Rows</h3>
         <p>
-          A <dfn>row</dfn> represents a horizontal arrangement of <a title="cell">cells</a> within a <a>table</a>. The core annotations of a row are:
+          A <dfn>row</dfn> represents a horizontal arrangement of <a title="cell">cells</a> within a <a>table</a>. The <a>core annotations</a> of a row are:
         </p>
         <ul>
           <li><dfn title="row table">table</dfn> &mdash; the <a>table</a> that the row appears in</li>
           <li><dfn title="row number">number</dfn> &mdash; the position of the row amongst the <a title="table rows">rows</a> for the <a title="row table">table</a>, starting from 1</li>
           <li><dfn title="row source number">source number</dfn> &mdash; the position of the row in the original <a title="table url">url</a> of the table, or <code>null</code></li>
+          <li><dfn title="row primary key">primary key</dfn> &mdash; a possibly empty list of <a title="cell">cells</a> whose values together provide a unique identifier for this row</li>
+          <li><dfn title="row referenced rows">referenced rows</dfn> &mdash; a possibly empty list of pairs of a <a title="table foreign keys">foreign key</a> and a row in a table within the same table group (which may be another row in the table that this row appears in)</li>
           <li><dfn title="row cells">cells</dfn> &mdash; the list of <a title="cell">cells</a> in the row. A row MUST contain one cell from each <a>column</a> in the table. The order of the cells in the list MUST match the order of the columns in which they appear within the <a>table columns</a> for the row's table.</li>
         </ul>
         <p>
@@ -205,16 +262,23 @@ var respecConfig = {
           <li>the certainty of the information in that row</li>
           <li>information about the source or provenance of the data in that row</li>
         </ul>
+      </section>
+      <section>
+        <h3>Cells</h3>
         <p>
-          A <dfn>cell</dfn> represents a cell at the intersection of a <a>row</a> and a <a>column</a> within a <a>table</a>. The core annotations of a cell are:
+          A <dfn>cell</dfn> represents a cell at the intersection of a <a>row</a> and a <a>column</a> within a <a>table</a>. The <a>core annotations</a> of a cell are:
         </p>
         <ul>
           <li><dfn title="cell table">table</dfn> &mdash; the <a>table</a> that the cell appears in</li>
           <li><dfn title="cell column">column</dfn> &mdash; the <a>column</a> that the cell appears in; the cell MUST be in the <a title="column cells">cells</a> for that column</li>
           <li><dfn title="cell row">row</dfn> &mdash; the <a>row</a> that the cell appears in; the cell MUST be in the <a title="row cells">cells</a> for that row</li>
-          <li><dfn>string value</dfn> &mdash; a string that is the original syntactic representation of the value of the cell, ie how the cell appears within a CSV file; this may be an empty string</li>
+          <li><dfn>string value</dfn> &mdash; a string that is the original syntactic representation of the value of the cell, eg how the cell appears within a CSV file; this may be an empty string</li>
           <li><dfn title="cell value">value</dfn> &mdash; the semantic value of the cell; this MAY be of a datatype other than a string and MAY be <code>null</code>. For example, annotations might enable a processor to understand the <a>string value</a> of the cell as representing a number or a date. By default, if the <a>string value</a> is an empty string, the semantic value of the cell is <code>null</code>. See <a href="http://w3c.github.io/csvw/metadata/#parsing-cells">Parsing Cells</a> in [[!tabular-metadata]] for further requirements on obtaining a cell value.</li>
-          <li><dfn title="cell errors">errors</dfn> &mdash; a (possibly empty) list of validation errors on the cell</li>
+          <li><dfn title="cell errors">errors</dfn> &mdash; a (possibly empty) list of validation errors generated while parsing the value of the cell</li>
+          <li><dfn title="cell text direction">text direction</dfn> &mdash; which direction the text within the cell should be displayed, as described in <a href="#bidirectional-tables" class="sectionRef"></a></li>
+          <li><dfn title="cell about URL">about URL</dfn> &mdash; a URL for the entity that this cell provides information about</li>
+          <li><dfn title="cell property URL">property URL</dfn> &mdash; a URL for the property that this cell provides</li>
+          <li><dfn title="cell value URL">value URL</dfn> &mdash; a URL for this cell's value</li>
         </ul>
         <p class="note">
           There presence or absence of quotes around a value within a CSV file is a syntactic detail that is not reflected in the tabular data model. In other words, there is no distinction in the model between the second value in <code>a,,z</code> and the second value in <code>a,"",z</code>.
@@ -224,38 +288,27 @@ var respecConfig = {
         </p>
         <ul>
           <li>notes to aid the interpretation of the value</li>
-          <li>type annotations for the value</li>
-          <li>a flag that indicates the value is a null value</li>
+          <li>information about the source or provenance of the data in that cell</li>
         </ul>
-        <p class="issue" data-number="41">
-          The permitted types of names and values of annotations need to be spelled out here.
-        </p>
-      </section>
-      <section>
-        <h3>Grouped Tabular Data Model</h3>
-        <p>
-          A <dfn>group of tables</dfn> comprises a set of <a title="annotated table">annotated tables</a> and a set of annotations that relate to the set. The core annotation of a group of tables is:
-        </p>
-        <ul>
-          <li><dfn title="table group resources">resources</dfn> &mdash; the list of <a title="table">tables</a> in the group of tables. A group of tables MUST have one or more tables</li>
       </section>
     </section>
     <section>
       <h2>Locating Metadata</h2>
       <p>
-        As described in <a href="#annotated-tabular-data-model" class="sectionRef"></a>, tabular data may have a number of annotations associated with it. Here we describe the different methods that can be used to locate those annotations given a link to a CSV file.
+        As described in <a href="#annotated-tabular-data-model" class="sectionRef"></a>, tabular data may have a number of annotations associated with it. Here we describe the different methods that can be used to locate metadata that provides those annotations.
       </p>
       <p>
-        In most methods of locating metadata described here, metadata is provided within a separate document. The syntax of this document is defined in the <a href="http://www.w3.org/TR/tabular-metadata/">Metadata Vocabulary for Tabular Data</a> specification. These documents can include things like:
+        In most methods of locating metadata described here, metadata is provided within separate documents. The syntax of these documents is defined in [[!tabular-metadata]]. These documents can include things like:
       </p>
       <ul>
-        <li>metadata about the table, such as titles, descriptions, provenance, and links to other tables</li>
+        <li>metadata about groups of tables, such as provenance, and links to other groups of tables</li>
+        <li>metadata about tables, such as titles, descriptions, provenance, and links to other tables</li>
         <li>metadata about columns in the table, such as titles, data types and other constraints, or flags to indicate values in the column are unique</li>
         <li>metadata about rows in the table, such as certainty or provenance</li>
         <li>metadata about values in the table, such as notes or type annotations</li>
       </ul>
       <p>
-        When creating a set of annotations from metadata, if the same property is specified in two locations then information "closer" to the end user or interpreter of the document should override other information, and information "closer" to the document itself should override information "further" from the document. Explicitly, the order of preference is:
+        When creating a set of annotations from metadata, if the same property is specified in two locations then information "closer" to the end user or interpreter of the document overrides other information, and information "closer" to the document itself overrides information "further" from the document. Explicitly, the order of precedence is:
       </p>
       <ol>
         <li>metadata supplied by the user of the implementation that is processing the tabular data, see <a href="#overriding-metadata" class="sectionRef"></a></li>
@@ -287,35 +340,93 @@ var respecConfig = {
           <li>by enabling the user to select an existing metadata file, which may be local or remote</li>
           <li>by enabling the user to specify a series of metadata files, which are merged by the processor and handled as if they were a single file</li>
         </ul>
+        <p>
+          For example, a processor might be invoked with:
+        </p>
+        <pre class="example" title="Command-line CSV processing with column types">
+$ csvlint data.csv --datatypes:string,float,string,string
+        </pre>
+        <p>
+          to enable the testing of the types of values in the columns of a CSV file, or with:
+        </p>
+        <pre class="example" title="Command-line CSV processing with a schema">
+$ csvlint data.csv --schema:schema.json
+        </pre>
+        <p>
+          to supply a schema that describes the contents of the file, against which it can be validated.
+        </p>
+        <p>
+          Metadata supplied in this way is called overriding, or user-supplied, metadata. Implementations should define how this is mapped into the vocabulary defined in [[!tabular-metadata]].
+        </p>
       </section>
       <section>
         <h3>Embedded Metadata</h3>
         <p>
-          Most syntaxes for tabular data provide a facility for <dfn title="embedded metadata">embedding metadata</dfn> within the tabular data file itself. The definition of a syntax for tabular data SHOULD include a description of how the syntax maps to an annotated data model. See <a href="#parsing" class="sectionRef"></a> for a description of this for CSV files.
+          Most syntaxes for tabular data provide a facility for <dfn title="embedded metadata">embedding metadata</dfn> within the tabular data file itself. The definition of a syntax for tabular data SHOULD include a description of how the syntax maps to an annotated data model, and in particular how any embedded metadata is mapped into the vocabulary defined in [[!tabular-metadata]]. For example, the following tab-delimited file contains embedded metadata:
+        </p>
+        <pre class="example" title="Tab-separated file containing embedded metadata">
+# publisher City of Palo Alto
+# updated 12/31/2010
+#name GID on_street species trim_cycle  inventory_date
+#datatype string  string  string  string  date:M/D/YYYY
+  GID On Street Species Trim Cycle  Inventory Date
+  1 ADDISON AV  Celtis australis  Large Tree Routine Prune  10/18/2010
+  2 EMERSON ST  Liquidambar styraciflua Large Tree Routine Prune  6/2/2010
+        </pre>
+        <p>
+          A processor that recognises this format may be able to extract and make sense of this embedded metadata. <a href="#parsing" class="sectionRef"></a> provides an informative guide on how embedded metadata commonly used within "CSV" files can be extracted.
         </p>
       </section>
       <section>
         <h3>Link Header</h3>
         <p>
-          When retrieving a tabular data file via HTTP, the response MAY include a <code>Link</code> header with <code>rel=describedby</code> and <code>type=application/csv-metadata+json</code> that points to a metadata file that describes the tabular data file. If there is more than one valid metadata file linked to through multiple <code>Link</code> headers, then the metadata referenced by <code>Link</code> headers that appear later in the response are used in preference to those referenced by earlier <code>Link</code> headers.
+          When retrieving a tabular data file via HTTP, the response MAY include a <code>Link</code> header with <code>rel="describedby"</code> and <code>type="application/csvm+json"</code> that points to a metadata file that describes the tabular data file. If there is more than one valid metadata file linked to through multiple <code>Link</code> headers, then the metadata referenced by <code>Link</code> headers that appear later in the response are used instead of those referenced by earlier <code>Link</code> headers.
+        </p>
+        <p>
+          For example, when the response to requesting a tab-separated file looks like:
+        </p>
+        <pre class="example highlight" title="HTTP response including Link headers">
+HTTP/1.1 200 OK
+Content-Type: text/tab-separated-values
+...
+Link: &lt;metadata.ttl&gt;; rel="describedBy"; type="text/turtle"
+Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
+        </pre>
+        <p>
+          an implementation should use the referenced <code>metadata.json</code> to supply metadata for processing the file.
+        </p>
+        <p>
+          If the metadata file found at this location does not explicitly include a reference to the relevant tabular data file then it MUST be ignored.
         </p>
       </section>
       <section>
         <h3>Standard File Metadata</h3>
         <p>
-          If no metadata document has been located through higher-priority mechanisms, processors MUST attempt to locate a file-specific metadata document. This method is only used if the URL of the tabular data file does not contain a query component.
+          Processors MUST also attempt to locate a file-specific metadata document. This method MUST NOT be used if the URL of the tabular data file contains a query component.
         </p>
         <p>
-          In this case, the file-specific metadata document should be located at <code><var>location</var>-metadata.json</code>, where <var>location</var> is the base URL of the tabular data file with the fragment component of the URL removed, if applicable. For example, if the tabular data file is at <code>http://example.org/south-west/devon.csv</code> then processors should attempt to locate a metadata document at <code>http://example.org/south-west/devon.csv-metadata.json</code>. If the metadata file found at this location does not explicitly point to the relevant tabular data file then it MUST be ignored.
+          In this case, the file-specific metadata document should be located at <code><var>location</var>-metadata.json</code>, where <var>location</var> is the base URL of the tabular data file with the fragment component of the URL removed, if applicable.
+        </p>
+        <p>
+          For example, if the tabular data file is at <code>http://example.org/south-west/devon.csv</code> then processors should attempt to locate a metadata document at <code>http://example.org/south-west/devon.csv-metadata.json</code>. On the other hand, if the tabular data file is at <code>http://example.com/index.php?file=43178.csv</code> then, because the URL of the tabular data file includes a query component, the processor should not attempt to look for a file-specific metadata document.
+        </p>
+        <p>
+          If the metadata file found at this location does not explicitly include a reference to the relevant tabular data file then it MUST be ignored.
         </p>
       </section>
       <section>
         <h3>Standard Directory Metadata</h3>
         <p>
-          If no metadata document has been located through higher-priority mechanisms, processors MUST attempt to locate a directory-level metadata document. This method is only used if the URL of the tabular data file does not contain a query component.
+          Processors MUST attempt to locate a directory-level metadata document. This method MUST NOT be used if the URL of the tabular data file contains a query component.
         </p>
         <p>
-          The common metadata document for a directory can be located by resolving the relative URL <code>metadata.json</code> against the base URL of the tabular data file. For example, if the tabular data file is at <code>http://example.org/south-west/devon.csv</code> then processors should attempt to locate a metadata file at <code>http://example.org/south-west/metadata.json</code>. If the metadata file found at this location does not explicitly point to the relevant tabular data file then it MUST be ignored.
+          The common metadata document for a directory can be located by resolving the relative URL <code>metadata.json</code> against the base URL of the tabular data file.
+        </p>
+        <p>
+          For example, if the tabular data file is at <code>http://example.org/south-west/devon.csv</code> then processors should attempt to locate a metadata file at <code>http://example.org/south-west/metadata.json</code>. On the other hand, if the tabular data file is at <code>http://example.com/index.php?file=43178.csv</code> then, because the URL of the tabular data file includes a query component, the processor should not attempt to look for a directory-level metadata document.
+        </p>
+        <p>
+          If the metadata file found at this location does not explicitly include a reference to the relevant tabular data file then it MUST be ignored.
         </p>
       </section>
     </section>
@@ -333,7 +444,7 @@ var respecConfig = {
       <p>
         For example, if a validator is passed a locally authored metadata file <code>spending.json</code>, which contains:
       </p>
-      <pre class="example highlight">
+      <pre class="example highlight" type="Metadata file referencing multiple tabular data files sharing a schema">
 {
   "tableSchema": "government-spending.csv",
   "resources": [{
@@ -352,27 +463,27 @@ var respecConfig = {
         <p>After locating metadata, all metadata documents discovered are <a href="http://w3c.github.io/csvw/metadata/#dfn-merged" class="externalDFN">merged</a> into a single description containing all <a title="annotation">annotations</a>. When starting with a metadata file, this involves merging any metadata located about the referenced tabular data files into that metadata file. When starting with a tabular data file this involves locating all metadata as described in <a href="#locating-metadata" class="sectionRef"></a> and merging all relevant metadata into a single descriptor.
         </p>
         <p>If processing starts with a tabular data file, implementations:</p>
-        <ol>
-          <li><p>Retrieve the tabular data file.</p></li>
-          <li><p>Retrieve the metadata files described in <a href="#locating-metadata" class="sectionRef"></a>:</p>
-            <ul>
+        <ol class="algorithm">
+          <li>Retrieve the tabular data file.</li>
+          <li>Retrieve the metadata files described in <a href="#locating-metadata" class="sectionRef"></a>:
+            <ol class="algorithm">
               <li>metadata supplied by the user (<code>UM</code>) (see <a href="#overriding-metadata" class="sectionRef"></a>)</li>
               <li>metadata referenced from a <em>Link Header</em> that may be returned when retrieving the tabular data file (<code>LM</code>) (see <a href="#link-header" class="sectionRef"></a>)</li>
               <li>file-specific metadata in a document located based on the location of the tabular data file (<code>FM</code>) (see <a href="#standard-file-metadata" class="sectionRef"></a>)</li>
               <li>directory-specific metadata in a document located based on the location of the tabular data file  (<code>DM</code>) (see <a href="#standard-directory-metadata" class="sectionRef"></a>)</li>
-            </ul>
+            </ol>
           </li>
-          <li><p>Extract the <em>first available</em> <a href="http://www.w3.org/TR/tabular-metadata/#dialect-descriptions">dialect description</a> (<code>DD</code>) from the metadata files <code>UM</code>, <code>LM</code>, <code>FM</code>, <code>DM</code> (in this order) for the table description associated with the tabular data file. If there is no such dialect description, extract the first available dialect description from a table group description in which the tabular data file is described. Otherwise use the default dialect description.</p></li>
-          <li><p>If the tabular data file was retrieved with <code>Content-Type</code> including the <code>header=absent</code> parameter set <code>header</code> to <code>false</code> in <code>DD</code>.</p></li>
+          <li>Extract the <em>first available</em> <a href="http://www.w3.org/TR/tabular-metadata/#dialect-descriptions">dialect description</a> (<code>DD</code>) from the metadata files <code>UM</code>, <code>LM</code>, <code>FM</code>, <code>DM</code> (in this order) for the table description associated with the tabular data file. If there is no such dialect description, extract the first available dialect description from a table group description in which the tabular data file is described. Otherwise use the default dialect description.</li>
+          <li>If the tabular data file was retrieved with <code>Content-Type</code> including the <code>header=absent</code> parameter set <code>header</code> to <code>false</code> in <code>DD</code>.</li>
           <li>
-            <p>Parse the tabular data file, using <code>DD</code> as a guide, to create a basic tabular data model (<code>T</code>) with core annotations. Extract embedded metadata (<code>EM</code>), for example from the <a>header line</a>.</p>
+            Parse the tabular data file, using <code>DD</code> as a guide, to create a basic tabular data model (<code>T</code>). Extract embedded metadata (<code>EM</code>), for example from the <a>header line</a>.
             <p class="note">Note: This specification provides a non-normative definition for parsing tabular data files, including the extraction of embedded metadata, in <a href="#parsing-tabular-data" class="sectionRef"></a>. No definition of the format of embedded metadata is given here; whatever syntax is used, it's assumed that metadata can be mapped to the vocabulary defined in [[!tabular-metadata]].</p>
           </li>
-          <li><p>Create the merged metadata <code>M = merge(UM, EM, LM, FM, DM)</code> using the <a href="http://w3c.github.io/csvw/metadata/#dfn-merged" class="externalDFN">merge algorithm</a> defined in [[!tabular-metadata]].</p></li>
-          <li><p>Use the metadata <code>M</code> to add annotations to the tabular data model <code>T</code> as described in <a href="http://w3c.github.io/csvw/metadata/#annotating-tables">Section 2 Annotating Tables</a> in [[!tabular-metadata]].</p></li>
+          <li>Create the merged metadata <code>M = merge(UM, EM, LM, FM, DM)</code> using the <a href="http://w3c.github.io/csvw/metadata/#dfn-merged" class="externalDFN">merge algorithm</a> defined in [[!tabular-metadata]].</li>
+          <li>Use the metadata <code>M</code> to add annotations to the tabular data model <code>T</code> as described in <a href="http://w3c.github.io/csvw/metadata/#annotating-tables">Section 2 Annotating Tables</a> in [[!tabular-metadata]].</li>
         </ol>
         <p>If the process starts with a Metadata file:</p>
-        <ol>
+        <ol class="algorithm">
           <li>Retrieve the metadata file yielding the metadata <code>UM</code> (which is treated as overriding metadata, see <a href="#overriding-metadata" class="sectionRef"></a>).</li>
           <li>For each table description in <code>UM</code>, run the steps for a tabular data file using the <code>url</code> from the table description with <code>UM</code> playing the role of <code>UM</code> to create one or more <a title="annotated table">annotated tables</a>.</li>
         </ol>
@@ -398,7 +509,7 @@ var respecConfig = {
             There are two levels of bidirectionality to consider when displaying tables: the directionality of the table (ie whether the columns should be arranged left-to-right or right-to-left) and the directionality of the content of individual cells.
           </p>
           <p>
-            The <a href="#tableDirection"><code>tableDirection</code> property</a> provides information about the desired display of the table. If <code>tableDirection=ltr</code> then the first column SHOULD be displayed on the left and the last column on the right. If <code>tableDirection=rtl</code> then the first column SHOULD be displayed on the right and the last column on the left.
+            The <a href="http://w3c.github.io/csvw/metadata/#tableDirection"><code>tableDirection</code> annotation</a> provides information about the desired display of the table. If <code>tableDirection=ltr</code> then the first column SHOULD be displayed on the left and the last column on the right. If <code>tableDirection=rtl</code> then the first column SHOULD be displayed on the right and the last column on the left.
           </p>
           <p>
             If <code>tableDirection=default</code> then tables SHOULD be displayed with attention to the bidirectionality of the content of the file. Specifically, the values of the cells in the table should be scanned breadth first: from the first cell in the first column through to the last cell in the first column, down to the last cell in the last column. If the first character in the table with a <a href="http://unicode.org/reports/tr9/#Bidirectional_Character_Types">strong type</a> as defined in [[!UNICODE-BIDI]] indicates a <abbr title="right-to-left">RTL</abbr> directionality, the table should be displayed with the first column on the right and the last column on the left. Otherwise, the table should be displayed with the first column on the left and the last column on the right. Characters such as whitespace, quotes, commas and numbers do not have a strong type, and therefore are skipped when identifying the character that determines the directionality of the table.
@@ -417,16 +528,22 @@ var respecConfig = {
       <section>
         <h3>Validating Tables</h3>
         <p>
-          <a href="http://w3c.github.io/csvw/metadata/#dfn-validators" class="externalDFN">Validators</a> test whether given tabular data files adhere to the structure defined within a <a href="http://w3c.github.io/csvw/metadata/#dfn-schema" class="externalDFN">schema</a>.
+          <a href="http://w3c.github.io/csvw/metadata/#dfn-validators" class="externalDFN">Validators</a> test whether given tabular data files adhere to the structure defined within a <a href="http://w3c.github.io/csvw/metadata/#dfn-schema" class="externalDFN">schema</a>. Validators MUST raise errors as defined in [[!tabular-metadata]] and in the following situations:
         </p>
-        <p class="issue">
-          We intend to detail how to validate groups of tabular data files against metadata. This would be normative: compliant validators would have to report the errors and warnings that we define. We invite comment on whether this is a useful thing to specify.
+        <ul>
+          <li>if there is more than one <a>row</a> with the same <a title="row primary key">primary key</a>, that is where the <a title="cell">cells</a> listed for the primary key for the row have the same <a title="cell value">values</a> as the cells listed for the primary key for another row</li>
+          <li>for each <a>row</a> that does not have a <a title="row referenced rows">referenced row</a> for each of the <a title="table foreign keys">foreign keys</a> on the <a>table</a> the row appears in</li>
+          <li>for each <a>cell</a> in a <a>column</a> whose <a title="column required">required</a> annotation is <code>true</code></li>
+          <li>for each <a title="cell errors">error</a> on each <a>cell</a></li>
+        </ul>
+        <p class="note">
+          There is no obligation for processors to halt processing at the first error.
         </p>
       </section>
       <section>
         <h3>Converting Tables</h3>
         <p>
-          Conversions of tabular data to other formats operate over a <a>annotated table</a> constructed as defined in <a href="http://w3c.github.io/csvw/metadata/#annotating-tables" class="sectionRef"></a>. The mechanics of these conversions to other formats are defined in other specifications.
+          Conversions of tabular data to other formats operate over a <a>annotated table</a> constructed as defined in <cite><a href="http://w3c.github.io/csvw/metadata/#annotating-tables">Annotating Tables</a></cite> in [[!tabular-metadata]]. The mechanics of these conversions to other formats are defined in other specifications.
         </p>
         <p>
           Conversion specifications MUST define a default mapping from an annotated table that lacks any annotations (ie that is equivalent to an un-annotated table).
@@ -435,10 +552,10 @@ var respecConfig = {
           Conversion specifications MUST use the <a href="http://w3c.github.io/csvw/metadata/#dfn-inherited-property" class="externalDFN">property value</a> of the <a href="http://w3c.github.io/csvw/metadata/#cell-propertyUrl"><code>propertyUrl</code></a> of a column as the basis for naming machine-readable fields in the target format, such as the name of the equivalent element or attribute in XML, property in JSON or property URI in RDF.
         </p>
         <p>
-          Conversion specifications MAY use any of the properties defined in this specification to adjust the mapping of an annotated table into another format.
+          Conversion specifications MAY use any of the annotations defined in [[!tabular-metadata]] to adjust the mapping of an annotated table into another format.
         </p>
         <p>
-          Conversion specifications MAY define additional properties, not defined in this specification, which are specifically used when converting to the target format of the conversion. For example, a conversion to XML might specify a <code>element-or-attribute</code> property on columns that determines whether a particular column is represented through an element or an attribute in the data.
+          Conversion specifications MAY define additional annotations, not defined in [[!tabular-metadata]], which are specifically used when converting to the target format of the conversion. For example, a conversion to XML might specify a <code>http://example.org/conversion/xml/element-or-attribute</code> property on columns that determines whether a particular column is represented through an element or an attribute in the data.
         </p>
         <p>
           Conversion specifications SHOULD specify format-specific properties specifying external processing steps to provide more control to people defining conversions. If these are specified, the conversion specification MUST specify at what point in the processing this external processing takes place, and what it takes place on. Examples might be:
@@ -451,37 +568,31 @@ var respecConfig = {
       </section>
     </section>
     <section id="syntax" class="informative">
-      <h2>CSV+ Syntax</h2>
+      <h2>Best Practice CSV</h2>
       <p>
-        There is no standard for CSV, and there are many variants of CSV used on the web today. This section defines a method for outputting tabular data adhering to the <a>annotated tabular data model</a> described in <a href="#annotated-tabular-data-model" class="sectionRef"></a> into a standard, CSV-based, syntax. Compliant applications that output this format must meet each of the constraints.
-      </p>
-      <p class="note">
-        We are actively working with the IETF to develop a standard for CSV, which is outside the scope of the Working Group. The details here aim to help shape that standard based on our requirements.
-      </p>
-      <p>
-        This section does not seek to describe how applications that <em>input</em> textual tabular data should interpret it, except that any data that is in the format defined here should be understood as defined here.
+        There is no standard for CSV, and there are many variants of CSV used on the web today. This section defines a method for expressing tabular data adhering to the <a>annotated tabular data model</a> defined in <a href="#annotated-tabular-data-model" class="sectionRef"></a> in CSV. Authors are encouraged to adhere to the constraints described in this section as implementations should process such CSV files consistently.
       </p>
       <div class="note">
         <p>
-          This syntax is not compliant with <code>text/csv</code> as defined in [[!RFC4180]] in that it permits line endings other than <code>CRLF</code>. Supporting <code>LF</code> line endings are important characteristics for data formats that are used on non-Windows platforms. However, all files that adhere to [[!RFC4180]]'s definition of CSV are compliant CSV+ files.
+          This syntax is not compliant with <code>text/csv</code> as defined in [[!RFC4180]] in that it permits line endings other than <code>CRLF</code>. Supporting <code>LF</code> line endings are important characteristics for data formats that are used on non-Windows platforms. However, all files that adhere to [[!RFC4180]]'s definition of CSV meet the constraints described in this section.
+        </p>
+        <p>
+          We are actively working with the IETF to develop a standard for CSV, which is outside the scope of the Working Group. The details here aim to help shape that standard based on our requirements.
         </p>
       </div>
       <section id="content-type">
         <h3>Content Type</h3>
         <p>
-          The appropriate content type for a CSV+ file is <code>text/csv</code>. For example, when a CSV+ file is transmitted via HTTP, the HTTP response MUST include a <code>Content-Type</code> header with the value <code>text/csv</code>:
+          The appropriate content type for a CSV file is <code>text/csv</code>. For example, when a CSV file is transmitted via HTTP, the HTTP response MUST include a <code>Content-Type</code> header with the value <code>text/csv</code>:
         </p>
         <pre>
 Content-Type: text/csv
         </pre>
-        <p class="issue">
-          See below for issues relating to whether we should instead define a different content type.
-        </p>
       </section>
       <section id="encoding">
         <h3>Encoding</h3>
         <p>
-          CSV+ files SHOULD be encoded using UTF-8. If a CSV+ file is not encoded using UTF-8, the encoding MUST be specified through the <code>charset</code> parameter in the <code>Content-Type</code> header:
+          CSV files SHOULD be encoded using UTF-8. If a CSV file is not encoded using UTF-8, the encoding MUST be specified through the <code>charset</code> parameter in the <code>Content-Type</code> header:
         </p>
         <pre>
 Content-Type: text/csv;charset=ISO-8859-1
@@ -490,13 +601,13 @@ Content-Type: text/csv;charset=ISO-8859-1
       <section id="line-endings">
         <h3>Line Endings</h3>
         <p>
-          The ends of rows in a CSV+ file MUST be either <code>CRLF</code> (<code>U+000D U+000A</code>) or <code>LF</code> (<code>U+000A</code>). Line endings within escaped <a title="cell">cells</a> are not normalised.
+          The ends of rows in a CSV file MUST be either <code>CRLF</code> (<code>U+000D U+000A</code>) or <code>LF</code> (<code>U+000A</code>). Line endings within escaped <a title="cell">cells</a> are not normalised.
         </p>
       </section>
       <section id="lines">
         <h3>Lines</h3>
         <p>
-          Each line of a CSV+ file MUST contain the same number of comma-separated values.
+          Each line of a CSV file MUST contain the same number of comma-separated values.
         </p>
         <p>
           Values that contain commas, line endings or double quotes MUST be escaped by having the entire value wrapped in double quotes. There MUST NOT be whitespace before or after the double quotes. Within these escaped cells, any double quotes MUST be escaped with two double quotes (<code>""</code>).
@@ -504,21 +615,21 @@ Content-Type: text/csv;charset=ISO-8859-1
         <section id="headers">
           <h4>Headers</h4>
           <p>
-            The first line of a CSV+ file SHOULD contain a comma-separated list of names of <a title="column">columns</a>. This is known as the <dfn>header line</dfn> and provides titles for the columns. There are no constraints on these titles.
+            The first line of a CSV file SHOULD contain a comma-separated list of names of <a title="column">columns</a>. This is known as the <dfn>header line</dfn> and provides titles for the columns. There are no constraints on these titles.
           </p>
           <p>
-            If a CSV+ file does not include a header line, this MUST be specified using the <code>header</code> parameter of the media type:
+            If a CSV file does not include a header line, this MUST be specified using the <code>header</code> parameter of the media type:
           </p>
           <pre>
 Content-Type: text/csv;header=absent
           </pre>
         </section>
         <section>
-          <h4>Bidirectionality in CSV+ Files</h4>
+          <h4>Bidirectionality in CSV Files</h4>
           <p>
-            Bidirectional content does not alter the definition of rows or the assignment of cells to columns. Whether or not a CSV+ file contains right-to-left characters, the first column's content is the first cell of each row, which is the text prior to the first occurrence of a comma within that row.
+            Bidirectional content does not alter the definition of rows or the assignment of cells to columns. Whether or not a CSV file contains right-to-left characters, the first column's content is the first cell of each row, which is the text prior to the first occurrence of a comma within that row.
           </p>
-          <div class="example">
+          <div class="example" title="Bidirectional CSV file">
             <p>
               For example, <a href="http://referendum2012.elections.eg/results/referendum-results">Egyptian Referendum results</a> are available as a CSV file at <a href="https://egelections-2011.appspot.com/Referendum2012/results/csv/EG.csv">https://egelections-2011.appspot.com/Referendum2012/results/csv/EG.csv</a>. Over the wire and in non-Unicode-aware text editors, the CSV looks like:
             </p>
@@ -565,19 +676,19 @@ Content-Type: text/csv;header=absent
               </thead>
               <tbody>
                 <tr>
-                  <th>row 1 (header)</th><th>المحافظة</th><th>نسبة موافق</th><th>نسبة غير موافق</th><th>عدد الناخبين</th><th>الأصوات الصحيحة</th><th>الأصوات الباطلة</th><th>نسبة المشاركة</th><th>موافق</th><th>غير موافق</th>
+                  <th>column names</th><th>المحافظة</th><th>نسبة موافق</th><th>نسبة غير موافق</th><th>عدد الناخبين</th><th>الأصوات الصحيحة</th><th>الأصوات الباطلة</th><th>نسبة المشاركة</th><th>موافق</th><th>غير موافق</th>
                 </tr>
                 <tr>
-                  <th>row 2</th><td>القليوبية</td><td>60.0</td><td>40.0</td><td>2,639,808</td><td>853,125</td><td>15,224</td><td>32.9</td><td>512,055</td><td>341,070</td>
+                  <th>row 1</th><td>القليوبية</td><td>60.0</td><td>40.0</td><td>2,639,808</td><td>853,125</td><td>15,224</td><td>32.9</td><td>512,055</td><td>341,070</td>
                 </tr>
                 <tr>
-                  <th>row 3</th><td>الجيزة</td><td>66.7</td><td>33.3</td><td>4,383,701</td><td>1,493,092</td><td>24,105</td><td>34.6</td><td>995,417</td><td>497,675</td>
+                  <th>row 2</th><td>الجيزة</td><td>66.7</td><td>33.3</td><td>4,383,701</td><td>1,493,092</td><td>24,105</td><td>34.6</td><td>995,417</td><td>497,675</td>
                 </tr>
                 <tr>
-                  <th>row 4</th><td>القاهرة</td><td>43.2</td><td>56.8</td><td>6,580,478</td><td>2,254,698</td><td>36,342</td><td>34.8</td><td>974,371</td><td>1,280,327</td>
+                  <th>row 3</th><td>القاهرة</td><td>43.2</td><td>56.8</td><td>6,580,478</td><td>2,254,698</td><td>36,342</td><td>34.8</td><td>974,371</td><td>1,280,327</td>
                 </tr>
                 <tr>
-                  <th>row 5</th><td>قنا</td><td>84.5</td><td>15.5</td><td>1,629,713</td><td>364,509</td><td>6,743</td><td>22.8</td><td>307,839</td><td>56,670</td>
+                  <th>row 4</th><td>قنا</td><td>84.5</td><td>15.5</td><td>1,629,713</td><td>364,509</td><td>6,743</td><td>22.8</td><td>307,839</td><td>56,670</td>
                 </tr>
               </tbody>
             </table>
@@ -585,7 +696,7 @@ Content-Type: text/csv;header=absent
               The fragment identifier <code>#col=3</code> identifies the third of the columns, named <code>نسبة غير موافق</code> (appearing as <code><bdo dir="ltr">&#8204;ن&#8204;س&#8204;ب&#8204;ة&#8204; &#8204;غ&#8204;ي&#8204;ر&#8204; &#8204;م&#8204;و&#8204;ا&#8204;ف&#8204;ق&#8204;</bdo></code> in the example).
             </p>
             <p>
-              [[!tabular-metadata]] defines how this table model should be displayed by compliant applications, and how metadata can affect the display. The default is for the display to be determined by the content of the table. For example, if this CSV were turned into an HTML table for display into a web page, it should be displayed with the first column on the right and the last on the left, as follows:
+              <a href="#bidirectional-tables" class="sectionRef"></a> defines how this table model should be displayed by compliant applications, and how metadata can affect the display. The default is for the display to be determined by the content of the table. For example, if this CSV were turned into an HTML table for display into a web page, it should be displayed with the first column on the right and the last on the left, as follows:
             </p>
             <table style="width: 100%; text-align: right">
               <thead>
@@ -740,7 +851,7 @@ Content-Type: text/csv;header=absent
         Standardising the parsing of CSV is outside the chartered scope of the Working Group. This non-normative section is intended to help the creators of parsers handle the wide variety of CSV-based formats that they may encounter due to the current lack of standardisation of the format.
       </p>
       <p>
-        This section describes an algorithm for parsing formats other than the plain CSV+ format specified in <a href="#syntax" class="sectionRef"></a> and extracting <a>embedded metadata</a>. The parsing algorithm uses the following flags. These may be set by metadata properties found while <a href="#locating-metadata" class="sectionRef">Locating Metadata</a>, including through user input (see <a href="#overriding-metadata" class="sectionRef">Overriding Metadata</a>) or through the inclusion of a <a href="http://w3c.github.io/csvw/metadata/#dialect-descriptions">dialect description</a> within a metadata file:
+        This section describes an algorithm for parsing formats that do not adhere to the constraints described in <a href="#syntax" class="sectionRef"></a>, as well as those that do, and extracting <a>embedded metadata</a>. The parsing algorithm uses the following flags. These may be set by metadata properties found while <a href="#locating-metadata" class="sectionRef">Locating Metadata</a>, including through user input (see <a href="overriding-metadata" class="sectionRef">Overriding Metadata</a>) or through the inclusion of a <a href="http://w3c.github.io/csvw/metadata/#dialect-descriptions">dialect description</a> within a metadata file:
       </p>
       <dl>
         <dt><dfn>encoding</dfn></dt>
@@ -771,7 +882,7 @@ Content-Type: text/csv;header=absent
       <p>
         The algorithm for parsing a document containing tabular data is as follows:
       </p>
-      <ol>
+      <ol class="algorithm">
         <li>Create <dfn>merged metadata</dfn> by locating all sources of metadata, other than embedded, as defined in <a href="#locating-metadata" class="sectionRef">Locating Metadata</a> and merge together in priority order as defined in <a href="http://w3c.github.io/csvw/metadata/#merging-metadata">Merging Metadata</a> in [[!tabular-metadata]].</li>
         <li>Read the file using the specified <a>encoding</a>.</li>
         <li>Find the rows. Each row ends with a <a>line terminator</a>, but values that are enclosed within the <a>quote character</a> may contain the <a>line terminator</a> without it indicating the end of the row. The <a>quote character</a> may be escaped using the <a>escape character</a> where it appears within cells. If the <a>escape character</a> is not the same as the <a>quote character</a> then the <a>escape character</a> is also used to escape the character that immediately follows it.</li>
@@ -799,9 +910,9 @@ Content-Type: text/csv;header=absent
         <section>
           <h4>Simple Example</h4>
           <p>
-            A simple CSV+ file at <code>http://example.org/tree-ops.csv</code> might look like:
+            A simple CSV file that complies to the constraints described in <a href="#syntax" class="sectionRef"></a>, at <code>http://example.org/tree-ops.csv</code>, might look like:
           </p>
-          <pre class="example">
+          <pre class="example" title="Simple CSV file">
 GID,On Street,Species,Trim Cycle,Inventory Date
 1,ADDISON AV,Celtis australis,Large Tree Routine Prune,10/18/2010
 2,EMERSON ST,Liquidambar styraciflua,Large Tree Routine Prune,6/2/2010
@@ -811,8 +922,8 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           </p>
           <table style="width: 100%; text-align: left">
             <thead>
-              <tr><th rowspan="2">id</th><th colspan="4">core annotations</th><th>annotations</th></tr>
-              <tr><th>table</th><th>number</th><th>source number</th><th>cells</th><th><code>title</code></th></tr>
+              <tr><th rowspan="2">id</th><th colspan="5">core annotations</th></tr>
+              <tr><th>table</th><th>number</th><th>source number</th><th>cells</th><th>titles</th></tr>
             </thead>
             <tbody>
               <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td>1</td><td><var>C1.1</var>, <var>C2.1</var></td><td><code>GID</code></td></tr>
@@ -822,7 +933,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               <tr><td><var>C5</var></td><td><var>T</var></td><td>5</td><td>5</td><td><var>C1.5</var>, <var>C2.5</var></td><td><code>Inventory Date</code></td></tr>
             </tbody>
           </table>
-          <p>Expressed as Table Metadata:</p>
+          <p>The extracted embedded metadata, as defined in [[!tabular-metadata]], would look like:</p>
           <pre class="highlight">
 {
   "@type": "Table",
@@ -852,27 +963,27 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             </tbody>
           </table>
           <p class="note">
-            The <a title="row source number">source number</a> of each row is offset by one from the <a title="row number">number</a> of each row because in the source CSV+ file, the header line is the first line. It is possible to reconstruct a [[RFC7111]] compliant reference to the first record in the original CSV+ file (<code>http://example.org/tree-ops.csv#row=2</code>) using the value of the row's source number. This enables implementations to retain provenance between the table model and the original file.
+            The <a title="row source number">source number</a> of each row is offset by one from the <a title="row number">number</a> of each row because in the source CSV file, the header line is the first line. It is possible to reconstruct a [[RFC7111]] compliant reference to the first record in the original CSV file (<code>http://example.org/tree-ops.csv#row=2</code>) using the value of the row's source number. This enables implementations to retain provenance between the table model and the original file.
           </p>
           <p>
             The cells have the annotations shown in the following table (note that the <a title="cell value">values</a> of all the cells in the table are strings, denoted by the double quotes in the table below):
           </p>
           <table style="width: 100%; text-align: left">
             <thead>
-              <tr><th rowspan="2">id</th><th colspan="6">core annotations</th></tr>
-              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th><th>errors</th></tr>
+              <tr><th rowspan="2">id</th><th colspan="5">core annotations</th></tr>
+              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th></tr>
             </thead>
             <tbody>
-              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"1"</code></td><td><code>"1"</code></td><td></td></tr>
-              <tr><td><var>C1.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R1</var></td><td><code>"ADDISON AV"</code></td><td><code>"ADDISON AV"</code></td><td></td></tr>
-              <tr><td><var>C1.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R1</var></td><td><code>"Celtis australis"</code></td><td><code>"Celtis australis"</code></td><td></td></tr>
-              <tr><td><var>C1.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R1</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td><td></td></tr>
-              <tr><td><var>C1.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R1</var></td><td><code>"10/18/2010"</code></td><td><code>"10/18/2010"</code></td><td></td></tr>
-              <tr><td><var>C2.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R2</var></td><td><code>"2"</code></td><td><code>"2"</code></td><td></td></tr>
-              <tr><td><var>C2.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R2</var></td><td><code>"EMERSON ST"</code></td><td><code>"EMERSON ST"</code></td><td></td></tr>
-              <tr><td><var>C2.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R2</var></td><td><code>"Liquidambar styraciflua"</code></td><td><code>"Liquidambar styraciflua"</code></td><td></td></tr>
-              <tr><td><var>C2.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R2</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td><td></td></tr>
-              <tr><td><var>C2.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R2</var></td><td><code>"6/2/2010"</code></td><td><code>"6/2/2010"</code></td><td></td></tr>
+              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"1"</code></td><td><code>"1"</code></td></tr>
+              <tr><td><var>C1.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R1</var></td><td><code>"ADDISON AV"</code></td><td><code>"ADDISON AV"</code></td></tr>
+              <tr><td><var>C1.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R1</var></td><td><code>"Celtis australis"</code></td><td><code>"Celtis australis"</code></td></tr>
+              <tr><td><var>C1.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R1</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td></tr>
+              <tr><td><var>C1.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R1</var></td><td><code>"10/18/2010"</code></td><td><code>"10/18/2010"</code></td></tr>
+              <tr><td><var>C2.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R2</var></td><td><code>"2"</code></td><td><code>"2"</code></td></tr>
+              <tr><td><var>C2.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R2</var></td><td><code>"EMERSON ST"</code></td><td><code>"EMERSON ST"</code></td></tr>
+              <tr><td><var>C2.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R2</var></td><td><code>"Liquidambar styraciflua"</code></td><td><code>"Liquidambar styraciflua"</code></td></tr>
+              <tr><td><var>C2.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R2</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td></tr>
+              <tr><td><var>C2.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R2</var></td><td><code>"6/2/2010"</code></td><td><code>"6/2/2010"</code></td></tr>
             </tbody>
           </table>
           <section>
@@ -880,15 +991,80 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           	<p>
           		The tools that the consumer of this data uses may provide a mechanism for overriding the metadata that has been provided within the file itself. For example, they might enable the consumer to add machine-readable names to the columns, or to mark the fifth column as holding a date in the format <code>M/D/YYYY</code>. These facilities are implementation defined; the code for a Javascript-based parser might look like:
           	</p>
-          	<pre class="highlight example">
+          	<pre class="highlight example" title="Javascript implementation configuration">
 data.parse({
   "column-names": ["GID", "on_street", "species", "trim_cycle", "inventory_date"],
   "datatypes": ["string", "string", "string", "string", "date"],
   "formats": [null,null,null,null,"M/D/YYYY"]
 });
           	</pre>
+            <p>
+              This is equivalent to a metadata file expressed in the syntax defined in [[!tabular-metadata]], looking like:
+            </p>
+            <pre class="example highlight" title="Equivalent metadata syntax">
+{
+  "@type": "Table",
+  "url": "http://example.org/tree-ops.csv",
+  "tableSchema": {
+    "columns": [{
+      "name": "GID",
+      "datatype": "string"
+    }, {
+      "name": "on_street",
+      "datatype": "string"
+    }, {
+      "name": "species",
+      "datatype": "string"
+    }, {
+      "name": "trim_cycle",
+      "datatype": "string"
+    }, {
+      "name": "inventory_date",
+      "datatype": {
+        "base": "date",
+        "format": "M/d/yyyy"
+      }
+    }]
+  }
+}
+            </pre>
+            <p>
+              This would be merged with the <a>embedded metadata</a> found in the CSV file, providing the titles for the columns to create:
+            </p>
+            <pre class="example highlight" title="Merged metadata">
+{
+  "@type": "Table",
+  "url": "http://example.org/tree-ops.csv",
+  "tableSchema": {
+    "columns": [{
+      "name": "GID", 
+      "title": "GID", 
+      "datatype": "string"
+    }, {
+      "name": "on_street", 
+      "title": "On Street", 
+      "datatype": "string"
+    }, {
+      "name": "species", 
+      "title": "Species", 
+      "datatype": "string"
+    }, {
+      "name": "trim_cycle", 
+      "title": "Trim Cycle", 
+      "datatype": "string"
+    }, {
+      "name": "inventory_date",
+      "title": "Inventory Date",
+      "datatype": {
+        "base": "date", 
+        "format": "M/d/yyyy"
+      }
+    }]
+  }
+}
+            </pre>
           	<p>
-          		The parser could then create an <a>annotated tabular data model</a> that included <code>name</code> annotations on the columns, <code>datatype</code> and <code>format</code> annotations on the cells, and created cells whose <a title="cell value">values</a> were of appropriate types (in the case of this Javascript implementation, the cells in the last column would be <code>Date</code> objects, for example).
+          		The processor can then create an <a>annotated tabular data model</a> that included <code>name</code> annotations on the columns, <code>datatype</code> and <code>format</code> annotations on the cells, and created cells whose <a title="cell value">values</a> were of appropriate types (in the case of this Javascript implementation, the cells in the last column would be <code>Date</code> objects, for example).
           	</p>
 						<p>
 							Assuming this kind of implementation-defined parsing, the columns would then have the annotations shown in the following table:
@@ -906,45 +1082,25 @@ data.parse({
 	              <tr><td><var>C5</var></td><td><var>T</var></td><td>5</td><td>5</td><td><var>C1.5</var>, <var>C2.5</var></td><td><code>inventory_date</code></td><td><code>Inventory Date</code></td></tr>
 	            </tbody>
 	          </table>
-          <p>After creating <a>embedded metadata</a> and merging with overriding metadata:</p>
-          <pre class="highlight">
-{
-  "@type": "Table",
-  "url": "http://example.org/tree-ops.csv",
-  "tableSchema": {
-    "columns": [
-      {"name": "GID", "title": "GID", "datatype": "string"},
-      {"name": "on_street", "title": "On Street", "datatype": "string"},
-      {"name": "species", "title": "Species", "datatype": "string"},
-      {"name": "trim_cycle", "title": "Trim Cycle", "datatype": "string"},
-      {
-        "name": "inventory_date",
-        "title": "Inventory Date",
-        "datatype": {"base": "date", "format": "M/d/yyyy"}
-      }
-    ]
-  }
-}
-          </pre>
 	          <p>
-	            The cells have the annotations shown in the following table. Because of the overrides provided by the consumer to guide the parsing, and the way the parser works, these include additional annotations but also, for the <code>Inventory Date</code> column (cells <var>C1.5</var> and <var>C2.5</var>), have a <a title="cell value">value</a> that is a parsed date rather than an unparsed string.
+	            The cells have the annotations shown in the following table. Because of the overrides provided by the consumer to guide the parsing, and the way the parser works, the cells in the <code>Inventory Date</code> column (cells <var>C1.5</var> and <var>C2.5</var>) have <a title="cell value">values</a> that are parsed dates rather than unparsed strings.
 	          </p>
 	          <table style="width: 100%; text-align: left">
 	            <thead>
-	              <tr><th rowspan="2">id</th><th colspan="6">core annotations</th><th colspan="2">annotations</th></tr>
-	              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th><th>errors</th><th>datatype</th><th>format</th></tr>
+	              <tr><th rowspan="2">id</th><th colspan="5">core annotations</th></tr>
+	              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th></tr>
 	            </thead>
 	            <tbody>
-	              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"1"</code></td><td><code>"1"</code></td><td></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C1.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R1</var></td><td><code>"ADDISON AV"</code></td><td><code>"ADDISON AV"</code></td><td></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C1.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R1</var></td><td><code>"Celtis australis"</code></td><td><code>"Celtis australis"</code></td><td></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C1.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R1</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td><td></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C1.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R1</var></td><td><code>"10/18/2010"</code></td><td><code>2010-10-18</code></td><td></td><td><code>date</code></td><td><code>M/D/YYYY</code></td></tr>
-	              <tr><td><var>C2.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R2</var></td><td><code>"2"</code></td><td><code>"2"</code></td><td></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C2.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R2</var></td><td><code>"EMERSON ST"</code></td><td><code>"EMERSON ST"</code></td><td></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C2.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R2</var></td><td><code>"Liquidambar styraciflua"</code></td><td><code>"Liquidambar styraciflua"</code></td><td></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C2.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R2</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td><td></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C2.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R2</var></td><td><code>"6/2/2010"</code></td><td><code>2010-06-02</code></td><td></td><td><code>date</code></td><td><code>M/D/YYYY</code></td></tr>
+	              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"1"</code></td><td><code>"1"</code></td></tr>
+	              <tr><td><var>C1.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R1</var></td><td><code>"ADDISON AV"</code></td><td><code>"ADDISON AV"</code></td></tr>
+	              <tr><td><var>C1.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R1</var></td><td><code>"Celtis australis"</code></td><td><code>"Celtis australis"</code></td></tr>
+	              <tr><td><var>C1.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R1</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td></tr>
+	              <tr><td><var>C1.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R1</var></td><td><code>"10/18/2010"</code></td><td><code>2010-10-18</code></td></tr>
+	              <tr><td><var>C2.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R2</var></td><td><code>"2"</code></td><td><code>"2"</code></td></tr>
+	              <tr><td><var>C2.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R2</var></td><td><code>"EMERSON ST"</code></td><td><code>"EMERSON ST"</code></td></tr>
+	              <tr><td><var>C2.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R2</var></td><td><code>"Liquidambar styraciflua"</code></td><td><code>"Liquidambar styraciflua"</code></td></tr>
+	              <tr><td><var>C2.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R2</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td></tr>
+	              <tr><td><var>C2.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R2</var></td><td><code>"6/2/2010"</code></td><td><code>2010-06-02</code></td></tr>
 	            </tbody>
 	          </table>
           </section>
@@ -953,7 +1109,7 @@ data.parse({
           	<p>
           		A similar set of annotations could be provided through a metadata file, located as discussed in <a href="#locating-metadata" class="sectionRef"></a> and defined in [[!tabular-metadata]]. For example, this might look like:
           	</p>
-      			<pre class="example highlight">
+      			<pre class="example highlight" title="Metadata file">
 {
   "@context": ["http://www.w3.org/ns/csvw", {"@language": "en"}],
   "url": "tree-ops.csv",
@@ -1014,19 +1170,14 @@ data.parse({
           		<dd><code>"http://opendefinition.org/licenses/cc-by/"</code></dd>
           		<dt><code>dc:modified</code></dt>
           		<dd><code>"2010-12-31"</code></dd>
-          		<dt><code>primaryKey</code></dt>
-          		<dd><var>C1</var></dd>
           	</dl>
-          	<p>
-          		Note that the value of the <code>primaryKey</code> annotation is a pointer to the <a>column</a> <var>C1</var> within the annotated tabular data model.
-          	</p>
 						<p>
 							The columns would have the annotations shown in the following table:
 	          </p>
 	          <table style="width: 100%; text-align: left">
 	            <thead>
-	              <tr><th rowspan="2">id</th><th colspan="4">core annotations</th><th colspan="3">annotations</th></tr>
-	              <tr><th>table</th><th>number</th><th>source number</th><th>cells</th><th><code>name</code></th><th><code>title</code></th><th><code>dc:description</code></th></tr>
+	              <tr><th rowspan="2">id</th><th colspan="6">core annotations</th><th colspan="1">other annotations</th></tr>
+	              <tr><th>table</th><th>number</th><th>source number</th><th>cells</th><th>name</th><th>titles</th><th><code>dc:description</code></th></tr>
 	            </thead>
 	            <tbody>
 	              <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td>1</td><td><var>C1.1</var>, <var>C2.1</var></td><td><code>GID</code></td><td><code>GID</code>, <code>Generic Identifier</code></td><td><code>An identifier for the operation on a tree.</code></td></tr>
@@ -1036,25 +1187,38 @@ data.parse({
 	              <tr><td><var>C5</var></td><td><var>T</var></td><td>5</td><td>5</td><td><var>C1.5</var>, <var>C2.5</var></td><td><code>inventory_date</code></td><td><code>Inventory Date</code></td><td><code>The date of the operation that was performed.</code></td></tr>
 	            </tbody>
 	          </table>
+            <p>
+              The rows have an additional <a title="row primary key">primary key</a> annotation, as shown in the following table:
+            </p>
+            <table style="width: 100%; text-align: left">
+              <thead>
+                <tr><th rowspan="2">id</th><th colspan="5">core annotations</th></tr>
+                <tr><th>table</th><th>number</th><th>source number</th><th>cells</th><th>primary key</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><var>R1</var></td><td><var>T</var></td><td>1</td><td>2</td><td><var>C1.1</var>, <var>C1.2</var>, <var>C1.3</var>, <var>C1.4</var>, <var>C1.5</var></td><td>C1.1</td></tr>
+                <tr><td><var>R2</var></td><td><var>T</var></td><td>2</td><td>3</td><td><var>C2.1</var>, <var>C2.2</var>, <var>C2.3</var>, <var>C2.4</var>, <var>C2.5</var></td><td>C2.1</td></tr>
+              </tbody>
+            </table>
 	          <p>
 	            Thanks to the provided metadata, the cells again have the annotations shown in the following table. The metadata file has provided the information to supplement the model with additional annotations but also, for the <code>Inventory Date</code> column (cells <var>C1.5</var> and <var>C2.5</var>), have a <a title="cell value">value</a> that is a parsed date rather than an unparsed string.
 	          </p>
 	          <table style="width: 100%; text-align: left">
 	            <thead>
-	              <tr><th rowspan="2">id</th><th colspan="6">core annotations</th><th colspan="2">annotations</th></tr>
-	              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th><th>errors</th><th>datatype</th><th>format</th></tr>
+	              <tr><th rowspan="2">id</th><th colspan="5">core annotations</th></tr>
+	              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th></tr>
 	            </thead>
 	            <tbody>
-	              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"1"</code></td><td><code>"1"</code></td><td></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C1.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R1</var></td><td><code>"ADDISON AV"</code></td><td><code>"ADDISON AV"</code></td><td></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C1.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R1</var></td><td><code>"Celtis australis"</code></td><td><code>"Celtis australis"</code></td><td></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C1.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R1</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td><td></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C1.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R1</var></td><td><code>"10/18/2010"</code></td><td><code>2010-10-18</code></td><td></td><td><code>date</code></td><td><code>M/D/YYYY</code></td></tr>
-	              <tr><td><var>C2.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R2</var></td><td><code>"2"</code></td><td><code>"2"</code></td><td></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C2.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R2</var></td><td><code>"EMERSON ST"</code></td><td><code>"EMERSON ST"</code></td><td></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C2.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R2</var></td><td><code>"Liquidambar styraciflua"</code></td><td><code>"Liquidambar styraciflua"</code></td><td></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C2.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R2</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td><td></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C2.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R2</var></td><td><code>"6/2/2010"</code></td><td><code>2010-06-02</code></td><td></td><td><code>date</code></td><td><code>M/D/YYYY</code></td></tr>
+	              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"1"</code></td><td><code>"1"</code></td></tr>
+	              <tr><td><var>C1.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R1</var></td><td><code>"ADDISON AV"</code></td><td><code>"ADDISON AV"</code></td></tr>
+	              <tr><td><var>C1.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R1</var></td><td><code>"Celtis australis"</code></td><td><code>"Celtis australis"</code></td></tr>
+	              <tr><td><var>C1.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R1</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td></tr>
+	              <tr><td><var>C1.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R1</var></td><td><code>"10/18/2010"</code></td><td><code>2010-10-18</code></td></tr>
+	              <tr><td><var>C2.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R2</var></td><td><code>"2"</code></td><td><code>"2"</code></td></tr>
+	              <tr><td><var>C2.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R2</var></td><td><code>"EMERSON ST"</code></td><td><code>"EMERSON ST"</code></td></tr>
+	              <tr><td><var>C2.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R2</var></td><td><code>"Liquidambar styraciflua"</code></td><td><code>"Liquidambar styraciflua"</code></td></tr>
+	              <tr><td><var>C2.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R2</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td></tr>
+	              <tr><td><var>C2.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R2</var></td><td><code>"6/2/2010"</code></td><td><code>2010-06-02</code></td></tr>
 	            </tbody>
 	          </table>
           </section>
@@ -1064,7 +1228,7 @@ data.parse({
           <p>
             The following slightly amended CSV file contains quoted and missing cell values:
           </p>
-          <pre class="example">
+          <pre class="example" title="CSV file containing quoted and missing cell values">
 GID,On Street,Species,Trim Cycle,Inventory Date
 1,ADDISON AV,"Celtis australis","Large Tree Routine Prune",10/18/2010
 2,,"Liquidambar styraciflua","Large Tree Routine Prune",
@@ -1074,20 +1238,20 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           </p>
           <table style="width: 100%; text-align: left">
             <thead>
-              <tr><th rowspan="2">id</th><th colspan="6">core annotations</th></tr>
-              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th><th>errors</th></tr>
+              <tr><th rowspan="2">id</th><th colspan="5">core annotations</th></tr>
+              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th></tr>
             </thead>
             <tbody>
-              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"1"</code></td><td><code>"1"</code></td><td></td></tr>
-              <tr><td><var>C1.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R1</var></td><td><code>"ADDISON AV"</code></td><td><code>"ADDISON AV"</code></td><td></td></tr>
-              <tr><td><var>C1.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R1</var></td><td><code>"Celtis australis"</code></td><td><code>"Celtis australis"</code></td><td></td></tr>
-              <tr><td><var>C1.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R1</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td><td></td></tr>
-              <tr><td><var>C1.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R1</var></td><td><code>"10/18/2010"</code></td><td><code>"10/18/2010"</code></td><td></td></tr>
-              <tr><td><var>C2.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R2</var></td><td><code>"2"</code></td><td><code>"2"</code></td><td></td></tr>
-              <tr><td><var>C2.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R2</var></td><td><code>""</code></td><td><code>null</code></td><td></td></tr>
-              <tr><td><var>C2.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R2</var></td><td><code>"Liquidambar styraciflua"</code></td><td><code>"Liquidambar styraciflua"</code></td><td></td></tr>
-              <tr><td><var>C2.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R2</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td><td></td></tr>
-              <tr><td><var>C2.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R2</var></td><td><code>""</code></td><td><code>null</code></td><td></td></tr>
+              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"1"</code></td><td><code>"1"</code></td></tr>
+              <tr><td><var>C1.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R1</var></td><td><code>"ADDISON AV"</code></td><td><code>"ADDISON AV"</code></td></tr>
+              <tr><td><var>C1.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R1</var></td><td><code>"Celtis australis"</code></td><td><code>"Celtis australis"</code></td></tr>
+              <tr><td><var>C1.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R1</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td></tr>
+              <tr><td><var>C1.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R1</var></td><td><code>"10/18/2010"</code></td><td><code>"10/18/2010"</code></td></tr>
+              <tr><td><var>C2.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R2</var></td><td><code>"2"</code></td><td><code>"2"</code></td></tr>
+              <tr><td><var>C2.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R2</var></td><td><code>""</code></td><td><code>null</code></td></tr>
+              <tr><td><var>C2.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R2</var></td><td><code>"Liquidambar styraciflua"</code></td><td><code>"Liquidambar styraciflua"</code></td></tr>
+              <tr><td><var>C2.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R2</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td></tr>
+              <tr><td><var>C2.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R2</var></td><td><code>""</code></td><td><code>null</code></td></tr>
             </tbody>
           </table>
         </section>
@@ -1099,7 +1263,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 	        <p>
 	          In this example, the publishers of the data are using an internal convention to supply additional metadata about the tabular data embedded within the file itself. They are also using a tab as a separator rather than a comma.
 	        </p>
-	        <pre class="example">
+	        <pre class="example" title="Tab-separated file containing embedded metadata">
 #	publisher	City of Palo Alto
 #	updated	12/31/2010
 #name	GID	on_street	species	trim_cycle	inventory_date
@@ -1115,8 +1279,8 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 	          </p>
 	          <table style="width: 100%; text-align: left">
 	            <thead>
-	              <tr><th rowspan="2">id</th><th colspan="4">core annotations</th><th>annotations</th></tr>
-	              <tr><th>table</th><th>number</th><th>source number</th><th>cells</th><th><code>title</code></th></tr>
+	              <tr><th rowspan="2">id</th><th colspan="5">core annotations</th></tr>
+	              <tr><th>table</th><th>number</th><th>source number</th><th>cells</th><th>titles</th></tr>
 	            </thead>
 	            <tbody>
 	              <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td>1</td><td><var>C1.1</var>, <var>C2.1</var>, <var>C3.1</var>, <var>C4.1</var>, <var>C5.1</var></td><td><code># publisher City of Palo Alto</code></td></tr>
@@ -1144,16 +1308,16 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 	          </p>
 	          <table style="width: 100%; text-align: left">
 	            <thead>
-	              <tr><th rowspan="2">id</th><th colspan="6">core annotations</th></tr>
-	              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th><th>errors</th></tr>
+	              <tr><th rowspan="2">id</th><th colspan="5">core annotations</th></tr>
+	              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th></tr>
 	            </thead>
 	            <tbody>
-	              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"# updated 12/31/2010"</code></td><td><code>"# updated 12/31/2010"</code></td><td></td></tr>
-	              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"#name	GID	on_street	species	trim_cycle	inventory_date"</code></td><td><code>"#name	GID	on_street	species	trim_cycle	inventory_date"</code></td><td></td></tr>
-	              <tr><td><var>C2.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R2</var></td><td><code>"#datatype	string	string	string	string	date:M/D/YYYY"</code></td><td><code>"#datatype	string	string	string	string	date:M/D/YYYY"</code></td><td></td></tr>
-	              <tr><td><var>C3.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R3</var></td><td><code>"	GID	On Street	Species	Trim Cycle	Inventory Date"</code></td><td><code>"	GID	On Street	Species	Trim Cycle	Inventory Date"</code></td><td></td></tr>
-	              <tr><td><var>C4.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R4</var></td><td><code>"	1 ADDISON AV	Celtis australis	Large Tree Routine Prune	10/18/2010"</code></td><td><code>"	1 ADDISON AV	Celtis australis	Large Tree Routine Prune	10/18/2010"</code></td><td></td></tr>
-	              <tr><td><var>C5.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R5</var></td><td><code>"	2 EMERSON ST	Liquidambar styraciflua Large Tree Routine Prune	6/2/2010"</code></td><td><code>"	2 EMERSON ST	Liquidambar styraciflua Large Tree Routine Prune	6/2/2010"</code></td><td></td></tr>
+	              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"# updated 12/31/2010"</code></td><td><code>"# updated 12/31/2010"</code></td></tr>
+	              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"#name	GID	on_street	species	trim_cycle	inventory_date"</code></td><td><code>"#name	GID	on_street	species	trim_cycle	inventory_date"</code></td></tr>
+	              <tr><td><var>C2.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R2</var></td><td><code>"#datatype	string	string	string	string	date:M/D/YYYY"</code></td><td><code>"#datatype	string	string	string	string	date:M/D/YYYY"</code></td></tr>
+	              <tr><td><var>C3.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R3</var></td><td><code>"	GID	On Street	Species	Trim Cycle	Inventory Date"</code></td><td><code>"	GID	On Street	Species	Trim Cycle	Inventory Date"</code></td></tr>
+	              <tr><td><var>C4.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R4</var></td><td><code>"	1 ADDISON AV	Celtis australis	Large Tree Routine Prune	10/18/2010"</code></td><td><code>"	1 ADDISON AV	Celtis australis	Large Tree Routine Prune	10/18/2010"</code></td></tr>
+	              <tr><td><var>C5.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R5</var></td><td><code>"	2 EMERSON ST	Liquidambar styraciflua Large Tree Routine Prune	6/2/2010"</code></td><td><code>"	2 EMERSON ST	Liquidambar styraciflua Large Tree Routine Prune	6/2/2010"</code></td></tr>
 	            </tbody>
 	          </table>
 	        </section>
@@ -1170,7 +1334,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 	          <p>
 	            Setting these is done in an implementation-defined way. It could be done, for example, by sniffing the contents of the file itself, through command-line options, or by embedding a dialect description into a metadata file associated with the tabular data, which would look like:
 	          </p>
-	          <pre class="example highlight">
+	          <pre class="example highlight" title="Dialect description">
 {
   "delimiter": "\t",
   "skipRows": 4,
@@ -1190,12 +1354,12 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 	            <li><code>datatype	string	string	string	string	date:M/D/YYYY</code></li>
 	          </ol>
             <p>
-              Second, because the first column has been skipped, the <a title="column source number">source number</a> of each of the columns is offset by one:
+              Second, because the first column has been skipped, the <a title="column source number">source number</a> of each of the columns is offset by one from the <a title="column number">number</a> of each column:
             </p>
             <table style="width: 100%; text-align: left">
               <thead>
-                <tr><th rowspan="2">id</th><th colspan="4">core properties</th><th>annotations</th></tr>
-                <tr><th>table</th><th>number</th><th>source number</th><th>cells</th><th><code>title</code></th></tr>
+                <tr><th rowspan="2">id</th><th colspan="5">core annotations</th></tr>
+                <tr><th>table</th><th>number</th><th>source number</th><th>cells</th><th>titles</th></tr>
               </thead>
               <tbody>
                 <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td>2</td><td><var>C1.1</var>, <var>C2.1</var></td><td><code>GID</code></td></tr>
@@ -1210,7 +1374,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             </p>
             <table style="width: 100%; text-align: left">
               <thead>
-                <tr><th rowspan="2">id</th><th colspan="4">core properties</th></tr>
+                <tr><th rowspan="2">id</th><th colspan="4">core annotations</th></tr>
                 <tr><th>table</th><th>number</th><th>source number</th><th>cells</th></tr>
               </thead>
               <tbody>
@@ -1222,7 +1386,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 	        <section>
 	        	<h5>Recognising Tabular Data Formats</h5>
 	        	<p>
-	        		The conventions used in this data (invented for the purpose of this example) are in fact intended to create an <a>annotated tabular data model</a> which includes named annotations on the table itself, on the columns and on the cells. The creator of these conventions could create a specification for this particular tabular data syntax and register a media type for it. The specification would include things statements like:
+	        		The conventions used in this data (invented for the purpose of this example) are in fact intended to create an <a>annotated tabular data model</a> which includes named annotations on the table itself, on the columns and on the cells. The creator of these conventions could create a specification for this particular tabular data syntax and register a media type for it. The specification would include statements like:
 	        	</p>
 	        	<ul>
 	        		<li>A tab delimiter is always used.</li>
@@ -1234,12 +1398,48 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 	        		<li>The remaining rows make up the data of the table.</li>
 	        	</ul>
 	        	<p>
-							Parsers that recognised the format could then build a more sophisticated annotated tabular data model using only the embedded information in the tabular data file. As before, the result would be a single <a>table</a> <var>T</var> with five columns and two rows. The table itself would have two annotations:
+							Parsers that recognised the format could then build a more sophisticated annotated tabular data model using only the embedded information in the tabular data file. They would extract metadata looking like:
+            </p>
+{
+  "@context": "http://www.w3.org/ns/csvw",
+  "url": "tree-ops.csv",
+  "dc:publisher": "City of Palo Alto",
+  "dc:updated": "12/31/2010",
+  "tableSchema": {
+    "columns": [{
+      "name": "GID",
+      "title": "GID",
+      "datatype": "string",
+    }, {
+      "name": "on_street",
+      "title": "On Street",
+      "datatype": "string"
+    }, {
+      "name": "species",
+      "title": "Species",
+      "datatype": "string"
+    }, {
+      "name": "trim_cycle",
+      "title": "Trim Cycle",
+      "datatype": "string"
+    }, {
+      "name": "inventory_date",
+      "title": "Inventory Date",
+      "datatype": {
+        "base": "date", 
+        "format": "M/d/yyyy"
+      }
+    }]
+  }
+}
+            </pre>
+            <p>
+              As before, the result would be a single <a>table</a> <var>T</var> with five columns and two rows. The table itself would have two annotations:
 						</p>
 						<dl>
-							<dt><code>publisher</code></dt>
+							<dt><code>dc:publisher</code></dt>
 							<dd><code>City of Palo Alto</code></dd>
-							<dt><code>updated</code></dt>
+							<dt><code>dc:updated</code></dt>
 							<dd><code>12/31/2010</code></dd>
 						</dl>
 						<p>
@@ -1247,8 +1447,8 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 	          </p>
 	          <table style="width: 100%; text-align: left">
 	            <thead>
-	              <tr><th rowspan="2">id</th><th colspan="4">core annotations</th><th colspan="2">annotations</th></tr>
-	              <tr><th>table</th><th>number</th><th>source number</th><th>cells</th><th><code>name</code></th><th><code>title</code></th></tr>
+	              <tr><th rowspan="2">id</th><th colspan="6">core annotations</th></tr>
+	              <tr><th>table</th><th>number</th><th>source number</th><th>cells</th><th>name</th><th>titles</th></tr>
 	            </thead>
 	            <tbody>
 	              <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td>2</td><td><var>C1.1</var>, <var>C2.1</var></td><td><code>GID</code></td><td><code>GID</code></td></tr>
@@ -1276,20 +1476,20 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 	          </p>
 	          <table style="width: 100%; text-align: left">
 	            <thead>
-	              <tr><th rowspan="2">id</th><th colspan="6">core annotations</th><th colspan="2">annotations</th></tr>
-	              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th><th>errors</th><th>datatype</th><th>format</th></tr>
+	              <tr><th rowspan="2">id</th><th colspan="5">core annotations</th></tr>
+	              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th></tr>
 	            </thead>
 	            <tbody>
-	              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"1"</code></td><td><code>"1"</code></td><td></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C1.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R1</var></td><td><code>"ADDISON AV"</code></td><td><code>"ADDISON AV"</code></td><td></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C1.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R1</var></td><td><code>"Celtis australis"</code></td><td><code>"Celtis australis"</code></td><td></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C1.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R1</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td><td></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C1.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R1</var></td><td><code>"10/18/2010"</code></td><td><code>2010-10-18</code></td><td></td><td><code>date</code></td><td><code>M/D/YYYY</code></td></tr>
-	              <tr><td><var>C2.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R2</var></td><td><code>"2"</code></td><td><code>"2"</code></td><td></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C2.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R2</var></td><td><code>"EMERSON ST"</code></td><td><code>"EMERSON ST"</code></td><td></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C2.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R2</var></td><td><code>"Liquidambar styraciflua"</code></td><td><code>"Liquidambar styraciflua"</code></td><td></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C2.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R2</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td><td></td><td><code>string</code></td><td></td></tr>
-	              <tr><td><var>C2.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R2</var></td><td><code>"6/2/2010"</code></td><td><code>2010-06-02</code></td><td></td><td><code>date</code></td><td><code>M/D/YYYY</code></td></tr>
+	              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"1"</code></td><td><code>"1"</code></td></tr>
+	              <tr><td><var>C1.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R1</var></td><td><code>"ADDISON AV"</code></td><td><code>"ADDISON AV"</code></td></tr>
+	              <tr><td><var>C1.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R1</var></td><td><code>"Celtis australis"</code></td><td><code>"Celtis australis"</code></td></tr>
+	              <tr><td><var>C1.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R1</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td></tr>
+	              <tr><td><var>C1.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R1</var></td><td><code>"10/18/2010"</code></td><td><code>2010-10-18</code></td></tr>
+	              <tr><td><var>C2.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R2</var></td><td><code>"2"</code></td><td><code>"2"</code></td></tr>
+	              <tr><td><var>C2.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R2</var></td><td><code>"EMERSON ST"</code></td><td><code>"EMERSON ST"</code></td></tr>
+	              <tr><td><var>C2.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R2</var></td><td><code>"Liquidambar styraciflua"</code></td><td><code>"Liquidambar styraciflua"</code></td></tr>
+	              <tr><td><var>C2.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R2</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td></tr>
+	              <tr><td><var>C2.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R2</var></td><td><code>"6/2/2010"</code></td><td><code>2010-06-02</code></td></tr>
 	            </tbody>
 	          </table>
 	        </section>
@@ -1299,7 +1499,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           <p>
             The following example shows a CSV file with multiple header lines:
           </p>
-          <pre class="example highlight">
+          <pre class="example highlight" title="CSV file with multiple header lines">
 Who,What,,Where,
 Organisation,Sector,Subsector,Department,Municipality
 #org,#sector,#subsector,#adm1,#adm2
@@ -1307,9 +1507,9 @@ UNICEF,Education,Teacher training,Chocó,Quidbó
 UNICEF,Education,Teacher training,Chocó,Bojayá
           </pre>
           <p>
-            Here, the first line contains some grouping titles, which are not particularly helpful. The lines following those contain useful titles for the columns. Thus the appropriate configuration is:
+            Here, the first line contains some grouping titles, which are not particularly helpful. The lines following those contain useful titles for the columns. Thus the appropriate configuration for a dialect description is:
           </p>
-          <pre class="example highlight">
+          <pre class="example highlight" title="Dialect description for multiple header lines">
 {
   "skipRows": 1,
   "headerRowCount": 2
@@ -1320,8 +1520,8 @@ UNICEF,Education,Teacher training,Chocó,Bojayá
           </p>
           <table style="width: 100%; text-align: left">
             <thead>
-              <tr><th rowspan="2">id</th><th colspan="4">core properties</th><th>annotations</th></tr>
-              <tr><th>table</th><th>number</th><th>source number</th><th>cells</th><th><code>title</code></th></tr>
+              <tr><th rowspan="2">id</th><th colspan="5">core annotations</th></tr>
+              <tr><th>table</th><th>number</th><th>source number</th><th>cells</th><th>titles</th></tr>
             </thead>
             <tbody>
               <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td>1</td><td><var>C1.1</var>, <var>C2.1</var></td><td><code>Organisation</code>, <code>#org</code></td></tr>
@@ -1334,7 +1534,7 @@ UNICEF,Education,Teacher training,Chocó,Bojayá
           <p>
             As metadata, this would look like:
           </p>
-          <pre class="example highlight">
+          <pre class="example highlight" title="Extracted metadata">
 {
   "tableSchema": {
     "columns": [
@@ -1350,7 +1550,7 @@ UNICEF,Education,Teacher training,Chocó,Bojayá
           <p>
             A separate metadata file could contain just the second of each of these titles, for example:
           </p>
-          <pre class="example highlight">
+          <pre class="example highlight" title="Metadata file">
 {
   "tableSchema": {
     "columns": [
