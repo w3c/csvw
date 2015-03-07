@@ -165,19 +165,17 @@ var respecConfig = {
 
       <p class="note">The conversion of CSV content to JSON is intended for web developers who need not care about the complexities of RDF [[!rdf11-concepts]]. Where the formality of RDF is required, [[!csv2rdf]] provides the procedures for mapping from CSV content to RDF which may be serialized to [[json-ld]].</p>
 
-      <p> The [[!tabular-data-model]] defines an <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-tabular-data-model" class="externalDFN">annotated tabular data model</a> consisting of <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table" class="externalDFN">tables</a>, <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column" class="externalDFN">columns</a>, <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row" class="externalDFN">rows</a> and <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell" class="externalDFN">cells</a>, enriched with <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotation" class="externalDFN">annotations</a> that describe the structure of the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-tabular-data" class="externalDFN">tabular data</a> and the meaning of its content.</p>
-
-      <p>The <a href="http://www.w3.org/TR/tabular-data-model/#dfn-grouped-tabular-data-model" class="externalDFN">grouped tabular data model</a> describes a <a href="http://www.w3.org/TR/tabular-data-model/#dfn-group-of-tables" class="externalDFN">table group</a> that is a collection of <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table" class="externalDFN">tables</a> published as a single atomic unit.</p>
+      <p> The [[!tabular-data-model]] defines an <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-tabular-data-model" class="externalDFN">annotated tabular data model</a> consisting of <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table" class="externalDFN">tables</a>, <a href="http://www.w3.org/TR/tabular-data-model/#dfn-column" class="externalDFN">columns</a>, <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row" class="externalDFN">rows</a> and <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell" class="externalDFN">cells</a>, enriched with <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotation" class="externalDFN">annotations</a> that describe the structure of the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-tabular-data" class="externalDFN">tabular data</a> and the meaning of its content. A <a href="http://www.w3.org/TR/tabular-data-model/#dfn-group-of-tables" class="externalDFN">table group</a> is a collection of <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table" class="externalDFN">tables</a> published as a single atomic unit.</p>
 
       <p>The conversion procedure described in this specification operates on the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-tabular-data" class="externalDFN">tabular data</a>. This specification does not specify the processes needed to convert CSV-encoded data into tabular data form. Please refer to [[!tabular-data-model]] for details of <a href="http://www.w3.org/TR/tabular-data-model/#parsing">parsing tabular data</a>.</p>
 
       <p>Conversion applications MUST provide at least two modes of operation: <a title="standard mode">standard</a> and <a title="minimal mode">minimal</a>.</p>
 
-      <p><dfn title="standard mode">Standard mode</dfn> conversion frames the information gleaned from the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell" class="externalDFN">cells</a> of the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-tabular-data" class="externalDFN">tabular data</a> with details of the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row" class="externalDFN">rows</a>, <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table" class="externalDFN">tables</a> and a <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table-group" class="externalDFN">table group</a> within which that information is provided.</p>
+      <p><dfn title="standard mode">Standard mode</dfn> conversion frames the information gleaned from the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell" class="externalDFN">cells</a> of the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-tabular-data" class="externalDFN">tabular data</a> with details of the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-row" class="externalDFN">rows</a>, <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table" class="externalDFN">tables</a> and a <a href="http://www.w3.org/TR/tabular-data-model/#dfn-group-of-tables" class="externalDFN">table group</a> within which that information is provided.</p>
 
       <p><dfn title="minimal mode">Minimal mode</dfn> conversion includes <em>only</em> the information gleaned from the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell" class="externalDFN">cells</a> of the <a href="http://www.w3.org/TR/tabular-data-model/#dfn-tabular-data" class="externalDFN">tabular data</a> within the output.</p>
 
-      <p><a title="standard mode">Standard</a> and <a title="minimal mode">minimal</a> conversion are described normatively <a href="#conversion-algorithm">below</a>.</p>
+      <p><a title="standard mode">Standard</a> and <a title="minimal mode">minimal</a> conversion are described normatively <a href="#generating-json">below</a>.</p>
 
       <p>Conversion applications MAY offer additional implementation specific conversion modes.</p>
 
@@ -202,7 +200,7 @@ var respecConfig = {
           <dd>The <a>aboutUrl</a> is the evaluation of the <code>aboutUrl</code> property of the current <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell" class="externalDFN">cell</a> as defined in <cite><a href="http://www.w3.org/TR/tabular-metadata/#dfn-uri-template-property">URI template properties</a></cite> in [[!tabular-metadata]].</dd>
 
           <dt><dfn>annotated table</dfn></dt>
-          <dd>The <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-table" class="externalDFN">annotated table</a> is defined in [[!tabular-data-model]] as describing a particular <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table-description" class="externalDFN">table</a> and its metadata.</dd>
+          <dd>The <a href="http://www.w3.org/TR/tabular-data-model/#dfn-annotated-table" class="externalDFN">annotated table</a> is defined in [[!tabular-data-model]] as describing a particular <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table" class="externalDFN">table</a> and its metadata.</dd>
 
           <dt><dfn>array</dfn></dt>
           <dd>An <a>array</a> is defined in JSON ([[!RFC7159]]) as an ordered sequence of zero or more values, where a value is a string, number, boolean, null, <a>object</a>, or <a>array</a>.</dd>
@@ -329,7 +327,7 @@ var respecConfig = {
               </li>
               <li>
                 <p>In <strong><a>standard mode</a></strong> only, insert any <a>notes</a> and <a>common properties</a> specified for the <a title="annotated table">table</a> into <a>object</a> <var>T</var>. Name-value pairs relating to <a>notes</a> and <a>common properties</a> are copied verbatim from the metadata description—noting that prefixes defined within the <a href="http://www.w3.org/2011/rdfa-context/rdfa-1.1">RDFa 1.1 Initial Context</a> ([[rdfa-core]]) are not expanded.</p>
-                <p class="note">All other annotations for the <a title="annotated table">table</a> are ignored during the conversion; including information about <a href="http://www.w3.org/TR/tabular-metadata/#dfn-tableSchema" class="externalDFN">table schemas</a> and <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description" class="externalDFN">column descriptions</a> specified therein, <a href="http://www.w3.org/TR/tabular-metadata/#dfn-dialect-description" class="externalDFN">dialect descriptions</a>, <a href="http://www.w3.org/TR/tabular-metadata/#dfn-foreign-key-definition" class="externalDFN">foreign-key-definitions</a> etc.</p>
+                <p class="note">All other annotations for the <a title="annotated table">table</a> are ignored during the conversion; including information about <a href="http://www.w3.org/TR/tabular-metadata/#dfn-tableschema" class="externalDFN">table schemas</a> and <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description" class="externalDFN">column descriptions</a> specified therein, <a href="http://www.w3.org/TR/tabular-metadata/#dfn-dialect-description" class="externalDFN">dialect descriptions</a>, <a href="http://www.w3.org/TR/tabular-metadata/#dfn-foreign-key-definition" class="externalDFN">foreign-key-definitions</a> etc.</p>
               </li>
               <li>
                 <p>In <strong><a>standard mode</a></strong> only, insert the following name-value pair into <a>object</a> <var>T</var>:
@@ -802,7 +800,7 @@ GID,On Street,Species,Trim Cycle,Diameter at Breast Ht,Inventory Date,Comments,P
 
         <p>Annotations for the <a title="column">columns</a>, <a title="row">rows</a> and <a title="cell">cells</a> in <a title="annotated table">table</a> <var>T</var> are shown in the tables below.</p>
 
-        <p><a href="column">Column</a> annotations:</p>
+        <p><a title="column">Column</a> annotations:</p>
         <table style="width: 100%; text-align: left">
           <thead>
             <tr><th rowspan="2">id</th><th colspan="4">core annotations</th><th colspan="5">annotations</th></tr>
@@ -1275,7 +1273,7 @@ B.B. King,2014-04-13T20:00,"Lynn Auditorium","Lynn, MA, 01901",http://frontgatet
       <section id="example-public-sector-roles-and-salaries">
         <h3>Example with table group comprising three interrelated tables</h3>
         <p>
-          This example is based on <a href="http://www.w3.org/TR/csvw-ucr/#UC-OrganogramData">Use Case #4 - Publication of public sector roles and salaries</a> and uses three <a title="annotated table">annotated tables</a> published within a <a>table group</a>. Information about senior roles and junior roles within a government department are published in CSV format by each department. These are validated against a centrally published <a href="http://www.w3.org/TR/tabular-metadata/#dfn-tableSchema" class="externalDFN">schema</a> to ensure that all the data published by departments is consistent. Additionally, a list of professions is also published centrally, providing a <em>controlled vocabulary</em> against which departmental submissions are validated.
+          This example is based on <a href="http://www.w3.org/TR/csvw-ucr/#UC-OrganogramData">Use Case #4 - Publication of public sector roles and salaries</a> and uses three <a title="annotated table">annotated tables</a> published within a <a>table group</a>. Information about senior roles and junior roles within a government department are published in CSV format by each department. These are validated against a centrally published <a href="http://www.w3.org/TR/tabular-metadata/#dfn-tableschema" class="externalDFN">schema</a> to ensure that all the data published by departments is consistent. Additionally, a list of professions is also published centrally, providing a <em>controlled vocabulary</em> against which departmental submissions are validated.
         </p>
 
         <p> 
