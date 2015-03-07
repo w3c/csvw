@@ -117,13 +117,13 @@ var respecConfig = {
         counter-reset: numsection;
         list-style-type: none;
       }
-      ol.algorithm li {
+      ol.algorithm > li {
         margin: 0.5em 0;
       }
-      ol.algorithm li:before {
+      ol.algorithm > li:before {
         font-weight: bold;
         counter-increment: numsection;
-        content: counters(numsection, ".") ") ";
+        content: counters(numsection, ".") " ";
       }
     </style>
   </head>
@@ -272,7 +272,7 @@ var respecConfig = {
           <li><dfn title="cell table">table</dfn> &mdash; the <a>table</a> that the cell appears in</li>
           <li><dfn title="cell column">column</dfn> &mdash; the <a>column</a> that the cell appears in; the cell MUST be in the <a title="column cells">cells</a> for that column</li>
           <li><dfn title="cell row">row</dfn> &mdash; the <a>row</a> that the cell appears in; the cell MUST be in the <a title="row cells">cells</a> for that row</li>
-          <li><dfn>string value</dfn> &mdash; a string that is the original syntactic representation of the value of the cell, eg how the cell appears within a CSV file; this may be an empty string</li>
+          <li><dfn title="cell string value">string value</dfn> &mdash; a string that is the original syntactic representation of the value of the cell, eg how the cell appears within a CSV file; this may be an empty string</li>
           <li><dfn title="cell value">value</dfn> &mdash; the semantic value of the cell; this MAY be of a datatype other than a string, MAY be a list, and MAY be <code>null</code>. For example, annotations might enable a processor to understand the <a>string value</a> of the cell as representing a number or a date. By default, if the <a>string value</a> is an empty string, the semantic value of the cell is <code>null</code>. See <a href="http://w3c.github.io/csvw/metadata/#parsing-cells">Parsing Cells</a> in [[!tabular-metadata]] for further requirements on obtaining a cell value.</li>
           <li><dfn title="cell ordered">ordered</dfn> &mdash; a boolean that, if the value of this cell is a list, indicates whether the order of that list should be preserved or not</li>
           <li><dfn title="cell errors">errors</dfn> &mdash; a (possibly empty) list of validation errors generated while parsing the value of the cell</li>
@@ -375,7 +375,7 @@ $ csvlint data.csv --schema:schema.json
   2 EMERSON ST  Liquidambar styraciflua Large Tree Routine Prune  6/2/2010
         </pre>
         <p>
-          A processor that recognises this format may be able to extract and make sense of this embedded metadata. <a href="#parsing" class="sectionRef"></a> provides an informative guide on how embedded metadata commonly used within "CSV" files can be extracted.
+          A processor that recognises this format may be able to extract and make sense of this embedded metadata. <a href="#parsing" class="sectionRef"></a> provides a non-normative guide on how embedded metadata commonly used within "CSV" files can be extracted.
         </p>
       </section>
       <section>
@@ -478,7 +478,7 @@ Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
           <li>If the tabular data file was retrieved with <code>Content-Type</code> including the <code>header=absent</code> parameter set <code>header</code> to <code>false</code> in <code>DD</code>.</li>
           <li>
             Parse the tabular data file, using <code>DD</code> as a guide, to create a basic tabular data model (<code>T</code>). Extract embedded metadata (<code>EM</code>), for example from the <a>header line</a>.
-            <p class="note">Note: This specification provides a non-normative definition for parsing tabular data files, including the extraction of embedded metadata, in <a href="#parsing-tabular-data" class="sectionRef"></a>. No definition of the format of embedded metadata is given here; whatever syntax is used, it's assumed that metadata can be mapped to the vocabulary defined in [[!tabular-metadata]].</p>
+            <p class="note">Note: This specification provides a non-normative definition for parsing tabular data files, including the extraction of embedded metadata, in <a href="#parsing" class="sectionRef"></a>. No definition of the format of embedded metadata is given here; whatever syntax is used, it's assumed that metadata can be mapped to the vocabulary defined in [[!tabular-metadata]].</p>
           </li>
           <li>Create the merged metadata <code>M = merge(UM, EM, LM, FM, DM)</code> using the <a href="http://w3c.github.io/csvw/metadata/#dfn-merged" class="externalDFN">merge algorithm</a> defined in [[!tabular-metadata]].</li>
           <li>Use the metadata <code>M</code> to add annotations to the tabular data model <code>T</code> as described in <a href="http://w3c.github.io/csvw/metadata/#annotating-tables">Section 2 Annotating Tables</a> in [[!tabular-metadata]].</li>
@@ -852,57 +852,239 @@ Content-Type: text/csv;header=absent
         Standardising the parsing of CSV is outside the chartered scope of the Working Group. This non-normative section is intended to help the creators of parsers handle the wide variety of CSV-based formats that they may encounter due to the current lack of standardisation of the format.
       </p>
       <p>
-        This section describes an algorithm for parsing formats that do not adhere to the constraints described in <a href="#syntax" class="sectionRef"></a>, as well as those that do, and extracting <a>embedded metadata</a>. The parsing algorithm uses the following flags. These may be set by metadata properties found while <a href="#locating-metadata" class="sectionRef">Locating Metadata</a>, including through user input (see <a href="overriding-metadata" class="sectionRef">Overriding Metadata</a>) or through the inclusion of a <a href="http://w3c.github.io/csvw/metadata/#dialect-descriptions">dialect description</a> within a metadata file:
+        This section describes an algorithm for parsing formats that do not adhere to the constraints described in <a href="#syntax" class="sectionRef"></a>, as well as those that do, and extracting <a>embedded metadata</a>. The parsing algorithm uses the following flags. These may be set by metadata properties found while <a href="#locating-metadata" class="sectionRef">Locating Metadata</a>, including through user input (see <a href="overriding-metadata" class="sectionRef">Overriding Metadata</a>) or through the inclusion of a <a href="http://w3c.github.io/csvw/metadata/#dfn-dialect-description" class="externalDFN">dialect description</a> within a metadata file:
       </p>
       <dl>
         <dt><dfn>encoding</dfn></dt>
-        <dd>The character encoding for the file, one of the encodings listed in [[!encoding]]. The default is <code>utf-8</code>.</dd>
+        <dd>The character encoding for the file, one of the encodings listed in [[!encoding]], set by the <a href="http://w3c.github.io/csvw/metadata/#dialect-encoding"><code>encoding</code></a> property of a <a href="http://w3c.github.io/csvw/metadata/#dfn-dialect-description" class="externalDFN">dialect description</a>. The default is <code>utf-8</code>.</dd>
         <dt><dfn>line terminator</dfn></dt>
-        <dd>The character that is used at the end of a row. The default is <code>CRLF</code>.</dd>
+        <dd>The character that is used at the end of a row, set by the <a href="http://w3c.github.io/csvw/metadata/#dialect-lineTerminator"><code>lineTerminator</code></a> property of a <a href="http://w3c.github.io/csvw/metadata/#dfn-dialect-description" class="externalDFN">dialect description</a>. The default is <code>CRLF</code>.</dd>
         <dt><dfn>quote character</dfn></dt>
-        <dd>The character that is used around escaped cells. The default is <code>"</code>.</dd>
+        <dd>The character that is used around escaped cells, set by the <a href="http://w3c.github.io/csvw/metadata/#dialect-quoteChar"><code>quoteChar</code></a> property of a <a href="http://w3c.github.io/csvw/metadata/#dfn-dialect-description" class="externalDFN">dialect description</a>. The default is <code>"</code>.</dd>
         <dt><dfn>escape character</dfn></dt>
-        <dd>The character that is used to escape the <a>quote character</a> within escaped cells. The default is <code>"</code> (such that <code>""</code> is used to escape <code>"</code> within an escaped cell).</dd>
+        <dd>The character that is used to escape the <a>quote character</a> within escaped cells, set by the <a href="http://w3c.github.io/csvw/metadata/#dialect-doubleQuote"><code>doubleQuote</code></a> property of a <a href="http://w3c.github.io/csvw/metadata/#dfn-dialect-description" class="externalDFN">dialect description</a>. The default is <code>"</code> (such that <code>""</code> is used to escape <code>"</code> within an escaped cell).</dd>
         <dt><dfn>skip rows</dfn></dt>
-        <dd>The number of rows to skip at the beginning of the file, before a header row or tabular data. The default is <code>0</code>.</dd>
+        <dd>The number of rows to skip at the beginning of the file, before a header row or tabular data, set by the <a href="http://w3c.github.io/csvw/metadata/#dialect-skipRows"><code>skipRows</code></a> property of a <a href="http://w3c.github.io/csvw/metadata/#dfn-dialect-description" class="externalDFN">dialect description</a>. The default is <code>0</code>. A value greater than <code>0</code> will mean that the <a title="row source number">source numbers</a> of <a title="row">rows</a> will be different from their <a title="row number">numbers</a>.</dd>
         <dt><dfn>comment prefix</dfn></dt>
-        <dd>A character that, when it appears at the beginning of a skipped row, indicates a comment that should be associated as a comment annotation to the table. The default is <code>#</code>.</dd>
+        <dd>A character that, when it appears at the beginning of a row, indicates that the row is a comment that should be associated as a <a href="http://www.w3.org/TR/rdf-schema/#ch_comment"><code>rdfs:comment</code></a> annotation to the table. This is set by the <a href="http://w3c.github.io/csvw/metadata/#dialect-commentPrefix"><code>commentPrefix</code></a> property of a <a href="http://w3c.github.io/csvw/metadata/#dfn-dialect-description" class="externalDFN">dialect description</a>. The default is <code>null</code>, which means no rows are treated as comments. A value other than <code>null</code> may mean that the <a title="row source number">source numbers</a> of <a title="row">rows</a> are different from their <a title="row number">numbers</a>.</dd>
         <dt><dfn>header row count</dfn></dt>
-        <dd>The number of header rows (following the skipped rows) in the file. The default is <code>1</code>.</dd>
+        <dd>The number of header rows (following the skipped rows) in the file, set by the <a href="http://w3c.github.io/csvw/metadata/#dialect-header"><code>header</code></a> or <a href="http://w3c.github.io/csvw/metadata/#dialect-headerRowCount"><code>headerRowCount</code></a> property of a <a href="http://w3c.github.io/csvw/metadata/#dfn-dialect-description" class="externalDFN">dialect description</a>. The default is <code>1</code>. A value other than <code>0</code> will mean that the <a title="row source number">source numbers</a> of <a title="row">rows</a> will be different from their <a title="row number">numbers</a>.</dd>
         <dt><dfn>delimiter</dfn></dt>
-        <dd>The separator between cells. The default is <code>,</code>.</dd>
+        <dd>The separator between cells, set by the <a href="http://w3c.github.io/csvw/metadata/#dialect-delimiter"><code>delimiter</code></a> property of a <a href="http://w3c.github.io/csvw/metadata/#dfn-dialect-description" class="externalDFN">dialect description</a>. The default is <code>,</code>.</dd>
         <dt><dfn>skip columns</dfn></dt>
-        <dd>The number of columns to skip at the beginning of each row, before any header columns. The default is <code>0</code>.</dd>
+        <dd>The number of columns to skip at the beginning of each row, before any header columns, set by the <a href="http://w3c.github.io/csvw/metadata/#dialect-skipColumns"><code>skipColumns</code></a> property of a <a href="http://w3c.github.io/csvw/metadata/#dfn-dialect-description" class="externalDFN">dialect description</a>. The default is <code>0</code>. A value other than <code>0</code> will mean that the <a title="column source number">source numbers</a> of <a title="column">columns</a> will be different from their <a title="column number">numbers</a>.</dd>
         <dt><dfn>header column count</dfn></dt>
-        <dd>The number of header columns (following the skipped columns) in each row. The default is <code>0</code>.</dd>
+        <dd>The number of header columns (following the skipped columns) in each row, set by the <a href="http://w3c.github.io/csvw/metadata/#dialect-headerColumnCount"><code>headerColumnCount</code></a> property of a <a href="http://w3c.github.io/csvw/metadata/#dfn-dialect-description" class="externalDFN">dialect description</a>. The default is <code>0</code>. A value other than <code>0</code> will mean that the <a title="column source number">source numbers</a> of <a title="column">columns</a> will be different from their <a title="column number">numbers</a>.</dd>
         <dt><dfn>skip blank rows</dfn></dt>
-        <dd>Indicates whether to ignore wholly empty rows (ie rows in which all the cells are empty). The default is <code>false</code>.</dd>
+        <dd>Indicates whether to ignore wholly empty rows (ie rows in which all the cells are empty), set by the <a href="http://w3c.github.io/csvw/metadata/#dialect-skipBlankRows"><code>skipBlankRows</code></a> property of a <a href="http://w3c.github.io/csvw/metadata/#dfn-dialect-description" class="externalDFN">dialect description</a>. The default is <code>false</code>. A value other than <code>false</code> may mean that the <a title="row source number">source numbers</a> of <a title="row">rows</a> are different from their <a title="row number">numbers</a>.</dd>
         <dt><dfn>trim</dfn></dt>
-        <dd>Indicates whether to trim whitespace around cells; may be <code>true</code>, <code>false</code>, <code>start</code> or <code>end</code>. The default is <code>false</code>.</dd>
+        <dd>Indicates whether to trim whitespace around cells; may be <code>true</code>, <code>false</code>, <code>start</code> or <code>end</code>, set by the <a href="http://w3c.github.io/csvw/metadata/#dialect-skipInitialSpace"><code>skipInitialSpace</code></a> or <a href="http://w3c.github.io/csvw/metadata/#dialect-trim"><code>trim</code></a> property of a <a href="http://w3c.github.io/csvw/metadata/#dfn-dialect-description" class="externalDFN">dialect description</a>. The default is <code>false</code>.</dd>
       </dl>
       <p>
-        The algorithm for parsing a document containing tabular data is as follows:
+        The algorithm for using these flags to parse a document containing tabular data to create a basic <a>annotated tabular data model</a> and to extract <a>embedded metadata</a> is as follows:
       </p>
       <ol class="algorithm">
-        <li>Create <dfn>merged metadata</dfn> by locating all sources of metadata, other than embedded, as defined in <a href="#locating-metadata" class="sectionRef">Locating Metadata</a> and merge together in priority order as defined in <a href="http://w3c.github.io/csvw/metadata/#merging-metadata">Merging Metadata</a> in [[!tabular-metadata]].</li>
-        <li>Read the file using the specified <a>encoding</a>.</li>
-        <li>Find the rows. Each row ends with a <a>line terminator</a>, but values that are enclosed within the <a>quote character</a> may contain the <a>line terminator</a> without it indicating the end of the row. The <a>quote character</a> may be escaped using the <a>escape character</a> where it appears within cells. If the <a>escape character</a> is not the same as the <a>quote character</a> then the <a>escape character</a> is also used to escape the character that immediately follows it.</li>
-        <li>Skip the number of rows indicated by the <a>skip rows</a> parameter. These form <code>rdfs:comment</code> annotations on the table. If a skipped row begins with the <a>comment prefix</a>, strip that prefix from the beginning of the row to create the content of the <code>rdfs:comment</code> annotation.</li>
-        <li>Gather the number of header rows indicated by the <a>header row count</a> parameter; the remaining rows are data rows.</li>
         <li>
-          Split the header and data rows into cells using the <a>delimiter</a>. Values that are enclosed within the <a>quote character</a> may contain the <a>delimiter</a>. The <a>quote character</a> may be escaped using the <a>escape character</a> where it appears within cells. If the <a>escape character</a> is not the same as the <a>quote character</a> then the <a>escape character</a> is also used to escape the character that immediately follows it.<br/>If <a>trim</a> is <code>true</code> or <code>start</code> then whitespace from the start of values that are not enclosed within the <a>quote character</a> is removed from the value. If <a>trim</a> is <code>true</code> or <code>end</code> then whitespace from the end of values that are not enclosed within the <a>quote character</a> is removed from the value.
+          Create a new <a>table</a> <em>T</em> with the annotations:
+          <ul class="algorithm">
+            <li><a title="table columns">columns</a> set to an empty list</li>
+            <li><a title="table rows">rows</a> set to an empty list</li>
+            <li><a title="table id">id</a> set to <code>null</code></li>
+            <li><a title="table url">url</a> set to the location of the file, if known, or <code>null</code></li>
+            <li><a title="table direction">direction</a> set to <code>ltr</code></li>
+            <li><a title="table suppress output">suppress output</a> set to <code>false</code></li>
+            <li><a title="table notes">notes</a> set to <code>false</code></li>
+            <li><a title="table foreign keys">foreign keys</a> set to an empty list</li>
+            <li><a title="table conversions">conversions</a> set to an empty list</li>
+          </ul>
         </li>
         <li>
-          Construct <a>embedded metadata</a> as Table Metadata (see <cite><a href="http://w3c.github.io/csvw/metadata/#tables"></a></cite> in [[!tabular-metadata]]).
+          Create a metadata document structure <em>M</em> that looks like:
+          <pre class="highlight">
+{
+  "@context": "http://www.w3.org/ns/csvw",
+  "rdfs:comment": []
+  "tableSchema": {
+    "columns": []
+  }
+}
+          </pre>
         </li>
-        <li>In each row, ignore the number of columns indicated by the <a>skip columns</a> parameter. Always start from the first character in the row when counting columns (see <a href="#bidirectionality-in-csv-files" class="sectionRef"></a>).</li>
-        <li>Gather the number of header columns indicated by the <a>header column count</a> parameter. Always start from the first character in the row when counting columns (see <a href="#bidirectionality-in-csv-files" class="sectionRef"></a>).</li>
-        <li>Each cell within a header row that is not in a skipped or header column is a <code>title</code> annotation on that column.</li>
-        <li>Each cell within a header column is an annotation on the row it appears in; if there is a header row then that provides the type of the annotation for the row, otherwise it is a <code>title</code> annotation.</li>
-        <li>If <a>skip blank rows</a> is <code>true</code> then ignore any rows in which all the cell values are empty strings.</li>
-        <li>Re-create <a>merged metadata</a> using by locating all sources of metadata, included embedded metadata as constructed above, as defined in <a href="#locating-metadata" class="sectionRef">Locating Metadata</a> and merge together in priority order as defined in <a href="http://w3c.github.io/csvw/metadata/#merging-metadata">Merging Metadata</a> in [[!tabular-metadata]].</li>
-        <li>Generate row data for each row using <a>merged metadata</a> by parsing the cells from each row as defined in <cite><a href="http://w3c.github.io/csvw/metadata/#parsing-cells"></a>Parsing Cells</cite> in [[!tabular-metadata]] and adding empty cells for <a title="virtual column">virtual columns</a>.</li>
+        <li>
+          If the URL of the tabular data file being parsed is known, set the <code>url</code> property on <em>M</em> to that URL.
+        </li>
+        <li>
+          Set <dfn>source row number</dfn> to <code>1</code>.
+        </li>
+        <li>Read the file using the <a>encoding</a>.</li>
+        <li>
+          Repeat the following the number of times indicated by <a>skip rows</a>:
+          <ol class="algorithm">
+            <li><a>Read a row</a> to provide the <a>row content</a>.</li>
+            <li>If the <a>comment prefix</a> is not <code>null</code> and the <a>row content</a> begins with the <a>comment prefix</a>, strip that prefix from the <a>row content</a>, and add the resulting string to the <code><em>M</em>.rdfs:comment</code> array.</li>
+            <li>Otherwise, if the <a>row content</a> is not an empty string, add the <a>row content</a> to the <code><em>M</em>.rdfs:comment</code> array.</li>
+            <li>Add <code>1</code> to the <a>source row number</a>.</li>
+          </ol>
+        </li>
+        <li>
+          Repeat the following the number of times indicated by <a>header row count</a>:
+          <ol class="algorithm">
+            <li><a>Read a row</a> to provide the <a>row content</a>.</li>
+            <li>If the <a>comment prefix</a> is not <code>null</code> and the <a>row content</a> begins with the <a>comment prefix</a>, strip that prefix from the <a>row content</a>, and add the resulting string to the <code><em>M</em>.rdfs:comment</code> array.</li>
+            <li>Otherwise, <a title="parse a row">parse the row</a> to provide a <a>list of cell values</a>, and:
+              <ol class="algorithm">
+                <li>Remove the first <a>skip columns</a> number of values from the <a>list of cell values</a>.</li>
+                <li>Remove the first <a>header column count</a> number of values from the <a>list of cell values</a>.</li>
+                <li>For each of the remaining values at index <em>i</em> in the <a>list of cell values</a>:
+                  <ol class="algorithm">
+                    <li>If the value at index <em>i</em> in the <a>list of cell values</a> is an empty string or consists only of whitespace, do nothing.</li>
+                    <li>Otherwise, if there is no column description object at index <em>i</em> in <code><em>M</em>.tableSchema.columns</code>, create a new one with a <code>title</code> property whose value is an array containing a single value that is the value at index <em>i</em> in the <a>list of cell values</a>.</li>
+                    <li>Otherwise, add the value at index <em>i</em> in the <a>list of cell values</a> to the array at <code><em>M</em>.tableSchema.columns[<em>i</em>].title</code>.</li>
+                  </ol>
+                </li>
+              </ol>
+            </li>
+            <li>Add <code>1</code> to the <a>source row number</a>.</li>
+          </ol>
+        </li>
+        <li>Set <dfn>row number</dfn> to <code>1</code>.</li>
+        <li>
+          While it is possible to read another row, do the following:
+          <ol class="algorithm">
+            <li>Set the <dfn>source column number</dfn> to <code>1</code>.</li>
+            <li><a>Read a row</a> to provide the <a>row content</a>.</li>
+            <li>If the <a>comment prefix</a> is not <code>null</code> and the <a>row content</a> begins with the <a>comment prefix</a>, strip that prefix from the <a>row content</a>, and add the resulting string to the <code><em>M</em>.rdfs:comment</code> array.</li>
+            <li>Otherwise, <a title="parse a row">parse the row</a> to provide a <a>list of cell values</a>, and:
+              <ol class="algorithm">
+                <li>If all of the values in the <a>list of cell values</a> are empty strings, and <a>skip blank rows</a> is <code>true</code>, add <code>1</code> to the <a>source row number</a> and move on to process the next row.</li>
+                <li>Otherwise, create a new <a>row</a> <em>R</em>, with:
+                  <ul>
+                    <li><a title="row table">table</a> set to <em>T</em></li>
+                    <li><a title="row number">number</a> set to <a>row number</a></li>
+                    <li><a title="row source number">source number</a> set to <a>source row number</a></li>
+                    <li><a title="row primary key">primary key</a> set to an empty list</li>
+                    <li><a title="row referenced rows">referenced rows</a> set to an empty list</li>
+                    <li><a title="row cells">cells</a> set to an empty list</li>
+                  </ul>
+                </li>
+                <li>Append <em>R</em> to the <a title="table rows">rows</a> of <a>table</a> <em>T</em>.</li>
+                <li>Remove the first <a>skip columns</a> number of values from the <a>list of cell values</a> and add that number to the <a>source column number</a>.</li>
+                <li>Remove the first <a>header column count</a> number of values from the <a>list of cell values</a> and add that number to the <a>source column number</a>.</li>
+                <li>For each of the remaining values at index <em>i</em> in the <a>list of cell values</a> (where <em>i</em> starts at <code>1</code>):
+                  <ol class="algorithm">
+                    <li>Identify the <a>column</a> <em>C</em> at index <em>i</em> within the <a title="table columns">columns</a> of <a>table</a> <em>T</em>. If there is no such column:
+                      <ol class="algorithm">
+                        <li>Create a new <a>column</a> <em>C</em> with:
+                          <ul>
+                            <li><a title="column table">table</a> set to <em>T</em></li>
+                            <li><a title="column number">number</a> set to <em>i</em></li>
+                            <li><a title="column source number">source number</a> set to <a>source column number</a></li>
+                            <li><a title="column name">name</a> set to <code>null</code></li>
+                            <li><a title="column titles">titles</a> set to an empty list</li>
+                            <li><a title="column required">required</a> set to <code>false</code></li>
+                            <li><a title="column datatype">datatype</a> set to <code>string</code></li>
+                            <li><a title="column virtual">virtual</a> set to <code>false</code></li>
+                            <li><a title="column suppress output">suppress output</a> set to <code>false</code></li>
+                            <li><a title="column cells">cells</a> set to an empty list</li>
+                          </ul>
+                        </li>
+                        <li>Append <em>C</em> to the <a title="table columns">columns</a> of <a>table</a> <em>T</em> (at index <em>i</em>).</li>
+                      </ol>
+                    </li>
+                    <li>Create a new <a>cell</a> <em>D</em>, with:
+                      <ul>
+                        <li><a title="cell table">table</a> set to <em>T</em></li>
+                        <li><a title="cell column">column</a> set to <em>C</em></li>
+                        <li><a title="cell row">row</a> set to <em>R</em></li>
+                        <li><a title="cell string value">string value</a> set to the value at index <em>i</em> in the <a>list of cell values</a></li>
+                        <li><a title="cell value">value</a> set to the value at index <em>i</em> in the <a>list of cell values</a></li>
+                        <li><a title="cell errors">errors</a> set to an empty list</li>
+                        <li><a title="cell text direction">text direction</a> set to <code>ltr</code></li>
+                        <li><a title="cell about URL">about URL</a> set to <code>null</code></li>
+                        <li><a title="cell property URL">property URL</a> set to <code>null</code></li>
+                        <li><a title="cell value URL">value URL</a> set to <code>null</code></li>
+                      </ul>
+                    </li>
+                    <li>Append <a>cell</a> <em>D</em> to the <a title="column cells">cells</a> of <a>column</a> <em>C</em>.</li>
+                    <li>Append <a>cell</a> <em>D</em> to the <a title="row cells">cells</a> of <a>row</a> <em>R</em> (at index <em>i</em>).</li>
+                    <li>Add <code>1</code> to the <a>source column number</a>.</li>
+                  </ol>
+                </li>
+              </ol>
+            </li>
+            <li>Add <code>1</code> to the <a>source row number</a>.</li>
+          </ol>
+        </li>
+        <li>If <code><em>M</em>.rdfs:comment</code> is an empty array, remove the <code>rdfs:comment</code> property from <em>M</em>.</li>
+        <li>Return the <a>table</a> <em>T</em> and the <a>embedded metadata</a> <em>M</em>.</li>
       </ol>
+      <p>
+        To <dfn>read a row</dfn> to provide <dfn>row content</dfn>, perform the following steps:
+      </p>
+      <ol class="algorithm">
+        <li>Set the <a>row content</a> to an empty string.</li>
+        <li>Read a character and process as follows:
+          <ol class="algorithm">
+            <li>If the character is an <a>escape character</a> followed by the <a>quote character</a>, append both characters to the <a>row content</a>, and move on to process the character following the <a>quote character</a>.</li>
+            <li>Otherwise, if the character is an <a>escape character</a> and the <a>escape character</a> is not the same as the <a>quote character</a>, append the <a>escape character</a> and the character following it to the <a>row content</a> and move on to process the next character.</li>
+            <li>Otherwise, if the character is a <a>quote character</a>, append the <a>quoted value</a> obtained by <a title="read a quoted value">reading a quoted value</a> to the <a>row content</a> and move on to process the character following the quoted value.</li>
+            <li>Otherwise, if the character is a <a>line terminator</a>, return the <a>row content</a>.</li>
+            <li>Otherwise, append the character to the <a>row content</a> and move on to process the next character.</li>
+          </ol>
+        </li>
+        <li>If there are no more characters to read, return the <a>row content</a>.</li>
+      </ol>
+      <p>
+        To <dfn>read a quoted value</dfn> to provide a <dfn>quoted value</dfn>, perform the following steps:
+      </p>
+      <ol class="algorithm">
+        <li>Set the <a>quoted value</a> to an empty string.</li>
+        <li>Read the initial <a>quote character</a> and add a <a>quote character</a> to the <a>quoted value</a>.</li>
+        <li>Read a character and process as follows:
+          <ol class="algorithm">
+            <li>If the character is an <a>escape character</a> followed by the <a>quote character</a>, append both characters to the <a>quoted value</a>, and move on to process the character following the <a>quote character</a>.</li>
+            <li>Otherwise, if the character is an <a>escape character</a> and the <a>escape character</a> is not the same as the <a>quote character</a>, append the <a>escape character</a> and the character following it to the <a>quoted value</a> and move on to process the next character.</li>
+            <li>Otherwise, if the character is a <a>quote character</a>, return the <a>quoted value</a>.</li>
+            <li>Otherwise, append the character to the <a>quoted value</a> and move on to process the next character.</li>
+          </ol>
+        </li>
+      </ol>
+      <p>
+        To <dfn>parse a row</dfn> to provide a <dfn>list of cell values</dfn>, perform the following steps:
+      </p>
+      <ol class="algorithm">
+        <li>Set the <a>list of cell values</a> to an empty list and the <dfn>current cell value</dfn> to an empty string.</li>
+        <li>Set the <dfn>quoted</dfn> flag to <code>false</code>.</li>
+        <li>Read a character and process as follows:
+          <ol class="algorithm">
+            <li>If the character is an <a>escape character</a> followed by the <a>quote character</a>, append a <a>quote character</a> to the <a>current cell value</a>, and move on to process the character following the <a>quote character</a>.</li>
+            <li>Otherwise, if the character is an <a>escape character</a> and the <a>escape character</a> is not the same as the <a>quote character</a>, append the character following the <a>escape character</a> to the <a>current cell value</a> and move on to process the next character.</li>
+            <li>Otherwise, if the character is a <a>quote character</a> then:
+              <ol class="algorithm">
+                <li>If <a>quoted</a> is <code>false</code>, set the <a>quoted</a> flag to <code>true</code>, and move on to process the next character. If the <a>current cell value</a> is not an empty string, raise an error.</li>
+                <li>Otherwise, set <a>quoted</a> to <code>false</code>, and move on to process the next character. If the next character is not the <a>delimiter</a>, raise an error.</li>
+              </ol>
+            </li>
+            <li>Otherwise, if the character is a <a>delimiter</a>, then:
+              <ol class="algorithm">
+                <li>If <a>quoted</a> is <code>true</code>, append the <a>delimiter</a> character to the <a>current cell value</a> and move on to process the next character.</li>
+                <li>Otherwise, <a title="trim a cell value">trim</a> the <a>current cell value</a>, add the resulting <a>trimmed cell value</a> to the <a>list of cell values</a> and move on to process the next character.</li>
+              </ol>
+            </li>
+            <li>Otherwise, append the character to the <a>current cell value</a> and move on to process the next character.</li>
+          </ol>
+        </li>
+        <li>If there are no more characters to read, <a title="trim a cell value">trim</a> the <a>current cell value</a>, add the resulting <a>trimmed cell value</a> to the <a>list of cell values</a> and return the <a>list of cell values</a>.</li>
+      </ol>
+      <p>
+        To <dfn>trim a cell value</dfn> to provide a <dfn>trimmed cell value</dfn>, perform the following steps:
+        <ol class="algorithm">
+          <li>Set the <a>trimmed cell value</a> to the provided cell value.</li>
+          <li>If <a>trim</a> is <code>true</code> or <code>start</code> then remove any leading whitespace from the start of the <a>trimmed cell value</a> and move on to the next step.</li>
+          <li>If <a>trim</a> is <code>true</code> or <code>end</code> then remove any trailing whitespace from the end of the <a>trimmed cell value</a> and move on to the next step.</li>
+          <li>Return the <a>trimmed cell value</a>.</li>
+        </ol>
+      </p>
       <p class="note">
         This parsing algorithm does not account for the possibility of there being more than one area of tabular data within a single CSV file.
       </p>
@@ -934,18 +1116,18 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               <tr><td><var>C5</var></td><td><var>T</var></td><td>5</td><td>5</td><td><var>C1.5</var>, <var>C2.5</var></td><td><code>Inventory Date</code></td></tr>
             </tbody>
           </table>
-          <p>The extracted embedded metadata, as defined in [[!tabular-metadata]], would look like:</p>
+          <p>The extracted <a>embedded metadata</a>, as defined in [[!tabular-metadata]], would look like:</p>
           <pre class="highlight">
 {
   "@type": "Table",
   "url": "http://example.org/tree-ops.csv",
   "tableSchema": {
     "columns": [
-      {"title": "GID"},
-      {"title": "On Street"},
-      {"title": "Species"},
-      {"title": "Trim Cycle"},
-      {"title": "Inventory Date"}
+      {"title": [ "GID" ]},
+      {"title": [ "On Street" ]},
+      {"title": [ "Species" ]},
+      {"title": [ "Trim Cycle" ]},
+      {"title": [ "Inventory Date" ]}
     ]
   }
 }
@@ -1235,7 +1417,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 2,,"Liquidambar styraciflua","Large Tree Routine Prune",
           </pre>
           <p>
-            Parsing this file similarly results in an <a>annotated tabular data model</a> of a single <a>table</a> <var>T</var> with five columns and two rows. The columns and rows have exactly the same annotations as previously, but there are two <code>null</code> cell values for <var>C2.2</var> and <var>C2.5</var>. Note that the quoting of values within the CSV makes no difference to either the <a>string value</a> or <a title="cell value">value</a> of the cell.
+            Parsing this file similarly results in an <a>annotated tabular data model</a> of a single <a>table</a> <var>T</var> with five columns and two rows. The columns and rows have exactly the same annotations as previously, but there are two <code>null</code> cell values for <var>C2.2</var> and <var>C2.5</var>. Note that the quoting of values within the CSV makes no difference to either the <a title="cell string value">string value</a> or <a title="cell value">value</a> of the cell.
           </p>
           <table style="width: 100%; text-align: left">
             <thead>
@@ -1331,6 +1513,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 	            <li><a>delimiter</a> to a tab character</li>
 	            <li><a>skip rows</a> to 4</li>
 	            <li><a>skip columns</a> to 1</li>
+              <li><a>comment prefix</a> to <code>#</code></li>
 	          </ul>
 	          <p>
 	            Setting these is done in an implementation-defined way. It could be done, for example, by sniffing the contents of the file itself, through command-line options, or by embedding a dialect description into a metadata file associated with the tabular data, which would look like:
@@ -1339,14 +1522,15 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 {
   "delimiter": "\t",
   "skipRows": 4,
-  "skipColumns": 1
+  "skipColumns": 1,
+  "commentPrefix": "#"
 }
 	          </pre>
 	          <p>
 	            With these flags in operation, parsing this file results in an <a>annotated tabular data model</a> of a single <a>table</a> <var>T</var> with five columns and two rows which is largely the same as that created from the original simple example described in <a href="#simple-example" class="sectionRef"></a>. There are three differences.
             </p>
             <p>
-              First, because the four skipped rows began with the default <a>comment prefix</a>, the table itself now has four <code>rdfs:comment</code> annotations, with the values:
+              First, because the four skipped rows began with the <a>comment prefix</a>, the table itself now has four <code>rdfs:comment</code> annotations, with the values:
 	          </p>
 	          <ol>
 	            <li><code> publisher	City of Palo Alto</code></li>
@@ -1399,7 +1583,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 	        		<li>The remaining rows make up the data of the table.</li>
 	        	</ul>
 	        	<p>
-							Parsers that recognised the format could then build a more sophisticated annotated tabular data model using only the embedded information in the tabular data file. They would extract metadata looking like:
+							Parsers that recognised the format could then build a more sophisticated annotated tabular data model using only the embedded information in the tabular data file. They would extract <a>embedded metadata</a> looking like:
             </p>
 {
   "@context": "http://www.w3.org/ns/csvw",
