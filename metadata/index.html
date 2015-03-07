@@ -95,6 +95,18 @@ var respecConfig = {
     <style>
       td, th { padding-left: 1em; padding-right: 1em; }
       tbody tr th { text-align: left; }
+      ol.algorithm {
+        counter-reset: numsection;
+        list-style-type: none;
+      }
+      ol.algorithm li {
+        margin: 0.5em 0;
+      }
+      ol.algorithm li:before {
+        font-weight: bold;
+        counter-increment: numsection;
+        content: counters(numsection, ".") ") ";
+      }
     </style>
   </head>
   <body>
@@ -219,8 +231,8 @@ GID,On Street,Species,Trim Cycle,Inventory Date
       </p>
       <ul>
         <li>properties that are used to identify the table or column that the annotations should appear on; these match up to core annotations on those objects in the annotated tabular data model defined in [[!tabular-data-model]] and do not create new annotations</li>
-        <li>properties that map directly to annotations that appear directly on the group of tables, table, column, row or cell whose description they appear on, such as the <code>name</code> of a column or the <code>dc:provenance</code> of a table</li>
-        <li>properties that are specified on the description of a group of tables, table or column to provide a default value for the equivalent annotation on each of the cells that appear in that table or column</li>
+        <li>properties that are used to create annotations that appear directly on the group of tables, table, column, row or cell whose description they appear on, such as the <code>name</code> of a column or the <code>dc:provenance</code> of a table</li>
+        <li>properties that are inherited, for example by being specified on the description of a group of tables and being inherited by each table in that group, or being specified for a table or column but being used to create or affect the values of annotations on each of the cells that appear in that table or column</li>
       </ul>
       <p>
         For example, in the <a>column description</a>
@@ -237,27 +249,9 @@ GID,On Street,Species,Trim Cycle,Inventory Date
 }
       </pre>
       <p>
-        the properties <code>name</code>, <code>title</code> and <code>dc:description</code> are <a title="direct property">direct properties</a> that become <code>name</code>, <code>title</code> and <code>dc:description</code> properties on the column in the data model. The <code>datatype</code> and <code>format</code> properties are <a title="inherited property">inherited properties</a> that become <code>datatype</code> and <code>format</code> properties on the cells within the column.
+        the properties <code>name</code>, <code>title</code> and <code>dc:description</code> are used to create the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-name" class="externalDFN">name</a>, <a href="http://w3c.github.io/csvw/syntax/#dfn-column-titles" class="externalDFN">titles</a> and <code>dc:description</code> annotations on the <a href="http://w3c.github.io/csvw/syntax/#dfn-column" class="externalDFN">column</a> in the data model. The <code>datatype</code> and <code>format</code> properties are <a title="inherited property">inherited properties</a> that affect the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">value</a> of each <a href="http://w3c.github.io/csvw/syntax/#dfn-cell" class="externalDFN">cell</a> in that column.
       </p>
       <p>The <dfn>property value</dfn> of an annotation is that defined in the metadata, unless otherwise noted.</p>
-      <section>
-        <h3>Direct Properties</h3>
-        <p>
-          <dfn title="direct property">Direct properties</dfn> are properties on the description object for a given table group, table, column, row or cell which map directly to annotations on the described table group, table, column, row or cell. The name of the annotation is the same as the name of the property. The value of the annotation is the same as the <a>property value</a>.
-        </p>
-      </section>
-      <section>
-        <h3>Inherited Properties</h3>
-        <p>
-          A cell may be assigned annotations based on properties on the description objects for the group of tables, table, column or row that it appears in. These properties are known as <dfn title="inherited property">inherited properties</dfn> and are listed in <a href="#inherited-properties-1" class="sectionRef"></a>. To ascertain a value for these annotations, an application MUST identify the relevant property in the descriptions of the table or column.
-        </p>
-        <p>
-          Applications MUST raise an error if the value of a property in a table description is not <a>compatible with</a> the value of that property on the group of tables. Applications MUST raise an error if the value of a property in a column description is not <a>compatible with</a> the value of that property on the table. Applications MUST raise an error if the value of a property on a cell is not <a>compatible with</a> the values of that property on the column that the cell is associated with.
-        </p>
-        <p>
-          A value for a cell, column or table is <dfn>compatible with</dfn> with a value on a column, table or group of tables if they are the same value or if the first value is a sub-value of the second value. The definitions of individual <a title="inherited property">inherited properties</a> indicate what values count as sub-values of others.
-        </p>
-      </section>
     </section>
     <section>
       <h2>Metadata Format</h2>
@@ -305,7 +299,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         <section>
           <h4>Link Properties</h4>
           <p>
-            <dfn title="link property">Link properties</dfn> hold a single reference to anther resource by URL. Their value is a <strong>string</strong> &mdash; resolved as a URL against the <a>base URL</a>.
+            <dfn title="link property">Link properties</dfn> hold a single reference to another resource by URL. Their value is a <strong>string</strong> &mdash; resolved as a URL against the <a>base URL</a>.
           </p>
           <p>
             For example, the <code>url</code> property is a link property. A <a>table description</a> might contain:
@@ -324,7 +318,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           </p>
           <dl>
             <dt>column names</dt>
-            <dd>a variable is set for each column within the schema; the name of the variable is the <a href="#cell-name"><code>name</code></a> of the column and the value is derived from the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">value</a> of the cell in that column in the row that is currently being processed, namely one of:
+            <dd>a variable is set for each column within the schema; the name of the variable is the <a href="#column-name"><code>name</code></a> of the column and the value is derived from the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">value</a> of the cell in that column in the row that is currently being processed, namely one of:
               <ul>
                 <li><code>null</code></li>
                 <li>the <a href="http://www.w3.org/TR/xmlschema11-2/#dt-canonical-representation" class="externalDFN">canonical representation</a> of the value of the cell, as defined in [[!xmlschema11-2]], if it has a single value</li>
@@ -346,10 +340,10 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           <p>
             The <a>property value</a> of a <a>URI template property</a> is only available when processing individual cells in a table, usually while converting tables as defined in [[!tabular-data-model]]. The value is the result of:
           </p>
-          <ol>
+          <ol class="algorithm">
             <li>applying the template against the cell in that column in the row that is currently being processed</li>
-            <li>expanding any prefixes as if the value were the name of a common property, as described in <a href="#common-properties" class="sectionRef"></a></li>
-            <li>resolving the resulting URL against the base URL of the <a href="http://w3c.github.io/csvw/syntax/#dfn-table-url" class="externalDFN">table url</a> if not null</ol>
+            <li>expanding any prefixes as if the value were the name of a <a>common property</a>, as described in <a href="#common-properties" class="sectionRef"></a></li>
+            <li>resolving the resulting URL against the base URL of the <a href="http://w3c.github.io/csvw/syntax/#dfn-table-url" class="externalDFN">table url</a> if not null</li>
           </ol>
           <p>
             For example, the <a href="#cell-aboutUrl"><code>aboutUrl</code></a> property holds a URI template that is used to generate a URL identifier for each row, which might look like:
@@ -432,10 +426,10 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         <section>
           <h4>Column Reference Properties</h4>
           <p>
-            <dfn title="column reference property">Column reference properties</dfn> hold one or more references to other column description objects. The referenced description object must have an <code>name</code> property. Column reference properties can then reference column description objects through values that are:
+            <dfn title="column reference property">Column reference properties</dfn> hold one or more references to other <a>column description</a> objects. The referenced description object must have an <code>name</code> property. Column reference properties can then reference column description objects through values that are:
           </p>
           <ul>
-            <li><strong>strings</strong> &mdash; which MUST match the <code>name</code> on a column description object within the metadata document</li>
+            <li><strong>strings</strong> &mdash; which MUST match the <code>name</code> on a <a>column description</a> object within the metadata document</li>
             <li><strong>arrays</strong> &mdash; lists of strings as above</li>
           </ul>
           <p>
@@ -466,7 +460,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
         <section>
           <h4>Object Properties</h4>
           <p>
-            <dfn title="object property">Object properties</dfn> hold one or more objects or references to objects by URL. Their values may be:
+            <dfn title="object property">Object properties</dfn> hold a single object or reference to an object by URL. Their values may be:
           </p>
           <ul>
             <li><strong>strings</strong> &mdash; resolved as URLs against the <a>base URL</a></li>
@@ -547,26 +541,24 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <li><strong>numbers</strong> &mdash; interpreted as integers or doubles</li>
             <li><strong>booleans</strong> &mdash; interpreted as booleans (<code>true</code> or <code>false</code>)</li>
             <li><strong>strings</strong> &mdash; interpreted as defined by the property</li>
-            <li><strong>arrays</strong> &mdash; lists of numbers, booleans or strings</li>
+            <li><strong>objects</strong> &mdash; interpreted as defined by the property</li>
+            <li><strong>arrays</strong> &mdash; lists of numbers, booleans, strings, or objects</li>
           </ul>
           <p class="note">
             JSON does not have date or time types. Where a property takes a date as a value, this MUST be a string in the format <code>YYYY-MM-DD</code>.
-          </p>
-          <p class="issue" data-number="136">
-            Having <strong>arrays</strong> as an atomic property creates issues when merging. We may consider the difference between an <a>atomic property</a> and an <a>atomic value</a>, where an atomic property takes an <a>atomic value</a> or an array of <a title="atomic value">atomic values</a>. However, the only case of an <a>atomic property</a> which accepts an array of values is <code>null</code>, which may not be required, so we may just restrict <code>null</code> to taking a single <a>atomic value</a>, and re-define an <a>atomic value</a> to be <strong>numbers</strong>, <strong>booleans</strong> or <strong>strings</strong>.
           </p>
         </section>
       </section>
       <section>
         <h3>Top-Level Properties</h3>
         <p>
-          The top-level object (whether it is a <a>table group description</a> or a <a>table description</a>) MUST have a <code>@context</code> property, an <a>array property</a>, as defined in <cite><a href="http://www.w3.org/TR/json-ld/#context-definitions">Section 8.7</a></cite> of [[!JSON-LD]]. The <code>@context</code> MUST contain one of the following:</p>
+          The top-level object (whether it is a <a>table group description</a> or a <a>table description</a>) MUST have a <code id="context">@context</code> property, an <a>array property</a>, as defined in <cite><a href="http://www.w3.org/TR/json-ld/#context-definitions">Section 8.7</a></cite> of [[!JSON-LD]]. The <code>@context</code> MUST contain one of the following:</p>
         <ul>
           <li>A string value of <code>http://www.w3.org/ns/csvw</code>, or</li>
           <li>An array composed of a string and an object, where the string is <code>http://www.w3.org/ns/csvw</code> and the object representing a local context definition, which is restricted to contain either or both of the following members.</li>
         </ul>
         <dl>
-          <dt><code>@language</code></dt>
+          <dt id="context-language"><code>@language</code></dt>
           <dd>
             <p>
               indicates the default language for the values of properties in the metadata document; if present, its value MUST be a language code [[!BCP47]] which is the <dfn>default language</dfn> for the values of other properties in the metadata document
@@ -575,43 +567,16 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               Note that the <code>@language</code> property of the <code>@context</code> object, which gives the default language used within the metadata file, is distinct from the <code>lang</code> property on a <a>description object</a>, which gives the language used in the data within a group of tables, table or column.
             </p>
           </dd>
-          <dt><code>@base</code></dt>
+          <dt id="context-base"><code>@base</code></dt>
           <dd>
             <p>
               indicates the base URL against which other URLs within the description are resolved; if present, its value MUST be a URL which is resolved against the location of the metadata document to provide the <dfn>base URL</dfn> for other URLs in the metadata document; if unspecified, the base URL used for interpreting relative URLs within the metadata document is the location of the metadata document itself
             </p>
             <p class="note">
-              Note that the <code>@base</code> property of the <code>@context</code> object provides the base URL used for URLs within the metadata document, not the URLs that appear within the group of tables or table it describes.
+              Note that the <code>@base</code> property of the <code>@context</code> object provides the base URL used for URLs within the metadata document, not the URLs that appear as data within the group of tables or table it describes.
             </p>
           </dd>
         </dl>
-        <p>
-          A <code>@context</code> B is <a>merged</a> into an original <code>@context</code> A by:
-        </p>
-        <ol>
-          <li><a title="merged">merge</a> the object value of A with B using empty objects if none exists.</li>
-          <li>If the resulting object is empty, the merged value is the string <code>http://www.w3.org/ns/csvw</code>.</li>
-          <li>Otherwise, the merged value is an array of <code>http://www.w3.org/ns/csvw</code> and the merged object.</li>
-        </ol>
-<pre class="example highlight" title="TableGroup definition with string @context">
-{
-  "@context": "http://www.w3.org/ns/csvw",
-  "@type": "TableGroup",
-  "resources": []
-}
-</pre>
-<pre class="example highlight" title="TableGroup definition with local @context">
-{
-  "@context": [
-    "http://www.w3.org/ns/csvw",
-    {
-      "@language": "en"
-    }
-  ],
-  "@type": "TableGroup",
-  "resources": []
-}
-</pre>
       </section>
       <section>
         <h3>Common Properties</h3>
@@ -641,24 +606,25 @@ GID,On Street,Species,Trim Cycle,Inventory Date
   "foaf:age": 18.5,
   "schema:description": ["first value", "second value"]
 }</code></pre>
-          <p>Alternatively, value expansion may be determined through custom JSON-LD Context mappings, or by pre-defining specific mappings in the default context. This also has merge considerations, where the <a>object property</a> allowing arrays is not appropriate.</p>
+          <p>Alternatively, value expansion may be determined through custom JSON-LD Context mappings, or by pre-defining specific mappings in the default context.</p>
           <p>Merge should be that of <a>atomic property</a> allowing arrays, not presently defined; i.e., coerce values to array, and concatenate unique values in order.</p>
         </div>
       </section>
       <section>
         <h3>Table Groups</h3>
         <p>
-          A <dfn>table group description</dfn> is a JSON object that describes a group of tables.
+          A <dfn>table group description</dfn> is a JSON object that describes a <a href="http://w3c.github.io/csvw/syntax/#dfn-group-of-tables" class="externalDFN">group of tables</a>.
         </p>
         <section>
           <h4>Required Properties</h4>
           <dl>
             <dt id="table-group-resources"><code>resources</code></dt>
             <dd>
-              <p>An <a>array property</a> of <a title="table description">table descriptions</a> for the tables in the group. When an array of table descriptions B is <a>merged</a> into an original array of table descriptions A, each table description within B is combined into the original array A by:</p>
+              <p>An <a>array property</a> of <a title="table description">table descriptions</a> for the tables in the group, namely those listed in the <a href="http://w3c.github.io/csvw/syntax/#dfn-table-group-resources" class="externalDFN">resources</a> annotation on the <a href="http://w3c.github.io/csvw/syntax/#dfn-group-of-tables" class="externalDFN">group of tables</a> being described.</p>
+              <p>When an array of table descriptions <code>B</code> is <a>merged</a> into an original array of table descriptions <code>A</code>, each table description within <code>B</code> is combined into the original array <code>A</code> by:</p>
               <ul>
-                <li>if there is a table description with the same <code>url</code> in A, the table description from B is <a>merged</a> into the matching table description in A</li>
-                <li>otherwise, the table description from B is appended to the array of table descriptions A</li>
+                <li>if there is a table description with the same <code>url</code> in <code>A</code>, the table description from <code>B</code> is <a>merged</a> into the matching table description in <code>A</code></li>
+                <li>otherwise, the table description from <code>B</code> is appended to the array of table descriptions <code>A</code></li>
               </ul>
             </dd>
           </dl>
@@ -676,7 +642,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <dt id="table-group-direction"><code>tableDirection</code></dt>
             <dd>
               <p>
-                An <a>atomic property</a> that MUST have a single string value that is one of <code>"rtl"</code>, <code>"ltr"</code> or <code>"default"</code>. Indicates whether the tables in the group should be displayed with the first column on the right, on the left, or based on the first character in the table that has a specific direction. See <a href="#bidirectional-tables" class="sectionRef"></a> for more details.
+                An <a>atomic property</a> that MUST have a single string value that is one of <code>"rtl"</code>, <code>"ltr"</code> or <code>"default"</code>. Indicates whether the tables in the group should be displayed with the first column on the right, on the left, or based on the first character in the table that has a specific direction. The value of this property becomes the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-table-direction" class="externalDFN">direction</a> annotation for all the tables in the table group.
               </p>
             </dd>
             <dt id="table-group-dialect"><code>dialect</code></dt>
@@ -685,15 +651,16 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             </dd>
             <dt id="table-group-conversions"><code>conversions</code></dt>
             <dd>
-              <p>An <a>array property</a> of <a title="conversion specification">conversion specifications</a> that provide mechanisms to transform the tabular data into other formats. See <a href="#conversion-specifications" class="sectionRef"></a> for more details. When an array of conversion specifications B is <a>merged</a> into an original array of conversion specifications A, each conversion specification within B is combined into the original array A by:</p>
+              <p>An <a>array property</a> of <a title="conversion specification">conversion specifications</a> that provide mechanisms to transform the tabular data into other formats. The value of this property becomes the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-table-conversions" class="externalDFN">conversions</a> annotation for all the tables in the table group.</p>
+              <p>When an array of conversion specifications <code>B</code> is <a>merged</a> into an original array of conversion specifications <code>A</code>, each conversion specification within <code>B</code> is combined into the original array <code>A</code> by:</p>
               <ul>
-                <li>if there is a conversion specification with the same <code>url</code>, <code>targetFormat</code> and <code>scriptFormat</code> in A, the conversion specification from B is <a>merged</a> into the matching conversion specification in A</li>
-                <li>otherwise, the conversion specification from B is appended to the array of conversion specifications A</li>
+                <li>if there is a conversion specification with the same <code>url</code> in <code>A</code>, the conversion specification from <code>B</code> is <a>merged</a> into the matching conversion specification in A</li>
+                <li>otherwise, the conversion specification from <code>B</code> is appended to the array of conversion specifications <code>A</code></li>
               </ul>
             </dd>
             <dt id="table-group-ld-id"><code>@id</code></dt>
             <dd>
-              If included, <code>@id</code> identifies the <a>table group description</a>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.
+              If included, <code>@id</code> identifies the <a href="http://w3c.github.io/csvw/syntax/#dfn-group-of-tables" class="externalDFN">group of tables</a>, as defined by [[!tabular-data-model]], described by this <a>table group description</a>. The value of this property becomes the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-table-group-id" class="externalDFN">id</a> annotation for the table group. Publishers MAY include this to provide additional information to JSON-LD based toolchains.
             </dd>
             <dt id="table-group-ld-type"><code>@type</code></dt>
             <dd>
@@ -719,7 +686,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <dt id="table-url"><code>url</code></dt>
             <dd>
               <p>
-                This <a>link property</a> gives the single URL of the CSV file that the table is held in, relative to the location of the metadata document.
+                This <a>link property</a> gives the single URL of the CSV file that the table is held in, relative to the location of the metadata document. The value of this property is the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-table-url" class="externalDFN">url</a> annotation for the table this table description describes.
               </p>
             </dd>
           </dl>
@@ -733,11 +700,12 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <dt id="table-schema"><code>tableSchema</code></dt>
             <dd>
               <p>An <a>object property</a> that provides a single <a>schema description</a> as described in <a href="#schemas" class="sectionRef"></a>. This may be provided as an embedded object within the JSON metadata or as a URL reference to a separate JSON schema document. If a table description is within a <a>table group description</a>, the <code>tableSchema</code> from that table group acts as the default for this property.</p>
+              <p>The <a>property value</a> of a <code>tableSchema</code>is that defined in the <a>table description</a>, if any, or that defined in the <a>table group description</a>, if any, or <code>null</code>.</p>
             </dd>
             <dt id="table-notes"><code>notes</code></dt>
             <dd>
               <p>
-                An <a>array property</a> that provides an array of objects representing arbitrary annotations on the annotated tabular data model. This specification does not place any constraints on the structure of these objects.
+                An <a>array property</a> that provides an array of objects representing arbitrary annotations on the annotated tabular data model.  The value of this property becomes the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-table-notes" class="externalDFN">direction</a> annotation for the table. The properties on these objects are interpreted equivalently to <a title="common property">common properties</a>. When an array of note objects <code>B</code> is <a>merged</a> into an original array of note objects <code>A</code>, each note object from <code>B</code> is appended into the array <code>A</code>.
               </p>
               <p class="note">
                 The <a href="http://www.w3.org/annotation/">Web Annotation Working Group</a> is developing a vocabulary for expressing annotations. In future versions of this specification, we anticipate referencing that vocabulary.
@@ -748,18 +716,18 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               <p>A <a>natural language property</a> that describes the title of the table.</p>
             </dd>
             <dt id="tableDirection"><code>tableDirection</code></dt>
-            <dd><p>As defined for <a href="#table-group-direction">table groups</a>.</p></dd>
-            <dt id="table-templates"><code>templates</code></dt>
-            <dd><p>As defined for <a href="#table-group-templates">table groups</a>.</p></dd>
+            <dd><p>As defined for <a href="#table-group-direction">table groups</a>. The value of this property becomes the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-table-direction" class="externalDFN">direction</a> annotation for this table.</p></dd>
+            <dt id="table-conversions"><code>conversions</code></dt>
+            <dd><p>As defined for <a href="#table-group-templates">table groups</a>. The value of this property becomes the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-table-conversions" class="externalDFN">conversions</a> annotation for this table.</p></dd>
             <dt id="table-dialect"><code>dialect</code></dt>
             <dd><p>As defined for <a href="#table-group-dialect">table groups</a>.</p></dd>
             <dt id="table-suppressOutput"><code>suppressOutput</code></dt>
             <dd>
-              <p>A boolean <a>atomic property</a>. If <code>true</code>, suppresses any output that would be generated when converting this table.</p>
+              <p>A boolean <a>atomic property</a>. If <code>true</code>, suppresses any output that would be generated when converting this table. The value of this property becomes the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-table-suppress-output" class="externalDFN">suppress output</a> annotation for this table.</p>
             </dd>
             <dt id="table-ld-id"><code>@id</code></dt>
             <dd>
-              <p>If included, <code>@id</code> identifies the <a>table description</a>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.</p>
+              <p>If included, <code>@id</code> identifies the <a href="http://w3c.github.io/csvw/syntax/#dfn-table" class="externalDFN">table</a>, as defined in [[!tabular-data-model]], described by this <a>table description</a>. The value of this property becomes the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-table-id" class="externalDFN">id</a> annotation for this table. Publishers MAY include this to provide additional information to JSON-LD based toolchains.</p>
             </dd>
             <dt id="table-ld-type"><code>@type</code></dt>
             <dd>
@@ -838,7 +806,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           </dd>
           <dt id="dialect-ld-id"><code>@id</code></dt>
           <dd>
-            <p>If included, <code>@id</code> identifies the <a>dialect description</a>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.</p>
+            <p>If included, <code>@id</code> identifies the dialect described by this <a>dialect description</a>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.</p>
           </dd>
           <dt id="dialect-ld-type"><code>@type</code></dt>
           <dd>
@@ -899,7 +867,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
                 The <code>targetFormat</code> URL is intended as an informative identifier for the target format, and applications SHOULD NOT access the URL.
               </p>
             </dd>
-            <dt id="conversion-templateFormat"><code>scriptFormat</code></dt>
+            <dt id="conversion-scriptFormat"><code>scriptFormat</code></dt>
             <dd>
               <p>
                 A <a>link property</a> giving the single URL for the format that is used by the script or template. If one has been defined, this should be a URL for a media type, in the form <code>http://www.iana.org/assignments/media-types/<var>media-type</var></code> such as <code>http://www.iana.org/assignments/media-types/application/javascript</code>. Otherwise, it can be any URL that describes the script or template format.
@@ -922,11 +890,11 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             </dd>
             <dt id="conversion-source"><code>source</code></dt>
             <dd>
-              <p>A single string <a>atomic property</a> that provides, if included, the format to which the tabular data should be transformed prior to the transformation using the script or template. If the value is <code>json</code>, the tabular data should first be transformed first to JSON based on the simple mapping defined in <a href="http://www.w3.org/TR/csv2json/">Generating JSON from Tabular Data on the Web</a>. If the value is <code>rdf</code>, it should similarly first be transformed to to an RDF graph based on the simple mapping defined in <a href="http://www.w3.org/TR/csv2rdf/">Generating RDF from Tabular Data on the Web</a>. If the <code>source</code> property is missing or <code>null</code> then the source of the transformation is the annotated tabular data model. No other values are valid.
+              <p>A single string <a>atomic property</a> that provides, if included, the format to which the tabular data should be transformed prior to the transformation using the script or template. If the value is <code>json</code>, the tabular data should first be transformed first to JSON based on the simple mapping defined in <a href="http://www.w3.org/TR/csv2json/">Generating JSON from Tabular Data on the Web</a>. If the value is <code>rdf</code>, it should similarly first be transformed to to an RDF graph based on the simple mapping defined in <a href="http://www.w3.org/TR/csv2rdf/">Generating RDF from Tabular Data on the Web</a>. If the <code>source</code> property is missing or <code>null</code> then the source of the transformation is the annotated tabular data model. No other values are valid.</p>
             </dd>
             <dt id="conversion-ld-id"><code>@id</code></dt>
             <dd>
-              <p>If included, <code>@id</code> identifies the <a>conversion specification</a>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.</p>
+              <p>If included, <code>@id</code> identifies the conversion described by this <a>conversion specification</a>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.</p>
             </dd>
             <dt id="conversion-ld-type"><code>@type</code></dt>
             <dd>
@@ -971,21 +939,21 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               The <a href="#column-name"><code>name</code></a> properties of the column descriptions MUST be unique within a given table description.
             </p>
             <p>
-              When an array of column descriptions B is <a>merged</a> into an original array of column descriptions A, each column description within B is combined into the original array A, based on the index of each column description, as follows:
+              When an array of column descriptions <code>B</code> is <a>merged</a> into an original array of column descriptions <code>A</code>, each column description within <code>B</code> is combined into the original array <code>A</code>, based on the index of each column description, as follows:
             </p>
-            <ol>
-              <li>if the column descriptions at the same index within A and B have the same <a href="#column-name"><code>name</code></a>, the column description from B is <a>merged</a> into the matching column description in A</li>
-              <li>otherwise, if the column descriptions at the same index within A and B have matching <a href="#column-title"><code>title</code></a>s (both titles are the same and either they both have the same language or one of them has an undefined language (<code>und</code>)), the column description from B is <a>merged</a> into the matching column description in A</li>
-              <li>otherwise, if there are column descriptions at the same index within A and B, a validator MUST generate an error</li>
-              <li>otherwise, if at a given index there is no column description within A, but there is a column description within B, then:
-                <ol>
-                  <li>if the <a href="#column-virtual"><code>virtual</code></a> property of the column description in B is <code>true</code>, then the column description is appended to A</li>
+            <ol class="algorithm">
+              <li>if the column descriptions at the same index within <code>A</code> and <code>B</code> have the same <a href="#column-name"><code>name</code></a>, the column description from <code>B</code> is <a>merged</a> into the matching column description in A</li>
+              <li>otherwise, if the column descriptions at the same index within <code>A</code> and <code>B</code> have matching <a href="#column-title"><code>title</code></a>s (both titles are the same and either they both have the same language or one of them has an undefined language (<code>und</code>)), the column description from <code>B</code> is <a>merged</a> into the matching column description in <code>A</code></li>
+              <li>otherwise, if there are column descriptions at the same index within <code>A</code> and <code>B</code>, a validator MUST generate an error</li>
+              <li>otherwise, if at a given index there is no column description within A, but there is a column description within <code>B</code>, then:
+                <ol class="algorithm">
+                  <li>if the <a href="#column-virtual"><code>virtual</code></a> property of the column description in <code>B</code> is <code>true</code>, then the column description is appended to <code>A</code></li>
                   <li>otherwise, a validator MUST generate an error</li>
                 </ol>
               </li>
-              <li>otherwise, if at a given index there is no column description within B, but there is a column description within A, then:
-                <ol>
-                  <li>if the <a href="#column-virtual"><code>virtual</code></a> property of the column description in A is <code>true</code>, then the column description is retained</li>
+              <li>otherwise, if at a given index there is no column description within B, but there is a column description within <code>A</code>, then:
+                <ol class="algorithm">
+                  <li>if the <a href="#column-virtual"><code>virtual</code></a> property of the column description in <code>A</code> is <code>true</code>, then the column description is retained</li>
                   <li>otherwise, a validator MUST generate an error</li>
                 </ol>
               </li>
@@ -994,10 +962,10 @@ GID,On Street,Species,Trim Cycle,Inventory Date
           <dt id="table-primaryKey"><code>primaryKey</code></dt>
           <dd>
             <p>
-              A <a>column reference property</a> that holds either a single reference to a column description object or an array of references.
+              A <a>column reference property</a> that holds either a single reference to a <a>column description</a> object or an array of references. The value of this property is used to create the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-row-primary-key" class="externalDFN">primary key</a> annotation for each row within a table that uses this schema by creating a list of the cells in that row that are in the referenced columns.
             </p>
             <p>
-              <a>Validators</a> MUST check that each row has a unique combination of cells in the indicated columns. For example, if <code>primaryKey</code> is set to <code>["familyName", "givenName"]</code> then every row must have a unique value for the combination of the <code>familyName</code> and <code>givenName</code> columns.
+              As defined in [[!tabular-data-model]], <a>validators</a> MUST check that each row has a unique combination of cells in the indicated columns. For example, if <code>primaryKey</code> is set to <code>["familyName", "givenName"]</code> then every row must have a unique value for the combination of the <code>familyName</code> and <code>givenName</code> columns.
             </p>
           </dd>
           <dt id="table-foreignKeys"><code>foreignKeys</code></dt>
@@ -1008,7 +976,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             <dl>
               <dt id="foreign-key-columns"><code>columns</code></dt>
               <dd>
-                <p>A <a>column reference property</a> that holds either a single reference to a column description object within this schema, or an array of references. These form the <dfn>referencing columns</dfn> for the <a>foreign key definition</a>.</p>
+                <p>A <a>column reference property</a> that holds either a single reference to a <a>column description</a> object within this schema, or an array of references. These form the <dfn>referencing columns</dfn> for the <a>foreign key definition</a>.</p>
               </dd>
               <dt id="foreign-key-reference"><code>reference</code></dt>
               <dd>
@@ -1026,11 +994,14 @@ GID,On Street,Species,Trim Cycle,Inventory Date
                   </dd>
                   <dt id="foreign-key-reference-columns"><code>columns</code></dt>
                   <dd>
-                    <p>A <a>column reference property</a> that holds either a single reference to a column description object within the <a href="#table-tableSchema"><code>tableSchema</code></a> of the <a>referenced table</a>, or an array of such references.</p>
+                    <p>A <a>column reference property</a> that holds either a single reference to a <a>column description</a> object within the <a href="#table-tableSchema"><code>tableSchema</code></a> of the <a>referenced table</a>, or an array of such references.</p>
                   </dd>
                 </dl>
                 <p>
-                  <a>Validators</a> MUST check that, for each row, the combination of cells in the <a>referencing columns</a> reference a unique row within the <a>referenced table</a> through a combination of cells in the <a>referenced columns</a>. For examples, see <a href="#foreign-key-reference-between-resources" class="sectionRef"></a> and <a href="#foreign-key-reference-between-schemas" class="sectionRef"></a>.
+                  The value of this property is used to create the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-table-foreign-keys" class="externalDFN">foreign keys</a> annotation on the table using this schema by creating a list of foreign keys comprising a list of columns in the table and a list of columns in the referenced table. The value of this property is also used to create the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-row-referenced-rows" class="externalDFN">referenced rows</a> annotation on each of the rows in the table that uses this schema, which is a pair of the relevant foreign key and the referenced row in the referenced table.
+                </p>
+                <p>
+                  As defined in [[!tabular-data-model]], <a>validators</a> MUST check that, for each row, the combination of cells in the <a>referencing columns</a> reference a unique row within the <a>referenced table</a> through a combination of cells in the <a>referenced columns</a>. For examples, see <a href="#foreign-key-reference-between-resources" class="sectionRef"></a> and <a href="#foreign-key-reference-between-schemas" class="sectionRef"></a>.
                 </p>
               </dd>
             </dl>
@@ -1038,12 +1009,12 @@ GID,On Street,Species,Trim Cycle,Inventory Date
               It is not required for the resource or schema referenced from a <code>foreignKeys</code> property to have a similarly defined <code>primaryKey</code>, though frequently it will.
             </p>
             <p>
-              When an array of foreign key definitions B is <a>merged</a> into an original array of foreign key definitions A, each foreign key definition within B which does not appear within A is appended to the original array A.
+              When an array of foreign key definitions <code>B</code> is <a>merged</a> into an original array of foreign key definitions <code>A</code>, each foreign key definition within <code>B</code> which does not appear within <code>A</code> is appended to the original array <code>A</code>.
             </p>
           </dd>
           <dt id="schema-ld-id"><code>@id</code></dt>
           <dd>
-            <p>If included, <code>@id</code> identifies the <a>schema description</a>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.</p>
+            <p>If included, <code>@id</code> identifies the <a>schema</a> described by this <a>schema description</a>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.</p>
           </dd>
           <dt id="schema-ld-type"><code>@type</code></dt>
           <dd>
@@ -1272,7 +1243,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             <dt id="column-name"><code>name</code></dt>
             <dd>
               <p>
-                An <a>atomic property</a> that gives a single canonical name for the column. This MUST be a string. Conversion specifications MUST use this property as the basis for the names of properties/elements/attributes in the results of conversions.
+                An <a>atomic property</a> that gives a single canonical name for the column. The value of this property is used to create the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-name" class="externalDFN">name</a> annotation for the described column. This MUST be a string. Conversion specifications MUST use this property as the basis for the names of properties/elements/attributes in the results of conversions.
               </p>
               <p>The <a>property value</a> of <code>name</code> is that defined within metadata, if it exists. Otherwise, it is the first value from the <a>property value</a> of <code>title</code> having the same language tag as <a>default language</a> or <code>und</code> of not specified percent-encoded as necessary to conform to the syntactic requirements described below, as a string without language, if any. Otherwise, it is the string <code>"_col.<em>[N]</em>"</code> where <code><em>[N]</em></code> is the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-number" class="externalDFN">column number</a>.
               </p>
@@ -1286,7 +1257,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             <dt id="column-title"><code>title</code></dt>
             <dd>
               <p>
-                A <a>natural language property</a> that provides possible alternative names for the column.
+                A <a>natural language property</a> that provides possible alternative names for the column. The value of this property is used to create the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-titles" class="externalDFN">titles</a> annotation for the described column.
               </p>
               <p class="issue" data-number="56">
                 The facility to specify multiple potential titles for a column is important when the same column description is used for multiple CSVs, through a mechanism yet to be defined by this specification.
@@ -1294,21 +1265,21 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             </dd>
             <dt id="column-required"><code>required</code></dt>
             <dd>
-              <p>A boolean <a>atomic property</a> taking a single value which indicates whether every cell within the column must have a non-null value. Its <a>property value</a> is that defined in metadata, or <code>false</code> otherwise.</p>
+              <p>A boolean <a>atomic property</a> taking a single value which indicates whether every cell within the column must have a non-null value. The value of this property is used to create the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-required" class="externalDFN">required</a> annotation for the described column. Its <a>property value</a> is that defined in metadata, or <code>false</code> otherwise.</p>
             </dd>
             <dt id="column-suppressOutput"><code>suppressOutput</code></dt>
             <dd>
-              <p>A boolean <a>atomic property</a>. If <code>true</code>, suppresses any output that would be generated when converting cells in this column.</p>
+              <p>A boolean <a>atomic property</a>. If <code>true</code>, suppresses any output that would be generated when converting cells in this column. The value of this property is used to create the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-suppress-output" class="externalDFN">suppress output</a> annotation for the described column.</p>
             </dd>
             <dt id="column-virtual"><code>virtual</code></dt>
             <dd>
-              <p>A boolean <a>atomic property</a> taking a single value which indicates whether the column is a <a href="http://w3c.github.io/csvw/syntax/#dfn-virtual-column" class="externalDFN">virtual column</a> not present in the original source. If present, a virtual column MUST appear after all other non-virtual column definitions.</p>
+              <p>A boolean <a>atomic property</a> taking a single value which indicates whether the column is a <a href="http://w3c.github.io/csvw/syntax/#dfn-virtual-column" class="externalDFN">virtual column</a> not present in the original source. The value of this property is used to create the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-virtual" class="externalDFN">virtual</a> annotation for the described column. If present, a virtual column MUST appear after all other non-virtual column definitions.</p>
               <p class="note">Virtual columns are useful for inserting cells with default values into an <a href="http://w3c.github.io/csvw/syntax/#dfn-annotated-table" class="externalDFN">annotated table</a> to control the results of conversions.</p>
               <p class="issue" data-number="179">We invite comment on whether <a href="http://w3c.github.io/csvw/syntax/#dfn-virtual-column" class="externalDFN">virtual columns</a> are useful enough to include in the final recommendation in spite of the added complexity.</p>
             </dd>
             <dt id="column-ld-id"><code>@id</code></dt>
             <dd>
-              <p>If included, <code>@id</code> identifies the <a>column description</a>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.</p>
+              <p>If included, <code>@id</code> identifies the <a href="http://w3c.github.io/csvw/syntax/#dfn-column" class="externalDFN">columns</a>, as defined in [[!tabular-data-model]] and potentially appearing across separate tables, described by this <a>column description</a>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.</p>
             </dd>
             <dt id="column-ld-type"><code>@type</code></dt>
             <dd>
@@ -1436,61 +1407,70 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
       <section>
         <h2>Inherited Properties</h2>
         <p>
-          Cell descriptions may override <a title="inherited property">inherited properties</a>, as described in <a href="#annotating-tables" class="sectionRef"></a>. It is good practice to define these properties on columns, so that all cells within a given column are handled in the same way, or on tables if appropriate. These properties are:
+          A <a href="http://w3c.github.io/csvw/syntax/#dfn-cell" class="externalDFN">cell</a> may be assigned annotations based on properties on the description objects for the <a title="table group description">group of tables</a>, <a title="table description">table</a>, <a title="schema description">schema</a> or <a title="column description">column</a> that it appears in. These properties are known as <dfn title="inherited property">inherited properties</dfn> and are listed below. To ascertain a value for certain annotations on cells, an application MUST identify the relevant property in the descriptions of the group of tables, table, schema or column.
+        </p>
+        <p>
+          Applications MUST raise an error if the value of a property in a <a>table description</a> is not <a>compatible with</a> the value of that property on the <a>table group description</a> it appears in. Applications MUST raise an error if the value of a property in a <a>schema description</a> is not <a>compatible with</a> the value of that property on the <a>table description</a> and <a>table group description</a> it appears in. Applications MUST raise an error if the value of a property in a <a>column description</a> is not <a>compatible with</a> the value of that property in the <a>schema description</a>, <a>table description</a> and/or <a>table group description</a> it appears in.
+        </p>
+        <p>
+          A value for an <a>inherited property</a> on a column or table description is <dfn>compatible with</dfn> with an inherited value on the same property on a table or table group description if they are the same value or if the first value is a sub-value of the second value. The definitions of individual <a title="inherited property">inherited properties</a> indicate what values count as sub-values of others.
         </p>
         <dl>
           <dt id="cell-null"><code>null</code></dt>
           <dd>
             <p>
-              An <a>atomic property</a> giving the string or strings used for null values within the data. If the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-string-value" class="externalDFN">string value</a> of the cell is equal to any one of these values, the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">cell value</a> is <code>null</code>. If not specified, the default for the <code>null</code> property is the empty string.
+              An <a>atomic property</a> giving the string or strings used for null values within the data. If the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-string-value" class="externalDFN">string value</a> of the cell is equal to any one of these values, the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">cell value</a> is <code>null</code>. If not specified, the default for the <code>null</code> property is the empty string. A value for this property is <a>compatible with</a> an inherited value if it is a subset of the inherited value.
             </p>
           </dd>
           <dt id="cell-language"><code>lang</code></dt>
           <dd>
             <p>
-              An <a>atomic property</a> giving a single string language code as defined by [[!BCP47]]. Indicates the language of the value within the cell.
+              An <a>atomic property</a> giving a single string language code as defined by [[!BCP47]]. Indicates the language of the value within the cell. A value for this property is <a>compatible with</a> an inherited value if it is a sub-language of the inherited value; for example <code>en-US</code> is compatible with <code>en</code> but not <code>fr</code>.
             </p>
           </dd>
           <dt id="cell-textDirection"><code>textDirection</code></dt>
           <dd>
             <p>
-              An <a>atomic property</a> that MUST have a single string value that is one of <code>"rtl"</code> or <code>"ltr"</code> (the default). Indicates whether the text within cells should be displayed by default as left-to-right or right-to-left text. See <a href="#bidirectional-tables" class="sectionRef"></a> for more details.
+              An <a>atomic property</a> that MUST have a single string value that is one of <code>"rtl"</code> or <code>"ltr"</code> (the default). Indicates whether the text within cells should be displayed by default as left-to-right or right-to-left text. The value of this property is used to create the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-text-direction" class="externalDFN">text direction</a> annotation for the cell. A value for this property is <a>compatible with</a> an inherited value only if they are identical.
             </p>
           </dd>
           <dt id="cell-separator"><code>separator</code></dt>
           <dd>
             <p>
-              An <a>atomic property</a> that MUST have a single string value that is the character used to separate items in the string value of the cell. If <code>null</code> or unspecified, the cell does not contain a list. Otherwise, application MUST split the string value of the cell on the specified separator character and parse each of the resulting strings separately. The cell's value will then be a list. Conversion specifications MUST use the separator to determine the conversion of a cell into the target format. See <a href="#parsing-cells"></a> for more details.
+              An <a>atomic property</a> that MUST have a single string value that is the character used to separate items in the string value of the cell. If <code>null</code> or unspecified, the cell does not contain a list. Otherwise, application MUST split the string value of the cell on the specified separator character and parse each of the resulting strings separately. The cell's value will then be a list. Conversion specifications MUST use the separator to determine the conversion of a cell into the target format. See <a href="#parsing-cells"></a> for more details. A value for this property is <a>compatible with</a> an inherited value only if they are identical.
             </p>
           </dd>
           <dt id="cell-default"><code>default</code></dt>
           <dd>
             <p>
-              An <a>atomic property</a> holding a single string that is used to create a default <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">value</a> for the cell in cases where the original <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-string-value" class="externalDFN">string value</a> is an empty string. This default value MAY be used when converting the table into other formats, or when the table is displayed. If not specified, the default for the <code>default</code> property is the empty string, <code>""</code>.
+              An <a>atomic property</a> holding a single string that is used to create a default <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">value</a> for the cell in cases where the original <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-string-value" class="externalDFN">string value</a> is an empty string. This default value MAY be used when converting the table into other formats, or when the table is displayed. If not specified, the default for the <code>default</code> property is the empty string, <code>""</code>. A value for this property is <a>compatible with</a> an inherited value only if they are identical.
             </p>
           </dd>
           <dt id="cell-datatype"><code>datatype</code></dt>
           <dd>
             <p>
-              An <a>object property</a> that contains either a single string that is the main datatype of the values of the cell or a <a>datatype description</a> object. If the value of this property is a string, it is a term defined in the default context representing a built-in datatype URL; if it is an object then it describes a more specialised datatype. If a cell contains a sequence (ie the <code>separator</code> property is specified and not <code>null</code>) then this property specifies the datatype of each value within that sequence. See <a href="#datatypes"></a> for more details.
+              An <a>atomic property</a> that contains either a single string that is the main datatype of the values of the cell or a <a>datatype description</a> object. If the value of this property is a string, it is a term defined in the default context representing a built-in datatype URL; if it is an object then it describes a more specialised datatype. If a cell contains a sequence (ie the <code>separator</code> property is specified and not <code>null</code>) then this property specifies the datatype of each value within that sequence. See <a href="#datatypes"></a> for more details.
+            </p>
+            <p>
+              A value for this property is <a>compatible with</a> an inherited value if they are identical, or if the value is a subtype within the datatype hierarchy defined in <a href="#datatypes" class="sectionRef"></a>, including if the inherited value is explicitly specified as the <a href="#datatype-base"><code>base</code></a> of this value.
             </p>
           </dd>
           <dt id="cell-aboutUrl"><code>aboutUrl</code></dt>
           <dd>
-            <p>A <a>URI template property</a> that MAY be used to create a unique identifier for each cell within a row when mapping data to other formats.</p>
-            <p class="note"><code>aboutUrl</code> is typically defined on a Schema or Table. If defined on individual Columns, care must be taken to ensure that transformed cell values maintain a semantic relationship.</p>
+            <p>A <a>URI template property</a> that MAY be used to create a unique identifier for each cell within a row when mapping data to other formats. A value for this property is <a>compatible with</a> an inherited value only if they are identical. The value of this property is used to create the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-about-url" class="externalDFN">about URL</a> annotation for the cell.</p>
+            <p class="note"><code>aboutUrl</code> is typically defined on a <a>schema description</a> or <a>table description</a>. If defined on individual <a title="column description">column descriptions</a>, care must be taken to ensure that transformed cell values maintain a semantic relationship.</p>
           </dd>
           <dt id="cell-propertyUrl"><code>propertyUrl</code></dt>
           <dd>
-            <p>An <a>URI template property</a> that MAY be used to create a URI for a property if the table is mapped to another format. The default value of <code>propertyUrl</code> is <code>"{#_name}"</code>.</p>
-            <p class="note"><code>propertyUrl</code> is typically defined on a Column. If defined on a Schema, Table or Table Group, care must be taken to ensure that transformed cell values maintain an appropriate semantic relationship. For example by including the <code>name</code> of the column in the generated URL by using <code>_name</code> in the template.</p>
+            <p>An <a>URI template property</a> that MAY be used to create a URI for a property if the table is mapped to another format. The default value of <code>propertyUrl</code> is <code>"{#_name}"</code>. A value for this property is <a>compatible with</a> an inherited value only if they are identical. The value of this property is used to create the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-property-url" class="externalDFN">property URL</a> annotation for the cell.</p>
+            <p class="note"><code>propertyUrl</code> is typically defined on a <a title="column description">column description</a>. If defined on a <a>schema description</a>, <a>table description</a> or <a>table group description</a>, care must be taken to ensure that transformed cell values maintain an appropriate semantic relationship, for example by including the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-name" class="externalDFN">name</a> of the column in the generated URL by using <code>_name</code> in the template.</p>
           </dd>
           <dt id="cell-valueUrl"><code>valueUrl</code></dt>
           <dd>
-            <p>An <a>URI template property</a> that is used to map the values to the cells into URLs. See <a href="#parsing-cells" class="sectionRef"></a> for details.</p>
+            <p>An <a>URI template property</a> that is used to map the values to the cells into URLs. See <a href="#parsing-cells" class="sectionRef"></a> for details. A value for this property is <a>compatible with</a> an inherited value only if they are identical. The value of this property is used to create the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value-url" class="externalDFN">value URL</a> annotation for the cell.</p>
             <p class="note">
               This allows a <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">cell value</a> to define one or more RDF <cite><a href="http://www.w3.org/TR/rdf11-concepts/#dfn-resource">resources</a></cite> value of a cell instead of a literal values, as defined in [[rdf-concepts]]. For example, if the value were <code>"{#reference}"</code>, each cell value of a column named <em>reference</em> would be used to create a URI such as <code>http://example.com/#1234</code>, if <code>1234</code> were a cell value of that column.</p>
-            <p class="note"><code>valueUrl</code> is typically defined on a Column. If defined on a Schema, Table or Table Group, care must be taken to ensure that transformed cell values maintain an appropriate semantic relationship.</p>
+            <p class="note"><code>valueUrl</code> is typically defined on a <a title="column description">column description</a>. If defined on a <a>schema description</a>, <a>table description</a> or <a>table group description</a>, care must be taken to ensure that transformed cell values maintain an appropriate semantic relationship.</p>
           </dd>
         </dl>
         <p>The <a>property value</a> of an <a>inherited property</a> is the first value, if any, found by looking in the current description object through all of its containing objects: a <a>inherited property</a> defined in a <a>column description</a> takes precedence of one defined in a <a>schema description</a>, which in turn takes precedence of one defined in a <a>table description</a>, which in turn takes precedence of one defined in a <a>table group description</a>.</p>
@@ -1529,7 +1509,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             <li>the datatype <code>json</code>, a sub-type of <code>string</code> which indicates the value is serialized JSON</li>
           </ul>
           <figure id="fig-datatypes">
-            <img src="http://www.w3.org/TR/xmlschema11-2/type-hierarchy-201104.png" width="810" height="1060" alt="Built-in Datatype Hierarchy diagram" longdesc="http://www.w3.org/TR/xmlschema11-2/type-hierarchy-201104.longdesc.html">
+            <img src="http://www.w3.org/TR/xmlschema11-2/type-hierarchy-201104.png" width="810" height="1060" alt="Built-in Datatype Hierarchy diagram" longdesc="http://www.w3.org/TR/xmlschema11-2/type-hierarchy-201104.longdesc.html"/>
             <figcaption>Diagram showing the built-in datatypes from [[!xmlschema11-2]]</figcaption>
           </figure>
         </section>
@@ -1668,20 +1648,24 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
         <p>
           The process of parsing the string value of a cell into a single value or a list of values is as follows:
         </p>
-        <ol>
-          <li>unless the <a href="#cell-datatype"><code>datatype</code></a> is <code>string</code> or <code>anyAtomicType</code> or <code>any</code>, strip leading and trailing whitespace from the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-string-value" class="externalDFN">string value</a></li>
+        <ol class="algorithm">
+          <li>unless the <a href="#cell-datatype"><code>datatype</code></a> is <code>string</code>, <code>json</code>, <code>xml</code>, <code>html</code>, <code>anyAtomicType</code> or <code>any</code>, replace all carriage return (<code>#xD</code>), line feed (<code>#xA</code>) and tab (<code>#x9</code>) characters with space characters</li>
+          <li>unless the <a href="#cell-datatype"><code>datatype</code></a> is <code>string</code>, <code>json</code>, <code>xml</code>, <code>html</code>, <code>anyAtomicType</code>, <code>any</code> or <code>normalizedString</code>, strip leading and trailing whitespace from the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-string-value" class="externalDFN">string value</a> and replace all instances of two or more whitespace characters with a single space character</li>
           <li>if the resulting string is an empty string, apply the remaining steps to the string given by the <a href="#cell-default"><code>default</code></a> property</li>
           <li>if the <a href="#cell-separator"><code>separator</code></a> property is not <code>null</code> and the resulting string is an empty string, the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">cell value</a> is an empty list</li>
           <li>if the <a href="#cell-separator"><code>separator</code></a> property is not <code>null</code>, the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">cell value</a> is a list of values created by:
-            <ol>
-              <li>splitting the resulting string at the character specified by the <code>separator</code> property</li>
-              <li>unless the <a href="#cell-datatype"><code>datatype</code></a> is <code>string</code> or <code>anyAtomicType</code> or <code>any</code>, stripping leading and trailing whitespace from these strings</li>
+            <ol class="algorithm">
+              <li>if the normalized string is an empty string, apply the remaining steps to the string given by the <a href="#cell-default"><code>default</code></a> property</li>
+              <li>if the normalized string is the same as any one of the values of the <a href="#cell-null"><code>null</code></a> property, then the resulting value is <code>null</code></li>
+              <li>split the normalized string at the character specified by the <code>separator</code> property</li>
+              <li>unless the <a href="#cell-datatype"><code>datatype</code></a> is <code>string</code> or <code>anyAtomicType</code> or <code>any</code>, strip leading and trailing whitespace from these strings</li>
               <li>applying the remaining steps to each of the strings in turn</li>
             </ol>
           </li>
+          <li>if the string is an empty string, apply the remaining steps to the string given by the <a href="#cell-default"><code>default</code></a> property</li>
           <li>if the string is the same as any one of the values of the <a href="#cell-null"><code>null</code></a> property, then the resulting value is <code>null</code></li>
           <li>validate the string based on the datatype, using the <a href="#datatype-format"><code>format</code></a> property if one is specified, as described below, and then against the constraints described in <a href="#datatypes" class="sectionRef"></a>; if there are any errors, add them to the list of <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-errors" class="externalDFN">errors</a> for the cell; the resulting value is typed as a <code>string</code> with the language provided by the <a href="#cell-lang"><code>lang</code></a> property</li>
-          <li>otherwise, if there are no errors, parse the string using the <a href="#datatype-format"><code>format</code></a> if one is specified, as described below; the resulting value is typed according to the <a href="#cell-datatype"><code>datatype</code></a> and if the <code>datatype</code> is <code>string</code> it has the language provided by the <a href="#cell-lang"><code>lang</code></a> property</li>
+          <li>otherwise, if there are no errors, parse the string using the <a href="#datatype-format"><code>format</code></a> if one is specified, as described below; the resulting value is typed according to the <a href="#cell-datatype"><code>datatype</code></a> and if the <code>datatype</code> is <code>string</code>, or there is no <code>datatype</code>, it has the language provided by the <a href="#cell-lang"><code>lang</code></a> property</li>
         </ol>
         <section class="informative">
           <h3>Parsing examples</h3>
@@ -1771,6 +1755,9 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             <dt id="number-pattern"><code>pattern</code></dt>
             <dd>A regular expression string, in the syntax and interpreted as defined by [[!ECMASCRIPT]].</dd>
           </dl>
+          <p class="note">
+            Authors are encouraged to be conservative in the regular expressions that they use, sticking to the basic features of regular expressions that are likely to be supported across implementations.
+          </p>
           <p>
             If the <a href="#datatype-format"><code>format</code></a> property is a single string, this is interpreted in the same way as if it were an object with a <code>pattern</code> property whose value is that string.
           </p>
@@ -1829,6 +1816,9 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             If the <a href="#cell-datatype"><code>datatype</code></a> is a date or time type, the <a href="#datatype-format"><code>format</code></a> property indicates the expected format for that date or time.
           </p>
           <p>
+            The supported date and time formats listed here are expressed in terms of the <a href="http://www.unicode.org/reports/tr35/tr35-dates.html#Date_Field_Symbol_Table">date field symbols</a> defined in [[!UAX35]] and MUST be interpreted by implementations as defined in that specification.
+          </p>
+          <p>
             The following date formats MUST be recognised by implementations:
           </p>
           <ul>
@@ -1861,13 +1851,22 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           </p>
           <ul>
             <li><code>yyyy-MM-ddTHH:mm:ss</code> eg <code>2015-03-15T15:02:37</code></li>
-            <li>any of the date formats above, followed by a space, followed by any of the time formats above, eg <code>M/d/yyyy HH:mm</code> for <code>3/22/2015 15:02</code> or <code>dd.MM.yyyy HH:mm:ss</code> for <code>22.03.2015 15:02:37</code></li>
+            <li><code>yyyy-MM-ddTHH:mm</code> eg <code>2015-03-15T15:02</code></li>
+            <li>any of the date formats above, followed by a single space, followed by any of the time formats above, eg <code>M/d/yyyy HH:mm</code> for <code>3/22/2015 15:02</code> or <code>dd.MM.yyyy HH:mm:ss</code> for <code>22.03.2015 15:02:37</code></li>
           </ul>
           <p>
-            Implementations MUST also recognise date, time and date/time formats that end with timezone markers consisting of between one and five <code>x</code>s or <code>X</code>s. For example, <code>yyyy-MM-ddTHH:mm:ssXXX</code> for <code>2015-03-15T15:02:37Z</code> or <code>2015-03-15T15:02:37-05:00</code>, or <code>HH:mm x</code> for <code>15:02 -0500</code>.
+            Implementations MUST also recognise date, time and date/time formats that end with timezone markers consisting of between one and three <code>x</code>s or <code>X</code>s, possibly after a single space. These MUST be interpreted as follows:
           </p>
+          <ul>
+            <li><code>X</code> eg <code>-08</code>, <code>+0530</code> or <code>Z</code> (minutes are optional)</li>
+            <li><code>XX</code> eg <code>-0800</code>, <code>+0530</code> or <code>Z</code></li>
+            <li><code>XXX</code> eg <code>-08:00</code>, <code>+05:30</code> or <code>Z</code></li>
+            <li><code>x</code> eg <code>-08</code> or <code>+0530</code> (<code>Z</code> is not permitted)</li>
+            <li><code>xx</code> eg <code>-0800</code> or <code>+0530</code> (<code>Z</code> is not permitted)</li>
+            <li><code>xxx</code> eg <code>-08:00</code> or <code>+05:30</code> (<code>Z</code> is not permitted)</li>
+          </ul>
           <p>
-            The supported date and time formats listed above are expressed in terms of the <a href="http://www.unicode.org/reports/tr35/tr35-dates.html#Date_Field_Symbol_Table">date field symbols</a> defined in [[!UAX35]] and MUST be interpreted by implementations as defined in that specification.
+            For example, formats could include <code>yyyy-MM-ddTHH:mm:ssXXX</code> for <code>2015-03-15T15:02:37Z</code> or <code>2015-03-15T15:02:37-05:00</code>, or <code>HH:mm x</code> for <code>15:02 -05</code>.
           </p>
           <p>
             The <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">cell value</a> will one or more dates/time values extracted using the <code>format</code>.
@@ -1879,10 +1878,16 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
         <section>
           <h3>Formats for durations</h3>
           <p>
-            Durations MUST be formatted and interpreted as defined in [[!xmlschema11-2]], using the [[!ISO8601]] format <code>P<var>n</var>Y<var>n</var>M<var>n</var>DT<var>n</var>H<var>n</var>M<var>n</var>S</code>.
+            Durations MUST be formatted and interpreted as defined in [[!xmlschema11-2]], using the [[!ISO8601]] format <code>-?P<var>n</var>Y<var>n</var>M<var>n</var>DT<var>n</var>H<var>n</var>M<var>n</var>S</code>. For example, the duration <code>P1Y1D</code> is used for a year and a day; the duration <code>PT2H30M</code> for 2 hours and 30 minutes.
           </p>
           <p>
-            The <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">cell value</a> will be one or more durations extracted using the <code>format</code>.</p>
+            If the <a href="#cell-datatype"><code>datatype</code></a> is a duration type, the <a href="#datatype-format"><code>format</code></a> property provides a regular expression for the string values, in the syntax and processed as defined by [[!ECMASCRIPT]].
+          </p>
+          <p class="note">
+            Authors are encouraged to be conservative in the regular expressions that they use, sticking to the basic features of regular expressions that are likely to be supported across implementations.
+          </p>
+          <p>
+            The <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">cell value</a> will be one or more durations extracted using the <code>format</code>.
           </p>
         </section>
         <section>
@@ -1909,7 +1914,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
       </p>
       <p>Implementations MUST merge metadata documents in a manner consistent with these rules. <a>Validators</a> MUST check and issue warnings where merge issues are found as noted below and in the relevant property definitions.</p>
       <p>
-        Merging of metadata happens in order from highest priority to lowest priority by merging the first two metadata files (A and B) together to create new merged metadata AB'. This is then used to merge in the next metadata file until all metadata have been processed to create a <a>table group description</a>. If the top-level object of either of the metadata files are <a title="table description">table descriptions</a>, these are treated as if they were <a title="table group description">table group descriptions</a> containing a single table description (ie having a single <code>resource</code> property whose value is the same as the original table description). Ensure that <code>@context</code> definitions are moved from the <a>table description</a> to the <a>table group description</a>.
+        Merging of metadata happens in order from highest priority to lowest priority by merging the first two metadata files (<code>A</code> and <code>B</code>) together to create new merged metadata AB'. This is then used to merge in the next metadata file until all metadata have been processed to create a <a>table group description</a>. If the top-level object of either of the metadata files are <a title="table description">table descriptions</a>, these are turned into <a title="table group description">table group descriptions</a> containing a single table description (ie having a single <code>resource</code> property whose value is the same as the original table description). Ensure that <code>@context</code> definitions are moved from the <a>table description</a> to the <a>table group description</a>.
       </p>
       <p>
         The location of the merged metadata is defined to be the location of the highest priority metadata file. This makes the <a>base URL</a> either that of the defined <code>@base</code> or the location of the first metadata file when resolving URLs, unless the user provides a metadata file.
@@ -1920,161 +1925,155 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
       <p>Prior to merging, each description object is expanded relative to its <code>@context</code> and values are normalized as follows:</p>
       <ul>
         <li>If the property is a <a>link property</a> the value is turned into an absolute URL using the <a>base URL</a>.</li>
-        <li>If the property is a <a>URI template property</a>, the value is turned into an absolute <a>URI template property</a> by expanding using the <a>base URL</a>.</li>
-        <li>If the property is an <a>object property</a> accepting arrays, then an object value is turned into an array containing that object.</li>
+        <li>If the property is an <a>object property</a> with a string value, the string is a URL referencing a JSON document containing a single object. Dereference this URL and replace the string value with that object.</li>
         <li>If the property is a <a>natural language property</a> and the value is not already an object, it is turned into an object whose properties are language codes and where the values of those properties are arrays. The suitable language code for the values is determined through the <a>default language</a>; if it can't be determined the language code <code>und</code> MUST be used.</li>
-        <li>If the property is a <a>common property</a> the values are expended using using <code>@context</code>.</li>
+        <li>If the property is an <a>atomic property</a> accepting strings or objects, normalize to the object form as described for that property.</li>
+        <li>If the property is a <a>common property</a> or <a href="#table-notes"><code>notes</code></a> the values are expanded using <code>@context</code>.</li>
       </ul>
       <p>
-        A description object B is <dfn>merged</dfn> into an original description object A by merging each property of B into A. If the property from B does not exist on A, it is simply added to A. If A does have the property, the way the values are merged depends on the type of the property, as follows:
+        Following this normalization process, set the <code>@context</code> to <code>http://www.w3.org/ns/csvw</code>.
+      </p>
+      <p>
+        A description object <code>B</code> is <dfn>merged</dfn> into an original description object <code>A</code> by merging each property of <code>B</code> into <code>A</code>. If the property from <code>B</code> does not exist on <code>A</code>, it is simply added to <code>A</code>. If <code>A</code> does have the property, the way the values are merged depends on the type of the property, as follows:
       </p>
       <ul>
         <li>If the property is an <a>array property</a>, the way in which values are merged depends on the property; see the relevant property for this definition.</li>
-        <li>If the property is a <a>link property</a>, <a>URI template property</a>, or <a>column reference property</a>, the value from A overrides that from B.</li>
-        <li>If the property is an <a>object property</a>, then if the property only accepts single objects:
-          <ol>
-            <li>if the value of the property in A is a string or the value from B is a string then the value from A overrides that from B</li>
-            <li>otherwise (if both values as objects) the objects are merged as described here</li>
-          </ol>
-          If the property accepts arrays, the result is an array of objects or strings: those from A followed by those from B that were not already a value in A.</li>
-        <li>If the property is a <a>natural language property</a>, the result is an object whose properties are language codes and where the values of those properties are arrays. The arrays MUST provide the values from A followed by those from B that were not already a value in A. If a value exists in <code>und</code> and any other language</code> the value from <code>und</code> MUST be removed, ensuring that the <code>und</code> property is removed if it's value becomes an empty array.</li>
-        <li>If the property is an <a>atomic property</a>, then if the property only accepts single values, the value from A overrides that from B; otherwise the result is an array of values: those from A followed by those from B that were not already a value in A.</li>
-        <li>If the property is a <a>common property</a>, the result is an array containing values from A followed by values from B not already in A.</li>
+        <li>If the property is an <a>object property</a> the objects are merged as described here.</li>
+        <li>If the property is a <a>natural language property</a>, the result is an object whose properties are language codes and where the values of those properties are arrays. The arrays MUST provide the values from <code>A</code> followed by those from <code>B</code> that were not already a value in <code>A</code>. If a value exists in the array for the undefined language (<code>und</code>) and in the array for any other language, the value from the array for <code>und</code> MUST be removed, ensuring that the <code>und</code> property is removed entirely if it's value becomes an empty array.</li>
+        <li>If the property is a <a>common property</a>, the result is an array containing values from <code>A</code> followed by values from <code>B</code>.</li>
+        <li>Otherwise, the value from <code>A</code> overrides that from <code>B</code>.</li>
       </ul>
-      <p>
-        If the type of the property cannot be determined, because it is not defined in this specification (ie because it is an extension property), the type of the property is determined based on its values in A and B, as follows, and merged accordingly:
-      </p>
-      <ul>
-        <li>If the value of the property in A and the value of the property in B are both objects, they are treated as if the property is an <a>object property</a> that only accepts single objects.</li>
-        <li>If one of the values is an array and the other is an object, they are treated as if the property is an <a>object property</a> that accepts arrays.</li>
-        <li>If the value of the property in A and the value of the property in B are <a title="atomic value">atomic values</a>, they are treated as if the property is an <a>atomic property</a> that only accepts single values.</li>
-        <li>If one of the values is an array and the other is an <a>atomic value</a>, they are treated as if the property is an <a>atomic property</a> that accepts arrays.</li>
-      </ul>
-      <p>For example, consider the following two Metadata documents to be merged:</p>
+      <p>For example, consider the following two Metadata documents to be merged (located at <code>http://example.com/metadata.json</code> and <code>http://example.com/doc1.csv-metadata.json</code>):</p>
       <pre class="example highlight" title="Metadata A to be merged">
 {
   "@context": ["http://www.w3.org/ns/csvw", {"@language": "en"}],
   "resources": [{
-    "url": "http://example.com/doc1",
+    "url": "doc1.csv",
     "dc:title": "foo",
     "tableDirection": "ltr",
     "tableSchema": {
       "aboutUrl": "{#foo}",
-      "columns": [
-        {"name": "foo", "title": "Foo", "required": true},
-        {"name": "bar"}
-      ]
+      "columns": [{
+        "name": "foo", 
+        "title": "Foo", 
+        "required": true
+      }, {
+        "name": "bar"
+      }]
     }
   }, {
-    "url": "http://example.com/doc2"
+    "url": "doc2.csv"
   }]
 }
       </pre>
       <pre class="example highlight" title="Metadata B to be merged">
 {
-  "@context": ["http://www.w3.org/ns/csvw", {"@base": "http://example.org/foo"}],
-  "url": "http://example.com/doc1",
+  "@context": "http://www.w3.org/ns/csvw",
+  "url": "http://example.com/doc1.csv",
   "dc:description": "bar",
   "tableSchema": {
     "propertyUrl": "{#_name}",
-    "columns": [
-      {"title": "Foo", "required": false},
-      {"name": "bar"},
-      {}
-    ]
+    "columns": [{
+      "title": "Foo",
+      "required": false
+    }, {
+      "name": "bar"
+    }, {
+    }]
   }
 }
       </pre>
       <p>The process of merging performs the following steps:</p>
-      <ol>
-        <li>Transform <em>B</em> from <code>Table</code> metadata to <code>TableGroup</code> metadata:
-      <pre class="example highlight" title="Metadata B as a TableGroup">
+      <ol class="algorithm">
+        <li>
+          Normalize <code>A</code> to use the language specified in the <code>@context</code> within the <a>natural language property</a> <a href="#column-title"><code>title</code></a> and to expand the <a>link property</a> <a href="#table-url"><code>url</code></a> against the <a>base URL</a> for <code>A</code>, <code>http://example.com/metadata.json</code>:
+      <pre class="example highlight" title="Metadata A after normalization">
 {
-  "@context": ["http://www.w3.org/ns/csvw", {"@base": "http://example.org/foo"}],
   "resources": [{
-    "url": "http://example.com/doc1",
+    "url": "<strong>http://example.com/doc1.csv</strong>",
+    "dc:title": "foo",
+    "tableDirection": "ltr",
+    "tableSchema": {
+      "aboutUrl": "{#foo}",
+      "columns": [{
+        "name": "foo", 
+        "title": <strong>{ "en": [ "Foo" ] }</strong>, 
+        "required": true
+      }, {
+        "name": "bar"
+      }]
+    }
+  }, {
+    "url": "<strong>http://example.com/doc2.csv</strong>"
+  }]
+}
+      </pre>
+        </li>
+        <li>Normalize <code>B</code> from a <a>table description</a> to a <a>table group description</a> by embedding the table description in a <code>resources</code> property, resolve the <a>link property</a> <a href="#table-url"><code>url</code></a> (which is already an absolute URL), and normalize the <a href="#column-title"><code>title</code></a> property to use the <code>und</code> language:
+      <pre class="example highlight" title="Metadata B after normalization">
+{
+  "resources": [{
+    "url": "http://example.com/doc1.csv",
     "dc:description": "bar",
     "tableSchema": {
       "propertyUrl": "{#_name}",
-      "columns": [
-        {"title": "Foo", "required": false},
-        {"name": "bar"},
-        {}
-      ]
+      "columns": [{
+        "title": <strong>{ "und": [ "Foo" ] }</strong>,
+        "required": false
+      }, {
+        "name": "bar"
+      }, {
+      }]
     }
   }]
 }
       </pre>
         </li>
-        <li>The <code>@context</code> is merged as defined in <a href="top-level-properties" class="sectionRef"></a> with <code>@base</code> imported into the value in <em>A</em>.</li>
         <li><code>resources</code> is an <a>array property</a> with rules specified in <a href="#table-groups" class="sectionRef"></a> and each value is merged accordingly:
-          <ol>
-            <li>The first value from <em>A</em> and <em>B</em> are now the following:
-              <pre class="example highlight" title="first resources values A' and B'">
+          <ol class="algorithm">
+            <li>The first value from <code>A</code> and <code>B</code> are now the following:
+              <pre class="example highlight" title="first resources values from A and B">
 {
-  "url": "http://example.com/doc1",
+  "url": "http://example.com/doc1.csv",
   "dc:title": "foo",
   "tableDirection": "ltr",
   "tableSchema": {
     "aboutUrl": "{#foo}",
-    "columns": [
-      {"name": "foo", "title": "Foo", "required": true},
-      {"name": "bar"}
-    ]
+    "columns": [{
+      "name": "foo", 
+      "title": { "en": [ "Foo" ] }, 
+      "required": true
+    }, {
+      "name": "bar"
+    }]
   }
 }
 
 {
-  "url": "http://example.com/doc1",
+  "url": "http://example.com/doc1.csv",
   "dc:description": "bar",
   "tableSchema": {
     "propertyUrl": "{#_name}",
-    "columns": [
-      {"title": "Foo", "required": false},
-      {"name": "bar"},
-      {}
-    ]
+    "columns": [{
+      "title": { "und": [ "Foo" ] },
+      "required": false
+    }, {
+      "name": "bar"
+    }, {
+    }]
   }
 }
               </pre>
-              The properties of these are expanded relative to the original metadata and context resulting in the following:
-              <pre class="example highlight" title="first resources values A' and B'">
-{
-  "url": "http://example.com/doc1",
-  "dc:title": {"@value": "foo", "@language": "en"},
-  "tableDirection": "ltr",
-  "tableSchema": {
-    "aboutUrl": "http://example.com/metadata-a{#foo}",
-    "columns": [
-      {"name": "foo", "title": {"en": ["Foo"]}, "required": true},
-      {"name": "bar"}
-    ]
-  }
-}
-
-{
-  "url": "http://example.com/doc1",
-  "dc:description": {"@value": "bar"},
-  "tableSchema": {
-    "propertyUrl": "http://example.org/foo{#_name}",
-    "columns": [
-      {"title": {"en": ["Foo"]}, "required": false},
-      {"name": "bar"},
-      {}
-    ]
-  }
-}
-              </pre>
-              Next each property from <em>B'</em> is considered:
-              <ol>
-                <li><code>url</code> is a <code>link property</code> so the value from <em>A'</em> overrides <em>B'</em> (althrough they are the same value)</li>
-                <li><code>dc:description</code> does not exist in <em>A'</em> so it is added to <em>A'</em></li>
-                <li>Each has <code>tableSchema</code> merged as an <a>object property</a> <em>A''</em> and <em>B''</em>:
-                  <ol>
-                    <li><em>B''</em> has a <code>propertyUrl</code> which is added to <em>A''</em>.</li>
+              As these have the same <a href="#table-url"><code>url</code></a>, these are merged. Each property from <code>B</code> is considered:
+              <ol class="algorithm">
+                <li><code>url</code> is the same (otherwise the two <a title="table description">table descriptions</a> would not be being merged</li>
+                <li><code>dc:description</code> does not exist in <code>A</code> so it is added to <code>A</code></li>
+                <li>The objects held by the <a>object property</a> <code>tableSchema</code> properties are merged:
+                  <ol class="algorithm">
+                    <li><code>B</code> has a <code>propertyUrl</code> which is added to <code>A</code>.</li>
                     <li>Each has <code>columns</code> which is merged as described in <a href="#schemas"></a>:
-                      <ol>
-                        <li>The first column matches on <code>title</code> because they each have the value <code>"Foo"</code> and the language tag <code>en</code> matches <code>und</code>. The value of <code>required</code> in <em>A''</em> is retained</li>
+                      <ol class="algorithm">
+                        <li>The first column matches on <code>title</code> because they each have the value <code>"Foo"</code> and the language tag <code>en</code> matches <code>und</code>. Because the <code>und</code> value is present in the <code>en</code> array, that value is removed from the <code>und</code> array, and because the array is now empty the <code>und</code> property is removed. The value of <code>required</code> in <em>A</em> is retained, as is the value of <code>name</code></li>
                         <li>The second column has a match on <code>name</code></li>
                       </ol>
                     </li>
@@ -2084,47 +2083,49 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
               The merged table description is now the following:
               <pre class="example highlight" title="first resources values merged">
 {
-  "url": "http://example.com/doc1",
-  "dc:title": {"@value": "foo", "@language": "en"},
-  "dc:description": {"@value": "bar}",
+  "url": "http://example.com/doc1.csv",
+  "dc:title": "foo",
+  "dc:description": "bar",
   "tableDirection": "ltr",
   "tableSchema": {
-    "aboutUrl": "http://example.com/metadata-a{#foo}",
-    "propertyUrl": "http://example.org/foo{#_name}",
-    "columns": [
-      {"name": "foo", "title": {"en": ["Foo"]}, "required": true},
-      {"name": "bar"}
-    ]
+    "aboutUrl": "{#foo}",
+    "propertyUrl": "{#_name}",
+    "columns": [{
+      "name": "foo", 
+      "title": { "en": [ "Foo" ]}, 
+      "required": true
+    },{
+      "name": "bar"
+    }]
   }
 }
               </pre>
             </li>
-            <li>As <em>B</em> has no <code>resources</code> value, the value from <em>A</em> is retained.
+            <li>The second resources value from <code>A</code> is retained as is.</li>
           </ol>
         </li>
       </ol>
       <p>The resulting merged metadata is now the following:</p>
       <pre class="example highlight" title="Fully merged metadata">
 {
-  "@context": ["http://www.w3.org/ns/csvw", {
-    "@language": "en",
-    "@base": "http://example.org/foo"
-  }],
   "resources": [{
-    "url": "http://example.com/doc1",
-    "dc:title": {"@value": "foo", "@language": "en"},
-    "dc:description":{"@value": "bar"},
+    "url": "http://example.com/doc1.csv",
+    "dc:title": "foo",
+    "dc:description": "bar",
     "tableDirection": "ltr",
     "tableSchema": {
-      "aboutUrl": "http://example.com/metadata-a{#foo}",
-      "propertyUrl": "http://example.org/foo{#_name}",
-      "columns": [
-        {"name": "foo", "title": {"en": ["Foo"]}, "required": true},
-        {"name": "bar"}
-      ]
+      "aboutUrl": "{#foo}",
+      "propertyUrl": "{#_name}",
+      "columns": [{
+        "name": "foo", 
+        "title": { "en": [ "Foo" ]}, 
+        "required": true
+      },{
+        "name": "bar"
+      }]
     }
   }, {
-    "url": "http://example.com/doc2"
+    "url": "http://example.com/doc2.csv"
   }]
 }
       </pre>

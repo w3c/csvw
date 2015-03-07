@@ -1,0 +1,334 @@
+# CSV+ tests
+## Distributed under both the W3C Test Suite License[1] and the W3C 3-
+## clause BSD License[2]. To contribute to a W3C Test Suite, see the
+## policies and contribution forms [3]
+##
+## 1. http://www.w3.org/Consortium/Legal/2008/04-testsuite-license
+## 2. http://www.w3.org/Consortium/Legal/2008/03-bsd-license
+## 3. http://www.w3.org/2004/10/27-testcases
+##
+## Test types (for now)
+## * CsvToJsonTest  - tests CSV evaluation to JSON
+## * CsvToRdfTest   - tests CSV evaluation to RDF using graph isomorphism
+## * CsvSparqlTest - tests CSV evaulation to RDF using SPARQL ASK query
+
+@prefix : <#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix mf:   <http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#> .
+@prefix csvt: <http://w3c.github.io/csvw/tests/vocab#> .
+
+<>  a mf:Manifest ;
+
+  rdfs:label "CSVW RDF tests";
+  rdfs:comment "Tests transformation of CSV to RDF";
+  mf:entries (
+    :test001 :test002 :test003 :test005 :test006 :test007 :test008 :test009 :test010 :test011
+    :test012 :test013 :test014 :test015 :test016 :test017 :test018 :test019 :test020 :test021
+    :test022 :test023 :test024 :test025 :test026
+  ) .
+
+:test001 a csvt:CSVtoRdfTest;
+  mf:name "Simple table";
+  rdfs:comment "The simplest possible table without metadata";
+  csvt:approval csvt:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test001.csv>;
+  mf:result <test001.rdf>;
+  .
+
+:test002 a csvt:CSVtoRdfTest;
+  mf:name "Quoted field";
+  rdfs:comment "Table with one quoted field without metadata";
+  csvt:approval csvt:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test002.csv>;
+  mf:result <test002.rdf>;
+  .
+
+:test003 a csvt:CSVtoRdfTest;
+  mf:name "Surrounding spaces";
+  rdfs:comment "Table with whitespace before and after every field without metadata";
+  csvt:approval csvt:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test003.csv>;
+  mf:result <test003.rdf>;
+  .
+
+:test005 a csvt:CSVtoRdfTest;
+  mf:name "Identifier references";
+  rdfs:comment "A table with entity identifiers and references to other entities without metadata";
+  csvt:approval csvt:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test005.csv>;
+  mf:result <test005.rdf>;
+  .
+
+:test006 a csvt:CSVtoRdfTest;
+  mf:name "No identifiers";
+  rdfs:comment "Records contain two entities with relationships which are duplicated without metadata";
+  csvt:approval csvt:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test006.csv>;
+  mf:result <test006.rdf>;
+  .
+
+:test007 a csvt:CSVtoRdfTest;
+  mf:name "Joined table with unique identifiers";
+  rdfs:comment "Joined data with identified records without metadata";
+  csvt:approval csvt:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test007.csv>;
+  mf:result <test007.rdf>;
+  .
+
+:test008 a csvt:CSVtoRdfTest;
+  mf:name "Microsyntax - internal field separator";
+  rdfs:comment "One field has comma-separated values without metadata";
+  csvt:approval csvt:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test008.csv>;
+  mf:result <test008.rdf>;
+  .
+
+:test009 a csvt:CSVtoRdfTest;
+  mf:name "Microsyntax - formatted time";
+  rdfs:comment "Field with parseable human formatted time without metadata";
+  csvt:approval csvt:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test009.csv>;
+  mf:result <test009.rdf>;
+  .
+
+:test010 a csvt:CSVtoRdfTest;
+  mf:name "Country-codes-and-names example";
+  rdfs:comment "Country-codes-and-names example";
+  csvt:approval csvt:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test010.csv>;
+  mf:result <test010.rdf>;
+  .
+
+:test011 a csvt:CSVtoRdfTest;
+  mf:name "tree-ops example with metadata";
+  rdfs:comment "tree-ops example with metadata. Processors should load metadata based on action URL.";
+  csvt:approval csvt:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test011.csv>;
+  mf:result <test011.rdf>;
+  csvt:implicit <test011.csv-metadata.json>;
+  .
+
+:test012 a csvt:CSVtoRdfTest;
+  mf:name "tree-ops example with directory metadata";
+  rdfs:comment "tree-ops example with directory metadata. Processors should find directory-based metadata.";
+  csvt:approval csvt:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test012/action.csv>;
+  mf:result <test012/result.rdf>;
+  csvt:implicit <test012/metadata.json>;
+  .
+
+:test013 a csvt:CSVtoRdfTest;
+  mf:name "tree-ops example from directory metadata";
+  rdfs:comment "tree-ops example from directory metadata. Processors should find CSV from metadata action file.";
+  csvt:approval csvt:Proposed;
+  csvt:option [
+    csvt:noProv true;
+    csvt:metadata <test013-user-metadata.json>;
+  ];
+  mf:action <test013.csv>;
+  mf:result <test013.rdf>;
+  csvt:implicit <test013-user-metadata.json>;
+  .
+
+:test014 a csvt:CSVtoRdfTest;
+  mf:name "tree-ops example with linked metadata";
+  rdfs:comment "tree-ops example with linked metadata. Processors load metadata from link header.";
+  csvt:approval csvt:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  csvt:httpLink "<test014-linked-metadata.json>; rel=\"describedby\"";
+  mf:action <test014.csv>;
+  mf:result <test014.rdf>;
+  csvt:implicit <test014-linked-metadata.json>;
+  .
+
+:test015 a csvt:CSVtoRdfTest;
+  mf:name "tree-ops example with user and directory metadata";
+  rdfs:comment "tree-ops example with user and directory metadata. Processors should find directory-based metadata.";
+  csvt:approval csvt:Proposed;
+  csvt:option [
+    csvt:noProv true;
+    csvt:metadata <test015/user-metadata.json>;
+  ];
+  mf:action <test015/action.csv>;
+  mf:result <test015/result.rdf>;
+  csvt:implicit <test015/user-metadata.json>,
+    <test015/metadata.json>;
+  .
+
+:test016 a csvt:CSVtoRdfTest;
+  mf:name "tree-ops example with linked and directory metadata";
+  rdfs:comment "tree-ops example with linked and directory metadata. Processors should find link- and directory-based metadata.";
+  csvt:approval csvt:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  csvt:httpLink "<linked-metadata.json>; rel=\"describedby\"";
+  mf:action <test016/action.csv>;
+  mf:result <test016/result.rdf>;
+  csvt:implicit <test016/linked-metadata.json>,
+    <test016/metadata.json>;
+  .
+
+:test017 a csvt:CSVtoRdfTest;
+  mf:name "tree-ops example with file and directory metadata";
+  rdfs:comment "tree-ops example with file and directory metadata. Processors should find file- and directory-based metadata.";
+  csvt:approval csvt:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test017/action.csv>;
+  mf:result <test017/result.rdf>;
+  csvt:implicit <test017/action.csv-metadata.json>,
+    <test017/metadata.json>;
+  .
+
+:test018 a csvt:CSVtoRdfTest;
+  mf:name "tree-ops example with user, file and directory metadata";
+  rdfs:comment "tree-ops example with user, file and directory metadata. Processors should find user-, file- and directory-based metadata.";
+  csvt:approval csvt:Proposed;
+  csvt:option [
+    csvt:noProv true;
+    csvt:metadata <test018/user-metadata.json>;
+  ];
+  mf:action <test018/action.csv>;
+  mf:result <test018/result.rdf>;
+  csvt:implicit <test018/user-metadata.json>,
+    <test018/action.csv-metadata.json>,
+    <test018/metadata.json>;
+  .
+
+:test019 a csvt:CSVtoRdfTest;
+  mf:name "no header";
+  rdfs:comment "If a CSV+ file does not include a header line, this MUST be specified using the header parameter.";
+  csvt:approval csvt:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test019.csv>;
+  mf:result <test019.rdf>;
+  csvt:contentType "text/csv;header=absent";
+  .
+
+:test020 a csvt:CSVtoRdfTest;
+  mf:name "trim=start";
+  rdfs:comment "If trim is true or start then whitespace from the start of values that are not enclosed MUST be removed from the value.";
+  csvt:approval csvt:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test020.csv>;
+  mf:result <test020.rdf>;
+  csvt:implicit <test020.csv-metadata.json>;
+  .
+
+:test021 a csvt:CSVtoRdfTest;
+  mf:name "trim=end";
+  rdfs:comment "If trim is true or end then whitespace from the end of values that are not enclosed MUST be removed from the value.";
+  csvt:approval csvt:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test021.csv>;
+  mf:result <test021.rdf>;
+  csvt:implicit <test021.csv-metadata.json>;
+  .
+
+:test022 a csvt:CSVtoRdfTest;
+  mf:name "trim=true";
+  rdfs:comment "If trim is true or start then whitespace from the start of values that are not enclosed MUST be removed from the value. If trim is true or end then whitespace from the end of values that are not enclosed MUST be removed from the value.";
+  csvt:approval csvt:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test022.csv>;
+  mf:result <test022.rdf>;
+  csvt:implicit <test022.csv-metadata.json>;
+  .
+
+:test023 a csvt:CSVtoRdfTest;
+  mf:name "dialect: header=false";
+  rdfs:comment "A single boolean atomic property that, if true, sets the header row count flag to 1, and if false to 0, unless headerRowCount is provided, in which case the value provided for the header property is ignored.";
+  csvt:approval csvt:Proposed;
+  csvt:option [
+    csvt:noProv true;
+    csvt:metadata <test023-user-metadata.json>;
+  ];
+  mf:action <test023.csv>;
+  mf:result <test023.rdf>;
+  csvt:implicit <test023-user-metadata.json>;
+  .
+
+:test024 a csvt:CSVtoRdfTest;
+  mf:name "dialect: header=false and headerRowCount=1";
+  rdfs:comment "A single boolean atomic property that, if true, sets the header row count flag to 1, and if false to 0, unless headerRowCount is provided, in which case the value provided for the header property is ignored.";
+  csvt:approval csvt:Proposed;
+  csvt:option [
+    csvt:noProv true;
+    csvt:metadata <test024-user-metadata.json>;
+  ];
+  mf:action <test024.csv>;
+  mf:result <test024.rdf>;
+  csvt:implicit <test024-user-metadata.json>;
+  .
+
+:test025 a csvt:CSVtoRdfTest;
+  mf:name "dialect: header=false and skipRows=1";
+  rdfs:comment "Ignore header uses column definitions from metadata";
+  csvt:approval csvt:Proposed;
+  csvt:option [
+    csvt:noProv true;
+    csvt:metadata <test025-user-metadata.json>;
+  ];
+  mf:action <test025.csv>;
+  mf:result <test025.rdf>;
+  csvt:implicit <test025-user-metadata.json>;
+  .
+
+:test026 a csvt:CSVtoRdfTest;
+  mf:name "tree-ops example with directory metadata";
+  rdfs:comment "tree-ops example with directory metadata. Processors should find directory-based metadata.";
+  csvt:approval csvt:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test026/metadata.json>;
+  mf:result <test026/result.rdf>;
+  csvt:implicit <test026/action.csv>,
+    <test026/metadata.json>;
+  .
