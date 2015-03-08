@@ -143,10 +143,29 @@ var respecConfig = {
       .grammar-literal { color: gray;}
       .TBD { font-style: italic; background: yellow;}
       .steps li { margin-bottom: 0.5em;}
-      dl.triple { padding: 0 0 0 1em; }
+      dl.triple {
+        padding: 0 0 0 1em;
+        margin-left: -1em;
+        text-indent: 0em;
+      }
       dl.triple dt, dl.triple dd { margin: 0; display: inline }
       dl.triple dt:after { content: ':'; }
       dl.triple dd:after { content: '\A'; white-space: pre; }
+      ol.algorithm {
+        counter-reset: numsection;
+        list-style-type: none;
+      }
+      ol.algorithm > li {
+        margin: 1em -1em;
+        text-indent: -1em;
+      }
+      ol.algorithm > li:before {
+        font-weight: bold;
+        counter-increment: numsection;
+        content: counters(numsection, ".") " ";
+      }
+      ol.algorithm>li>p {text-indent: 0em}
+      ol.algorithm>li>p:first-child {position: relative; display: inline;}
     </style>
   </head>
   <body>
@@ -237,7 +256,7 @@ var respecConfig = {
           <dt><dfn>common properties</dfn></dt>
           <dd>The <a>common properties</a> of a metadata resource are defined in <a href="http://www.w3.org/TR/tabular-metadata/#common-properties">Section 3.3 Common Properties</a> of [[!tabular-metadata]]). The RDF values of these properties are the result of running the [[!json-ld-api]] <cite><a href="http://www.w3.org/TR/json-ld-api/#deserialize-json-ld-to-rdf-algorithm">toRdf</a></cite> algorithm over the <a>common properties</a> defined within the metadata description.</dd>
 
-               <p class="issue" data-number="288">“Create simplified algorithm for turning normalized JSON-LD into RDF”: once that is done, the reference to the <code>toRdf</code> algorithm should be replaced.</p>
+               <dd class="issue" data-number="288">“Create simplified algorithm for turning normalized JSON-LD into RDF”: once that is done, the reference to the <code>toRdf</code> algorithm should be replaced.</dd>
 
 
           <dt><dfn>identifier</dfn></dt>
@@ -287,22 +306,21 @@ var respecConfig = {
 
         <p class="note">Where an <a>annotated table</a> is defined in isolation (e.g. in the absence of a <a>table group description</a>), a default <a>table group description</a> is provided with a single <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table-group-resources" class="externalDFN"><code>resources</code></a> annotation that refers to that <a title="annotated table">table</a>.</p>
 
-        <ol>
+        <ol class="algorithm">
           <li>
-            <p>In <strong><a>standard mode</a></strong> only, establish a new <a>node</a> <var>G</var>.</p>
-            <p>If the <a>table group</a> has an <a>identifier</a> then <a>node</a> <var>G</var> MUST be identified accordingly; else if <a>identifier</a> is <code>null</code>, then <a>node</a> <var>G</var> MUST be a <a>blank node</a>.</p>
+            In <strong><a>standard mode</a></strong> only, establish a new <a>node</a> <var>G</var>.
+            If the <a>table group</a> has an <a>identifier</a> then <a>node</a> <var>G</var> MUST be identified accordingly; else if <a>identifier</a> is <code>null</code>, then <a>node</a> <var>G</var> MUST be a <a>blank node</a>.
           </li>
           <li>
-            <p>In <strong><a>standard mode</a></strong> only, specify the type of <a>node</a> <var>G</var> as <code>csvw:TableGroup</code>; emit the following triple:
-              <dl class="triple">
-                <dt>subject</dt>
-                <dd><a>node</a> <var>G</var></dd>
-                <dt>predicate</dt>
-                <dd><code>rdf:type</code></dd>
-                <dt>object</dt>
-                <dd><code>csvw:TableGroup</code></dd>
-              </dl>
-            </p>
+            <p>In <strong><a>standard mode</a></strong> only, specify the type of <a>node</a> <var>G</var> as <code>csvw:TableGroup</code>; emit the following triple:</p>
+            <dl class="triple">
+              <dt>subject</dt>
+              <dd><a>node</a> <var>G</var></dd>
+              <dt>predicate</dt>
+              <dd><code>rdf:type</code></dd>
+              <dt>object</dt>
+              <dd><code>csvw:TableGroup</code></dd>
+            </dl>
           </li>
           <li>
             <p>In <strong><a>standard mode</a></strong> only, recursively insert the triples resulting from running the [[!json-ld-api]] <cite><a href="http://www.w3.org/TR/json-ld-api/#deserialize-json-ld-to-rdf-algorithm">toRdf</a></cite> algorithm over any <a>common properties</a> specified for the <a>table group</a>, with <a>node</a> <var>G</var> as an initial <a>subject</a>.</p>
@@ -311,34 +329,32 @@ var respecConfig = {
           <li>
             <p>Each <a title="annotated table">table</a> is processed sequentially in the order they are referenced in the <a>table group description</a>.</p>
             <p>For each <a title="annotated table">table</a> where the value of property <a href="http://www.w3.org/TR/tabular-metadata/#table-suppressOutput"><code>suppressOutput</code></a> is not <var>true</var>:</p>
-            <ol>
+            <ol class="algorithm">
               <li>
                 <p>In <strong><a>standard mode</a></strong> only, establish a new <a>node</a> <var>T</var> which represents the current <a title="annotated table">table</a>.</p>
                 <p>If the <a title="annotated table">table</a> has an <a>identifier</a> then <a>node</a> <var>T</var> MUST be identified accordingly; else if <a>identifier</a> is <code>null</code>, then <a>node</a> <var>T</var> MUST be a <a>blank node</a>.</p>
               </li>
               <li>
-                <p>In <strong><a>standard mode</a></strong> only, specify the type of <a>node</a> <var>T</var> as <code>csvw:Table</code>; emit the following triple:
-                  <dl class="triple">
-                    <dt>subject</dt>
-                    <dd><a>node</a> <var>T</var></dd>
-                    <dt>predicate</dt>
-                    <dd><code>rdf:type</code></dd>
-                    <dt>object</dt>
-                    <dd><code>csvw:Table</code></dd>
-                  </dl>
-                </p>
+                <p>In <strong><a>standard mode</a></strong> only, specify the type of <a>node</a> <var>T</var> as <code>csvw:Table</code>; emit the following triple:</p>
+                <dl class="triple">
+                  <dt>subject</dt>
+                  <dd><a>node</a> <var>T</var></dd>
+                  <dt>predicate</dt>
+                  <dd><code>rdf:type</code></dd>
+                  <dt>object</dt>
+                  <dd><code>csvw:Table</code></dd>
+                </dl>
               </li>
               <li>
-                <p>In <strong><a>standard mode</a></strong> only, specify the source CSV+ file <var>URL</var> for the current <a title="annotated table">table</a> based on the value of property <a href="http://www.w3.org/TR/tabular-metadata/#table-url"><code>url</code></a>; emit the following triple:
-                  <dl class="triple">
-                    <dt>subject</dt>
-                    <dd><a>node</a> <var>T</var></dd>
-                    <dt>predicate</dt>
-                    <dd><code>csvw:url</code></dd>
-                    <dt>object</dt>
-                    <dd>a <a>node</a> identified by <var>URL</var></dd>
-                  </dl>
-                </p>
+                <p>In <strong><a>standard mode</a></strong> only, specify the source CSV+ file <var>URL</var> for the current <a title="annotated table">table</a> based on the value of property <a href="http://www.w3.org/TR/tabular-metadata/#table-url"><code>url</code></a>; emit the following triple:</p>
+                <dl class="triple">
+                  <dt>subject</dt>
+                  <dd><a>node</a> <var>T</var></dd>
+                  <dt>predicate</dt>
+                  <dd><code>csvw:url</code></dd>
+                  <dt>object</dt>
+                  <dd>a <a>node</a> identified by <var>URL</var></dd>
+                </dl>
               </li>
               <li>
                 <p>In <strong><a>standard mode</a></strong> only, recursively insert the triples resulting from running the [[!json-ld-api]] <cite><a href="http://www.w3.org/TR/json-ld-api/#deserialize-json-ld-to-rdf-algorithm">toRdf</a></cite> algorithm over any <a>notes</a> and <a>common properties</a> specified for the <a title="annotated table">table</a>, with <a>node</a> <var>T</var> as an initial <a>subject</a>.</p>
@@ -353,72 +369,69 @@ var respecConfig = {
               <li>
                 <p>Each <a>row</a> within the <a title="annotated table">table</a> is processed sequentially in order.</p>
                 <p>For each <a>row</a> in the current <a title="annotated table">table</a>:</p>
-                <ol>
+                <ol class="algorithm">
                   <li>
                     <p>In <strong><a>standard mode</a></strong> only, establish a new <a>blank node</a> <var>R</var> which represents the current <a>row</a>.</p>
                   </li>
                   <li>
-                    <p>In <strong><a>standard mode</a></strong> only, relate the <a>row</a> to the <a title="annotated table">table</a>; emit the following triple:
-                      <dl class="triple">
-                        <dt>subject</dt>
-                        <dd><a>node</a> <var>T</var></dd>
-                        <dt>predicate</dt>
-                        <dd><code>csvw:row</code></dd>
-                        <dt>object</dt>
-                        <dd><a>node</a> <var>R</var></dd>
-                      </dl>
-                    </p>
+                    <p>In <strong><a>standard mode</a></strong> only, relate the <a>row</a> to the <a title="annotated table">table</a>; emit the following triple:</p>
+                    <dl class="triple">
+                      <dt>subject</dt>
+                      <dd><a>node</a> <var>T</var></dd>
+                      <dt>predicate</dt>
+                      <dd><code>csvw:row</code></dd>
+                      <dt>object</dt>
+                      <dd><a>node</a> <var>R</var></dd>
+                    </dl>
                   </li>
                   <li>
-                    <p>In <strong><a>standard mode</a></strong> only, specify the <a>row number</a> <var>n</var> for the <a>row</a>; emit the following triple:
-                      <dl class="triple">
-                        <dt>subject</dt>
-                        <dd><a>node</a> <var>R</var></dd>
-                        <dt>predicate</dt>
-                        <dd><code>csvw:rownum</code></dd>
-                        <dt>object</dt>
-                        <dd>a <a title="literal node">literal</a> <var>n</var>; specified with <a href="http://www.w3.org/TR/rdf11-concepts/#dfn-datatype-iri" class="externalDFN">datatype IRI</a> <code>xsd:integer</code></dd>
-                      </dl>
-                    </p>
+                    <p>In <strong><a>standard mode</a></strong> only, specify the <a>row number</a> <var>n</var> for the <a>row</a>; emit the following triple:</p>
+                    <dl class="triple">
+                      <dt>subject</dt>
+                      <dd><a>node</a> <var>R</var></dd>
+                      <dt>predicate</dt>
+                      <dd><code>csvw:rownum</code></dd>
+                      <dt>object</dt>
+                      <dd>a <a title="literal node">literal</a> <var>n</var>; specified with <a href="http://www.w3.org/TR/rdf11-concepts/#dfn-datatype-iri" class="externalDFN">datatype IRI</a> <code>xsd:integer</code></dd>
+                    </dl>
                   </li>
                   <li>
-                    <p>In <strong><a>standard mode</a></strong> only, specify the <a>row source number</a> <var>n<sub>source</sub></var> for the <a>row</a> within the source CSV+ file <var>URL</var> using a fragment-identifier as specified in [[RFC7111]]; if <a>row source number</a> is not <code>null</code>, emit the following triple:
-                      <dl class="triple">
-                        <dt>subject</dt>
-                        <dd><a>node</a> <var>R</var></dd>
-                        <dt>predicate</dt>
-                        <dd><code>csvw:url</code></dd>
-                        <dt>object</dt>
-                        <dd>a <a>node</a> identified by <var>URL</var><code>#row=</code><var>n<sub>source</sub></var></dd>
-                      </dl>
-                    </p>
+                    <p>In <strong><a>standard mode</a></strong> only, specify the <a>row source number</a> <var>n<sub>source</sub></var> for the <a>row</a> within the source CSV+ file <var>URL</var> using a fragment-identifier as specified in [[RFC7111]]; if <a>row source number</a> is not <code>null</code>, emit the following triple:</p>
+                    <dl class="triple">
+                      <dt>subject</dt>
+                      <dd><a>node</a> <var>R</var></dd>
+                      <dt>predicate</dt>
+                      <dd><code>csvw:url</code></dd>
+                      <dt>object</dt>
+                      <dd>a <a>node</a> identified by <var>URL</var><code>#row=</code><var>n<sub>source</sub></var></dd>
+                    </dl>
                   </li>
                   <li>
                     <p>The <a title="subject">subject(s)</a> described by each <a>row</a> are determined according to the <a>aboutUrl</a> property for each <a>cell</a> in the current <a>row</a>. Where <a>aboutUrl</a> is undefined, a default <a>subject</a> for the <a>row</a> is used.</p>
                     <p class="note">A <a>row</a> MAY describe multiple interrelated <a title="subject">subjects</a>; where the <a>valueUrl</a> property for one cell matches the <a>aboutUrl</a> property for another <a>cell</a> in the same <a>row</a>.</p>
                     <p>Determine the unique <a title="subject">subjects</a> for the current <a>row</a>; including a default <a>subject</a> if <a>aboutUrl</a> is unspecified for any <a title="cell">cells</a> in the <a>row</a>.</p>
                     <p>For each <a>subject</a> that the current <a>row</a> describes where at least one of the <a title="cell">cells</a> that refers to that <a>subject</a> has a <a title="cell value">value</a> that is not <code>null</code> and is not associated with a <a>column</a> where the value of property <a href="http://www.w3.org/TR/tabular-metadata/#column-suppressOutput"><code>suppressOutput</code></a> has value <var>true</var>:</p>
-                    <ol>
+                    <ol class="algorithm">
                       <li>
                         <p>Establish a new <a>node</a> <var>S</var> which represents the current <a>subject</a>.</p>
                         <p>If the <a>subject</a> is explicitly identified (e.g., because a <a>cell</a> in the current <a>row</a> specified the <a>subject</a> using the <a>aboutUrl</a> property), then <a>node</a> <var>S</var> MUST be identified accordingly; else <a>node</a> <var>S</var> MUST be a <a>blank node</a>.</p>
                       </li>
                       <li>
-                        <p>In <strong><a>standard mode</a></strong> only, relate the current <a>subject</a> to the current <a>row</a>; emit the following triple:
-                          <dl class="triple">
-                            <dt>subject</dt>
-                            <dd><a>node</a> <var>R</var></dd>
-                            <dt>predicate</dt>
-                            <dd><code>rel:describes</code></dd>
-                            <dt>object</dt>
-                            <dd><a>node</a> <var>S</var></dd>
-                          </dl>
-                        </p>
+                        <p>In <strong><a>standard mode</a></strong> only, relate the current <a>subject</a> to the current <a>row</a>; emit the following triple:</p>
+                        <dl class="triple">
+                          <dt>subject</dt>
+                          <dd><a>node</a> <var>R</var></dd>
+                          <dt>predicate</dt>
+                          <dd><code>rel:describes</code></dd>
+                          <dt>object</dt>
+                          <dd><a>node</a> <var>S</var></dd>
+                        </dl>
                       </li>
                       <li>
                         <p>Each <a>cell</a> referring to the current <a>subject</a> is then processed sequentially in turn according to the order of the <a title="column">columns</a> (e.g. <var>1</var> to <var>n</var>).</p>
                         <p>For each <a>cell</a> referring to the current <a>subject</a> where the value of property <a href="http://www.w3.org/TR/tabular-metadata/#column-suppressOutput"><code>suppressOutput</code></a> for the <a>column</a> associated with that <a>cell</a> is not <var>true</var>:</p>
-                        <p>If the <a>valueUrl</a> for the current <a>cell</a> is not <code>null</code>, then <a>valueUrl</a> identifies a <a>node</a> <var>V<sub>url</sub></var> that is related the current <a>subject</a> using the <a>propertyUrl</a> <var>P</var> for the current <a>cell</a>; emit the following triple:
+                        <ol class="algorithm">
+                        <li>If the <a>valueUrl</a> for the current <a>cell</a> is not <code>null</code>, then <a>valueUrl</a> identifies a <a>node</a> <var>V<sub>url</sub></var> that is related the current <a>subject</a> using the <a>propertyUrl</a> <var>P</var> for the current <a>cell</a>; emit the following triple:
                           <dl class="triple">
                             <dt>subject</dt>
                             <dd><a>node</a> <var>S</var></dd>
@@ -427,8 +440,8 @@ var respecConfig = {
                             <dt>object</dt>
                             <dd><a>node</a> <var>V<sub>url</sub></var></dd>
                           </dl>
-                        </p>
-                        <p>Else, if the <a>cell</a> specifies a <a href="http://www.w3.org/TR/tabular-metadata/#cell-separator"><code>separator</code></a> property and the <a>cell value</a> is not an empty sequence and the <a>cell</a> specifies that boolean property <a href="http://www.w3.org/TR/tabular-metadata/#cell-ordered"><code>ordered</code></a> is <var>true</var>, then the <a>cell value</a> provides an <em>ordered</em> sequence of <a title="literal node">literal nodes</a> for inclusion within the RDF output using an instance of <code>rdf:List</code> <var>V<sub>list</sub></var> as defined in [[rdf-schema]]. This instance is related to the <a>subject</a> using the <a>propertyUrl</a> <var>P</var> for the current <a>cell</a>; emit the triples defining list <var>V<sub>list</sub></var> plus:
+                        </li>
+                        <li>Else, if the <a>cell</a> specifies a <a href="http://www.w3.org/TR/tabular-metadata/#cell-separator"><code>separator</code></a> property and the <a>cell value</a> is not an empty sequence and the <a>cell</a> specifies that boolean property <a href="http://www.w3.org/TR/tabular-metadata/#cell-ordered"><code>ordered</code></a> is <var>true</var>, then the <a>cell value</a> provides an <em>ordered</em> sequence of <a title="literal node">literal nodes</a> for inclusion within the RDF output using an instance of <code>rdf:List</code> <var>V<sub>list</sub></var> as defined in [[rdf-schema]]. This instance is related to the <a>subject</a> using the <a>propertyUrl</a> <var>P</var> for the current <a>cell</a>; emit the triples defining list <var>V<sub>list</sub></var> plus:
                           <dl class="triple">
                             <dt>subject</dt>
                             <dd><a>node</a> <var>S</var></dd>
@@ -437,8 +450,8 @@ var respecConfig = {
                             <dt>object</dt>
                             <dd><a>node</a> <var>V<sub>list</sub></var></dd>
                           </dl>
-                        </p>
-                        <p>Else, if the <a>cell</a> specifies a <a href="http://www.w3.org/TR/tabular-metadata/#cell-separator"><code>separator</code></a> property and the <a>cell value</a> is not an empty sequence, then the <a>cell value</a> provides an <em>unordered</em> sequence of <a title="literal node">literal nodes</a> for inclusion within the RDF output, each of which is related to the <a>subject</a> using the <a>propertyUrl</a> <var>P</var> for the current <a>cell</a>. For each value provided in the sequence, add a <a>literal node</a> <var>V<sub>literal</sub></var>; emit the following triple:
+                        </li>
+                        <li>Else, if the <a>cell</a> specifies a <a href="http://www.w3.org/TR/tabular-metadata/#cell-separator"><code>separator</code></a> property and the <a>cell value</a> is not an empty sequence, then the <a>cell value</a> provides an <em>unordered</em> sequence of <a title="literal node">literal nodes</a> for inclusion within the RDF output, each of which is related to the <a>subject</a> using the <a>propertyUrl</a> <var>P</var> for the current <a>cell</a>. For each value provided in the sequence, add a <a>literal node</a> <var>V<sub>literal</sub></var>; emit the following triple:
                           <dl class="triple">
                             <dt>subject</dt>
                             <dd><a>node</a> <var>S</var></dd>
@@ -447,8 +460,8 @@ var respecConfig = {
                             <dt>object</dt>
                             <dd><a>literal node</a> <var>V<sub>literal</sub></var></dd>
                           </dl>
-                        </p>
-                        <p>Else, if the <a>cell value</a> is not <code>null</code> and the <a>cell</a> does not specify a <a href="http://www.w3.org/TR/tabular-metadata/#cell-separator"><code>separator</code></a> property, then the <a>cell value</a> provides a single <a>literal node</a> <var>V<sub>literal</sub></var> for inclusion within the RDF output that is related the current <a>subject</a> using the <a>propertyUrl</a> <var>P</var> for the current <a>cell</a>; emit the following triple:
+                        </li>
+                        <li>Else, if the <a>cell value</a> is not <code>null</code> and the <a>cell</a> does not specify a <a href="http://www.w3.org/TR/tabular-metadata/#cell-separator"><code>separator</code></a> property, then the <a>cell value</a> provides a single <a>literal node</a> <var>V<sub>literal</sub></var> for inclusion within the RDF output that is related the current <a>subject</a> using the <a>propertyUrl</a> <var>P</var> for the current <a>cell</a>; emit the following triple:
                           <dl class="triple">
                             <dt>subject</dt>
                             <dd><a>node</a> <var>S</var></dd>
@@ -457,7 +470,8 @@ var respecConfig = {
                             <dt>object</dt>
                             <dd><a>literal node</a> <var>V<sub>literal</sub></var></dd>
                           </dl>
-                        </p>
+                        </li>
+                        </ol>
                         <p>The <a title="literal node">literal nodes</a> derived from the <a title="cell value">cell values</a> MUST be expressed according to the <a href="http://www.w3.org/TR/tabular-metadata/#cell-datatype"><code>datatype</code></a> property of the cell as defined below: <a href="#datatypes">Interpreting datatypes</a>.</p> 
                         <p class="note">In the case where a sequence of values is provided, the <code>datatype</code> applies to all members of the sequence.</p>
                       </li>
@@ -1182,11 +1196,11 @@ B.B. King,2014-04-13T20:00,"Lynn Auditorium","Lynn, MA, 01901",http://frontgatet
           </thead>
           <tbody>
             <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td>1</td><td><var>C1.1</var>, <var>C2.1</var></td><td><code>name</code></td><td><code>Name</code></td><td></td></tr>
-            <tr><td><var>C2</var></td><td><var>T</var></td><td>2</td><td>2</td><td><var>C1.2</var>, <var>C2.2</var></td><td><code>start-date</code></td><td><code>Start Date</code></td></td><td></td></tr>
-            <tr><td><var>C3</var></td><td><var>T</var></td><td>3</td><td>3</td><td><var>C1.3</var>, <var>C2.3</var></td><td><code>location-name</code></td><td><code>Location Name</code></td></td><td></td></tr>
-            <tr><td><var>C4</var></td><td><var>T</var></td><td>4</td><td>4</td><td><var>C1.4</var>, <var>C2.4</var></td><td><code>location-address</code></td><td><code>Location Address</code></td></td><td></td></tr>
-            <tr><td><var>C5</var></td><td><var>T</var></td><td>5</td><td>5</td><td><var>C1.5</var>, <var>C2.5</var></td><td><code>ticket-url</code></td><td><code>Ticket Url</code></td></td><td></td></tr>
-            <tr><td><var>C6</var></td><td><var>T</var></td><td>6</td><td>6</td><td><var>C1.6</var>, <var>C2.6</var></td><td><code>type-event</code></td><td></td></td><td><code>true</code></td></tr>
+            <tr><td><var>C2</var></td><td><var>T</var></td><td>2</td><td>2</td><td><var>C1.2</var>, <var>C2.2</var></td><td><code>start-date</code></td><td><code>Start Date</code></td><td></td></tr>
+            <tr><td><var>C3</var></td><td><var>T</var></td><td>3</td><td>3</td><td><var>C1.3</var>, <var>C2.3</var></td><td><code>location-name</code></td><td><code>Location Name</code></td><td></td></tr>
+            <tr><td><var>C4</var></td><td><var>T</var></td><td>4</td><td>4</td><td><var>C1.4</var>, <var>C2.4</var></td><td><code>location-address</code></td><td><code>Location Address</code></td><td></td></tr>
+            <tr><td><var>C5</var></td><td><var>T</var></td><td>5</td><td>5</td><td><var>C1.5</var>, <var>C2.5</var></td><td><code>ticket-url</code></td><td><code>Ticket Url</code></td><td></td></tr>
+            <tr><td><var>C6</var></td><td><var>T</var></td><td>6</td><td>6</td><td><var>C1.6</var>, <var>C2.6</var></td><td><code>type-event</code></td><td></td><td><code>true</code></td></tr>
             <tr><td><var>C7</var></td><td><var>T</var></td><td>7</td><td>7</td><td><var>C1.7</var>, <var>C2.7</var></td><td><code>type-place</code></td><td></td><td><code>true</code></td></tr>
             <tr><td><var>C8</var></td><td><var>T</var></td><td>8</td><td>8</td><td><var>C1.8</var>, <var>C2.8</var></td><td><code>type-offer</code></td><td></td><td><code>true</code></td></tr>
             <tr><td><var>C9</var></td><td><var>T</var></td><td>9</td><td>9</td><td><var>C1.9</var>, <var>C2.9</var></td><td><code>location</code></td><td></td><td><code>true</code></td></tr>
@@ -1273,7 +1287,7 @@ B.B. King,2014-04-13T20:00,"Lynn Auditorium","Lynn, MA, 01901",http://frontgatet
 
         <div class="note">
           <p>Three resources are defined for each row within the table; event, location and offer.</p>
-          <p>Each <a>column</a> explicitly defines both <a href="http://www.w3.org/TR/tabular-metadata/#cell-aboutUrl"><code>aboutUrl</code></a> and <a href="http://www.w3.org/TR/tabular-metadata/#cell-propertyUrl"><code>propertyUrl</code></a> properties which are inherited by the column's <a title="cell"></a>cells</a>.</p>
+          <p>Each <a>column</a> explicitly defines both <a href="http://www.w3.org/TR/tabular-metadata/#cell-aboutUrl"><code>aboutUrl</code></a> and <a href="http://www.w3.org/TR/tabular-metadata/#cell-propertyUrl"><code>propertyUrl</code></a> properties which are inherited by the column's <a title="cell">cells</a>.</p>
           <p><a title="column">Columns</a> <var>C6</var>, <var>C7</var> and <var>C8</var> (<code>{ "name": "type-event"}</code>, <code>{ "name": "type-place"}</code> and <code>{ "name": "type-offer"}</code>) define the semantic types of the resources described by each <a>row</a>: <code>schema:MusicEvent</code>, <code>schema:Place</code> and <code>schema:Offer</code> respectively.</p>
           <p><a title="column">Column</a> <var>C9</var> (<code>{ "name": "location"}</code>) uses the <a href="http://www.w3.org/TR/tabular-metadata/#cell-aboutUrl"><code>aboutUrl</code></a> and <a href="http://www.w3.org/TR/tabular-metadata/#cell-valueUrl"><code>valueUrl</code></a> to assert the relationship between the event and location resources.</p>
           <p><a title="column">Column</a> <var>C10</var> (<code>{ "name": "offer"}</code>) uses the <a href="http://www.w3.org/TR/tabular-metadata/#cell-aboutUrl"><code>aboutUrl</code></a> and <a href="http://www.w3.org/TR/tabular-metadata/#cell-valueUrl"><code>valueUrl</code></a> to assert the relationship between the event and offer resources.</p>
@@ -1509,7 +1523,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
         <p><a title="annotated table">Table</a> annotations:</p>
         <table style="width: 100%; text-align: left">
           <thead>
-            <tr><th rowspan="3">id</th><th colspan="3">core annotations</th><th colspan="3">annotations</th></tr>
+            <tr><th rowspan="3">id</th><th colspan="3">core annotations</th><th colspan="4">annotations</th></tr>
             <tr><th rowspan="2"><code>url</code></th><th rowspan="2">columns</th><th rowspan="2">rows</th><th rowspan="2"><code>primaryKey</code></th><th rowspan="2"><code>suppressOutput</code></th><th colspan="2"><code>foreignKeys</code></th></tr>
             <tr><th><code>columns</code></th><th><code>reference</code></th></tr>
           </thead>
