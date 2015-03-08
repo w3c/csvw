@@ -144,10 +144,29 @@ var respecConfig = {
       .grammar-literal { color: gray;}
       .TBD { font-style: italic; background: yellow;}
       .steps li { margin-bottom: 0.5em;}
-      dl.nvp { padding: 0 0 0 1em; }
+      dl.nvp {
+        padding: 0 0 0 1em;
+        margin-left: -1em;
+        text-indent: 0em;
+      }
       dl.nvp dt, dl.nvp dd { margin: 0; display: inline }
       dl.nvp dt:after { content: ':'; }
       dl.nvp dd:after { content: '\A'; white-space: pre; }
+      ol.algorithm {
+        counter-reset: numsection;
+        list-style-type: none;
+      }
+      ol.algorithm > li {
+        margin: 1em -1em;
+        text-indent: -1em;
+      }
+      ol.algorithm > li:before {
+        font-weight: bold;
+        counter-increment: numsection;
+        content: counters(numsection, ".") " ";
+      }
+      ol.algorithm>li>p {text-indent: 0em}
+      ol.algorithm>li>p:first-child {position: relative; display: inline;}
     </style>
   </head>
   <body>
@@ -269,113 +288,105 @@ var respecConfig = {
 
          <p class="issue" data-number="293">“What metadata is used when processing starting with a CSV vs a Metadata file”: the structure of the algorithm may depend on the outcome of this issue; there may be a different entry point to the algorithm depending on whether the processing starts with a Metadata file or a CSV file.</p>
 
-        <ol>
+        <ol class="algorithm">
           <li>
             <p>In <strong><a>minimal mode</a></strong> only, insert an empty <a>array</a> <var>A</var> into the JSON output. The <a title="object">objects</a> containing the name-value pairs associated with the <a title="cell value">cell values</a> will be subsequently inserted into this <a>array</a>.</p>
             <p>In <strong><a>standard mode</a></strong> only, insert an empty <a>object</a> <var>G</var> into the JSON output which is associated with the <a>table group</a>.</p>
           </li>
           <li>
-            <p>In <strong><a>standard mode</a></strong> only, if the <a>table group</a> has an <a>identifier</a> <var>I<sub>G</sub></var>; insert the following name-value pair into <a>object</a> <var>G</var>:
-              <dl class="nvp">
-                <dt>name</dt>
-                <dd><code>@id</code></dd>
-                <dt>value</dt>
-                <dd><var>I<sub>G</sub></var></dd>
-              </dl>
-            </p>
+            <p>In <strong><a>standard mode</a></strong> only, if the <a>table group</a> has an <a>identifier</a> <var>I<sub>G</sub></var>; insert the following name-value pair into <a>object</a> <var>G</var>:</p>
+            <dl class="nvp">
+              <dt>name</dt>
+              <dd><code>@id</code></dd>
+              <dt>value</dt>
+              <dd><var>I<sub>G</sub></var></dd>
+            </dl>
           </li>
           <li>
             <p>In <strong><a>standard mode</a></strong> only, insert any <a>common properties</a> specified for the <a>table group</a> into <a>object</a> <var>G</var>. Name-value pairs relating to <a>common properties</a> are copied verbatim from the metadata description—noting that prefixes defined within the <a href="http://www.w3.org/2011/rdfa-context/rdfa-1.1">RDFa 1.1 Initial Context</a> ([[rdfa-core]]) are not expanded.</p>
           </li>
           <li>
-            <p>In <strong><a>standard mode</a></strong> only, insert the following name-value pair into <a>object</a> <var>G</var>:
-              <dl class="nvp">
-                <dt>name</dt>
-                <dd><code>table</code></dd>
-                <dt>value</dt>
-                <dd><var>A<sub>T</sub></var></dd>
-              </dl>
-            </p>
+            <p>In <strong><a>standard mode</a></strong> only, insert the following name-value pair into <a>object</a> <var>G</var>:</p>
+            <dl class="nvp">
+              <dt>name</dt>
+              <dd><code>table</code></dd>
+              <dt>value</dt>
+              <dd><var>A<sub>T</sub></var></dd>
+            </dl>
             <p>where <var>A<sub>T</sub></var> is an <a>array</a> into which the <a title="object">objects</a> describing the <a title="annotated table">annotated tables</a> will be subsequently inserted.</p>
           </li>
           <li>
             <p>Each <a title="annotated table">table</a> is processed sequentially in the order they are referenced in the <a>table group description</a>.</p>
             <p>For each <a title="annotated table">table</a> where the value of property <a href="http://www.w3.org/TR/tabular-metadata/#table-suppressOutput"><code>suppressOutput</code></a> is not <var>true</var>:</p>
-            <ol>
+            <ol class="algorithm">
               <li>
                 <p>In <strong><a>standard mode</a></strong> only, insert an empty <a>object</a> <var>T</var> into the <a>array</a> <var>A<sub>T</sub></var> to represent the <a title="annotated table">table</a>.</p>
               </li>
               <li>
-                <p>In <strong><a>standard mode</a></strong> only, if the <a title="annotated table">table</a> has an <a>identifier</a> <var>I<sub>T</sub></var>; insert the following name-value pair into <a>object</a> <var>T</var>:
-                  <dl class="nvp">
-                    <dt>name</dt>
-                    <dd><code>@id</code></dd>
-                    <dt>value</dt>
-                    <dd><var>I<sub>T</sub></var></dd>
-                  </dl>
-                </p>
+                <p>In <strong><a>standard mode</a></strong> only, if the <a title="annotated table">table</a> has an <a>identifier</a> <var>I<sub>T</sub></var>; insert the following name-value pair into <a>object</a> <var>T</var>:</p>
+                <dl class="nvp">
+                  <dt>name</dt>
+                  <dd><code>@id</code></dd>
+                  <dt>value</dt>
+                  <dd><var>I<sub>T</sub></var></dd>
+                </dl>
               </li>
               <li>
-                <p>In <strong><a>standard mode</a></strong> only, specify the source CSV+ file <var>URL</var> for the current table based on the value of property <a href="http://www.w3.org/TR/tabular-metadata/#table-url"><code>url</code></a>; insert the following name-value pair into <a>object</a> <var>T</var>:
-                  <dl class="nvp">
-                    <dt>name</dt>
-                    <dd><code>url</code></dd>
-                    <dt>value</dt>
-                    <dd><var>URL</var></dd>
-                  </dl>
-                </p>
+                <p>In <strong><a>standard mode</a></strong> only, specify the source CSV+ file <var>URL</var> for the current table based on the value of property <a href="http://www.w3.org/TR/tabular-metadata/#table-url"><code>url</code></a>; insert the following name-value pair into <a>object</a> <var>T</var>:</p>
+                <dl class="nvp">
+                  <dt>name</dt>
+                  <dd><code>url</code></dd>
+                  <dt>value</dt>
+                  <dd><var>URL</var></dd>
+                </dl>
               </li>
               <li>
                 <p>In <strong><a>standard mode</a></strong> only, insert any <a>notes</a> and <a>common properties</a> specified for the <a title="annotated table">table</a> into <a>object</a> <var>T</var>. Name-value pairs relating to <a>notes</a> and <a>common properties</a> are copied verbatim from the metadata description—noting that prefixes defined within the <a href="http://www.w3.org/2011/rdfa-context/rdfa-1.1">RDFa 1.1 Initial Context</a> ([[rdfa-core]]) are not expanded.</p>
                 <p class="note">All other annotations for the <a title="annotated table">table</a> are ignored during the conversion; including information about <a href="http://www.w3.org/TR/tabular-metadata/#dfn-tableschema" class="externalDFN">table schemas</a> and <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description" class="externalDFN">column descriptions</a> specified therein, <a href="http://www.w3.org/TR/tabular-metadata/#dfn-dialect-description" class="externalDFN">dialect descriptions</a>, <a href="http://www.w3.org/TR/tabular-metadata/#dfn-foreign-key-definition" class="externalDFN">foreign-key-definitions</a> etc.</p>
               </li>
               <li>
-                <p>In <strong><a>standard mode</a></strong> only, insert the following name-value pair into <a>object</a> <var>T</var>:
-                  <dl class="nvp">
-                    <dt>name</dt>
-                    <dd><code>row</code></dd>
-                    <dt>value</dt>
-                    <dd><var>A<sub>R</sub></var></dd>
-                  </dl>
-                </p>
+                <p>In <strong><a>standard mode</a></strong> only, insert the following name-value pair into <a>object</a> <var>T</var>:</p>
+                <dl class="nvp">
+                  <dt>name</dt>
+                  <dd><code>row</code></dd>
+                  <dt>value</dt>
+                  <dd><var>A<sub>R</sub></var></dd>
+                </dl>
                 <p>where <var>A<sub>R</sub></var> is an <a>array</a> into which the <a title="object">objects</a> describing the <a title="row">rows</a> will be subsequently inserted.</p>
               </li>
               <li>
                 <p>Each <a>row</a> within the <a title="annotated table">table</a> is processed sequentially in order.</p>
                 <p>For each <a>row</a> in the current <a title="annotated table">table</a>:</p>
-                <ol>
+                <ol class="algorithm">
                   <li>
                     <p>In <strong><a>standard mode</a></strong> only, insert an empty <a>object</a> <var>R</var> into the <a>array</a> <var>A<sub>R</sub></var> to represent the <a>row</a>.</p>
                   </li>
                   <li>
-                    <p>In <strong><a>standard mode</a></strong> only, specify the <a>row number</a> <var>n</var> for the <a>row</a>; insert the following name-value pair into <a>object</a> <var>R</var>:
-                      <dl class="nvp">
-                        <dt>name</dt>
-                        <dd><code>rownum</code></dd>
-                        <dt>value</dt>
-                        <dd><var>n</var></dd>
-                      </dl>
-                    </p>
+                    <p>In <strong><a>standard mode</a></strong> only, specify the <a>row number</a> <var>n</var> for the <a>row</a>; insert the following name-value pair into <a>object</a> <var>R</var>:</p>
+                    <dl class="nvp">
+                      <dt>name</dt>
+                      <dd><code>rownum</code></dd>
+                      <dt>value</dt>
+                      <dd><var>n</var></dd>
+                    </dl>
                   </li>
                   <li>
-                    <p>In <strong><a>standard mode</a></strong> only, specify the <a>row source number</a> <var>n<sub>source</sub></var> for the <a>row</a> within the source CSV+ file <var>URL</var> using a fragment-identifier as specified in [[RFC7111]]; if <a>row source number</a> is not <code>null</code>, insert the following name-value pair into <a>object</a> <var>R</var>:
-                      <dl class="nvp">
-                        <dt>name</dt>
-                        <dd><code>url</code></dd>
-                        <dt>value</dt>
-                        <dd><var>URL</var><code>#row=</code><var>n<sub>source</sub></var></dd>
-                      </dl>
-                    </p>
+                    <p>In <strong><a>standard mode</a></strong> only, specify the <a>row source number</a> <var>n<sub>source</sub></var> for the <a>row</a> within the source CSV+ file <var>URL</var> using a fragment-identifier as specified in [[RFC7111]]; if <a>row source number</a> is not <code>null</code>, insert the following name-value pair into <a>object</a> <var>R</var>:</p>
+                    <dl class="nvp">
+                      <dt>name</dt>
+                      <dd><code>url</code></dd>
+                      <dt>value</dt>
+                      <dd><var>URL</var><code>#row=</code><var>n<sub>source</sub></var></dd>
+                    </dl>
                   </li>
                   <li>
-                    <p>In <strong><a>standard mode</a></strong> only, insert the following name-value pair into <a>object</a> <var>R</var>:
-                      <dl class="nvp">
-                        <dt>name</dt>
-                        <dd><code>describes</code></dd>
-                        <dt>value</dt>
-                        <dd><var>A</var></dd>
-                      </dl>
-                    </p>
+                    <p>In <strong><a>standard mode</a></strong> only, insert the following name-value pair into <a>object</a> <var>R</var>:</p>
+                    <dl class="nvp">
+                      <dt>name</dt>
+                      <dd><code>describes</code></dd>
+                      <dt>value</dt>
+                      <dd><var>A</var></dd>
+                    </dl>
                     <p>where <var>A</var> is an <a>array</a>. The <a title="object">objects</a> containing the name-value pairs associated with the <a title="cell value">cell values</a> will be subsequently inserted into this <a>array</a>.</p>
                   </li>
                   <li>
@@ -386,21 +397,20 @@ var respecConfig = {
                     <p>Determine the unique <a title="subject">subjects</a> for the current <a>row</a>—including a default <a>subject</a> if <a>aboutUrl</a> is unspecified for any <a title="cell">cells</a> in the <a>row</a>.</p>
                     
                     <p>For each <a>subject</a> that the current <a>row</a> describes where at least one of the <a title="cell">cells</a> that refers to that <a>subject</a> has a <a title="cell value">value</a> that is not <code>null</code>, and is not associated with a <a>column</a> where the value of property <a href="http://www.w3.org/TR/tabular-metadata/#column-suppressOutput"><code>suppressOutput</code></a> has value <var>true</var>:</p>
-                    <ol>
+                    <ol class="algorithm">
                       <li>
                         <p>Create an empty <a>object</a> <var>S<sub>i</sub></var> to represent the <a>subject</a> <var>i</var>—but don't insert it into the <a>array</a> <var>A</var> yet.</p>
                         <p>(<var>i</var> is the index number with values from <var>1</var> to <var>n</var>, where <var>n</var> is the number of <a title="subject">subjects</a> for the <a>row</a>)</p>
                         <p><a title="subject">Subject</a> <var>i</var> is identified according to the <a>aboutUrl</a> property of its associated <a title="cell">cells</a>: <var>@id<sub>s</sub></var>. For a <em>default</em> <a>subject</a> where <a>aboutUrl</a> is not specified by its <a title="cell">cells</a>, <var>@id<sub>s</sub></var> is <code>null</code>.</p>
                       </li>
                       <li>
-                        <p>If the identifier for <a>subject</a> <var>i</var>, <var>@id<sub>s</sub></var>, is not <code>null</code>, then insert the following name-value pair into <a>object</a> <var>S<sub>i</sub></var>:
-                          <dl class="nvp">
-                            <dt>name</dt>
-                            <dd><code>@id</code></dd>
-                            <dt>value</dt>
-                            <dd><var>@id<sub>s</sub></var></dd>
-                          </dl>
-                        </p>
+                        <p>If the identifier for <a>subject</a> <var>i</var>, <var>@id<sub>s</sub></var>, is not <code>null</code>, then insert the following name-value pair into <a>object</a> <var>S<sub>i</sub></var>:</p>
+                        <dl class="nvp">
+                          <dt>name</dt>
+                          <dd><code>@id</code></dd>
+                          <dt>value</dt>
+                          <dd><var>@id<sub>s</sub></var></dd>
+                        </dl>
                       </li>
                       <li>
                         <p>Each <a>cell</a> referring to <a>subject</a> <var>i</var> is then processed sequentially according to the order of the <a title="column">columns</a> (e.g. <var>1</var> to <var>n</var>).</p>
@@ -411,35 +421,31 @@ var respecConfig = {
 
                         <p class="issue" data-number="298">Should JSON output truncate the propertyUrl in cases where propertyUrl is not specifically defined?</p>
 
-                        <p>If the <a>valueUrl</a> for the current <a>cell</a> is not <code>null</code>, then insert the following name-value pair into <a>object</a> <var>S<sub>i</sub></var>:
-                          <dl class="nvp">
-                            <dt>name</dt>
-                            <dd><var>N</var></dd>
-                            <dt>value</dt>
-                            <dd><var>V<sub>url</sub></var></dd>
-                          </dl>
-                        </p>
+                        <p>If the <a>valueUrl</a> for the current <a>cell</a> is not <code>null</code>, then insert the following name-value pair into <a>object</a> <var>S<sub>i</sub></var>:</p>
+                        <dl class="nvp">
+                          <dt>name</dt>
+                          <dd><var>N</var></dd>
+                          <dt>value</dt>
+                          <dd><var>V<sub>url</sub></var></dd>
+                        </dl>
                         <p>where <var>V<sub>url</sub></var> is the value of <a>valueUrl</a> property for the current <a>cell</a>, is expressed as a string in the JSON output.</p>
 
-                        <p>Else, if the <a>cell</a> specifies a <a href="http://www.w3.org/TR/tabular-metadata/#cell-separator"><code>separator</code></a> property and the <a>cell value</a> is not an empty sequence, then the <a>cell value</a> provides a sequence of values for inclusion within the JSON output; insert an <a>array</a> <var>A<sub>v</sub></var> containing each value <var>V</var> of the sequence into <a>object</a> <var>S<sub>i</sub></var>:
-                          <dl class="nvp">
-                            <dt>name</dt>
-                            <dd><var>N</var></dd>
-                            <dt>value</dt>
-                            <dd><var>A<sub>v</sub></var></dd>
-                          </dl>
-                        </p
-
+                        <p>Else, if the <a>cell</a> specifies a <a href="http://www.w3.org/TR/tabular-metadata/#cell-separator"><code>separator</code></a> property and the <a>cell value</a> is not an empty sequence, then the <a>cell value</a> provides a sequence of values for inclusion within the JSON output; insert an <a>array</a> <var>A<sub>v</sub></var> containing each value <var>V</var> of the sequence into <a>object</a> <var>S<sub>i</sub></var>:</p>
+                        <dl class="nvp">
+                          <dt>name</dt>
+                          <dd><var>N</var></dd>
+                          <dt>value</dt>
+                          <dd><var>A<sub>v</sub></var></dd>
+                        </dl>
                         <p class="note">Since <a title="array">arrays</a> are implicitly <em>ordered</em> in JSON, the <a href="http://www.w3.org/TR/tabular-metadata/#cell-ordered"><code>ordered</code></a> property, if specified, has no effect on the JSON output.</p>
 
-                        <p>Else, if the <a>cell value</a> is not <code>null</code>, then the <a>cell value</a> provides a single value <var>V</var> for inclusion within the JSON output; insert the following name-value pair into <a>object</a> <var>S<sub>i</sub></var>:
-                          <dl class="nvp">
-                            <dt>name</dt>
-                            <dd><var>N</var></dd>
-                            <dt>value</dt>
-                            <dd><var>V</var></dd>
-                          </dl>
-                        </p>
+                        <p>Else, if the <a>cell value</a> is not <code>null</code>, then the <a>cell value</a> provides a single value <var>V</var> for inclusion within the JSON output; insert the following name-value pair into <a>object</a> <var>S<sub>i</sub></var>:</p>
+                        <dl class="nvp">
+                          <dt>name</dt>
+                          <dd><var>N</var></dd>
+                          <dt>value</dt>
+                          <dd><var>V</var></dd>
+                        </dl>
 
                         <p>Value <var>V</var> derived from the <a title="cell value">cell values</a> MUST be expressed in the JSON output according to the <a href="http://www.w3.org/TR/tabular-metadata/#cell-datatype"><code>datatype</code></a> property of the cell as defined below: <a href="#datatypes">Interpreting datatypes</a>.</p> 
                         <p class="note">In the case where a sequence of values is provided, the <code>datatype</code> applies to all members of the sequence.</p>
@@ -452,11 +458,11 @@ var respecConfig = {
                     <p>If <a>subject</a> <var>i</var> is referenced once <em>and only once</em>, then <a>object</a> <var>S<sub>i</sub></var> becomes the value of the referring name-value pair in place of the reference in order to create a nested <a>object</a>.</p>
                     <p>Else, insert <a>object</a> <var>S<sub>i</sub></var>, potentially including nested <a title="object">objects</a>, into <a>array</a> <var>A</var>.</p>
                   </li>
-                  <div class="issue" data-number="299">
-                    <p>Do we want to create nested objects in the JSON output where a row describes multiple resources?</p>
-                    <p>Nesting relies on recursion through the <a title="object">objects</a> defined for each <a>subject</a> within a <a>row</a> in order to "plug" related <a title="object">objects</a> together in a hierarchy. This adds a little complexity - but is worth doing (I think) to create graph-like output familiar to most JSON users. Without this recursion, the JSON output would just be a flat set of <a title="object">objects</a>.</p>
-                  </div>
                 </ol>
+                <div class="issue" data-number="299">
+                  <p>Do we want to create nested objects in the JSON output where a row describes multiple resources?</p>
+                  <p>Nesting relies on recursion through the <a title="object">objects</a> defined for each <a>subject</a> within a <a>row</a> in order to "plug" related <a title="object">objects</a> together in a hierarchy. This adds a little complexity - but is worth doing (I think) to create graph-like output familiar to most JSON users. Without this recursion, the JSON output would just be a flat set of <a title="object">objects</a>.</p>
+                </div>
               </li>
             </ol>
           </li>
@@ -527,7 +533,7 @@ var respecConfig = {
             <tr><td><code>token</code></td><td>string</td><td></td></tr>
             <tr><td><code>language</code></td><td>string</td><td></td></tr>
             <tr><td><code>Name</code></td><td>string</td><td></td></tr>
-            <tr><td><code>NCName</code></td><td>string</td></td></tr>
+            <tr><td><code>NCName</code></td><td>string</td><td></td></tr>
             <tr><td><code>time</code></td><td>string</td><td></td></tr>
           </tbody>
         </table>
@@ -1112,11 +1118,11 @@ B.B. King,2014-04-13T20:00,"Lynn Auditorium","Lynn, MA, 01901",http://frontgatet
           </thead>
           <tbody>
             <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td>1</td><td><var>C1.1</var>, <var>C2.1</var></td><td><code>name</code></td><td><code>Name</code></td><td></td></tr>
-            <tr><td><var>C2</var></td><td><var>T</var></td><td>2</td><td>2</td><td><var>C1.2</var>, <var>C2.2</var></td><td><code>start-date</code></td><td><code>Start Date</code></td></td><td></td></tr>
-            <tr><td><var>C3</var></td><td><var>T</var></td><td>3</td><td>3</td><td><var>C1.3</var>, <var>C2.3</var></td><td><code>location-name</code></td><td><code>Location Name</code></td></td><td></td></tr>
-            <tr><td><var>C4</var></td><td><var>T</var></td><td>4</td><td>4</td><td><var>C1.4</var>, <var>C2.4</var></td><td><code>location-address</code></td><td><code>Location Address</code></td></td><td></td></tr>
-            <tr><td><var>C5</var></td><td><var>T</var></td><td>5</td><td>5</td><td><var>C1.5</var>, <var>C2.5</var></td><td><code>ticket-url</code></td><td><code>Ticket Url</code></td></td><td></td></tr>
-            <tr><td><var>C6</var></td><td><var>T</var></td><td>6</td><td>6</td><td><var>C1.6</var>, <var>C2.6</var></td><td><code>type-event</code></td><td></td></td><td><code>true</code></td></tr>
+            <tr><td><var>C2</var></td><td><var>T</var></td><td>2</td><td>2</td><td><var>C1.2</var>, <var>C2.2</var></td><td><code>start-date</code></td><td><code>Start Date</code></td><td></td></tr>
+            <tr><td><var>C3</var></td><td><var>T</var></td><td>3</td><td>3</td><td><var>C1.3</var>, <var>C2.3</var></td><td><code>location-name</code></td><td><code>Location Name</code></td><td></td></tr>
+            <tr><td><var>C4</var></td><td><var>T</var></td><td>4</td><td>4</td><td><var>C1.4</var>, <var>C2.4</var></td><td><code>location-address</code></td><td><code>Location Address</code></td><td></td></tr>
+            <tr><td><var>C5</var></td><td><var>T</var></td><td>5</td><td>5</td><td><var>C1.5</var>, <var>C2.5</var></td><td><code>ticket-url</code></td><td><code>Ticket Url</code></td><td></td></tr>
+            <tr><td><var>C6</var></td><td><var>T</var></td><td>6</td><td>6</td><td><var>C1.6</var>, <var>C2.6</var></td><td><code>type-event</code></td><td></td><td><code>true</code></td></tr>
             <tr><td><var>C7</var></td><td><var>T</var></td><td>7</td><td>7</td><td><var>C1.7</var>, <var>C2.7</var></td><td><code>type-place</code></td><td></td><td><code>true</code></td></tr>
             <tr><td><var>C8</var></td><td><var>T</var></td><td>8</td><td>8</td><td><var>C1.8</var>, <var>C2.8</var></td><td><code>type-offer</code></td><td></td><td><code>true</code></td></tr>
             <tr><td><var>C9</var></td><td><var>T</var></td><td>9</td><td>9</td><td><var>C1.9</var>, <var>C2.9</var></td><td><code>location</code></td><td></td><td><code>true</code></td></tr>
@@ -1207,7 +1213,7 @@ B.B. King,2014-04-13T20:00,"Lynn Auditorium","Lynn, MA, 01901",http://frontgatet
 
         <div class="note">
           <p>Three resources are defined for each row within the table; event, location and offer - therefore three <a title="object">objects</a> are created for each <a>row</a>.</p>
-          <p>Each <a>column</a> explicitly defines both <a href="http://www.w3.org/TR/tabular-metadata/#cell-aboutUrl"><code>aboutUrl</code></a> and <a href="http://www.w3.org/TR/tabular-metadata/#cell-propertyUrl"><code>propertyUrl</code></a> properties which are inherited by the column's <a title="cell"></a>cells</a>.</p>
+          <p>Each <a>column</a> explicitly defines both <a href="http://www.w3.org/TR/tabular-metadata/#cell-aboutUrl"><code>aboutUrl</code></a> and <a href="http://www.w3.org/TR/tabular-metadata/#cell-propertyUrl"><code>propertyUrl</code></a> properties which are inherited by the column's <a title="cell">cells</a>.</p>
           <p><a title="column">Columns</a> <var>C6</var>, <var>C7</var> and <var>C8</var> (<code>{ "name": "type-event"}</code>, <code>{ "name": "type-place"}</code> and <code>{ "name": "type-offer"}</code>) define the semantic types of the resources described by each <a>row</a>: <code>schema:MusicEvent</code>, <code>schema:Place</code> and <code>schema:Offer</code> respectively—noting that the use of <code>rdf:type</code> is not converted to the <a>name</a> <code>@type</code> (as used in [[json-ld]]) by this conversion application as it is not, and does not need to be, JSON-LD-aware.</p>
           <p><a title="column">Column</a> <var>C9</var> (<code>{ "name": "location"}</code>) uses the <a href="http://www.w3.org/TR/tabular-metadata/#cell-aboutUrl"><code>aboutUrl</code></a> and <a href="http://www.w3.org/TR/tabular-metadata/#cell-valueUrl"><code>valueUrl</code></a> to assert the relationship between the event and location resources.</p>
           <p><a title="column">Column</a> <var>C10</var> (<code>{ "name": "offer"}</code>) uses the <a href="http://www.w3.org/TR/tabular-metadata/#cell-aboutUrl"><code>aboutUrl</code></a> and <a href="http://www.w3.org/TR/tabular-metadata/#cell-valueUrl"><code>valueUrl</code></a> to assert the relationship between the event and offer resources.</p>
@@ -1444,7 +1450,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
         <p><a title="annotated table">Table</a> annotations:</p>
         <table style="width: 100%; text-align: left">
           <thead>
-            <tr><th rowspan="3">id</th><th colspan="3">core annotations</th><th colspan="3">annotations</th></tr>
+            <tr><th rowspan="3">id</th><th colspan="3">core annotations</th><th colspan="4">annotations</th></tr>
             <tr><th rowspan="2"><code>url</code></th><th rowspan="2">columns</th><th rowspan="2">rows</th><th rowspan="2"><code>primaryKey</code></th><th rowspan="2"><code>suppressOutput</code></th><th colspan="2"><code>foreignKeys</code></th></tr>
             <tr><th><code>columns</code></th><th><code>reference</code></th></tr>
           </thead>
