@@ -95,7 +95,7 @@
     "Schema": "csvw:Schema",
     "Table": "csvw:Table",
     "TableGroup": "csvw:TableGroup",
-    "Template": "csvw:Template",
+    "Transformation": "csvw:Transformation",
     "aboutUrl": {
       "@id": "csvw:aboutUrl",
       "@type": "@id"
@@ -249,6 +249,10 @@
       "@id": "csvw:rownum",
       "@type": "xsd:integer"
     },
+    "scriptFormat": {
+      "@id": "csvw:scriptFormat",
+      "@type": "xsd:anyURI"
+    },
     "separator": {
       "@id": "csvw:separator",
       "@language": null
@@ -294,12 +298,8 @@
       "@id": "csvw:targetFormat",
       "@type": "xsd:anyURI"
     },
-    "scriptFormat": {
-      "@id": "csvw:scriptFormat",
-      "@type": "xsd:anyURI"
-    },
-    "templates": {
-      "@id": "csvw:templates",
+    "transformations": {
+      "@id": "csvw:transformations",
       "@type": "@id"
     },
     "textDirection": {
@@ -478,13 +478,13 @@
         }
       },
       {
-        "@id": "csvw:Template",
+        "@id": "csvw:Transformation",
         "@type": "rdfs:Class",
         "rdfs:label": {
-          "en": "Template Specification"
+          "en": "Transformation Definition"
         },
         "rdfs:comment": {
-          "en": "A Template Specification is a definition of how tabular data can be transformed into another format."
+          "en": "A Transformation Definition is a definition of how tabular data can be transformed into another format."
         }
       }
     ],
@@ -998,6 +998,18 @@
         "rdfs:range": "xsd:integer"
       },
       {
+        "@id": "csvw:scriptFormat",
+        "@type": "rdf:Property",
+        "rdfs:label": {
+          "en": "script format"
+        },
+        "rdfs:comment": {
+          "en": "A link property giving the single URL for the format that is used by the script or template. If one has been defined, this should be a URL for a media type, in the form http://www.iana.org/assignments/media-types/media-type such as http://www.iana.org/assignments/media-types/application/javascript. Otherwise, it can be any URL that describes the script or template format."
+        },
+        "rdfs:domain": "csvw:Transformation",
+        "rdfs:range": "xsd:anyURI"
+      },
+      {
         "@id": "csvw:separator",
         "@type": "rdf:Property",
         "rdfs:label": {
@@ -1073,7 +1085,7 @@
         "rdfs:comment": {
           "en": "The format to which the tabular data should be transformed prior to the transformation using the template. If the value is \"json\", the tabular data should first be transformed first to JSON based on the simple mapping defined in Generating JSON from Tabular Data on the Web. If the value is \"rdf\", it should similarly first be transformed to XML based on the simple mapping defined in Generating RDF from Tabular Data on the Web."
         },
-        "rdfs:domain": "csvw:Template",
+        "rdfs:domain": "csvw:Transformation",
         "rdfs:range": "xsd:string"
       },
       {
@@ -1149,37 +1161,27 @@
         "rdfs:comment": {
           "en": "A link property giving the single URL for the format that will be created through the transformation. If one has been defined, this should be a URL for a media type, in the form http://www.iana.org/assignments/media-types/media-type such as http://www.iana.org/assignments/media-types/text/calendar. Otherwise, it can be any URL that describes the target format."
         },
-        "rdfs:domain": "csvw:Template",
+        "rdfs:domain": "csvw:Transformation",
         "rdfs:range": "xsd:anyURI"
       },
       {
-        "@id": "csvw:scriptFormat",
+        "@id": "csvw:transformations",
         "@type": "rdf:Property",
         "rdfs:label": {
-          "en": "script format"
+          "en": "transformations"
         },
         "rdfs:comment": {
-          "en": "A link property giving the single URL for the format that is used by the script or template. If one has been defined, this should be a URL for a media type, in the form http://www.iana.org/assignments/media-types/media-type such as http://www.iana.org/assignments/media-types/application/javascript. Otherwise, it can be any URL that describes the script or template format."
-        },
-        "rdfs:domain": "csvw:Template",
-        "rdfs:range": "xsd:anyURI"
-      },
-      {
-        "@id": "csvw:templates",
-        "@type": "rdf:Property",
-        "rdfs:label": {
-          "en": "templates"
-        },
-        "rdfs:comment": {
-          "en": "An array of template specifications that provide mechanisms to transform the tabular data into other formats. "
+          "en": "An array property of transformation definitions that provide mechanisms to transform the tabular data into other formats."
         },
         "rdfs:domain": {
           "owl:unionOf": [
             "csvw:TableGroup",
-            "csvw:Table"
+            "csvw:Table",
+            "csvw:Schema",
+            "csvw:Column"
           ]
         },
-        "rdfs:range": "csvw:Template"
+        "rdfs:range": "csvw:Transformation"
       },
       {
         "@id": "csvw:textDirection",
@@ -1207,11 +1209,11 @@
           "en": "title"
         },
         "rdfs:comment": {
-          "en": "For a Template: A natural language property that describes the format that will be generated from the transformation. This is useful if the target format is a generic format (such as application/json) and the transformation is creating a specific profile of that format.\n\nFor a Column: A natural language property that provides possible alternative names for the column."
+          "en": "For a Transformation A natural language property that describes the format that will be generated from the transformation. This is useful if the target format is a generic format (such as application/json) and the transformation is creating a specific profile of that format.\n\nFor a Column: A natural language property that provides possible alternative names for the column."
         },
         "rdfs:domain": {
           "owl:unionOf": [
-            "csvw:Template",
+            "csvw:Transformation",
             "csvw:Column"
           ]
         }
@@ -1240,7 +1242,7 @@
         "rdfs:domain": {
           "owl:unionOf": [
             "csvw:Table",
-            "csvw:Template"
+            "csvw:Transformation"
           ]
         },
         "rdfs:range": "xsd:anyURI"
