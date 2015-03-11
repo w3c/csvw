@@ -45,9 +45,13 @@ csvw: a owl:Ontology;
 
 
 # Class definitions
+csvw:Cell a rdfs:Class;
+  rdfs:label "Cell"@en;
+  rdfs:comment """A Cell represents a cell at the intersection of a Row and a Column within a Table."""@en;
+  rdfs:isDefinedBy csvw: .
 csvw:Column a rdfs:Class;
   rdfs:label "Column Description"@en;
-  rdfs:comment """A Column Description describes a single column."""@en;
+  rdfs:comment """A Column represents a vertical arrangement of Cells within a Table."""@en;
   rdfs:isDefinedBy csvw: .
 csvw:Datatype a rdfs:Class;
   rdfs:label "Datatype"@en;
@@ -61,17 +65,21 @@ csvw:Direction a rdfs:Class;
   rdfs:label "Direction"@en;
   rdfs:comment """The class of table/text directions."""@en;
   rdfs:isDefinedBy csvw: .
+csvw:Row a rdfs:Class;
+  rdfs:label "Row"@en;
+  rdfs:comment """A Row represents a horizontal arrangement of cells within a Table."""@en;
+  rdfs:isDefinedBy csvw: .
 csvw:Schema a rdfs:Class;
   rdfs:label "Schema"@en;
   rdfs:comment """A Schema is a definition of a tabular format that may be common to multiple tables."""@en;
   rdfs:isDefinedBy csvw: .
 csvw:Table a rdfs:Class;
-  rdfs:label "Table Description"@en;
-  rdfs:comment """A Table describes an Annotated Table."""@en;
+  rdfs:label "Annotated Table"@en;
+  rdfs:comment """An annotated table is a table that is annotated with additional metadata."""@en;
   rdfs:isDefinedBy csvw: .
 csvw:TableGroup a rdfs:Class;
-  rdfs:label "Table Group Description"@en;
-  rdfs:comment """A Table Group describes an Annotated Table Group."""@en;
+  rdfs:label "Group of Tables"@en;
+  rdfs:comment """A Group of Tables comprises a set of Annotated Tables and a set of annotations that relate to those Tables."""@en;
   rdfs:isDefinedBy csvw: .
 csvw:Transformation a rdfs:Class;
   rdfs:label "Transformation Definition"@en;
@@ -120,6 +128,11 @@ csvw:default a rdf:Property;
   rdfs:comment """An atomic property holding a single string that provides a default string value for the cell in cases where the original string value is a null value. This default value may be used when converting the table into other formats."""@en;
   rdfs:domain [ owl:unionOf (csvw:TableGroup csvw:Table csvw:Schema csvw:Column)];
   rdfs:range xsd:string;
+  rdfs:isDefinedBy csvw: .
+csvw:describes a rdf:Property;
+  rdfs:label "describes"@en;
+  rdfs:comment """From IANA describes: The relationship A 'describes' B asserts that resource A provides a description of resource B. There are no constraints on the format or representation of either A or B, neither are there any further constraints on either resource."""@en;
+  rdfs:domain csvw:Row;
   rdfs:isDefinedBy csvw: .
 csvw:delimiter a rdf:Property;
   rdfs:label "delimiter"@en;
@@ -300,6 +313,7 @@ csvw:row a rdf:Property;
   rdfs:comment """Relates a Table to each Row output."""@en;
   rdfs:subPropertyOf rdfs:member;
   rdfs:domain csvw:Table;
+  rdfs:range csvw:Row;
   rdfs:isDefinedBy csvw: .
 csvw:rownum a rdf:Property;
   rdfs:label "row number"@en;
