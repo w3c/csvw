@@ -70,6 +70,13 @@ var respecConfig = {
     noLegacyStyle: false
     };
     </script>
+    <script class="remove">
+    function updateExample(doc, content) {
+   	  var utils = require("core/utils");
+    // perform transformations to make it render and prettier
+      return utils.xmlEscape(content);
+    }
+    </script>
     <style type="text/css">
       .grammar td { font-family: monospace; vertical-align: top; }
       .grammar-literal { color: gray;}
@@ -511,28 +518,12 @@ var respecConfig = {
 
       An illustrative example of provenance information is provided below in Turtle [[turtle]] syntax, the conversion application used is identified as <code>http://example.org/my-csv2rdf-application</code>:
 
-      <pre class="example highlight" id="example-provenance-info">
-@prefix csvw: &lt;http://www.w3.org/ns/csvw#&gt; .
-@prefix prov: &lt;http://www.w3.org/ns/prov#&gt; .
-@prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .
-
-&lt;&gt; prov:wasGeneratedBy [
-    a prov:Activity ;
-    prov:wasAssociatedWith  &lt;http://example.org/my-csv2rdf-application&gt; ;
-    prov:startedAtTime "2015-02-13T15:12:44"^^xsd:dateTime ;
-    prov:endedAtTime   "2015-02-13T15:12:46"^^xsd:dateTime ;
-    prov:qualifiedUsage [ a prov:Usage ;
-        prov:entity &lt;http://example.org/csv/data.csv&gt; ;
-        prov:hadRole csvw:csvEncodedTabularData
-    ];
-    prov:qualifiedUsage [ a prov:Usage ;
-        prov:entity 
-                &lt;http://example.org/csv/data.csv-metadata.json&gt; ,                 
-                &lt;http://example.org/csv/metadata.json&gt; ;
-        prov:hadRole csvw:tabularMetadata
-    ];
-]
-      </pre>
+      <pre class="example highlight"
+           id="example-provenance-info"
+           title="http://example.org/prov-example.ttl"
+           data-include="../examples/prov-example.ttl"
+           data-oninclude="updateExample">
+       </pre>
     </section>
 
     <section>
@@ -618,11 +609,11 @@ var respecConfig = {
         <p>
           This example comprises a single <a>annotated table</a> containing information attributes about countries; country code, position (latitude, longitude) and name. Whilst the input CSV+ file, published at <code>http://example.org/countries.csv</code>, includes a <a href="http://www.w3.org/TR/tabular-data-model/#dfn-header-line" class="externalDFN">header line</a>, no further metadata annotations are given. The CSV+ file is provided below:
         </p>
-        <pre class="example" id="example-countries-csv+">
-countryCode,latitude,longitude,name
-AD,42.546245,1.601554,Andorra
-AE,23.424076,53.847818,"United Arab Emirates"
-AF,33.93911,67.709953,Afghanistan
+        <pre class="example"
+             id="example-countries-csv+"
+             title="http://example.org/countries.csv"
+             data-include="../examples/countries.csv"
+             data-oninclude="updateExample">
         </pre>
 
         <p>The <a>annotated table</a> generated from parsing the CSV+ file is shown below and provides the basis for the conversion to RDF.</p>
@@ -696,73 +687,22 @@ AF,33.93911,67.709953,Afghanistan
 
         <p><strong><a title="minimal mode">Minimal mode</a></strong> output for this example is provided in Turtle [[turtle]] syntax below:</p>
 
-        <pre class="example highlight" id="example-countries-minimal-ttl">
-@base &lt;http://example.org/countries.csv&gt; .
-
-_:8228a149-8efe-448d-b15f-8abf92e7bd17
-  &lt;#countryCode&gt; "AD" ;
-  &lt;#latitude&gt; "42.546245" ;
-  &lt;#longitude&gt; "1.601554" ;
-  &lt;#name&gt; "Andorra" .
-
-_:ec59dcfc-872a-4144-822b-9ad5e2c6149c
-  &lt;#countryCode&gt; "AE" ;
-  &lt;#latitude&gt; "23.424076" ;
-  &lt;#longitude&gt; "53.847818" ;
-  &lt;#name&gt; "United Arab Emirates" .
-
-_:e8f2e8e9-3d02-4bf5-b4f1-4794ba5b52c9
-  &lt;#countryCode&gt; "AF" ;
-  &lt;#latitude&gt; "33.93911" ;
-  &lt;#longitude&gt; "67.709953" ;
-  &lt;#name&gt; "Afghanistan" .
+        <pre class="example highlight"
+             id="example-countries-minimal-ttl"
+             title="http://example.org/countries-minimal.ttl"
+             data-include="../examples/countries-minimal.ttl"
+             data-oninclude="updateExample">
         </pre>
 
         <p class="note">The <a href="http://www.w3.org/TR/tabular-metadata/#cell-aboutUrl"><code>aboutUrl</code></a> property has not been set for cells in table <var>T</var> (<code>{ "url": "http://example.org/countries.csv"}</code>) - <a title="cell">cells</a> in a given <a>row</a> where <a href="http://www.w3.org/TR/tabular-metadata/#cell-aboutUrl"><code>aboutUrl</code></a> has not been specified are assumed to refer to the same <a>subject</a>. This unspecified <a>subject</a> is treated as a <a>blank node</a>.</p>
 
         <p><strong><a title="standard mode">Standard mode</a></strong> output for this example is provided in Turtle [[turtle]] syntax below:</p>
 
-        <pre class="example highlight" id="example-countries-standard-ttl">
-@base &lt;http://example.org/countries.csv&gt; .
-@prefix csvw: &lt;http://www.w3.org/ns/csvw#&gt; .
-@prefix rel: &lt;http://www.iana.org/assignments/link-relations/&gt; .
-@prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .
-
-_:d4f8e548-9601-4e41-aadb-09a8bce32625 a csvw:TableGroup ;
-  csvw:table [ a csvw:Table ;
-    csvw:url &lt;http://example.org/countries.csv&gt; ;
-    csvw:row [
-      csvw:rownum "1"^^xsd:integer ;
-      csvw:url &lt;#row=2&gt; ;
-      rel:describes _:8228a149-8efe-448d-b15f-8abf92e7bd17
-    ], [
-      csvw:rownum "2"^^xsd:integer ;
-      csvw:url &lt;#row=3&gt; ;
-      rel:describes _:ec59dcfc-872a-4144-822b-9ad5e2c6149c
-    ], [
-      csvw:rownum "3"^^xsd:integer ;
-      csvw:url &lt;#row=4&gt; ;
-      rel:describes _:e8f2e8e9-3d02-4bf5-b4f1-4794ba5b52c9
-    ]
-  ] .
-
-_:8228a149-8efe-448d-b15f-8abf92e7bd17
-  &lt;#countryCode&gt; "AD" ;
-  &lt;#latitude&gt; "42.546245" ;
-  &lt;#longitude&gt; "1.601554" ;
-  &lt;#name&gt; "Andorra" .
-
-_:ec59dcfc-872a-4144-822b-9ad5e2c6149c
-  &lt;#countryCode&gt; "AE" ;
-  &lt;#latitude&gt; "23.424076" ;
-  &lt;#longitude&gt; "53.847818" ;
-  &lt;#name&gt; "United Arab Emirates" .
-
-_:e8f2e8e9-3d02-4bf5-b4f1-4794ba5b52c9
-  &lt;#countryCode&gt; "AF" ;
-  &lt;#latitude&gt; "33.93911" ;
-  &lt;#longitude&gt; "67.709953" ;
-  &lt;#name&gt; "Afghanistan" .
+        <pre class="example highlight"
+             id="example-countries-standard-ttl"
+             title="http://example.org/countries-standard.ttl"
+             data-include="../examples/countries-standard.ttl"
+             data-oninclude="updateExample">
         </pre>
 
         <div class="note">
@@ -779,84 +719,17 @@ _:e8f2e8e9-3d02-4bf5-b4f1-4794ba5b52c9
         <p>
           This example is based on <a href="http://www.w3.org/TR/csvw-ucr/#UC-PaloAltoTreeData">Use Case #11 - City of Palo Alto Tree Data</a> and comprises a single <a>annotated table</a> describing an inventory of tree maintenance operations. The input CSV+ file, published at <code>http://example.org/tree-ops-ext.csv</code>, and the associated metadata description <code>http://example.org/tree-ops-ext.csv-metadata.json</code> are provided below:
         </p>
-        <pre class="example" id="example-tree-ops-ext-csv+">
-GID,On Street,Species,Trim Cycle,Diameter at Breast Ht,Inventory Date,Comments,Protected,KML
-1,ADDISON AV,Celtis australis,Large Tree Routine Prune,11,10/18/2010,,,"&lt;Point&gt;&lt;coordinates&gt;-122.156485,37.440963&lt;/coordinates&gt;&lt;/Point&gt;"
-2,EMERSON ST,Liquidambar styraciflua,Large Tree Routine Prune,11,6/2/2010,,,"&lt;Point&gt;&lt;coordinates&gt;-122.156749,37.440958&lt;/coordinates&gt;&lt;/Point&gt;"
-6,ADDISON AV,Robinia pseudoacacia,Large Tree Routine Prune,29,6/1/2010,cavity or decay; trunk decay; codominant leaders; included bark; large leader or limb decay; previous failure root damage; root decay;  beware of BEES,YES,"&lt;Point&gt;&lt;coordinates&gt;-122.156299,37.441151&lt;/coordinates&gt;&lt;/Point&gt;"
+        <pre class="example"
+             id="example-tree-ops-ext-csv+"
+             title="http://example.org/tree-ops-ext.csv"
+             data-include="../examples/tree-ops-ext.csv"
+             data-oninclude="updateExample">
         </pre>
-        <pre class="example highlight" id="example-tree-ops-ext-metadata">
-{
-  "url": "tree-ops-ext.csv",
-  "@context": ["http://www.w3.org/ns/csvw", {"@language": "en"}],
-  "@id": "http://example.org/tree-ops-ext",
-  "dc:title": "Tree Operations",
-  "dc:keywords": ["tree", "street", "maintenance"],
-  "dc:publisher": [{
-    "schema:name": "Example Municipality",
-    "schema:url": "http://example.org"
-  }],
-  "dc:license": {"@id": "http://opendefinition.org/licenses/cc-by/"},
-  "dc:modified": {"@value": "2010-12-31", "@type": "xsd:date"},
-  "tableSchema": {
-    "columns": [{
-      "name": "GID",
-      "title": [
-        "GID",
-        "Generic Identifier"
-      ],
-      "dc:description": "An identifier for the operation on a tree.",
-      "datatype": "string",
-      "required": true, 
-      "suppressOutput": true
-    }, {
-      "name": "on_street",
-      "title": "On Street",
-      "dc:description": "The street that the tree is on.",
-      "datatype": "string"
-    }, {
-      "name": "species",
-      "title": "Species",
-      "dc:description": "The species of the tree.",
-      "datatype": "string"
-    }, {
-      "name": "trim_cycle",
-      "title": "Trim Cycle",
-      "dc:description": "The operation performed on the tree.",
-      "datatype": "string",
-      "lang": "en"
-    }, {
-      "name": "dbh",
-      "title": "Diameter at Breast Ht",
-      "dc:description": "Diameter at Breast Height (DBH) of the tree (in feet), measured 4.5ft above ground.",
-      "datatype": "integer"
-    }, {
-      "name": "inventory_date",
-      "title": "Inventory Date",
-      "dc:description": "The date of the operation that was performed.",
-      "datatype": {"base": "date", "format": "M/d/yyyy"}
-    }, {
-      "name": "comments",
-      "title": "Comments",
-      "dc:description": "Supplementary comments relating to the operation or tree.",
-      "datatype": "string",
-      "separator": ";"
-    }, {
-      "name": "protected",
-      "title": "Protected",
-      "dc:description": "Indication (YES / NO) whether the tree is subject to a protection order.",
-      "datatype": {"base": "boolean", "format": "YES|NO"},
-      "default": "NO"
-    }, {
-      "name": "kml",
-      "title": "KML",
-      "dc:description": "KML-encoded description of tree location.",
-      "datatype": "xml"
-    }],
-    "primaryKey": "GID",
-    "aboutUrl": "http://example.org/tree-ops-ext#gid-{GID}"
-  }
-}
+        <pre class="example highlight"
+             id="example-tree-ops-ext-metadata"
+             title="http://example.org/tree-ops-ext.csv-metadata.json"
+             data-include="../examples/tree-ops-ext.csv-metadata.json"
+             data-oninclude="updateExample">
         </pre>
 
         <p>The <a>annotated table</a> generated from parsing the CSV+ file and associated metadata is shown below and provides the basis for the conversion to RDF.</p>
@@ -960,38 +833,11 @@ GID,On Street,Species,Trim Cycle,Diameter at Breast Ht,Inventory Date,Comments,P
 
         <p><strong><a title="minimal mode">Minimal mode</a></strong> output for this example is provided in Turtle [[turtle]] syntax below:</p>
 
-        <pre class="example highlight" id="example-tree-ops-ext-minimal-ttl">
-@base &lt;http://example.org/tree-ops-ext.csv&gt; .
-@prefix rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt; .
-@prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .
-
-&lt;http://example.org/tree-ops-ext#gid-1&gt;
-  &lt;#on_street&gt; "ADDISON AV" ;
-  &lt;#species&gt; "Celtis australis" ;
-  &lt;#trim_cycle&gt; "Large Tree Routine Prune"@en ;
-  &lt;#dbh&gt; "11"^^xsd:integer ;
-  &lt;#inventory_date&gt; "2010-10-18"^^xsd:date ;
-  &lt;#protected&gt; false ;
-  &lt;#kml&gt; "&lt;Point&gt;&lt;coordinates&gt;-122.156485,37.440963&lt;/coordinates&gt;&lt;/Point&gt;"^^rdf:XMLLiteral .
-
-&lt;http://example.org/tree-ops-ext#gid-2&gt;
-  &lt;#on_street&gt; "EMERSON ST" ;
-  &lt;#species&gt; "Liquidambar styraciflua" ;
-  &lt;#trim_cycle&gt; "Large Tree Routine Prune"@en ;
-  &lt;#dbh&gt; "11"^^xsd:integer ;
-  &lt;#inventory_date&gt; "2010-06-02"^^xsd:date ;
-  &lt;#protected&gt; false ;
-  &lt;#kml&gt; "&lt;Point&gt;&lt;coordinates&gt;-122.156749,37.440958&lt;/coordinates&gt;&lt;/Point&gt;"^^rdf:XMLLiteral .
-
-&lt;http://example.org/tree-ops-ext#gid-6&gt;
-  &lt;#on_street&gt; "ADDISON AV" ;
-  &lt;#species&gt; "Robinia pseudoacacia" ;
-  &lt;#trim_cycle&gt; "Large Tree Routine Prune"@en ;
-  &lt;#dbh&gt; "29"^^xsd:integer ;
-  &lt;#inventory_date&gt; "2010-06-01"^^xsd:date ;
-  &lt;#comments&gt; "cavity or decay", "trunk decay", "codominant leaders", "included bark", "large leader or limb decay", "previous failure root damage", "root decay", "beware of BEES" ;
-  &lt;#protected&gt; true ;
-  &lt;#kml&gt; "&lt;Point&gt;&lt;coordinates&gt;-122.156299,37.441151&lt;/coordinates&gt;&lt;/Point&gt;"^^rdf:XMLLiteral .
+        <pre class="example highlight"
+             id="example-tree-ops-ext-minimal-ttl"
+             title="http://example.org/tree-ops-ext-minimal.ttl"
+             data-include="../examples/tree-ops-ext-minimal.ttl"
+             data-oninclude="updateExample">
         </pre>
 
         <div class="note">
@@ -1005,69 +851,11 @@ GID,On Street,Species,Trim Cycle,Diameter at Breast Ht,Inventory Date,Comments,P
 
         <p><strong><a title="standard mode">Standard mode</a></strong> output for this example is provided in Turtle [[turtle]] syntax below:</p>
 
-        <pre class="example highlight" id="example-tree-ops-ext-standard-ttl">
-@base &lt;http://example.org/tree-ops-ext.csv&gt; .
-@prefix csvw: &lt;http://www.w3.org/ns/csvw#&gt; .
-@prefix dc: &lt;http://purl.org/dc/terms/&gt; .
-@prefix rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt; .
-@prefix rel: &lt;http://www.iana.org/assignments/link-relations/&gt; .
-@prefix schema: &lt;http://schema.org/&gt; .
-@prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .
-
-_:68fc08e5-56a0-47e2-a784-3a644d8257c4 a csvw:TableGroup ;
-  csvw:table &lt;http://example.org/tree-ops-ext&gt; .
-
-&lt;http://example.org/tree-ops-ext&gt; a csvw:Table ;
-  csvw:url &lt;http://example.org/tree-ops-ext.csv&gt; ;
-  dc:title "Tree Operations"@en ;
-  dc:keywords "tree"@en, "street"@en, "maintenance"@en ;
-  dc:publisher [
-    schema:name "Example Municipality"@en ;
-    schema:url &lt;http://example.org&gt;
-  ] ;
-  dc:license &lt;http://opendefinition.org/licenses/cc-by/&gt; ;
-  dc:modified "2010-12-31"^^xsd:date ;
-  csvw:row [
-    csvw:rownum "1"^^xsd:integer ;
-    csvw:url &lt;#row=2&gt; ;
-    rel:describes &lt;http://example.org/tree-ops-ext#gid-1&gt;
-  ], [
-    csvw:rownum "2"^^xsd:integer ;
-    csvw:url &lt;#row=3&gt; ;
-    rel:describes &lt;http://example.org/tree-ops-ext#gid-2&gt;
-  ], [
-    csvw:rownum "3"^^xsd:integer ;
-    csvw:url &lt;#row=4&gt; ;
-    rel:describes &lt;http://example.org/tree-ops-ext#gid-6&gt;
-  ] .
-
-&lt;http://example.org/tree-ops-ext#gid-1&gt;
-  &lt;#on_street&gt; "ADDISON AV" ;
-  &lt;#species&gt; "Celtis australis" ;
-  &lt;#trim_cycle&gt; "Large Tree Routine Prune"@en ;
-  &lt;#dbh&gt; "11"^^xsd:integer ;
-  &lt;#inventory_date&gt; "2010-10-18"^^xsd:date ;
-  &lt;#protected&gt; false ;
-  &lt;#kml&gt; "&lt;Point&gt;&lt;coordinates&gt;-122.156485,37.440963&lt;/coordinates&gt;&lt;/Point&gt;"^^rdf:XMLLiteral .
-
-&lt;http://example.org/tree-ops-ext#gid-2&gt;
-  &lt;#on_street&gt; "EMERSON ST" ;
-  &lt;#species&gt; "Liquidambar styraciflua" ;
-  &lt;#trim_cycle&gt; "Large Tree Routine Prune"@en ;
-  &lt;#dbh&gt; "11"^^xsd:integer ;
-  &lt;#inventory_date&gt; "2010-06-02"^^xsd:date ;
-  &lt;#protected&gt; false ;
-  &lt;#kml&gt; "&lt;Point&gt;&lt;coordinates&gt;-122.156749,37.440958&lt;/coordinates&gt;&lt;/Point&gt;"^^rdf:XMLLiteral .
-
-&lt;http://example.org/tree-ops-ext#gid-6&gt;
-  &lt;#on_street&gt; "ADDISON AV" ;
-  &lt;#species&gt; "Robinia pseudoacacia" ;
-  &lt;#trim_cycle&gt; "Large Tree Routine Prune"@en ;
-  &lt;#dbh&gt; "29"^^xsd:integer ;
-  &lt;#inventory_date&gt; "2010-06-01"^^xsd:date ;
-  &lt;#comments&gt; "cavity or decay", "trunk decay", "codominant leaders", "included bark", "large leader or limb decay", "previous failure root damage", "root decay", "beware of BEES" ;
-  &lt;#protected&gt; true ;
-  &lt;#kml&gt; "&lt;Point&gt;&lt;coordinates&gt;-122.156299,37.441151&lt;/coordinates&gt;&lt;/Point&gt;"^^rdf:XMLLiteral .
+        <pre class="example highlight"
+             id="example-tree-ops-ext-standard-ttl"
+             title="http://example.org/tree-ops-ext-standard.ttl"
+             data-include="../examples/tree-ops-ext-standard.ttl"
+             data-oninclude="updateExample">
         </pre>
 
         <div class="note">
@@ -1085,79 +873,17 @@ _:68fc08e5-56a0-47e2-a784-3a644d8257c4 a csvw:TableGroup ;
         <p> 
           The input CSV+ file, published at <code>http://example.org/events-listing.csv</code>, and the associated metadata description <code>http://example.org/events-listing.csv-metadata.json</code> are provided below:
         </p>
-        <pre class="example" id="example-events-listing-csv+">
-Name, Start Date, Location Name, Location Address, Ticket Url
-B.B. King,2014-04-12T19:30,"Lupo’s Heartbreak Hotel","79 Washington St., Providence, RI",https://www.etix.com/ticket/1771656
-B.B. King,2014-04-13T20:00,"Lynn Auditorium","Lynn, MA, 01901",http://frontgatetickets.com/venue.php?id=11766
+        <pre class="example"
+             id="example-events-listing-csv+"
+             title="http://example.org/events-listing.csv"
+             data-include="../examples/events-listing.csv"
+             data-oninclude="updateExample">
         </pre>
-        <pre class="example highlight" id="example-events-listing-metadata">
-{
-  "url": "events-listing.csv",
-  "@context": ["http://www.w3.org/ns/csvw", {"@language": "en"}],
-  "tableSchema": {
-    "columns": [{
-      "name": "name",
-      "title": "Name",
-      "aboutUrl": "#event-{_row}",
-      "propertyUrl": "schema:name"
-    }, {
-      "name": "start-date",
-      "title": "Start Date",
-      "datatype": {
-        "base": "datetime",
-        "format": "yyyy-MM-ddTHH:mm"
-      },
-      "aboutUrl": "#event-{_row}",
-      "propertyUrl": "schema:startDate"
-    }, {
-      "name": "location-name",
-      "title": "Location Name",
-      "aboutUrl": "#place-{_row}",
-      "propertyUrl": "schema:name"
-    }, {
-      "name": "location-address",
-      "title": "Location Address",
-      "aboutUrl": "#place-{_row}",
-      "propertyUrl": "schema:address"
-    }, {
-      "name": "ticket-url",
-      "title": "Ticket Url",
-      "datatype": "anyURI",
-      "aboutUrl": "#offer-{_row}",
-      "propertyUrl": "schema:url"
-    }, {
-      "name": "type-event",
-      "virtual": true,
-      "aboutUrl": "#event-{_row}",
-      "propertyUrl": "rdf:type",
-      "valueUrl": "schema:MusicEvent"
-    }, {
-      "name": "type-place",
-      "virtual": true,
-      "aboutUrl": "#place-{_row}",
-      "propertyUrl": "rdf:type",
-      "valueUrl": "schema:Place"
-    }, {
-      "name": "type-offer",
-      "virtual": true,
-      "aboutUrl": "#offer-{_row}",
-      "propertyUrl": "rdf:type",
-      "valueUrl": "schema:Offer"
-    }, {
-      "name": "location",
-      "virtual": true,
-      "aboutUrl": "#event-{_row}",
-      "propertyUrl": "schema:location",
-      "valueUrl": "#place-{_row}"
-    }, {
-      "name": "offers",
-      "virtual": true,
-      "aboutUrl": "#event-{_row}",
-      "propertyUrl": "schema:offers",
-      "valueUrl": "#offer-{_row}"
-    }]
-  }
-}
+        <pre class="example highlight"
+             id="example-events-listing-metadata"
+             title="http://example.org/events-listing.csv-metadata.json"
+             data-include="../examples/events-listing.csv-metadata.json"
+             data-oninclude="updateExample">
         </pre>
 
         <div class="note">
@@ -1250,36 +976,11 @@ B.B. King,2014-04-13T20:00,"Lynn Auditorium","Lynn, MA, 01901",http://frontgatet
 
         <p><strong><a title="minimal mode">Minimal mode</a></strong> output for this example is provided in Turtle [[turtle]] syntax below:</p>
 
-        <pre class="example highlight" id="example-events-listing-minimal-ttl">
-@base &lt;http://example.org/events-listing.csv&gt; .
-@prefix schema: &lt;http://schema.org/&gt; .
-@prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .
-
-&lt;#event-1&gt; a schema:MusicEvent ;
-  schema:name "B.B. King" ;
-  schema:startDate "2014-04-12T19:30:00"^^xsd:dateTime ;
-  schema:location &lt;#place-1&gt; ;
-  schema:offer &lt;#offer-1&gt; .
-
-&lt;#place-1&gt; a schema:Place ;
-  schema:name "Lupo’s Heartbreak Hotel" ;
-  schema:address "79 Washington St., Providence, RI" .
-
-&lt;#offer-1&gt; a schema:Offer ;
-  schema:offer &lt;https://www.etix.com/ticket/1771656&gt; .
-
-&lt;#event-2&gt; a schema:MusicEvent ;
-  schema:name "B.B. King" ;
-  schema:startDate "2014-04-13T20:00:00"^^xsd:dateTime ;
-  schema:location &lt;#place-2&gt; ;
-  schema:offer &lt;#offer-2&gt; .
-
-&lt;#place-2&gt; a schema:Place ;
-  schema:name "Lynn Auditorium" ;
-  schema:address "Lynn, MA, 01901" .
-
-&lt;#offer-2&gt; a schema:Offer ;
-  schema:offer &lt;http://frontgatetickets.com/venue.php?id=11766&gt; .
+        <pre class="example highlight"
+             id="example-events-listing-minimal-ttl"
+             title="http://example.org/events-listing-minimal.ttl"
+             data-include="../examples/events-listing-minimal.ttl"
+             data-oninclude="updateExample">
         </pre>
 
         <div class="note">
@@ -1292,52 +993,11 @@ B.B. King,2014-04-13T20:00,"Lynn Auditorium","Lynn, MA, 01901",http://frontgatet
 
         <p><strong><a title="standard mode">Standard mode</a></strong> output for this example is provided in Turtle [[turtle]] syntax below:</p>
 
-        <pre class="example highlight" id="example-events-listing-standard-ttl">
-@base &lt;http://example.org/events-listing.csv&gt; .
-@prefix csvw: &lt;http://www.w3.org/ns/csvw#&gt; .
-@prefix rel: &lt;http://www.iana.org/assignments/link-relations/&gt; .
-@prefix schema: &lt;http://schema.org/&gt; .
-@prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .
-
-_:95cc7970-ce99-44b0-900c-e2c2c028bbd3 a csvw:TableGroup ;
-  csvw:table [ a csvw:Table ;
-    csvw:url &lt;http://example.org/events-listing.csv&gt; ;
-    csvw:row [
-      csvw:rownum "1"^^xsd:integer ;
-      csvw:url &lt;#row=2&gt; ;
-      rel:describes &lt;#event-1&gt;, &lt;#place-1&gt;, &lt;#offer-1&gt;
-    ], [
-      csvw:rownum "2"^^xsd:integer ;
-      csvw:url &lt;#row=3&gt; ;
-      rel:describes &lt;#event-2&gt;, &lt;#place-2&gt;, &lt;#offer-2&gt;
-    ]
-  ] .
-
-&lt;#event-1&gt; a schema:MusicEvent ;
-  schema:name "B.B. King" ;
-  schema:startDate "2014-04-12T19:30:00"^^xsd:dateTime ;
-  schema:location &lt;#place-1&gt; ;
-  schema:offer &lt;#offer-1&gt; .
-
-&lt;#place-1&gt; a schema:Place ;
-  schema:name "Lupo’s Heartbreak Hotel" ;
-  schema:address "79 Washington St., Providence, RI" .
-
-&lt;#offer-1&gt; a schema:Offer ;
-  schema:offer &lt;https://www.etix.com/ticket/1771656&gt; .
-
-&lt;#event-2&gt; a schema:MusicEvent ;
-  schema:name "B.B. King" ;
-  schema:startDate "2014-04-13T20:00:00"^^xsd:dateTime ;
-  schema:location &lt;#place-2&gt; ;
-  schema:offer &lt;#offer-2&gt; .
-
-&lt;#place-2&gt; a schema:Place ;
-  schema:name "Lynn Auditorium" ;
-  schema:address "Lynn, MA, 01901" .
-
-&lt;#offer-2&gt; a schema:Offer ;
-  schema:offer &lt;http://frontgatetickets.com/venue.php?id=11766&gt; .
+        <pre class="example highlight"
+             id="example-events-listing-standard-ttl"
+             title="http://example.org/events-listing-standard.ttl"
+             data-include="../examples/events-listing-standard.ttl"
+             data-oninclude="updateExample">
         </pre>
 
         <div class="note">
@@ -1355,149 +1015,29 @@ _:95cc7970-ce99-44b0-900c-e2c2c028bbd3 a csvw:TableGroup ;
         <p> 
           The input CSV+ files and the associated metadata description are provided below:
         </p>
-        <pre class="example" id="example-public-sector-roles-and-salaries-csv+-professions" title="http://example.org/gov.uk/professions.csv">
-Profession
-Finance
-Information Technology
-Operational Delivery
-Policy
+        <pre class="example"
+             id="example-public-sector-roles-and-salaries-csv+-professions"
+             data-include="../examples/gov.uk/professions.csv"
+             data-oninclude="updateExample"
+             title="http://example.org/gov.uk/professions.csv">
         </pre>
-        <pre class="example" id="example-public-sector-roles-and-salaries-csv+-senior-roles" title="http://example.org/senior-roles.csv">
-Post Unique Reference,Name,Grade,Job Title,Reports to Senior Post,Profession
-90115,Steve Egan,SCS1A,Deputy Chief Executive,90334,Finance
-90334,Sir Alan Langlands,SCS4,Chief Executive,xx,Policy
+        <pre class="example"
+             id="example-public-sector-roles-and-salaries-csv+-senior-roles"
+             data-include="../examples/senior-roles.csv"
+             data-oninclude="updateExample"
+             title="http://example.org/senior-roles.csv">
         </pre>
-        <pre class="example" id="example-public-sector-roles-and-salaries-csv+-junior-roles" title="http://example.org/junior-roles.csv">
-Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic Job Title,Number of Posts (FTE),Profession
-90115,4,17426,20002,Administrator,8.67,Operational Delivery
-90115,5,19546,22478,Administrator,0.5,Operational Delivery
+        <pre class="example"
+             id="example-public-sector-roles-and-salaries-csv+-junior-roles"
+             data-include="../examples/junior-roles.csv"
+             data-oninclude="updateExample"
+             title="http://example.org/junior-roles.csv">
         </pre>
-        <pre class="example highlight" id="example-public-sector-roles-and-salaries-metadata" title="http://example.org/metadata.json">
-{
-  "@type": "TableGroup",
-  "@context": ["http://www.w3.org/ns/csvw", {"@language": "en"}],
-  "resources": [{
-    "url": "professions.csv",
-    "tableSchema": {
-      "columns": [{
-        "name": "name",
-        "title": "Profession",
-        "datatype": "string",
-        "required": true
-      }],
-      "primaryKey": "name"
-    },
-    "suppressOutput": true
-  }, {
-    "url": "senior-roles.csv",
-    "tableSchema": {
-      "columns": [{
-        "name": "ref",
-        "title": "Post Unique Reference",
-        "datatype": "string",
-        "required": true,
-        "propertyUrl": "dc:identifier"
-      }, {
-        "name": "name",
-        "title": "Name",
-        "datatype": "string",
-        "propertyUrl": "foaf:name"
-      }, {
-        "name": "grade",
-        "title": "Grade",
-        "datatype": "string",
-        "propertyUrl": "http://example.org/def/grade"
-      }, {
-        "name": "job",
-        "title": "Job Title",
-        "datatype": "string",
-        "propertyUrl": "http://example.org/def/job"
-      }, {
-        "name": "reportsTo",
-        "title": "Reports to Senior Post",
-        "datatype": "string",
-        "null": "xx",
-        "propertyUrl": "http://example.org/def/reportsTo",
-        "valueUrl": "senior-roles.csv#post-{reportsTo}"
-      }, {
-        "name": "profession",
-        "title": "Profession",
-        "datatype": "string",
-        "propertyUrl": "http://example.org/def/profession"
-      }],
-      "primaryKey": "ref",
-      "aboutUrl": "#post-{ref}",
-      "foreignKeys": [{
-        "columns": "reportsTo",
-        "reference": {
-          "resource": "senior-roles.csv",
-          "columns": "ref"
-        }
-      }, {
-        "columns": "profession",
-        "reference": {
-          "resource": "professions.csv",
-          "columns": "name"
-        }
-      }]
-    }
-  }, {
-    "url": "junior-roles.csv",
-    "tableSchema": {
-      "columns": [{
-        "name": "reportsToSenior",
-        "title": "Reporting Senior Post",
-        "datatype": "string",
-        "propertyUrl": "http://example.org/def/reportsTo",
-        "valueUrl": "senior-roles.csv#post-{reportsToSenior}",
-        "required": true
-      }, {
-        "name": "grade",
-        "title": "Grade",
-        "datatype": "string",
-        "propertyUrl": "http://example.org/def/grade"
-      }, {
-        "name": "min-pay",
-        "title": "Payscale Minimum (£)",
-        "datatype": "integer",
-        "propertyUrl": "http://example.org/def/min-pay"
-      }, {
-        "name": "max-pay",
-        "title": "Payscale Maximum (£)",
-        "datatype": "integer",
-        "propertyUrl": "http://example.org/def/max-pay"
-      }, {
-        "name": "job",
-        "title": "Generic Job Title",
-        "datatype": "string",
-        "propertyUrl": "http://example.org/def/job"
-      }, {
-        "name": "number",
-        "title": "Number of Posts (FTE)",
-        "datatype": "number",
-        "propertyUrl": "http://example.org/def/number-of-posts" 
-      }, {
-        "name": "profession",
-        "title": "Profession",
-        "datatype": "string",
-        "propertyUrl": "http://example.org/def/profession"
-      }],
-      "foreignKeys": [{
-        "columns": "reportsToSenior",
-        "reference": {
-          "resource": "senior-roles.csv",
-          "columns": "ref"
-        }
-      }, {
-        "columns": "profession",
-        "reference": {
-          "resource": "professions.csv",
-          "columns": "name"
-        }
-      }]
-    }
-  }]
-}
+        <pre class="example highlight"
+             id="example-public-sector-roles-and-salaries-metadata"
+             data-include="../examples/metadata.json"
+             data-oninclude="updateExample"
+             title="http://example.org/metadata.json">
         </pre>
 
         <p class="note">In this example, the resource <code>gov.uk/professions.csv</code> is identified using a relative URL to host <code>http://example.org</code>. In reality this resource would be published centrally by government and served from some remote host. Similarly, the metadata description resource <code>metadata.json</code> would be also be centrally published. Government departments seeking to validate their role and salary data would download a copy of this metadata description and place it, without modification, in the same directory as their CSV+ files whose names MUST match those specified in the metadata description; <code>senior-roles.csv</code> and <code>junior-roles.csv</code>.</p>
@@ -1636,43 +1176,11 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
 
         <p><strong><a title="minimal mode">Minimal mode</a></strong> output for this example is provided in Turtle [[turtle]] syntax below:</p>
 
-        <pre class="example highlight" id="example-public-sector-roles-and-salaries-minimal-ttl">
-@prefix dc: &lt;http://purl.org/dc/terms/&gt; .
-@prefix foaf: &lt;http://xmlns.com/foaf/0.1/&gt; .
-@prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .
-
-&lt;http://example.org/senior-roles.csv#post-90115&gt;
-  dc:identifier "90115" ;
-  foaf:name "Steve Egan" ;
-  &lt;http://example.org/def/grade&gt; "SCS1A" ;
-  &lt;http://example.org/def/job&gt; "Deputy Chief Executive" ;
-  &lt;http://example.org/def/reportsTo&gt; &lt;http://example.org/senior-roles.csv#post-90334&gt; ;
-  &lt;http://example.org/def/profession&gt; "Finance" .
-
-&lt;http://example.org/senior-roles.csv#post-90334&gt;
-  dc:identifier "90334" ;
-  foaf:name "Sir Alan Langlands" ;
-  &lt;http://example.org/def/grade&gt; "SCS4" ;
-  &lt;http://example.org/def/job&gt; "Chief Executive" ;
-  &lt;http://example.org/def/profession&gt; "Policy" .
-
-_:d8b8e40c-8c74-458b-99f7-64d1cf5c65f2
-  &lt;http://example.org/def/reportsTo&gt; &lt;http://example.org/senior-roles.csv#post-90115&gt; ;
-  &lt;http://example.org/def/grade&gt; "4" ;
-  &lt;http://example.org/def/min-pay&gt; "17426"^^xsd:integer ;
-  &lt;http://example.org/def/max-pay&gt; "20002"^^xsd:integer ;
-  &lt;http://example.org/def/job&gt; "Administrator" ;
-  &lt;http://example.org/def/number-of-posts&gt; "8.67"^^xsd:double ;
-  &lt;http://example.org/def/profession&gt; "Operational Delivery" .
-
-_:fa1fa954-dd5f-4aa1-b2bc-20bf9867fac6
-  &lt;http://example.org/def/reportsTo&gt; &lt;http://example.org/senior-roles.csv#post-90115&gt; ;
-  &lt;http://example.org/def/grade&gt; "5" ;
-  &lt;http://example.org/def/min-pay&gt; "19546"^^xsd:integer ;
-  &lt;http://example.org/def/max-pay&gt; "22478"^^xsd:integer ;
-  &lt;http://example.org/def/job&gt; "Administrator" ;
-  &lt;http://example.org/def/number-of-posts&gt; "0.5"^^xsd:double ;
-  &lt;http://example.org/def/profession&gt; "Operational Delivery" .
+        <pre class="example highlight"
+             id="example-public-sector-roles-and-salaries-minimal-ttl"
+             title="http://example.org/public-sector-roles-and-salaries-minimal.ttl"
+             data-include="../examples/public-sector-roles-and-salaries-minimal.ttl"
+             data-oninclude="updateExample">
         </pre>
 
         <div class="note">
@@ -1683,70 +1191,11 @@ _:fa1fa954-dd5f-4aa1-b2bc-20bf9867fac6
 
         <p><strong><a title="standard mode">Standard mode</a></strong> output for this example is provided in Turtle [[turtle]] syntax below:</p>
 
-        <pre class="example highlight" id="example-public-sector-roles-and-salaries-standard-ttl">
-@prefix csvw: &lt;http://www.w3.org/ns/csvw#&gt; .
-@prefix dc: &lt;http://purl.org/dc/terms/&gt; .
-@prefix foaf: &lt;http://xmlns.com/foaf/0.1/&gt; .
-@prefix rel: &lt;http://www.iana.org/assignments/link-relations/&gt; .
-@prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .
-
-_:3d36cfbb-d2d5-4573-a1a7-3bf817062db8 a csvw:TableGroup ;
-  csvw:table [ a csvw:Table ;
-    csvw:url &lt;http://example.org/senior-roles.csv&gt; ;
-    csvw:row [
-      csvw:rownum "1"^^xsd:integer ;
-      csvw:url &lt;http://example.org/senior-roles.csv#row=2&gt; ;
-      rel:describes &lt;http://example.org/senior-roles.csv#post-90115&gt;
-    ], [
-      csvw:rownum "2"^^xsd:integer ;
-      csvw:url &lt;http://example.org/senior-roles.csv#row=3&gt; ;
-      rel:describes &lt;http://example.org/senior-roles.csv#post-90334&gt;
-    ]
-  ], [ a csvw:Table ;
-    csvw:url &lt;http://example.org/junior-roles.csv&gt; ;
-    csvw:row [
-      csvw:rownum "1"^^xsd:integer ;
-      csvw:url &lt;http://example.org/junior-roles.csv#row=2&gt; ;
-      rel:describes _:d8b8e40c-8c74-458b-99f7-64d1cf5c65f2
-    ], [
-      csvw:rownum "2"^^xsd:integer ;
-      csvw:url &lt;http://example.org/junior-roles.csv#row=3&gt; ;
-      rel:describes _:fa1fa954-dd5f-4aa1-b2bc-20bf9867fac6
-    ]
-  ] .
-
-&lt;http://example.org/senior-roles.csv#post-90115&gt;
-  dc:identifier "90115" ;
-  foaf:name "Steve Egan" ;
-  &lt;http://example.org/def/grade&gt; "SCS1A" ;
-  &lt;http://example.org/def/job&gt; "Deputy Chief Executive" ;
-  &lt;http://example.org/def/reportsTo&gt; &lt;http://example.org/senior-roles.csv#post-90334&gt; ;
-  &lt;http://example.org/def/profession&gt; "Finance" .
-
-&lt;http://example.org/senior-roles.csv#post-90334&gt;
-  dc:identifier "90334" ;
-  foaf:name "Sir Alan Langlands" ;
-  &lt;http://example.org/def/grade&gt; "SCS4" ;
-  &lt;http://example.org/def/job&gt; "Chief Executive" ;
-  &lt;http://example.org/def/profession&gt; "Policy" .
-
-_:d8b8e40c-8c74-458b-99f7-64d1cf5c65f2
-  &lt;http://example.org/def/reportsTo&gt; &lt;http://example.org/senior-roles.csv#post-90115&gt; ;
-  &lt;http://example.org/def/grade&gt; "4" ;
-  &lt;http://example.org/def/min-pay&gt; "17426"^^xsd:integer ;
-  &lt;http://example.org/def/max-pay&gt; "20002"^^xsd:integer ;
-  &lt;http://example.org/def/job&gt; "Administrator" ;
-  &lt;http://example.org/def/number-of-posts&gt; "8.67"^^xsd:double ;
-  &lt;http://example.org/def/profession&gt; "Operational Delivery" .
-
-_:fa1fa954-dd5f-4aa1-b2bc-20bf9867fac6
-  &lt;http://example.org/def/reportsTo&gt; &lt;http://example.org/senior-roles.csv#post-90115&gt; ;
-  &lt;http://example.org/def/grade&gt; "5" ;
-  &lt;http://example.org/def/min-pay&gt; "19546"^^xsd:integer ;
-  &lt;http://example.org/def/max-pay&gt; "22478"^^xsd:integer ;
-  &lt;http://example.org/def/job&gt; "Administrator" ;
-  &lt;http://example.org/def/number-of-posts&gt; "0.5"^^xsd:double ;
-  &lt;http://example.org/def/profession&gt; "Operational Delivery" .
+        <pre class="example highlight"
+             id="example-public-sector-roles-and-salaries-standard-ttl"
+             title="http://example.org/public-sector-roles-and-salaries-standard.ttl"
+             data-include="../examples/public-sector-roles-and-salaries-standard.ttl"
+             data-oninclude="updateExample">
         </pre>
 
         <div class="note">

@@ -60,6 +60,13 @@ var respecConfig = {
     noLegacyStyle: false
     };
     </script>
+    <script class="remove">
+    function escapeContent(doc, content) {
+          var utils = require("core/utils");
+    // perform transformations to make it render and prettier
+      return utils.xmlEscape(content);
+    }
+    </script>
     <style type="text/css">
       .grammar td { font-family: monospace; vertical-align: top; }
       .grammar-literal { color: gray;}
@@ -1041,10 +1048,10 @@ Content-Type: text/csv;header=absent
           <p>
             A simple CSV file that complies to the constraints described in <a href="#syntax" class="sectionRef"></a>, at <code>http://example.org/tree-ops.csv</code>, might look like:
           </p>
-          <pre class="example" title="Simple CSV file">
-GID,On Street,Species,Trim Cycle,Inventory Date
-1,ADDISON AV,Celtis australis,Large Tree Routine Prune,10/18/2010
-2,EMERSON ST,Liquidambar styraciflua,Large Tree Routine Prune,6/2/2010
+          <pre class="example"
+               title="http://example.org/tree-ops.csv"
+               data-include="../examples/tree-ops.csv"
+               data-oninclude="updateExample">
           </pre>
           <p>
             Parsing this file results in an <a>annotated tabular data model</a> of a single <a>table</a> <var>T</var> with five columns and two rows. The columns have the annotations shown in the following table:
@@ -1063,7 +1070,7 @@ GID,On Street,Species,Trim Cycle,Inventory Date
             </tbody>
           </table>
           <p>The extracted <a>embedded metadata</a>, as defined in [[!tabular-metadata]], would look like:</p>
-          <pre class="highlight">
+          <pre class="example highlight" title="tree-ops.csv Embedded Metadata">
 {
   "@type": "Table",
   "url": "http://example.org/tree-ops.csv",
@@ -1238,53 +1245,11 @@ data.parse({
           	<p>
           		A similar set of annotations could be provided through a metadata file, located as discussed in <a href="#locating-metadata" class="sectionRef"></a> and defined in [[!tabular-metadata]]. For example, this might look like:
           	</p>
-      			<pre class="example highlight" title="Metadata file">
-{
-  "@context": ["http://www.w3.org/ns/csvw", {"@language": "en"}],
-  "url": "tree-ops.csv",
-  "dc:title": "Tree Operations",
-  "dc:keywords": ["tree", "street", "maintenance"],
-  "dc:publisher": [{
-    "schema:name": "Example Municipality",
-    "schema:url": {"@id": "http://example.org"}
-  }],
-  "dc:license": {"@id": "http://opendefinition.org/licenses/cc-by/"},
-  "dc:modified": {"@value": "2010-12-31", "@type": "date"},
-  "tableSchema": {
-    "columns": [{
-      "name": "GID",
-      "title": [
-        "GID",
-        "Generic Identifier"
-      ],
-      "dc:description": "An identifier for the operation on a tree.",
-      "datatype": "string",
-      "required": true
-    }, {
-      "name": "on_street",
-      "title": "On Street",
-      "dc:description": "The street that the tree is on.",
-      "datatype": "string"
-    }, {
-      "name": "species",
-      "title": "Species",
-      "dc:description": "The species of the tree.",
-      "datatype": "string"
-    }, {
-      "name": "trim_cycle",
-      "title": "Trim Cycle",
-      "dc:description": "The operation performed on the tree.",
-      "datatype": "string"
-    }, {
-      "name": "inventory_date",
-      "title": "Inventory Date",
-      "dc:description": "The date of the operation that was performed.",
-      "datatype": {"base": "date", "format": "M/d/yyyy"}
-    }],
-    "primaryKey": "GID"
-  }
-}
-			      </pre>
+            <pre class="example highlight"
+                 title="http://example.org/tree-ops.csv-metadata.json"
+                 data-include="../examples/tree-ops.csv-metadata.json"
+                 data-oninclude="updateExample">
+            </pre>
           	<p>
           		The <a>annotated tabular data model</a> generated from this would be more sophisticated again. The <a>table</a> itself would have the following annotations:
           	</p>
