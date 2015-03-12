@@ -36,7 +36,8 @@ var localBibliography = {
   "csv2rdf": {
       "authors": [
         "Jeremy Tandy",
-        "Ivan Herman"
+        "Ivan Herman",
+        "Gregg Kellogg"
       ],
       "title": "Generating RDF from Tabular Data on the Web",
       "href" : "http://www.w3.org/TR/2015/WD-csv2rdf-20150108/",
