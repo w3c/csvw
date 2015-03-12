@@ -7,11 +7,13 @@
     "dc11": "http://purl.org/dc/elements/1.1/",
     "dcat": "http://www.w3.org/ns/dcat#",
     "dcterms": "http://purl.org/dc/terms/",
+    "dctypes": "http://purl.org/dc/dcmitype/",
     "foaf": "http://xmlns.com/foaf/0.1/",
     "gr": "http://purl.org/goodrelations/v1#",
     "grddl": "http://www.w3.org/2003/g/data-view#",
     "ical": "http://www.w3.org/2002/12/cal/icaltzd#",
     "ma": "http://www.w3.org/ns/ma-ont#",
+    "oa": "http://www.w3.org/ns/oa#",
     "og": "http://ogp.me/ns#",
     "org": "http://www.w3.org/ns/org#",
     "owl": "http://www.w3.org/2002/07/owl#",
@@ -88,10 +90,12 @@
     "unsignedLong": "xsd:unsignedLong",
     "unsignedShort": "xsd:unsignedShort",
     "yearMonthDuration": "xsd:yearMonthDuration",
+    "Cell": "csvw:Cell",
     "Column": "csvw:Column",
     "Datatype": "csvw:Datatype",
     "Dialect": "csvw:Dialect",
     "Direction": "csvw:Direction",
+    "Row": "csvw:Row",
     "Schema": "csvw:Schema",
     "Table": "csvw:Table",
     "TableGroup": "csvw:TableGroup",
@@ -124,6 +128,9 @@
     "default": {
       "@id": "csvw:default",
       "@language": null
+    },
+    "describes": {
+      "@id": "csvw:describes"
     },
     "delimiter": {
       "@id": "csvw:delimiter",
@@ -243,6 +250,7 @@
     },
     "row": {
       "@id": "csvw:row",
+      "@type": "@id",
       "@container": "@set"
     },
     "rownum": {
@@ -408,13 +416,23 @@
     },
     "rdfs_classes": [
       {
+        "@id": "csvw:Cell",
+        "@type": "rdfs:Class",
+        "rdfs:label": {
+          "en": "Cell"
+        },
+        "rdfs:comment": {
+          "en": "A Cell represents a cell at the intersection of a Row and a Column within a Table."
+        }
+      },
+      {
         "@id": "csvw:Column",
         "@type": "rdfs:Class",
         "rdfs:label": {
           "en": "Column Description"
         },
         "rdfs:comment": {
-          "en": "A Column Description describes a single column."
+          "en": "A Column represents a vertical arrangement of Cells within a Table."
         }
       },
       {
@@ -448,6 +466,16 @@
         }
       },
       {
+        "@id": "csvw:Row",
+        "@type": "rdfs:Class",
+        "rdfs:label": {
+          "en": "Row"
+        },
+        "rdfs:comment": {
+          "en": "A Row represents a horizontal arrangement of cells within a Table."
+        }
+      },
+      {
         "@id": "csvw:Schema",
         "@type": "rdfs:Class",
         "rdfs:label": {
@@ -461,20 +489,20 @@
         "@id": "csvw:Table",
         "@type": "rdfs:Class",
         "rdfs:label": {
-          "en": "Table Description"
+          "en": "Annotated Table"
         },
         "rdfs:comment": {
-          "en": "A Table describes an Annotated Table."
+          "en": "An annotated table is a table that is annotated with additional metadata."
         }
       },
       {
         "@id": "csvw:TableGroup",
         "@type": "rdfs:Class",
         "rdfs:label": {
-          "en": "Table Group Description"
+          "en": "Group of Tables"
         },
         "rdfs:comment": {
-          "en": "A Table Group describes an Annotated Table Group."
+          "en": "A Group of Tables comprises a set of Annotated Tables and a set of annotations that relate to those Tables."
         }
       },
       {
@@ -593,6 +621,17 @@
           ]
         },
         "rdfs:range": "xsd:string"
+      },
+      {
+        "@id": "csvw:describes",
+        "@type": "rdf:Property",
+        "rdfs:label": {
+          "en": "describes"
+        },
+        "rdfs:comment": {
+          "en": "From IANA describes: The relationship A 'describes' B asserts that resource A provides a description of resource B. There are no constraints on the format or representation of either A or B, neither are there any further constraints on either resource."
+        },
+        "rdfs:domain": "csvw:Row"
       },
       {
         "@id": "csvw:delimiter",
@@ -984,7 +1023,8 @@
           "en": "Relates a Table to each Row output."
         },
         "rdfs:subPropertyOf": "rdfs:member",
-        "rdfs:domain": "csvw:Table"
+        "rdfs:domain": "csvw:Table",
+        "rdfs:range": "csvw:Row"
       },
       {
         "@id": "csvw:rownum",

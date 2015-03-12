@@ -335,41 +335,47 @@ var respecConfig = {
                       </li>
                       <li>
                         <p>Each <a>cell</a> referring to <a>subject</a> <var>i</var> is then processed sequentially according to the order of the <a title="column">columns</a> (e.g. <var>1</var> to <var>n</var>).</p>
-                        <p>For each <a>cell</a> referring to <a>subject</a> <var>i</var>, where the value of property <a href="http://www.w3.org/TR/tabular-metadata/#column-suppressOutput"><code>suppressOutput</code></a> for the <a>column</a> associated with that <a>cell</a> is not <var>true</var>, insert a name-value pair into <a>object</a> <var>S<sub>i</sub></var> as described below.</p>
-                        <p><a title="name">Name</a> <var>N</var> is determined from the <a>propertyUrl</a> property of the current <a>cell</a>.</p>
-                        <p>If the value of <a>propertyUrl</a> for the <a>cell</a> has not been explicitly specified in the metadata description (e.g. the value of <a>propertyUrl</a> is a concatenation of the CSV+ file <var>URL</var>, <code>#</code> (<code>U+0023</code>) and the value of the <a href="http://www.w3.org/TR/tabular-metadata/#column-name"><code>name</code></a> property for the column associated with the <a>cell</a>), then <a>name</a> <var>N</var> MUST take the value of the only the fragment identifier of <a>propertyUrl</a>.</p>
-                        <p>Else, <a>name</a> <var>N</var> MUST take the entire value of <a>propertyUrl</a>.</p>
+                        <p>For each <a>cell</a> referring to <a>subject</a> <var>i</var>, where the value of property <a href="http://www.w3.org/TR/tabular-metadata/#column-suppressOutput"><code>suppressOutput</code></a> for the <a>column</a> associated with that <a>cell</a> is not <var>true</var>, insert a name-value pair into <a>object</a> <var>S<sub>i</sub></var> as described below:</p>
+                        <ol class="algorithm">
+                          <li>
+                            <p>If the value of <a>propertyUrl</a> for the <a>cell</a> is not <code>null</code>, then <a>name</a> <var>N</var> takes the value of <a>propertyUrl</a>.</p>
+                            <p>Else, <a>name</a> <var>N</var> takes the value of the <a href="http://www.w3.org/TR/tabular-metadata/#column-name"><code>name</code></a> property for the column associated with the <a>cell</a>.</p>
+                          </li>
+                          <li>
+                            <p>If the <a>valueUrl</a> for the current <a>cell</a> is not <code>null</code>, then insert the following name-value pair into <a>object</a> <var>S<sub>i</sub></var>:</p>
+                            <dl class="nvp">
+                              <dt>name</dt>
+                              <dd><var>N</var></dd>
+                              <dt>value</dt>
+                              <dd><var>V<sub>url</sub></var></dd>
+                            </dl>
+                            <p>where <var>V<sub>url</sub></var> is the value of <a>valueUrl</a> property for the current <a>cell</a>, is expressed as a string in the JSON output.</p>
+                          </li>
+                          <li>
+                            <p>Else, if the <a>cell</a> specifies a <a href="http://www.w3.org/TR/tabular-metadata/#cell-separator"><code>separator</code></a> property and the <a>cell value</a> is not an empty sequence, then the <a>cell value</a> provides a sequence of values for inclusion within the JSON output; insert an <a>array</a> <var>A<sub>v</sub></var> containing each value <var>V</var> of the sequence into <a>object</a> <var>S<sub>i</sub></var>:</p>
+                            <dl class="nvp">
+                              <dt>name</dt>
+                              <dd><var>N</var></dd>
+                              <dt>value</dt>
+                              <dd><var>A<sub>v</sub></var></dd>
+                            </dl>
+                            <p class="note">Since <a title="array">arrays</a> are implicitly <em>ordered</em> in JSON, the <a href="http://www.w3.org/TR/tabular-metadata/#cell-ordered"><code>ordered</code></a> property, if specified, has no effect on the JSON output.</p>
+                          </li>
+                          <li>
+                            <p>Else, if the <a>cell value</a> is not <code>null</code>, then the <a>cell value</a> provides a single value <var>V</var> for inclusion within the JSON output; insert the following name-value pair into <a>object</a> <var>S<sub>i</sub></var>:</p>
+                            <dl class="nvp">
+                              <dt>name</dt>
+                              <dd><var>N</var></dd>
+                              <dt>value</dt>
+                              <dd><var>V</var></dd>
+                            </dl>
 
-                        <p class="issue" data-number="298">Should JSON output truncate the propertyUrl in cases where propertyUrl is not specifically defined?</p>
+                            <p>Value <var>V</var> derived from the <a title="cell value">cell values</a> MUST be expressed in the JSON output according to the <a href="http://www.w3.org/TR/tabular-metadata/#cell-datatype"><code>datatype</code></a> property of the cell as defined below: <a href="#datatypes">Interpreting datatypes</a>.</p> 
+                          </li>
+                        </ol>
 
-                        <p>If the <a>valueUrl</a> for the current <a>cell</a> is not <code>null</code>, then insert the following name-value pair into <a>object</a> <var>S<sub>i</sub></var>:</p>
-                        <dl class="nvp">
-                          <dt>name</dt>
-                          <dd><var>N</var></dd>
-                          <dt>value</dt>
-                          <dd><var>V<sub>url</sub></var></dd>
-                        </dl>
-                        <p>where <var>V<sub>url</sub></var> is the value of <a>valueUrl</a> property for the current <a>cell</a>, is expressed as a string in the JSON output.</p>
-
-                        <p>Else, if the <a>cell</a> specifies a <a href="http://www.w3.org/TR/tabular-metadata/#cell-separator"><code>separator</code></a> property and the <a>cell value</a> is not an empty sequence, then the <a>cell value</a> provides a sequence of values for inclusion within the JSON output; insert an <a>array</a> <var>A<sub>v</sub></var> containing each value <var>V</var> of the sequence into <a>object</a> <var>S<sub>i</sub></var>:</p>
-                        <dl class="nvp">
-                          <dt>name</dt>
-                          <dd><var>N</var></dd>
-                          <dt>value</dt>
-                          <dd><var>A<sub>v</sub></var></dd>
-                        </dl>
-                        <p class="note">Since <a title="array">arrays</a> are implicitly <em>ordered</em> in JSON, the <a href="http://www.w3.org/TR/tabular-metadata/#cell-ordered"><code>ordered</code></a> property, if specified, has no effect on the JSON output.</p>
-
-                        <p>Else, if the <a>cell value</a> is not <code>null</code>, then the <a>cell value</a> provides a single value <var>V</var> for inclusion within the JSON output; insert the following name-value pair into <a>object</a> <var>S<sub>i</sub></var>:</p>
-                        <dl class="nvp">
-                          <dt>name</dt>
-                          <dd><var>N</var></dd>
-                          <dt>value</dt>
-                          <dd><var>V</var></dd>
-                        </dl>
-
-                        <p>Value <var>V</var> derived from the <a title="cell value">cell values</a> MUST be expressed in the JSON output according to the <a href="http://www.w3.org/TR/tabular-metadata/#cell-datatype"><code>datatype</code></a> property of the cell as defined below: <a href="#datatypes">Interpreting datatypes</a>.</p> 
                         <p class="note">In the case where a sequence of values is provided, the <code>datatype</code> applies to all members of the sequence.</p>
+                        
                       </li>
                     </ol>
                   </li>
@@ -472,11 +478,11 @@ var respecConfig = {
         <p>
           This example comprises a single <a>annotated table</a> containing information attributes about countries; country code, position (latitude, longitude) and name. Whilst the input CSV+ file, published at <code>http://example.org/countries.csv</code>, includes a <a href="http://www.w3.org/TR/tabular-data-model/#dfn-header-line" class="externalDFN">header line</a>, no further metadata annotations are given. The CSV+ file is provided below:
         </p>
-        <pre class="example" id="example-countries-csv+">
-countryCode,latitude,longitude,name
-AD,42.546245,1.601554,Andorra
-AE,23.424076,53.847818,"United Arab Emirates"
-AF,33.93911,67.709953,Afghanistan
+        <pre class="example"
+             id="example-countries-csv+"
+             title="http://example.org/countries.csv"
+             data-include="../examples/countries.csv"
+             data-oninclude="updateExample">
         </pre>
 
         <p>The <a>annotated table</a> generated from parsing the CSV+ file is shown below and provides the basis for the conversion to JSON.</p>
@@ -550,23 +556,11 @@ AF,33.93911,67.709953,Afghanistan
 
         <p><strong><a title="minimal mode">Minimal mode</a></strong> output for this example is provided below:</p>
 
-        <pre class="example highlight" id="example-countries-minimal-json">
-[{ 
-  "countryCode": "AD", 
-  "latitude": "42.546245", 
-  "longitude": "1.601554", 
-  "name": "Andorra" 
-}, { 
-  "countryCode": "AE", 
-  "latitude": "23.424076", 
-  "longitude": "53.847818", 
-  "name": "United Arab Emirates" 
-}, { 
-  "countryCode": "AF", 
-  "latitude": "33.93911", 
-  "longitude": "67.709953", 
-  "name": "Afghanistan" 
-}]
+        <pre class="example highlight"
+             id="example-countries-minimal-json"
+             title="http://example.org/countries-minimal.json"
+             data-include="../examples/countries-minimal.json"
+             data-oninclude="updateExample">
         </pre>
 
         <div class="note">
@@ -576,40 +570,11 @@ AF,33.93911,67.709953,Afghanistan
 
         <p><strong><a title="standard mode">Standard mode</a></strong> output for this example is provided below:</p>
 
-        <pre class="example highlight" id="example-countries-standard-json">
-{
-  "table": [{
-    "url": "http://example.org/countries.csv",
-    "row": [{
-      "rownum": 1,
-      "url": "http://example.org/countries.csv#row=2",
-      "describes": [{ 
-        "countryCode": "AD", 
-        "latitude": "42.546245", 
-        "longitude": "1.601554", 
-        "name": "Andorra" 
-      }]
-    }, {
-      "rownum": 2,
-      "url": "http://example.org/countries.csv#row=3",
-      "describes": [{ 
-        "countryCode": "AE", 
-        "latitude": "23.424076", 
-        "longitude": "53.847818", 
-        "name": "United Arab Emirates"
-      }]
-    }, {
-      "rownum": 3,
-      "url": "http://example.org/countries.csv#row=4",
-      "describes": [{  
-        "countryCode": "AF", 
-        "latitude": "33.93911", 
-        "longitude": "67.709953", 
-        "name": "Afghanistan" 
-      }]
-    }]
-  }]
-}
+        <pre class="example highlight"
+             id="example-countries-standard-json"
+             title="http://example.org/countries-standard.json"
+             data-include="../examples/countries-standard.json"
+             data-oninclude="updateExample">
         </pre>
 
         <div class="note">
@@ -625,85 +590,20 @@ AF,33.93911,67.709953,Afghanistan
         <p>
           This example is based on <a href="http://www.w3.org/TR/csvw-ucr/#UC-PaloAltoTreeData">Use Case #11 - City of Palo Alto Tree Data</a> and comprises a single <a>annotated table</a> describing an inventory of tree maintenance operations. The input CSV+ file, published at <code>http://example.org/tree-ops-ext.csv</code>, and the associated metadata description <code>http://example.org/tree-ops-ext.csv-metadata.json</code> are provided below:
         </p>
-        <pre class="example" id="example-tree-ops-ext-csv+">
-GID,On Street,Species,Trim Cycle,Diameter at Breast Ht,Inventory Date,Comments,Protected,KML
-1,ADDISON AV,Celtis australis,Large Tree Routine Prune,11,10/18/2010,,,"&lt;Point&gt;&lt;coordinates&gt;-122.156485,37.440963&lt;/coordinates&gt;&lt;/Point&gt;"
-2,EMERSON ST,Liquidambar styraciflua,Large Tree Routine Prune,11,6/2/2010,,,"&lt;Point&gt;&lt;coordinates&gt;-122.156749,37.440958&lt;/coordinates&gt;&lt;/Point&gt;"
-6,ADDISON AV,Robinia pseudoacacia,Large Tree Routine Prune,29,6/1/2010,cavity or decay; trunk decay; codominant leaders; included bark; large leader or limb decay; previous failure root damage; root decay;  beware of BEES,YES,"&lt;Point&gt;&lt;coordinates&gt;-122.156299,37.441151&lt;/coordinates&gt;&lt;/Point&gt;"
+        <pre class="example"
+             id="example-tree-ops-ext-csv+"
+             title="http://example.org/tree-ops-ext.csv"
+             data-include="../examples/tree-ops-ext.csv"
+             data-oninclude="updateExample">
         </pre>
-        <pre class="example highlight" id="example-tree-ops-ext-metadata">
-{
-  "url": "tree-ops-ext.csv",
-  "@context": ["http://www.w3.org/ns/csvw", {"@language": "en"}],
-  "@id": "http://example.org/tree-ops-ext",
-  "dc:title": "Tree Operations",
-  "dc:keywords": ["tree", "street", "maintenance"],
-  "dc:publisher": [{
-    "schema:name": "Example Municipality",
-    "schema:url": "http://example.org"
-  }],
-  "dc:license": {"@id": "http://opendefinition.org/licenses/cc-by/"},
-  "dc:modified": {"@value": "2010-12-31", "@type": "xsd:date"},
-  "tableSchema": {
-    "columns": [{
-      "name": "GID",
-      "title": [
-        "GID",
-        "Generic Identifier"
-      ],
-      "dc:description": "An identifier for the operation on a tree.",
-      "datatype": "string",
-      "required": true, 
-      "suppressOutput": true
-    }, {
-      "name": "on_street",
-      "title": "On Street",
-      "dc:description": "The street that the tree is on.",
-      "datatype": "string"
-    }, {
-      "name": "species",
-      "title": "Species",
-      "dc:description": "The species of the tree.",
-      "datatype": "string"
-    }, {
-      "name": "trim_cycle",
-      "title": "Trim Cycle",
-      "dc:description": "The operation performed on the tree.",
-      "datatype": "string",
-      "lang": "en"
-    }, {
-      "name": "dbh",
-      "title": "Diameter at Breast Ht",
-      "dc:description": "Diameter at Breast Height (DBH) of the tree (in feet), measured 4.5ft above ground.",
-      "datatype": "integer"
-    }, {
-      "name": "inventory_date",
-      "title": "Inventory Date",
-      "dc:description": "The date of the operation that was performed.",
-      "datatype": {"base": "date", "format": "M/d/yyyy"}
-    }, {
-      "name": "comments",
-      "title": "Comments",
-      "dc:description": "Supplementary comments relating to the operation or tree.",
-      "datatype": "string",
-      "separator": ";"
-    }, {
-      "name": "protected",
-      "title": "Protected",
-      "dc:description": "Indication (YES / NO) whether the tree is subject to a protection order.",
-      "datatype": {"base": "boolean", "format": "YES|NO"},
-      "default": "NO"
-    }, {
-      "name": "kml",
-      "title": "KML",
-      "dc:description": "KML-encoded description of tree location.",
-      "datatype": "xml"
-    }],
-    "primaryKey": "GID",
-    "aboutUrl": "http://example.org/tree-ops-ext#gid-{GID}"
-  }
-}
+        <pre class="example highlight"
+             id="example-tree-ops-ext-metadata"
+             title="http://example.org/tree-ops-ext.csv-metadata.json"
+             data-include="../examples/tree-ops-ext.csv-metadata.json"
+             data-oninclude="updateExample">
         </pre>
+
+        <p class="note">The <code>notes</code> annotation in the metadata description uses the <a href="http://www.openannotation.org/spec/core/">Open Annotation data model</a> currently under development within the <a href="http://www.w3.org/annotation/">Web Annotations Working Group</a>. This is purely illustrative; no constraints are placed on the value of the <code>notes</code> annotation.</p>
 
         <p>The <a>annotated table</a> generated from parsing the CSV+ file and associated metadata is shown below and provides the basis for the conversion to JSON.</p>
 
@@ -718,12 +618,17 @@ GID,On Street,Species,Trim Cycle,Diameter at Breast Ht,Inventory Date,Comments,P
             <tr><td><var>T</var></td><td><code>http://example.org/tree-ops-ext.csv</code></td><td><var>C1</var>, <var>C2</var>, <var>C3</var>, <var>C4</var>, <var>C5</var>, <var>C6</var>, <var>C7</var>, <var>C8</var>, <var>C9</var></td><td><var>R1</var>, <var>R2</var>, <var>R3</var></td><td><strong><code>@id</code></strong></td><td><code>&lt;http://example.org/tree-ops-ext&gt;</code></td></tr>
             <tr><td></td><td></td><td></td><td></td><td><strong><code>dc:title</code></strong></td><td><code>"Tree Operations"</code></td></tr>
             <tr><td></td><td></td><td></td><td></td><td><strong><code>dc:keywords</code></strong></td><td><code>["tree", "street", "maintenance"]</code></td></tr>
-            <tr><td></td><td></td><td></td><td></td><td><strong><code>dc:publisher</code></strong></td><td><code>[{ "schema:name": "Example Municipality", "schema:url": "http://example.org" }]</code></td></tr>
+            <tr><td></td><td></td><td></td><td></td><td><strong><code>dc:publisher</code></strong></td><td><code>[{ "schema:name": "Example Municipality", "schema:url": { "@id": "http://example.org" } }]</code></td></tr>
             <tr><td></td><td></td><td></td><td></td><td><strong><code>dc:license</code></strong></td><td><code>&lt;http://opendefinition.org/licenses/cc-by/&gt;</code></td></tr>
             <tr><td></td><td></td><td></td><td></td><td><strong><code>dc:modified</code></strong></td><td><code>"2010-12-31"</code></td></tr>
+            <tr><td></td><td></td><td></td><td></td><td><strong><code>notes</code></strong></td><td><code>[{ "@type": "oa:Annotation", ... }]</code></td></tr>
             <tr><td></td><td></td><td></td><td></td><td><strong><code>primaryKey</code></strong></td><td><var>C1</var></td></tr>
           </tbody>
         </table>
+
+        <div class="note">
+          <p>The value of the <code>notes</code> annotation has been shortened for clarity in the table above.
+        </div>
 
         <p>Annotations for the <a title="column">columns</a>, <a title="row">rows</a> and <a title="cell">cells</a> in <a title="annotated table">table</a> <var>T</var> are shown in the tables below.</p>
 
@@ -804,43 +709,11 @@ GID,On Street,Species,Trim Cycle,Diameter at Breast Ht,Inventory Date,Comments,P
 
         <p><strong><a title="minimal mode">Minimal mode</a></strong> output for this example is provided below:</p>
 
-        <pre class="example highlight" id="example-tree-ops-ext-minimal-json">
-[{
-  "@id": "http://example.org/tree-ops-ext#gid-1",
-  "on_street": "ADDISON AV",
-  "species": "Celtis australis",
-  "trim_cycle": "Large Tree Routine Prune",
-  "dbh": 11,
-  "inventory_date": "2010-10-18",
-  "protected": false,
-  "kml": "&lt;Point&gt;&lt;coordinates&gt;-122.156485,37.440963&lt;/coordinates&gt;&lt;/Point&gt;"
-}, {
-  "@id": "http://example.org/tree-ops-ext#gid-2",
-  "on_street": "EMERSON ST",
-  "species": "Liquidambar styraciflua",
-  "trim_cycle": "Large Tree Routine Prune",
-  "dbh": 11,
-  "inventory_date": "2010-06-02",
-  "protected": false,
-  "kml": "&lt;Point&gt;&lt;coordinates&gt;-122.156749,37.440958&lt;/coordinates&gt;&lt;/Point&gt;"
-}, {
-  "@id": "http://example.org/tree-ops-ext#gid-6",
-  "on_street": "ADDISON AV",
-  "species": "Robinia pseudoacacia",
-  "trim_cycle": "Large Tree Routine Prune",
-  "dbh": 29,
-  "inventory_date": "2010-06-01",
-  "comments": [ "cavity or decay", 
-    "trunk decay", 
-    "codominant leaders", 
-    "included bark",
-    "large leader or limb decay", 
-    "previous failure root damage", 
-    "root decay", 
-    "beware of BEES" ],
-  "protected": true,
-  "kml": "&lt;Point&gt;&lt;coordinates&gt;-122.156299,37.441151&lt;/coordinates&gt;&lt;/Point&gt;"
-}]
+        <pre class="example highlight"
+             id="example-tree-ops-ext-minimal-json"
+             title="http://example.org/tree-ops-ext-minimal.json"
+             data-include="../examples/tree-ops-ext-minimal.json"
+             data-oninclude="updateExample">
         </pre>
 
         <div class="note">
@@ -852,73 +725,16 @@ GID,On Street,Species,Trim Cycle,Diameter at Breast Ht,Inventory Date,Comments,P
 
         <p><strong><a title="standard mode">Standard mode</a></strong> output for this example is provided below:</p>
 
-        <pre class="example highlight" id="example-tree-ops-ext-standard-json">
-{
-  "table": [{
-    "@id": "http://example.org/tree-ops-ext",
-    "url": "http://example.org/tree-ops-ext.csv",
-    "dc:title": "Tree Operations",
-    "dc:keywords": [ "tree", "street", "maintenance" ],
-    "dc:publisher": [{
-      "schema:name": "Example Municipality",
-      "schema:url": "http://example.org"
-    }],
-    "dc:license": "http://opendefinition.org/licenses/cc-by/",
-    "dc:modified": "2010-12-31",
-    "row": [{
-      "rownum": 1,
-      "url": "http://example.org/tree-ops-ext.csv#row=2",
-      "describes": [{ 
-        "@id": "http://example.org/tree-ops-ext#gid-1",
-        "on_street": "ADDISON AV",
-        "species": "Celtis australis",
-        "trim_cycle": "Large Tree Routine Prune",
-        "dbh": 11,
-        "inventory_date": "2010-10-18",
-        "protected": false,
-        "kml": "&lt;Point&gt;&lt;coordinates&gt;-122.156485,37.440963&lt;/coordinates&gt;&lt;/Point&gt;"
-      }]
-    }, {
-      "rownum": 2,
-      "url": "http://example.org/tree-ops-ext.csv#row=3",
-      "describes": [{ 
-        "@id": "http://example.org/tree-ops-ext#gid-2",
-        "on_street": "EMERSON ST",
-        "species": "Liquidambar styraciflua",
-        "trim_cycle": "Large Tree Routine Prune",
-        "dbh": 11,
-        "inventory_date": "2010-06-02",
-        "protected": false,
-        "kml": "&lt;Point&gt;&lt;coordinates&gt;-122.156749,37.440958&lt;/coordinates&gt;&lt;/Point&gt;"
-      }]
-    }, {
-      "rownum": 3,
-      "url": "http://example.org/tree-ops-ext.csv#row=4",
-      "describes": [{  
-        "@id": "http://example.org/tree-ops-ext#gid-6",
-        "on_street": "ADDISON AV",
-        "species": "Robinia pseudoacacia",
-        "trim_cycle": "Large Tree Routine Prune",
-        "dbh": 29,
-        "inventory_date": "2010-06-01",
-        "comments": [ "cavity or decay", 
-          "trunk decay", 
-          "codominant leaders", 
-          "included bark",
-          "large leader or limb decay", 
-          "previous failure root damage", 
-          "root decay", 
-          "beware of BEES" ],
-        "protected": true,
-        "kml": "&lt;Point&gt;&lt;coordinates&gt;-122.156299,37.441151&lt;/coordinates&gt;&lt;/Point&gt;"
-      }]
-    }]
-  }]
-}
+        <pre class="example highlight"
+             id="example-tree-ops-ext-standard-json"
+             title="http://example.org/tree-ops-ext-standard.json"
+             data-include="../examples/tree-ops-ext-standard.json"
+             data-oninclude="updateExample">
         </pre>
 
         <div class="note">
           <p><a title="annotated table">Table</a> <var>T</var> (<code>{ "url": "http://example.org/tree-ops-ext.csv"}</code>) has been explicitly identified: <code>{ "@id": "&lt;http://exmple.org/tree-ops-ext&gt;"}</code>.</p>
+          <p><a title="common properties">Common properties</a> and <a>notes</a> specified for <a title="annotated table">table</a> <var>T</var> (<code>{ "url": "http://example.org/tree-ops-ext.csv"}</code>) are included in the output.</p>
         </div>
 
       </section>
@@ -931,79 +747,17 @@ GID,On Street,Species,Trim Cycle,Diameter at Breast Ht,Inventory Date,Comments,P
         <p> 
           The input CSV+ file, published at <code>http://example.org/events-listing.csv</code>, and the associated metadata description <code>http://example.org/events-listing.csv-metadata.json</code> are provided below:
         </p>
-        <pre class="example" id="example-events-listing-csv+">
-Name, Start Date, Location Name, Location Address, Ticket Url
-B.B. King,2014-04-12T19:30,"Lupo’s Heartbreak Hotel","79 Washington St., Providence, RI",https://www.etix.com/ticket/1771656
-B.B. King,2014-04-13T20:00,"Lynn Auditorium","Lynn, MA, 01901",http://frontgatetickets.com/venue.php?id=11766
+        <pre class="example"
+             id="example-events-listing-csv+"
+             title="http://example.org/events-listing.csv"
+             data-include="../examples/events-listing.csv"
+             data-oninclude="updateExample">
         </pre>
-        <pre class="example highlight" id="example-events-listing-metadata">
-{
-  "url": "events-listing.csv",
-  "@context": ["http://www.w3.org/ns/csvw", {"@language": "en"}],
-  "tableSchema": {
-    "columns": [{
-      "name": "name",
-      "title": "Name",
-      "aboutUrl": "#event-{_row}",
-      "propertyUrl": "schema:name"
-    }, {
-      "name": "start-date",
-      "title": "Start Date",
-      "datatype": {
-        "base": "datetime",
-        "format": "yyyy-MM-ddTHH:mm"
-      },
-      "aboutUrl": "#event-{_row}",
-      "propertyUrl": "schema:startDate"
-    }, {
-      "name": "location-name",
-      "title": "Location Name",
-      "aboutUrl": "#place-{_row}",
-      "propertyUrl": "schema:name"
-    }, {
-      "name": "location-address",
-      "title": "Location Address",
-      "aboutUrl": "#place-{_row}",
-      "propertyUrl": "schema:address"
-    }, {
-      "name": "ticket-url",
-      "title": "Ticket Url",
-      "datatype": "anyURI",
-      "aboutUrl": "#offer-{_row}",
-      "propertyUrl": "schema:url"
-    }, {
-      "name": "type-event",
-      "virtual": true,
-      "aboutUrl": "#event-{_row}",
-      "propertyUrl": "rdf:type",
-      "valueUrl": "schema:MusicEvent"
-    }, {
-      "name": "type-place",
-      "virtual": true,
-      "aboutUrl": "#place-{_row}",
-      "propertyUrl": "rdf:type",
-      "valueUrl": "schema:Place"
-    }, {
-      "name": "type-offer",
-      "virtual": true,
-      "aboutUrl": "#offer-{_row}",
-      "propertyUrl": "rdf:type",
-      "valueUrl": "schema:Offer"
-    }, {
-      "name": "location",
-      "virtual": true,
-      "aboutUrl": "#event-{_row}",
-      "propertyUrl": "schema:location",
-      "valueUrl": "#place-{_row}"
-    }, {
-      "name": "offers",
-      "virtual": true,
-      "aboutUrl": "#event-{_row}",
-      "propertyUrl": "schema:offers",
-      "valueUrl": "#offer-{_row}"
-    }]
-  }
-}
+        <pre class="example highlight"
+             id="example-events-listing-metadata"
+             title="http://example.org/events-listing.csv-metadata.json"
+             data-include="../examples/events-listing.csv-metadata.json"
+             data-oninclude="updateExample">
         </pre>
 
         <div class="note">
@@ -1096,40 +850,11 @@ B.B. King,2014-04-13T20:00,"Lynn Auditorium","Lynn, MA, 01901",http://frontgatet
 
         <p><strong><a title="minimal mode">Minimal mode</a></strong> output for this example is provided below:</p>
 
-        <pre class="example highlight" id="example-events-listing-minimal-json">
-[{
-  "@id": "http://example.org/events-listing.csv#event-1",
-  "rdf:type": "schema:MusicEvent",
-  "schema:name": "B.B. King",
-  "schema:startDate": "2014-04-12T19:30:00",
-  "schema:location": {
-    "@id": "http://example.org/events-listing.csv#place-1",
-    "rdf:type": "schema:Place",
-    "schema:name": "Lupo’s Heartbreak Hotel",
-    "schema:address": "79 Washington St., Providence, RI"
-  },
-  "schema:offer": {
-    "@id": "http://example.org/events-listing.csv#offer-1",
-    "rdf:type": "schema:Offer",
-    "schema:offer": "https://www.etix.com/ticket/1771656"
-  }
-}, {
-  "@id": "http://example.org/events-listing.csv#event-2",
-  "rdf:type": "schema:MusicEvent",
-  "schema:name": "B.B. King",
-  "schema:startDate": "2014-04-13T20:00:00",
-  "schema:location": {
-    "@id": "http://example.org/events-listing.csv#place-2",
-    "rdf:type": "schema:Place",
-    "schema:name": "Lynn Auditorium",
-    "schema:address": "Lynn, MA, 01901"
-  },
-  "schema:offer": {
-    "@id": "http://example.org/events-listing.csv#offer-2",
-    "rdf:type": "schema:Offer",
-    "schema:offer": "http://frontgatetickets.com/venue.php?id=11766"
-  }
-}]
+        <pre class="example highlight"
+             id="example-events-listing-minimal-json"
+             title="http://example.org/events-listing-minimal.json"
+             data-include="../examples/events-listing-minimal.json"
+             data-oninclude="updateExample">
         </pre>
 
         <div class="note">
@@ -1142,53 +867,11 @@ B.B. King,2014-04-13T20:00,"Lynn Auditorium","Lynn, MA, 01901",http://frontgatet
 
         <p><strong><a title="standard mode">Standard mode</a></strong> output for this example is provided below:</p>
 
-        <pre class="example highlight" id="example-events-listing-standard-json">
-{
-  "table": [{
-    "url": "http://example.org/events-listing.csv",
-    "row": [{
-      "rownum": 1,
-      "url": "http://example.org/events-listing.csv#row=2",
-      "describes": [{ 
-        "@id": "http://example.org/events-listing.csv#event-1",
-        "rdf:type": "schema:MusicEvent",
-        "schema:name": "B.B. King",
-        "schema:startDate": "2014-04-12T19:30:00",
-        "schema:location": {
-          "@id": "http://example.org/events-listing.csv#place-1",
-          "rdf:type": "schema:Place",
-          "schema:name": "Lupo’s Heartbreak Hotel",
-          "schema:address": "79 Washington St., Providence, RI"
-        },
-        "schema:offer": {
-          "@id": "http://example.org/events-listing.csv#offer-1",
-          "rdf:type": "schema:Offer",
-          "schema:offer": "https://www.etix.com/ticket/1771656"
-        }
-      }]
-    }, {
-      "rownum": 2,
-      "url": "http://example.org/events-listing.csv#row=3",
-      "describes": [{ 
-        "@id": "http://example.org/events-listing.csv#event-2",
-        "rdf:type": "schema:MusicEvent",
-        "schema:name": "B.B. King",
-        "schema:startDate": "2014-04-13T20:00:00",
-        "schema:location": {
-          "@id": "http://example.org/events-listing.csv#place-2",
-          "rdf:type": "schema:Place",
-          "schema:name": "Lynn Auditorium",
-          "schema:address": "Lynn, MA, 01901"
-        },
-        "schema:offer": {
-          "@id": "http://example.org/events-listing.csv#offer-2",
-          "rdf:type": "schema:Offer",
-          "schema:offer": "http://frontgatetickets.com/venue.php?id=11766"
-        }
-      }]
-    }]
-  }]
-}
+        <pre class="example highlight"
+             id="example-events-listing-standard-json"
+             title="http://example.org/events-listing-standard.json"
+             data-include="../examples/events-listing-standard.json"
+             data-oninclude="updateExample">
         </pre>
 
         <div class="note">
@@ -1206,149 +889,29 @@ B.B. King,2014-04-13T20:00,"Lynn Auditorium","Lynn, MA, 01901",http://frontgatet
         <p> 
           The input CSV+ files and the associated metadata description are provided below:
         </p>
-        <pre class="example" id="example-public-sector-roles-and-salaries-csv+-professions" title="http://example.org/gov.uk/professions.csv">
-Profession
-Finance
-Information Technology
-Operational Delivery
-Policy
+        <pre class="example"
+             id="example-public-sector-roles-and-salaries-csv+-professions"
+             data-include="../examples/gov.uk/professions.csv"
+             data-oninclude="updateExample"
+             title="http://example.org/gov.uk/professions.csv">
         </pre>
-        <pre class="example" id="example-public-sector-roles-and-salaries-csv+-senior-roles" title="http://example.org/senior-roles.csv">
-Post Unique Reference,Name,Grade,Job Title,Reports to Senior Post,Profession
-90115,Steve Egan,SCS1A,Deputy Chief Executive,90334,Finance
-90334,Sir Alan Langlands,SCS4,Chief Executive,xx,Policy
+        <pre class="example"
+             id="example-public-sector-roles-and-salaries-csv+-senior-roles"
+             data-include="../examples/senior-roles.csv"
+             data-oninclude="updateExample"
+             title="http://example.org/senior-roles.csv">
         </pre>
-        <pre class="example" id="example-public-sector-roles-and-salaries-csv+-junior-roles" title="http://example.org/junior-roles.csv">
-Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic Job Title,Number of Posts (FTE),Profession
-90115,4,17426,20002,Administrator,8.67,Operational Delivery
-90115,5,19546,22478,Administrator,0.5,Operational Delivery
+        <pre class="example"
+             id="example-public-sector-roles-and-salaries-csv+-junior-roles"
+             data-include="../examples/junior-roles.csv"
+             data-oninclude="updateExample"
+             title="http://example.org/junior-roles.csv">
         </pre>
-        <pre class="example highlight" id="example-public-sector-roles-and-salaries-metadata" title="http://example.org/metadata.json">
-{
-  "@type": "TableGroup",
-  "@context": ["http://www.w3.org/ns/csvw", {"@language": "en"}],
-  "resources": [{
-    "url": "gov.uk/professions.csv",
-    "tableSchema": {
-      "columns": [{
-        "name": "name",
-        "title": "Profession",
-        "datatype": "string",
-        "required": true
-      }],
-      "primaryKey": "name"
-    },
-    "suppressOutput": true
-  }, {
-    "url": "senior-roles.csv",
-    "tableSchema": {
-      "columns": [{
-        "name": "ref",
-        "title": "Post Unique Reference",
-        "datatype": "string",
-        "required": true,
-        "propertyUrl": "dc:identifier"
-      }, {
-        "name": "name",
-        "title": "Name",
-        "datatype": "string",
-        "propertyUrl": "foaf:name"
-      }, {
-        "name": "grade",
-        "title": "Grade",
-        "datatype": "string",
-        "propertyUrl": "http://example.org/def/grade"
-      }, {
-        "name": "job",
-        "title": "Job Title",
-        "datatype": "string",
-        "propertyUrl": "http://example.org/def/job"
-      }, {
-        "name": "reportsTo",
-        "title": "Reports to Senior Post",
-        "datatype": "string",
-        "null": "xx",
-        "propertyUrl": "http://example.org/def/reportsTo",
-        "valueUrl": "senior-roles.csv#post-{reportsTo}"
-      }, {
-        "name": "profession",
-        "title": "Profession",
-        "datatype": "string",
-        "propertyUrl": "http://example.org/def/profession"
-      }],
-      "primaryKey": "ref",
-      "aboutUrl": "#post-{ref}",
-      "foreignKeys": [{
-        "columns": "reportsTo",
-        "reference": {
-          "resource": "senior-roles.csv",
-          "columns": "ref"
-        }
-      }, {
-        "columns": "profession",
-        "reference": {
-          "resource": "gov.uk/professions.csv",
-          "columns": "name"
-        }
-      }]
-    }
-  }, {
-    "url": "junior-roles.csv",
-    "tableSchema": {
-      "columns": [{
-        "name": "reportsToSenior",
-        "title": "Reporting Senior Post",
-        "datatype": "string",
-        "propertyUrl": "http://example.org/def/reportsTo",
-        "valueUrl": "senior-roles.csv#post-{reportsToSenior}",
-        "required": true
-      }, {
-        "name": "grade",
-        "title": "Grade",
-        "datatype": "string",
-        "propertyUrl": "http://example.org/def/grade"
-      }, {
-        "name": "min-pay",
-        "title": "Payscale Minimum (£)",
-        "datatype": "integer",
-        "propertyUrl": "http://example.org/def/min-pay"
-      }, {
-        "name": "max-pay",
-        "title": "Payscale Maximum (£)",
-        "datatype": "integer",
-        "propertyUrl": "http://example.org/def/max-pay"
-      }, {
-        "name": "job",
-        "title": "Generic Job Title",
-        "datatype": "string",
-        "propertyUrl": "http://example.org/def/job"
-      }, {
-        "name": "number",
-        "title": "Number of Posts (FTE)",
-        "datatype": "number",
-        "propertyUrl": "http://example.org/def/number-of-posts" 
-      }, {
-        "name": "profession",
-        "title": "Profession",
-        "datatype": "string",
-        "propertyUrl": "http://example.org/def/profession"
-      }],
-      "foreignKeys": [{
-        "columns": "reportsToSenior",
-        "reference": {
-          "resource": "senior-roles.csv",
-          "columns": "ref"
-        }
-      }, {
-        "columns": "profession",
-        "reference": {
-          "resource": "gov.uk/professions.csv",
-          "columns": "name"
-        }
-      }]
-    }
-  }]
-}
+        <pre class="example highlight"
+             id="example-public-sector-roles-and-salaries-metadata"
+             data-include="../examples/metadata.json"
+             data-oninclude="updateExample"
+             title="http://example.org/metadata.json">
         </pre>
 
         <p class="note">In this example, the resource <code>gov.uk/professions.csv</code> is identified using a relative URL to host <code>http://example.org</code>. In reality this resource would be published centrally by government and served from some remote host. Similarly, the metadata description resource <code>metadata.json</code> would be also be centrally published. Government departments seeking to validate their role and salary data would download a copy of this metadata description and place it, without modification, in the same directory as their CSV+ files whose names MUST match those specified in the metadata description; <code>senior-roles.csv</code> and <code>junior-roles.csv</code>.</p>
@@ -1487,39 +1050,11 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
 
         <p><strong><a title="minimal mode">Minimal mode</a></strong> output for this example is provided below:</p>
 
-        <pre class="example highlight" id="example-public-sector-roles-and-salaries-minimal-json">
-[{
-  "@id": "http://example.org/senior-roles.csv#post-90115",
-  "dc:identifier": "90115",
-  "foaf:name": "Steve Egan",
-  "http://example.org/def/grade": "SCS1A",
-  "http://example.org/def/job": "Deputy Chief Executive",
-  "http://example.org/def/reportsTo": "http://example.org/senior-roles.csv#post-90334",
-  "http://example.org/def/profession": "Finance"
-}, {
-  "@id": "http://example.org/senior-roles.csv#post-90334",
-  "dc:identifier": "90334",
-  "foaf:name": "Sir Alan Langlands",
-  "http://example.org/def/grade": "SCS4",
-  "http://example.org/def/job": "Chief Executive",
-  "http://example.org/def/profession": "Policy"
-}, {
-  "http://example.org/def/reportsTo": "http://example.org/senior-roles.csv#post-90115",
-  "http://example.org/def/grade": "4",
-  "http://example.org/def/min-pay": 17426,
-  "http://example.org/def/max-pay": 20002,
-  "http://example.org/def/job": "Administrator",
-  "http://example.org/def/number-of-posts": 8.67,
-  "http://example.org/def/profession": "Operational Delivery"
-}, {
-  "http://example.org/def/reportsTo": "http://example.org/senior-roles.csv#post-90115",
-  "http://example.org/def/grade": "5",
-  "http://example.org/def/min-pay": 19546,
-  "http://example.org/def/max-pay": 22478,
-  "http://example.org/def/job": "Administrator",
-  "http://example.org/def/number-of-posts": 0.5,
-  "http://example.org/def/profession": "Operational Delivery"
-}]
+        <pre class="example highlight"
+             id="example-public-sector-roles-and-salaries-minimal-json"
+             title="http://example.org/public-sector-roles-and-salaries-minimal.json"
+             data-include="../examples/public-sector-roles-and-salaries-minimal.json"
+             data-oninclude="updateExample">
         </pre>
 
         <div class="note">
@@ -1531,63 +1066,11 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
 
         <p><strong><a title="standard mode">Standard mode</a></strong> output for this example is provided below:</p>
 
-        <pre class="example highlight" id="example-public-sector-roles-and-salaries-standard-json">
-{
-  "table": [{
-    "url": "http://example.org/senior-roles.csv",
-    "row": [{
-      "rownum": 1,
-      "url": "http://example.org/senior-roles.csv#row=2",
-      "describes": [{ 
-        "@id": "http://example.org/senior-roles.csv#post-90115",
-        "dc:identifier": "90115",
-        "foaf:name": "Steve Egan",
-        "http://example.org/def/grade": "SCS1A",
-        "http://example.org/def/job": "Deputy Chief Executive",
-        "http://example.org/def/reportsTo": "http://example.org/senior-roles.csv#post-90334",
-        "http://example.org/def/profession": "Finance"
-      }]
-    }, {
-      "rownum": 2,
-      "url": "http://example.org/senior-roles.csv#row=3",
-      "describes": [{ 
-        "@id": "http://example.org/senior-roles.csv#post-90334",
-        "dc:identifier": "90334",
-        "foaf:name": "Sir Alan Langlands",
-        "http://example.org/def/grade": "SCS4",
-        "http://example.org/def/job": "Chief Executive",
-        "http://example.org/def/profession": "Policy"
-      }]
-    }]
-  }, {
-    "url": "http://example.org/junior-roles.csv",
-    "row": [{
-      "rownum": 1,
-      "url": "http://example.org/junior-roles.csv#row=2",
-      "describes": [{ 
-        "http://example.org/def/reportsTo": "http://example.org/senior-roles.csv#post-90115",
-        "http://example.org/def/grade": "4",
-        "http://example.org/def/min-pay": 17426,
-        "http://example.org/def/max-pay": 20002,
-        "http://example.org/def/job": "Administrator",
-        "http://example.org/def/number-of-posts": 8.67,
-        "http://example.org/def/profession": "Operational Delivery"
-      }]
-    }, {
-      "rownum": 2,
-      "url": "http://example.org/junior-roles.csv#row=3",
-      "describes": [{ 
-        "http://example.org/def/reportsTo": "http://example.org/senior-roles.csv#post-90115",
-        "http://example.org/def/grade": "5",
-        "http://example.org/def/min-pay": 19546,
-        "http://example.org/def/max-pay": 22478,
-        "http://example.org/def/job": "Administrator",
-        "http://example.org/def/number-of-posts": 0.5,
-        "http://example.org/def/profession": "Operational Delivery"
-      }]
-    }]
-  }]
-}
+        <pre class="example highlight"
+             id="example-public-sector-roles-and-salaries-standard-json"
+             title="http://example.org/public-sector-roles-and-salaries-standard.json"
+             data-include="../examples/public-sector-roles-and-salaries-standard.json"
+             data-oninclude="updateExample">
         </pre>
       </section>
 
