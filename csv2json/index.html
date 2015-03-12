@@ -335,41 +335,47 @@ var respecConfig = {
                       </li>
                       <li>
                         <p>Each <a>cell</a> referring to <a>subject</a> <var>i</var> is then processed sequentially according to the order of the <a title="column">columns</a> (e.g. <var>1</var> to <var>n</var>).</p>
-                        <p>For each <a>cell</a> referring to <a>subject</a> <var>i</var>, where the value of property <a href="http://www.w3.org/TR/tabular-metadata/#column-suppressOutput"><code>suppressOutput</code></a> for the <a>column</a> associated with that <a>cell</a> is not <var>true</var>, insert a name-value pair into <a>object</a> <var>S<sub>i</sub></var> as described below.</p>
-                        <p><a title="name">Name</a> <var>N</var> is determined from the <a>propertyUrl</a> property of the current <a>cell</a>.</p>
-                        <p>If the value of <a>propertyUrl</a> for the <a>cell</a> has not been explicitly specified in the metadata description (e.g. the value of <a>propertyUrl</a> is a concatenation of the CSV+ file <var>URL</var>, <code>#</code> (<code>U+0023</code>) and the value of the <a href="http://www.w3.org/TR/tabular-metadata/#column-name"><code>name</code></a> property for the column associated with the <a>cell</a>), then <a>name</a> <var>N</var> MUST take the value of the only the fragment identifier of <a>propertyUrl</a>.</p>
-                        <p>Else, <a>name</a> <var>N</var> MUST take the entire value of <a>propertyUrl</a>.</p>
+                        <p>For each <a>cell</a> referring to <a>subject</a> <var>i</var>, where the value of property <a href="http://www.w3.org/TR/tabular-metadata/#column-suppressOutput"><code>suppressOutput</code></a> for the <a>column</a> associated with that <a>cell</a> is not <var>true</var>, insert a name-value pair into <a>object</a> <var>S<sub>i</sub></var> as described below:</p>
+                        <ol class="algorithm">
+                          <li>
+                            <p>If the value of <a>propertyUrl</a> for the <a>cell</a> is not <code>null</code>, then <a>name</a> <var>N</var> takes the value of <a>propertyUrl</a>.</p>
+                            <p>Else, <a>name</a> <var>N</var> takes the value of the <a href="http://www.w3.org/TR/tabular-metadata/#column-name"><code>name</code></a> property for the column associated with the <a>cell</a>.</p>
+                          </li>
+                          <li>
+                            <p>If the <a>valueUrl</a> for the current <a>cell</a> is not <code>null</code>, then insert the following name-value pair into <a>object</a> <var>S<sub>i</sub></var>:</p>
+                            <dl class="nvp">
+                              <dt>name</dt>
+                              <dd><var>N</var></dd>
+                              <dt>value</dt>
+                              <dd><var>V<sub>url</sub></var></dd>
+                            </dl>
+                            <p>where <var>V<sub>url</sub></var> is the value of <a>valueUrl</a> property for the current <a>cell</a>, is expressed as a string in the JSON output.</p>
+                          </li>
+                          <li>
+                            <p>Else, if the <a>cell</a> specifies a <a href="http://www.w3.org/TR/tabular-metadata/#cell-separator"><code>separator</code></a> property and the <a>cell value</a> is not an empty sequence, then the <a>cell value</a> provides a sequence of values for inclusion within the JSON output; insert an <a>array</a> <var>A<sub>v</sub></var> containing each value <var>V</var> of the sequence into <a>object</a> <var>S<sub>i</sub></var>:</p>
+                            <dl class="nvp">
+                              <dt>name</dt>
+                              <dd><var>N</var></dd>
+                              <dt>value</dt>
+                              <dd><var>A<sub>v</sub></var></dd>
+                            </dl>
+                            <p class="note">Since <a title="array">arrays</a> are implicitly <em>ordered</em> in JSON, the <a href="http://www.w3.org/TR/tabular-metadata/#cell-ordered"><code>ordered</code></a> property, if specified, has no effect on the JSON output.</p>
+                          </li>
+                          <li>
+                            <p>Else, if the <a>cell value</a> is not <code>null</code>, then the <a>cell value</a> provides a single value <var>V</var> for inclusion within the JSON output; insert the following name-value pair into <a>object</a> <var>S<sub>i</sub></var>:</p>
+                            <dl class="nvp">
+                              <dt>name</dt>
+                              <dd><var>N</var></dd>
+                              <dt>value</dt>
+                              <dd><var>V</var></dd>
+                            </dl>
 
-                        <p class="issue" data-number="298">Should JSON output truncate the propertyUrl in cases where propertyUrl is not specifically defined?</p>
+                            <p>Value <var>V</var> derived from the <a title="cell value">cell values</a> MUST be expressed in the JSON output according to the <a href="http://www.w3.org/TR/tabular-metadata/#cell-datatype"><code>datatype</code></a> property of the cell as defined below: <a href="#datatypes">Interpreting datatypes</a>.</p> 
+                          </li>
+                        </ol>
 
-                        <p>If the <a>valueUrl</a> for the current <a>cell</a> is not <code>null</code>, then insert the following name-value pair into <a>object</a> <var>S<sub>i</sub></var>:</p>
-                        <dl class="nvp">
-                          <dt>name</dt>
-                          <dd><var>N</var></dd>
-                          <dt>value</dt>
-                          <dd><var>V<sub>url</sub></var></dd>
-                        </dl>
-                        <p>where <var>V<sub>url</sub></var> is the value of <a>valueUrl</a> property for the current <a>cell</a>, is expressed as a string in the JSON output.</p>
-
-                        <p>Else, if the <a>cell</a> specifies a <a href="http://www.w3.org/TR/tabular-metadata/#cell-separator"><code>separator</code></a> property and the <a>cell value</a> is not an empty sequence, then the <a>cell value</a> provides a sequence of values for inclusion within the JSON output; insert an <a>array</a> <var>A<sub>v</sub></var> containing each value <var>V</var> of the sequence into <a>object</a> <var>S<sub>i</sub></var>:</p>
-                        <dl class="nvp">
-                          <dt>name</dt>
-                          <dd><var>N</var></dd>
-                          <dt>value</dt>
-                          <dd><var>A<sub>v</sub></var></dd>
-                        </dl>
-                        <p class="note">Since <a title="array">arrays</a> are implicitly <em>ordered</em> in JSON, the <a href="http://www.w3.org/TR/tabular-metadata/#cell-ordered"><code>ordered</code></a> property, if specified, has no effect on the JSON output.</p>
-
-                        <p>Else, if the <a>cell value</a> is not <code>null</code>, then the <a>cell value</a> provides a single value <var>V</var> for inclusion within the JSON output; insert the following name-value pair into <a>object</a> <var>S<sub>i</sub></var>:</p>
-                        <dl class="nvp">
-                          <dt>name</dt>
-                          <dd><var>N</var></dd>
-                          <dt>value</dt>
-                          <dd><var>V</var></dd>
-                        </dl>
-
-                        <p>Value <var>V</var> derived from the <a title="cell value">cell values</a> MUST be expressed in the JSON output according to the <a href="http://www.w3.org/TR/tabular-metadata/#cell-datatype"><code>datatype</code></a> property of the cell as defined below: <a href="#datatypes">Interpreting datatypes</a>.</p> 
                         <p class="note">In the case where a sequence of values is provided, the <code>datatype</code> applies to all members of the sequence.</p>
+                        
                       </li>
                     </ol>
                   </li>
