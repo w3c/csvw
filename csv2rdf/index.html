@@ -350,7 +350,7 @@ var respecConfig = {
                   <li>
                     <p>Establish a new <a>blank node</a> <var>S<sub>def</sub></var> to be used as the default subject for <a title="cell">cells</a> where <a>aboutUrl</a> is undefined.</p>
                     <p class="note">A <a>row</a> MAY describe multiple interrelated <a title="subject">subjects</a>; where the <a>valueUrl</a> property for one cell matches the <a>aboutUrl</a> property for another <a>cell</a> in the same <a>row</a>.</p>
-                    <p>For each <a>cell</a> in the current <a>row</a> where the value of <a href="http://www.w3.org/TR/tabular-metadata/#column-suppressOutput"><code>suppressOutput</code></a> is <var>false</var>:</p>
+                    <p>For each <a>cell</a> in the current <a>row</a> where the value of property <a href="http://www.w3.org/TR/tabular-metadata/#column-suppressOutput"><code>suppressOutput</code></a> for the <a>column</a> associated with that <a>cell</a> is not <var>true</var>:</p>
                     <ol class="algorithm">
                       <li>
                         <p>Establish a <a>node</a> <var>S</var> from the <a>aboutUrl</a> property if set, or from <var>S<sub>def</sub></var> otherwise as the current <a>subject</a>.</p>
@@ -370,7 +370,7 @@ var respecConfig = {
                         <p>If the value of <a>propertyUrl</a> for the <a>cell</a> is not <code>null</code>, then predicate <var>P</var> takes the value of <a>propertyUrl</a>.</p>
                         <p>Else, <a>predicate</a> <var>P</var> is constructed by appending the value of the <a href="http://www.w3.org/TR/tabular-metadata/#column-name"><code>name</code></a> property for the column associated with the <a>cell</a> to the the CSV+ file <var>URL</var> as a fragment identifier.</p>
                       </li>  
-                      <li>If the <a>valueUrl</a> for the current <a>cell</a> is not <code>null</code>, then <a>valueUrl</a> identifies a <a>node</a> <var>V<sub>url</sub></var> that is related the current <a>subject</a> using the <a>propertyUrl</a> <var>P</var> for the current <a>cell</a>; emit the following triple:
+                      <li>If the <a>valueUrl</a> for the current <a>cell</a> is not <code>null</code>, then <a>valueUrl</a> identifies a <a>node</a> <var>V<sub>url</sub></var> that is related the current <a>subject</a> using the <a>predicate</a> <var>P</var>; emit the following triple:
                         <dl class="triple">
                           <dt>subject</dt>
                           <dd><a>node</a> <var>S</var></dd>
@@ -380,7 +380,7 @@ var respecConfig = {
                           <dd><a>node</a> <var>V<sub>url</sub></var></dd>
                         </dl>
                       </li>
-                      <li>Else, if the <a>cell</a> specifies a <a href="http://www.w3.org/TR/tabular-metadata/#cell-separator"><code>separator</code></a> property and the <a>cell value</a> is not an empty sequence and the <a>cell</a> specifies that boolean property <a href="http://www.w3.org/TR/tabular-metadata/#cell-ordered"><code>ordered</code></a> is <var>true</var>, then the <a>cell value</a> provides an <em>ordered</em> sequence of <a title="literal node">literal nodes</a> for inclusion within the RDF output using an instance of <code>rdf:List</code> <var>V<sub>list</sub></var> as defined in [[rdf-schema]]. This instance is related to the <a>subject</a> using the <a>propertyUrl</a> <var>P</var> for the current <a>cell</a>; emit the triples defining list <var>V<sub>list</sub></var> plus:
+                      <li>Else, if the <a>cell</a> specifies a <a href="http://www.w3.org/TR/tabular-metadata/#cell-separator"><code>separator</code></a> property and the <a>cell value</a> is not an empty sequence and the <a>cell</a> specifies that boolean property <a href="http://www.w3.org/TR/tabular-metadata/#cell-ordered"><code>ordered</code></a> is <var>true</var>, then the <a>cell value</a> provides an <em>ordered</em> sequence of <a title="literal node">literal nodes</a> for inclusion within the RDF output using an instance of <code>rdf:List</code> <var>V<sub>list</sub></var> as defined in [[rdf-schema]]. This instance is related to the <a>subject</a> using the <a>predicate</a> <var>P</var>; emit the triples defining list <var>V<sub>list</sub></var> plus the following triple:
                         <dl class="triple">
                           <dt>subject</dt>
                           <dd><a>node</a> <var>S</var></dd>
@@ -390,7 +390,7 @@ var respecConfig = {
                           <dd><a>node</a> <var>V<sub>list</sub></var></dd>
                         </dl>
                       </li>
-                      <li>Else, if the <a>cell</a> specifies a <a href="http://www.w3.org/TR/tabular-metadata/#cell-separator"><code>separator</code></a> property and the <a>cell value</a> is not an empty sequence, then the <a>cell value</a> provides an <em>unordered</em> sequence of <a title="literal node">literal nodes</a> for inclusion within the RDF output, each of which is related to the <a>subject</a> using the <a>propertyUrl</a> <var>P</var> for the current <a>cell</a>. For each value provided in the sequence, add a <a>literal node</a> <var>V<sub>literal</sub></var>; emit the following triple:
+                      <li>Else, if the <a>cell</a> specifies a <a href="http://www.w3.org/TR/tabular-metadata/#cell-separator"><code>separator</code></a> property and the <a>cell value</a> is not an empty sequence, then the <a>cell value</a> provides an <em>unordered</em> sequence of <a title="literal node">literal nodes</a> for inclusion within the RDF output, each of which is related to the <a>subject</a> using the <a>predicate</a> <var>P</var>. For each value provided in the sequence, add a <a>literal node</a> <var>V<sub>literal</sub></var>; emit the following triple:
                         <dl class="triple">
                           <dt>subject</dt>
                           <dd><a>node</a> <var>S</var></dd>
@@ -400,7 +400,7 @@ var respecConfig = {
                           <dd><a>literal node</a> <var>V<sub>literal</sub></var></dd>
                         </dl>
                       </li>
-                      <li>Else, if the <a>cell value</a> is not <code>null</code> and the <a>cell</a> does not specify a <a href="http://www.w3.org/TR/tabular-metadata/#cell-separator"><code>separator</code></a> property, then the <a>cell value</a> provides a single <a>literal node</a> <var>V<sub>literal</sub></var> for inclusion within the RDF output that is related the current <a>subject</a> using the <a>propertyUrl</a> <var>P</var> for the current <a>cell</a>; emit the following triple:
+                      <li>Else, if the <a>cell value</a> is not <code>null</code> and the <a>cell</a> does not specify a <a href="http://www.w3.org/TR/tabular-metadata/#cell-separator"><code>separator</code></a> property, then the <a>cell value</a> provides a single <a>literal node</a> <var>V<sub>literal</sub></var> for inclusion within the RDF output that is related the current <a>subject</a> using the <a>predicate</a> <var>P</var>; emit the following triple:
                         <dl class="triple">
                           <dt>subject</dt>
                           <dd><a>node</a> <var>S</var></dd>
