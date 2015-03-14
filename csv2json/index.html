@@ -209,192 +209,256 @@ var respecConfig = {
 
         <p class="note">Where an <a>annotated table</a> is defined in isolation (e.g. in the absence of a <a>table group description</a>), a default <a>table group description</a> is provided with a single <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table-group-resources" class="externalDFN"><code>resources</code></a> annotation that refers to that <a title="annotated table">table</a>.</p>
 
-        <ol class="algorithm">
-          <li>
-            <p>In <strong><a>minimal mode</a></strong> only, insert an empty <a>array</a> <var>A</var> into the JSON output. The <a title="object">objects</a> containing the name-value pairs associated with the <a title="cell value">cell values</a> will be subsequently inserted into this <a>array</a>.</p>
-            <p>In <strong><a>standard mode</a></strong> only, insert an empty <a>object</a> <var>G</var> into the JSON output which is associated with the <a>table group</a>.</p>
-          </li>
-          <li>
-            <p>In <strong><a>standard mode</a></strong> only, if the <a>table group</a> has an <a>identifier</a> <var>I<sub>G</sub></var>; insert the following name-value pair into <a>object</a> <var>G</var>:</p>
-            <dl class="nvp">
-              <dt>name</dt>
-              <dd><code>@id</code></dd>
-              <dt>value</dt>
-              <dd><var>I<sub>G</sub></var></dd>
-            </dl>
-          </li>
-          <li>
-            <p>In <strong><a>standard mode</a></strong> only, insert any <a>common properties</a> specified for the <a>table group</a> into <a>object</a> <var>G</var>. Name-value pairs relating to <a>common properties</a> are copied verbatim from the metadata description—noting that prefixes defined within the <a href="http://www.w3.org/2011/rdfa-context/rdfa-1.1">RDFa 1.1 Initial Context</a> ([[rdfa-core]]) are not expanded.</p>
-          </li>
-          <li>
-            <p>In <strong><a>standard mode</a></strong> only, insert the following name-value pair into <a>object</a> <var>G</var>:</p>
-            <dl class="nvp">
-              <dt>name</dt>
-              <dd><code>table</code></dd>
-              <dt>value</dt>
-              <dd><var>A<sub>T</sub></var></dd>
-            </dl>
-            <p>where <var>A<sub>T</sub></var> is an <a>array</a> into which the <a title="object">objects</a> describing the <a title="annotated table">annotated tables</a> will be subsequently inserted.</p>
-          </li>
-          <li>
-            <p>Each <a title="annotated table">table</a> is processed sequentially in the order they are referenced in the <a>table group description</a>.</p>
-            <p>For each <a title="annotated table">table</a> where the value of property <a href="http://www.w3.org/TR/tabular-metadata/#table-suppressOutput"><code>suppressOutput</code></a> is <var>false</var>:</p>
-            <ol class="algorithm">
-              <li>
-                <p>In <strong><a>standard mode</a></strong> only, insert an empty <a>object</a> <var>T</var> into the <a>array</a> <var>A<sub>T</sub></var> to represent the <a title="annotated table">table</a>.</p>
-              </li>
-              <li>
-                <p>In <strong><a>standard mode</a></strong> only, if the <a title="annotated table">table</a> has an <a>identifier</a> <var>I<sub>T</sub></var>; insert the following name-value pair into <a>object</a> <var>T</var>:</p>
-                <dl class="nvp">
-                  <dt>name</dt>
-                  <dd><code>@id</code></dd>
-                  <dt>value</dt>
-                  <dd><var>I<sub>T</sub></var></dd>
-                </dl>
-              </li>
-              <li>
-                <p>In <strong><a>standard mode</a></strong> only, specify the source CSV+ file <var>URL</var> for the current table based on the value of property <a href="http://www.w3.org/TR/tabular-metadata/#table-url"><code>url</code></a>; insert the following name-value pair into <a>object</a> <var>T</var>:</p>
-                <dl class="nvp">
-                  <dt>name</dt>
-                  <dd><code>url</code></dd>
-                  <dt>value</dt>
-                  <dd><var>URL</var></dd>
-                </dl>
-              </li>
-              <li>
-                <p>In <strong><a>standard mode</a></strong> only, insert any <a>notes</a> and <a>common properties</a> specified for the <a title="annotated table">table</a> into <a>object</a> <var>T</var>. Name-value pairs relating to <a>notes</a> and <a>common properties</a> are copied verbatim from the metadata description—noting that prefixes defined within the <a href="http://www.w3.org/2011/rdfa-context/rdfa-1.1">RDFa 1.1 Initial Context</a> ([[rdfa-core]]) are not expanded.</p>
-                <p class="note">All other annotations for the <a title="annotated table">table</a> are ignored during the conversion; including information about <a href="http://www.w3.org/TR/tabular-metadata/#dfn-tableschema" class="externalDFN">table schemas</a> and <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description" class="externalDFN">column descriptions</a> specified therein, <a href="http://www.w3.org/TR/tabular-metadata/#dfn-dialect-description" class="externalDFN">dialect descriptions</a>, <a href="http://www.w3.org/TR/tabular-metadata/#dfn-foreign-key-definition" class="externalDFN">foreign-key-definitions</a> etc.</p>
-              </li>
-              <li>
-                <p>In <strong><a>standard mode</a></strong> only, insert the following name-value pair into <a>object</a> <var>T</var>:</p>
-                <dl class="nvp">
-                  <dt>name</dt>
-                  <dd><code>row</code></dd>
-                  <dt>value</dt>
-                  <dd><var>A<sub>R</sub></var></dd>
-                </dl>
-                <p>where <var>A<sub>R</sub></var> is an <a>array</a> into which the <a title="object">objects</a> describing the <a title="row">rows</a> will be subsequently inserted.</p>
-              </li>
-              <li>
-                <p>Each <a>row</a> within the <a title="annotated table">table</a> is processed sequentially in order.</p>
-                <p>For each <a>row</a> in the current <a title="annotated table">table</a>:</p>
-                <ol class="algorithm">
-                  <li>
-                    <p>In <strong><a>standard mode</a></strong> only, insert an empty <a>object</a> <var>R</var> into the <a>array</a> <var>A<sub>R</sub></var> to represent the <a>row</a>.</p>
-                  </li>
-                  <li>
-                    <p>In <strong><a>standard mode</a></strong> only, specify the <a>row number</a> <var>n</var> for the <a>row</a>; insert the following name-value pair into <a>object</a> <var>R</var>:</p>
-                    <dl class="nvp">
-                      <dt>name</dt>
-                      <dd><code>rownum</code></dd>
-                      <dt>value</dt>
-                      <dd><var>n</var></dd>
-                    </dl>
-                  </li>
-                  <li>
-                    <p>In <strong><a>standard mode</a></strong> only, specify the <a>row source number</a> <var>n<sub>source</sub></var> for the <a>row</a> within the source CSV+ file <var>URL</var> using a fragment-identifier as specified in [[RFC7111]]; if <a>row source number</a> is not <code>null</code>, insert the following name-value pair into <a>object</a> <var>R</var>:</p>
-                    <dl class="nvp">
-                      <dt>name</dt>
-                      <dd><code>url</code></dd>
-                      <dt>value</dt>
-                      <dd><var>URL</var><code>#row=</code><var>n<sub>source</sub></var></dd>
-                    </dl>
-                  </li>
-                  <li>
-                    <p>In <strong><a>standard mode</a></strong> only, insert the following name-value pair into <a>object</a> <var>R</var>:</p>
-                    <dl class="nvp">
-                      <dt>name</dt>
-                      <dd><code>describes</code></dd>
-                      <dt>value</dt>
-                      <dd><var>A</var></dd>
-                    </dl>
-                    <p>where <var>A</var> is an <a>array</a>. The <a title="object">objects</a> containing the name-value pairs associated with the <a title="cell value">cell values</a> will be subsequently inserted into this <a>array</a>.</p>
-                  </li>
-                  <li>
-                    <p>The <a title="subject">subject(s)</a> described by each <a>row</a> are determined according to the <a>aboutUrl</a> property for each <a>cell</a> in the current <a>row</a>. Where <a>aboutUrl</a> is undefined, a default <a>subject</a> for the <a>row</a> is used.</p>
+        <section>
+          <h3>Minimal mode</h3>
+          <ol class="algorithm">
+            <li>
+              <p>Insert an empty <a>array</a> <var>A</var> into the JSON output. The <a title="object">objects</a> containing the name-value pairs associated with the <a title="cell value">cell values</a> will be subsequently inserted into this <a>array</a>.</p>
+            </li>
+            <li>
+              <p>Each <a title="annotated table">table</a> is processed sequentially in the order they are referenced in the <a>table group description</a>. For each <a title="annotated table">table</a> where the value of property <a href="http://www.w3.org/TR/tabular-metadata/#table-suppressOutput"><code>suppressOutput</code></a> is <var>false</var>:</p>
+              <ol class="algorithm">
+                <li>
+                  <p>Each <a>row</a> within the <a title="annotated table">table</a> is processed sequentially in order.</p>
+                  <p>For each <a>row</a> in the current <a title="annotated table">table</a>:</p>
+                  <ol class="algorithm">
+                    <li>
+                      <p>The <a title="subject">subject(s)</a> described by each <a>row</a> are determined according to the <a>aboutUrl</a> property for each <a>cell</a> in the current <a>row</a>. Where <a>aboutUrl</a> is undefined, a default <a>subject</a> for the <a>row</a> is used.</p>
 
-                    <p class="note">A <a>row</a> MAY describe multiple interrelated <a title="subject">subjects</a>; where the <a>valueUrl</a> property for one cell matches the <a>aboutUrl</a> property for another <a>cell</a> in the same <a>row</a>.</p>
-                    
-                    <p>Determine the unique <a title="subject">subjects</a> for the current <a>row</a>—including a default <a>subject</a> if <a>aboutUrl</a> is unspecified for any <a title="cell">cells</a> in the <a>row</a>.</p>
-                    
-                    <p>For each <a>subject</a> that the current <a>row</a> describes where at least one of the <a title="cell">cells</a> that refers to that <a>subject</a> has a <a title="cell value">value</a> that is not <code>null</code>, and is associated with a <a>column</a> where the value of property <a href="http://www.w3.org/TR/tabular-metadata/#column-suppressOutput"><code>suppressOutput</code></a> has value <var>false</var>:</p>
-                    <ol class="algorithm">
-                      <li>
-                        <p>Create an empty <a>object</a> <var>S<sub>i</sub></var> to represent the <a>subject</a> <var>i</var>—but don't insert it into the <a>array</a> <var>A</var> yet.</p>
-                        <p>(<var>i</var> is the index number with values from <var>1</var> to <var>n</var>, where <var>n</var> is the number of <a title="subject">subjects</a> for the <a>row</a>)</p>
-                        <p><a title="subject">Subject</a> <var>i</var> is identified according to the <a>aboutUrl</a> property of its associated <a title="cell">cells</a>: <var>@id<sub>s</sub></var>. For a <em>default</em> <a>subject</a> where <a>aboutUrl</a> is not specified by its <a title="cell">cells</a>, <var>@id<sub>s</sub></var> is <code>null</code>.</p>
-                      </li>
-                      <li>
-                        <p>If the identifier for <a>subject</a> <var>i</var>, <var>@id<sub>s</sub></var>, is not <code>null</code>, then insert the following name-value pair into <a>object</a> <var>S<sub>i</sub></var>:</p>
-                        <dl class="nvp">
-                          <dt>name</dt>
-                          <dd><code>@id</code></dd>
-                          <dt>value</dt>
-                          <dd><var>@id<sub>s</sub></var></dd>
-                        </dl>
-                      </li>
-                      <li>
-                        <p>Each <a>cell</a> referring to <a>subject</a> <var>i</var> is then processed sequentially according to the order of the <a title="column">columns</a> (e.g. <var>1</var> to <var>n</var>).</p>
-                        <p>For each <a>cell</a> referring to <a>subject</a> <var>i</var>, where the value of property <a href="http://www.w3.org/TR/tabular-metadata/#column-suppressOutput"><code>suppressOutput</code></a> for the <a>column</a> associated with that <a>cell</a> is <var>false</var>, insert a name-value pair into <a>object</a> <var>S<sub>i</sub></var> as described below:</p>
-                        <ol class="algorithm">
-                          <li>
-                            <p>If the value of <a>propertyUrl</a> for the <a>cell</a> is not <code>null</code>, then <a>name</a> <var>N</var> takes the value of <a>propertyUrl</a>.</p>
-                            <p>Else, <a>name</a> <var>N</var> takes the value of the <a href="http://www.w3.org/TR/tabular-metadata/#column-name"><code>name</code></a> property for the column associated with the <a>cell</a>.</p>
-                          </li>
-                          <li>
-                            <p>If the <a>valueUrl</a> for the current <a>cell</a> is not <code>null</code>, then insert the following name-value pair into <a>object</a> <var>S<sub>i</sub></var>:</p>
-                            <dl class="nvp">
-                              <dt>name</dt>
-                              <dd><var>N</var></dd>
-                              <dt>value</dt>
-                              <dd><var>V<sub>url</sub></var></dd>
-                            </dl>
-                            <p>where <var>V<sub>url</sub></var> is the value of <a>valueUrl</a> property for the current <a>cell</a>, is expressed as a string in the JSON output.</p>
-                          </li>
-                          <li>
-                            <p>Else, if the <a>cell</a> specifies a <a href="http://www.w3.org/TR/tabular-metadata/#cell-separator"><code>separator</code></a> property and the <a>cell value</a> is not an empty sequence, then the <a>cell value</a> provides a sequence of values for inclusion within the JSON output; insert an <a>array</a> <var>A<sub>v</sub></var> containing each value <var>V</var> of the sequence into <a>object</a> <var>S<sub>i</sub></var>:</p>
-                            <dl class="nvp">
-                              <dt>name</dt>
-                              <dd><var>N</var></dd>
-                              <dt>value</dt>
-                              <dd><var>A<sub>v</sub></var></dd>
-                            </dl>
-                            <p class="note">Since <a title="array">arrays</a> are implicitly <em>ordered</em> in JSON, the <a href="http://www.w3.org/TR/tabular-metadata/#cell-ordered"><code>ordered</code></a> property, if specified, has no effect on the JSON output.</p>
-                          </li>
-                          <li>
-                            <p>Else, if the <a>cell value</a> is not <code>null</code>, then the <a>cell value</a> provides a single value <var>V</var> for inclusion within the JSON output; insert the following name-value pair into <a>object</a> <var>S<sub>i</sub></var>:</p>
-                            <dl class="nvp">
-                              <dt>name</dt>
-                              <dd><var>N</var></dd>
-                              <dt>value</dt>
-                              <dd><var>V</var></dd>
-                            </dl>
+                      <p class="note">A <a>row</a> MAY describe multiple interrelated <a title="subject">subjects</a>; where the <a>valueUrl</a> property for one cell matches the <a>aboutUrl</a> property for another <a>cell</a> in the same <a>row</a>.</p>
+                      
+                      <p>Determine the unique <a title="subject">subjects</a> for the current <a>row</a>—including a default <a>subject</a> if <a>aboutUrl</a> is unspecified for any <a title="cell">cells</a> in the <a>row</a>.</p>
+                    </li>
+                    <li>
+                      <p>Generate a sequence of <var>S<sub>i</sub></var> <a title="object">objects</a>, each corresponding to <a>subject</a> <var>i</var> of the current row, as
+                        described in <a href="#gen-subj-cells"></a>.</p>
+                    </li>
+                    <li>
+                      <p>Transform the sequence <var>S<sub>i</sub></var> into the final sequence of possibly nested <a title="object">objects</a> for the current row, as described in <a href="#nesting-objects"></a>.</p>
+                    </li>
+                    <li>
+                      <p>Insert each <a>object</a> <var>S<sub>i</sub></var> into <a>array</a> <var>A</var>.</p>
+                    </li>
+                  </ol>
+                </li>
+              </ol>
+            </li>
+          </ol>
+        </section>
 
-                            <p>Value <var>V</var> derived from the <a title="cell value">cell values</a> MUST be expressed in the JSON output according to the <a href="http://www.w3.org/TR/tabular-metadata/#cell-datatype"><code>datatype</code></a> property of the cell as defined below: <a href="#datatypes">Interpreting datatypes</a>.</p> 
-                          </li>
-                        </ol>
+        <section>
+          <h3>Standard mode</h3>
+          <ol class="algorithm">
+            <li>
+              <p>Insert an empty <a>object</a> <var>G</var> into the JSON output which is associated with the <a>table group</a>.</p>
+            </li>
+            <li>
+              <p>If the <a>table group</a> has an <a>identifier</a> <var>I<sub>G</sub></var>; insert the following name-value pair into <a>object</a> <var>G</var>:</p>
+              <dl class="nvp">
+                <dt>name</dt>
+                <dd><code>@id</code></dd>
+                <dt>value</dt>
+                <dd><var>I<sub>G</sub></var></dd>
+              </dl>
+            </li>
+            <li>
+              <p>Insert any <a>common properties</a> specified for the <a>table group</a> into <a>object</a> <var>G</var>. Name-value pairs relating to <a>common properties</a> are copied verbatim from the metadata description—noting that prefixes defined within the <a href="http://www.w3.org/2011/rdfa-context/rdfa-1.1">RDFa 1.1 Initial Context</a> ([[rdfa-core]]) are not expanded.</p>
+            </li>
+            <li>
+              <p>Insert the following name-value pair into <a>object</a> <var>G</var>:</p>
+              <dl class="nvp">
+                <dt>name</dt>
+                <dd><code>table</code></dd>
+                <dt>value</dt>
+                <dd><var>A<sub>T</sub></var></dd>
+              </dl>
+              <p>where <var>A<sub>T</sub></var> is an <a>array</a> into which the <a title="object">objects</a> describing the <a title="annotated table">annotated tables</a> will be subsequently inserted.</p>
+            </li>
+            <li>
+              <p>Each <a title="annotated table">table</a> is processed sequentially in the order they are referenced in the <a>table group description</a>.</p>
+              <p>For each <a title="annotated table">table</a> where the value of property <a href="http://www.w3.org/TR/tabular-metadata/#table-suppressOutput"><code>suppressOutput</code></a> is <var>false</var>:</p>
+              <ol class="algorithm">
+                <li>
+                  <p>Insert an empty <a>object</a> <var>T</var> into the <a>array</a> <var>A<sub>T</sub></var> to represent the <a title="annotated table">table</a>.</p>
+                </li>
+                <li>
+                  <p>If the <a title="annotated table">table</a> has an <a>identifier</a> <var>I<sub>T</sub></var>; insert the following name-value pair into <a>object</a> <var>T</var>:</p>
+                  <dl class="nvp">
+                    <dt>name</dt>
+                    <dd><code>@id</code></dd>
+                    <dt>value</dt>
+                    <dd><var>I<sub>T</sub></var></dd>
+                  </dl>
+                </li>
+                <li>
+                  <p>Specify the source CSV+ file <var>URL</var> for the current table based on the value of property <a href="http://www.w3.org/TR/tabular-metadata/#table-url"><code>url</code></a>; insert the following name-value pair into <a>object</a> <var>T</var>:</p>
+                  <dl class="nvp">
+                    <dt>name</dt>
+                    <dd><code>url</code></dd>
+                    <dt>value</dt>
+                    <dd><var>URL</var></dd>
+                  </dl>
+                </li>
+                <li>
+                  <p>Insert any <a>notes</a> and <a>common properties</a> specified for the <a title="annotated table">table</a> into <a>object</a> <var>T</var>. Name-value pairs relating to <a>notes</a> and <a>common properties</a> are copied verbatim from the metadata description—noting that prefixes defined within the <a href="http://www.w3.org/2011/rdfa-context/rdfa-1.1">RDFa 1.1 Initial Context</a> ([[rdfa-core]]) are not expanded.</p>
+                  <p class="note">All other annotations for the <a title="annotated table">table</a> are ignored during the conversion; including information about <a href="http://www.w3.org/TR/tabular-metadata/#dfn-tableschema" class="externalDFN">table schemas</a> and <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description" class="externalDFN">column descriptions</a> specified therein, <a href="http://www.w3.org/TR/tabular-metadata/#dfn-dialect-description" class="externalDFN">dialect descriptions</a>, <a href="http://www.w3.org/TR/tabular-metadata/#dfn-foreign-key-definition" class="externalDFN">foreign-key-definitions</a> etc.</p>
+                </li>
+                <li>
+                  <p>Insert the following name-value pair into <a>object</a> <var>T</var>:</p>
+                  <dl class="nvp">
+                    <dt>name</dt>
+                    <dd><code>row</code></dd>
+                    <dt>value</dt>
+                    <dd><var>A<sub>R</sub></var></dd>
+                  </dl>
+                  <p>where <var>A<sub>R</sub></var> is an <a>array</a> into which the <a title="object">objects</a> describing the <a title="row">rows</a> will be subsequently inserted.</p>
+                </li>
+                <li>
+                  <p>Each <a>row</a> within the <a title="annotated table">table</a> is processed sequentially in order.</p>
+                  <p>For each <a>row</a> in the current <a title="annotated table">table</a>:</p>
+                  <ol class="algorithm">
+                    <li>
+                      <p>Insert an empty <a>object</a> <var>R</var> into the <a>array</a> <var>A<sub>R</sub></var> to represent the <a>row</a>.</p>
+                    </li>
+                    <li>
+                      <p>Specify the <a>row number</a> <var>n</var> for the <a>row</a>; insert the following name-value pair into <a>object</a> <var>R</var>:</p>
+                      <dl class="nvp">
+                        <dt>name</dt>
+                        <dd><code>rownum</code></dd>
+                        <dt>value</dt>
+                        <dd><var>n</var></dd>
+                      </dl>
+                    </li>
+                    <li>
+                      <p>Specify the <a>row source number</a> <var>n<sub>source</sub></var> for the <a>row</a> within the source CSV+ file <var>URL</var> using a fragment-identifier as specified in [[RFC7111]]; if <a>row source number</a> is not <code>null</code>, insert the following name-value pair into <a>object</a> <var>R</var>:</p>
+                      <dl class="nvp">
+                        <dt>name</dt>
+                        <dd><code>url</code></dd>
+                        <dt>value</dt>
+                        <dd><var>URL</var><code>#row=</code><var>n<sub>source</sub></var></dd>
+                      </dl>
+                    </li>
+                    <li>
+                      <p>Insert the following name-value pair into <a>object</a> <var>R</var>:</p>
+                      <dl class="nvp">
+                        <dt>name</dt>
+                        <dd><code>describes</code></dd>
+                        <dt>value</dt>
+                        <dd><var>A</var></dd>
+                      </dl>
+                      <p>where <var>A</var> is an <a>array</a>. The <a title="object">objects</a> containing the name-value pairs associated with the <a title="cell value">cell values</a> will be subsequently inserted into this <a>array</a>.</p>
+                    </li>
+                    <li>
+                      <p>The <a title="subject">subject(s)</a> described by each <a>row</a> are determined according to the <a>aboutUrl</a> property for each <a>cell</a> in the current <a>row</a>. Where <a>aboutUrl</a> is undefined, a default <a>subject</a> for the <a>row</a> is used.</p>
 
-                        <p class="note">In the case where a sequence of values is provided, the <code>datatype</code> applies to all members of the sequence.</p>
-                        
-                      </li>
-                    </ol>
-                  </li>
-                  <li>
-                    <p>If more than one <a>subject</a> is associated with the current <a>row</a>, review each of the <a title="object">objects</a> associated with those <a title="subject">subjects</a> to determine whether they can be nested.</p>
-                    <p>For each <a>subject</a> <var>i</var> associated with the current <a>row</a>, recurse through the name-value pairs in the <a title="object">objects</a> associated with that <a>row</a> to determine if <a>subject</a> <var>i</var> is referenced—excluding the <a>object</a> describing <a>subject</a> <var>i</var> itself (<a>object</a> <var>S<sub>i</sub></var>).</p>
-                    <p>If <a>subject</a> <var>i</var> is referenced once <em>and only once</em>, then <a>object</a> <var>S<sub>i</sub></var> becomes the value of the referring name-value pair in place of the reference in order to create a nested <a>object</a>.</p>
-                    <p>Else, insert <a>object</a> <var>S<sub>i</sub></var>, potentially including nested <a title="object">objects</a>, into <a>array</a> <var>A</var>.</p>
-                  </li>
-                </ol>
-                <div class="issue" data-number="299">
-                  <p>Do we want to create nested objects in the JSON output where a row describes multiple resources?</p>
-                  <p>Nesting relies on recursion through the <a title="object">objects</a> defined for each <a>subject</a> within a <a>row</a> in order to "plug" related <a title="object">objects</a> together in a hierarchy. This adds a little complexity - but is worth doing (I think) to create graph-like output familiar to most JSON users. Without this recursion, the JSON output would just be a flat set of <a title="object">objects</a>.</p>
-                </div>
-              </li>
-            </ol>
-          </li>
-        </ol>
+                      <p class="note">A <a>row</a> MAY describe multiple interrelated <a title="subject">subjects</a>; where the <a>valueUrl</a> property for one cell matches the <a>aboutUrl</a> property for another <a>cell</a> in the same <a>row</a>.</p>
+                      
+                      <p>Determine the unique <a title="subject">subjects</a> for the current <a>row</a>—including a default <a>subject</a> if <a>aboutUrl</a> is unspecified for any <a title="cell">cells</a> in the <a>row</a>.</p>
+                    </li>
+                    <li>
+                      <p>Generate a sequence of <var>S<sub>i</sub></var> <a title="object">objects</a>, each corresponding to <a>subject</a> <var>i</var> of the current row, as
+                        described in <a href="#gen-subj-cells"></a>.</p>
+                    </li>
+                    <li>
+                      <p>Transform the sequence <var>S<sub>i</sub></var> into the final sequence of possibly nested <a title="object">objects</a> for the current row, as described in <a href="#nesting-objects"></a>.</p>
+                    </li>
+                    <li>
+                      <p>Insert each <a>object</a> <var>S<sub>i</sub></var> into <a>array</a> <var>A</var>.</p>
+                    </li>
+                  </ol>
+                </li>
+              </ol>
+            </li>
+          </ol>
+        </section>
       </section>
+
+      <section id="gen-subj-cells">
+          <h2>Generating of Objects</h2>
+
+          <p>This algorithm generates a sequence of <var>S<sub>i</sub></var> <a title="object">objects</a>, each corresponding to <a>subject</a> <var>i</var> of the current row.</p>
+
+          <p>For each <a>subject</a> that the current <a>row</a> describes where at least one of the <a title="cell">cells</a> that refers to that <a>subject</a> has a <a title="cell value">value</a> that is not <code>null</code>, and is associated with a <a>column</a> where the value of property <a href="http://www.w3.org/TR/tabular-metadata/#column-suppressOutput"><code>suppressOutput</code></a> has value <var>false</var>:</p>
+          <ol class="algorithm">
+            <li>
+              <p>Create an empty <a>object</a> <var>S<sub>i</sub></var> to represent the <a>subject</a> <var>i</var>.</p>
+              <p>(<var>i</var> is the index number with values from <var>1</var> to <var>n</var>, where <var>n</var> is the number of <a title="subject">subjects</a> for the <a>row</a>)</p>
+              <p><a title="subject">Subject</a> <var>i</var> is identified according to the <a>aboutUrl</a> property of its associated <a title="cell">cells</a>: <var>@id<sub>s</sub></var>. For a <em>default</em> <a>subject</a> where <a>aboutUrl</a> is not specified by its <a title="cell">cells</a>, <var>@id<sub>s</sub></var> is <code>null</code>.</p>
+            </li>
+            <li>
+              <p>If the identifier for <a>subject</a> <var>i</var>, <var>@id<sub>s</sub></var>, is not <code>null</code>, then insert the following name-value pair into <a>object</a> <var>S<sub>i</sub></var>:</p>
+              <dl class="nvp">
+                <dt>name</dt>
+                <dd><code>@id</code></dd>
+                <dt>value</dt>
+                <dd><var>@id<sub>s</sub></var></dd>
+              </dl>
+            </li>
+            <li>
+              <p>Each <a>cell</a> referring to <a>subject</a> <var>i</var> is then processed sequentially according to the order of the <a title="column">columns</a> (e.g. <var>1</var> to <var>n</var>).</p>
+              <p>For each <a>cell</a> referring to <a>subject</a> <var>i</var>, where the value of property <a href="http://www.w3.org/TR/tabular-metadata/#column-suppressOutput"><code>suppressOutput</code></a> for the <a>column</a> associated with that <a>cell</a> is <var>false</var>, insert a name-value pair into <a>object</a> <var>S<sub>i</sub></var> as described below:</p>
+              <ol class="algorithm">
+                <li>
+                  <p>If the value of <a>propertyUrl</a> for the <a>cell</a> is not <code>null</code>, then <a>name</a> <var>N</var> takes the value of <a>propertyUrl</a>.</p>
+                  <p>Else, <a>name</a> <var>N</var> takes the value of the <a href="http://www.w3.org/TR/tabular-metadata/#column-name"><code>name</code></a> property for the column associated with the <a>cell</a>.</p>
+                </li>
+                <li>
+                  <p>If the <a>valueUrl</a> for the current <a>cell</a> is not <code>null</code>, then insert the following name-value pair into <a>object</a> <var>S<sub>i</sub></var>:</p>
+                  <dl class="nvp">
+                    <dt>name</dt>
+                    <dd><var>N</var></dd>
+                    <dt>value</dt>
+                    <dd><var>V<sub>url</sub></var></dd>
+                  </dl>
+                  <p>where <var>V<sub>url</sub></var> is the value of <a>valueUrl</a> property for the current <a>cell</a>, is expressed as a string in the JSON output.</p>
+                </li>
+                <li>
+                  <p>Else, if the <a>cell</a> specifies a <a href="http://www.w3.org/TR/tabular-metadata/#cell-separator"><code>separator</code></a> property and the <a>cell value</a> is not an empty sequence, then the <a>cell value</a> provides a sequence of values for inclusion within the JSON output; insert an <a>array</a> <var>A<sub>v</sub></var> containing each value <var>V</var> of the sequence into <a>object</a> <var>S<sub>i</sub></var>:</p>
+                  <dl class="nvp">
+                    <dt>name</dt>
+                    <dd><var>N</var></dd>
+                    <dt>value</dt>
+                    <dd><var>A<sub>v</sub></var></dd>
+                  </dl>
+                  <p class="note">Since <a title="array">arrays</a> are implicitly <em>ordered</em> in JSON, the <a href="http://www.w3.org/TR/tabular-metadata/#cell-ordered"><code>ordered</code></a> property, if specified, has no effect on the JSON output.</p>
+                </li>
+                <li>
+                  <p>Else, if the <a>cell value</a> is not <code>null</code>, then the <a>cell value</a> provides a single value <var>V</var> for inclusion within the JSON output; insert the following name-value pair into <a>object</a> <var>S<sub>i</sub></var>:</p>
+                  <dl class="nvp">
+                    <dt>name</dt>
+                    <dd><var>N</var></dd>
+                    <dt>value</dt>
+                    <dd><var>V</var></dd>
+                  </dl>
+
+                  <p>Value <var>V</var> derived from the <a title="cell value">cell values</a> MUST be expressed in the JSON output according to the <a href="http://www.w3.org/TR/tabular-metadata/#cell-datatype"><code>datatype</code></a> property of the cell as defined below: <a href="#datatypes">Interpreting datatypes</a>.</p> 
+                </li>
+              </ol>
+
+              <p class="note">In the case where a sequence of values is provided, the <code>datatype</code> applies to all members of the sequence.</p>
+              
+            </li>
+          </ol>
+      </section>
+
+      <section id="nesting-objects">
+        <h2>Generating Nested Objects</h2>
+        <p>This algorithm considers a sequence of <var>S<sub>i</sub></var> <a title="object">objects</a>, each corresponding to <a>subject</a> <var>i</var> of the current row, and as generated by <a href="#gen-subj-cells"></a>. It generates a new <var>S<sub>i</sub></var> sequence, where, if possible, an <var>S<sub>j</sub></var> with an explicit <code>@id<sub>i</sub></code>, referred to <em>once and only once</em> by another object <var>S<sub>k</sub></var> through a reference originating from an <code>aboutUrl</code> value, is directly added into <var>S<sub>k</sub></var>.</p>
+
+        <div class="issue" data-number="299">
+          <p>Do we want to create nested objects in the JSON output where a row describes multiple resources?</p>
+          <p>Nesting relies on recursion through the <a title="object">objects</a> defined for each <a>subject</a> within a <a>row</a> in order to "plug" related <a title="object">objects</a> together in a hierarchy. This adds a little complexity - but is worth doing (I think) to create graph-like output familiar to most JSON users. Without this recursion, the JSON output would just be a flat set of <a title="object">objects</a>.</p>
+          <p>The text below is outdated and is only a placeholder for now; the issue comments contain some proposals for a possible replacement of this text.</p>
+        </div>
+
+
+
+        <p>For each <a>subject</a> <var>i</var> associated with the current <a>row</a>, recurse through the name-value pairs in the <a title="object">objects</a> associated with that <a>row</a> to determine if <a>subject</a> <var>i</var> is referenced—excluding the <a>object</a> describing <a>subject</a> <var>i</var> itself (<a>object</a> <var>S<sub>i</sub></var>).</p>
+        <p>If <a>subject</a> <var>i</var> is referenced once <em>and only once</em>, then <a>object</a> <var>S<sub>i</sub></var> becomes the value of the referring name-value pair in place of the reference in order to create a nested <a>object</a>.</p>
+
+
+      </section>
+
 
       <section id="datatypes">
         <h3>Interpreting datatypes</h3>
