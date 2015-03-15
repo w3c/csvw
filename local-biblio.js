@@ -66,5 +66,13 @@ var localBibliography = {
     "status" : "REC",
     "publisher" : "W3C",
     "href" : "http://www.w3.org/TR/REC-xml/#sec-notation"
+  },
+  "Knuth" : {
+    "author" : [
+      "Donald E. Knuth"
+    ],
+    "title" : "The Art of Computer Programming Volume 1: Fundamental Algorithms (3rd ed.)",
+    "publisher" : "Addison-Wesley Professional",
+    "rawDate" : "1997-11-14"
   }
 };
