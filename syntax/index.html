@@ -334,7 +334,7 @@ $ csvlint data.csv --schema:schema.json
           to supply a schema that describes the contents of the file, against which it can be validated.
         </p>
         <p>
-          Metadata supplied in this way is called overriding, or user-supplied, metadata. Implementations should define how this is mapped into the vocabulary defined in [[!tabular-metadata]]. If such metadata describes a <a>table</a> or <a>group of tables</a> then it is the only metadata used for processing tabular data files, other than the data embedded within that files as defined in <a href="#embedded-metadata" class="sectionRef"></a>.
+          Metadata supplied in this way is called overriding, or user-supplied, metadata. Implementations should define how this is mapped into the vocabulary defined in [[!tabular-metadata]]. If such metadata describes a <a>table</a> or <a>group of tables</a> then it is the only metadata used for processing tabular data files, other than the data embedded within those files as defined in <a href="#embedded-metadata" class="sectionRef"></a>.
         </p>
       </section>
       <section>
@@ -459,17 +459,20 @@ Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
           <li>Extract the <em>first available</em> <a href="http://www.w3.org/TR/tabular-metadata/#dialect-descriptions">dialect description</a> (<code>DD</code>) from the metadata files <code>UM</code> and  <code>FM</code> (in this order) for the <a>table</a> associated with the tabular data file. If there is no such dialect description, extract the first available dialect description from a <a>group of tables</a> in which the tabular data file is described. Otherwise use the default dialect description.</li>
           <li>If the tabular data file was retrieved with <code>Content-Type</code> including the <code>header=absent</code> parameter set <code>header</code> to <code>false</code> in <code>DD</code>.</li>
           <li>
-            Parse the tabular data file, using <code>DD</code> as a guide, to create a basic tabular data model (<code>T</code>). Extract <a>embedded metadata</a> (<code>EM</code>), for example from the <a>header line</a>.
-            <p class="note">Note: This specification provides a non-normative definition for parsing tabular data files, including the extraction of <a>embedded metadata</a>, in <a href="#parsing" class="sectionRef"></a>. No definition of the format of <a>embedded metadata</a> is given here; whatever syntax is used, it's assumed that metadata can be mapped to the vocabulary defined in [[!tabular-metadata]].</p>
+            <p>Parse the tabular data file, using <code>DD</code> as a guide, to create a basic tabular data model (<code>T</code>) and extract <a>embedded metadata</a> (<code>EM</code>), for example from the <a>header line</a>.</p>
+            <p class="note">This specification provides a non-normative definition for parsing tabular data files, including the extraction of <a>embedded metadata</a>, in <a href="#parsing" class="sectionRef"></a>. No definition of the format of <a>embedded metadata</a> is given here; whatever syntax is used, it's assumed that metadata can be mapped to the vocabulary defined in [[!tabular-metadata]].</p>
           </li>
           <li>Create the merged metadata <code>M = merge(UM, EM, FM)</code> using the <a href="http://w3c.github.io/csvw/metadata/#dfn-merged" class="externalDFN">merge algorithm</a> defined in [[!tabular-metadata]].</li>
           <li>Use the metadata <code>M</code> to add annotations to the tabular data model <code>T</code> as described in <a href="http://w3c.github.io/csvw/metadata/#annotating-tables">Section 2 Annotating Tables</a> in [[!tabular-metadata]].</li>
         </ol>
-        <p>If the process starts with a Metadata file:</p>
+        <p>If the process starts with a metadata file:</p>
         <ol class="algorithm">
           <li>Retrieve the metadata file yielding the metadata <code>UM</code> (which is treated as overriding metadata, see <a href="#overriding-metadata" class="sectionRef"></a>).</li>
-          <li>For each <a>table</a> in <code>UM</code>, run the steps for a tabular data file using the <code>url</code> from the <a>table</a> with <code>UM</code> playing the role of <code>UM</code> to create one or more <a title="annotated table">annotated tables</a>.</li>
+          <li>For each <a>table</a> in <code>UM</code> in order, run the steps for a tabular data file using the <code>url</code> from the <a>table</a> with <code>UM</code> playing the role of <code>UM</code> to create one or more <a title="annotated table">annotated tables</a>.</li>
         </ol>
+        <p class="note">
+          In the case of starting with a metadata file, <code>UM</code> will describe a <a>table</a> or <a>group of tables</a>, and no other metadata files will be retrieved. Thus the metadata file must provide all applicable metadata aside from that embedded within the tabular data files themselves.
+        </p>
       </section>
       <section>
         <h3>Displaying Tables</h3>
