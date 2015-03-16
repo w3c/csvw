@@ -205,12 +205,11 @@ var respecConfig = {
 
         <p>A conformant JSON conversion application MUST produce output conforming to this algorithm according to the chosen mode of conversion: <a title="standard mode">standard</a> or <a title="minimal mode">minimal</a>.</p>
 
-        <p>Unless specified otherwise, the steps in the algorithm defined herein apply to both <a title="standard mode">standard</a> <em>and</em> <a title="minimal mode">minimal</a> modes.</p>
-
         <p class="note">Where an <a>annotated table</a> is defined in isolation (e.g. in the absence of a <a>table group description</a>), a default <a>table group description</a> is provided with a single <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table-group-resources" class="externalDFN"><code>resources</code></a> annotation that refers to that <a title="annotated table">table</a>.</p>
 
         <section>
           <h3>Minimal mode</h3>
+          <p>The steps in the algorithm defined here apply to <a title="minimal mode">minimal</a> mode.</p>
           <ol class="algorithm">
             <li>
               <p>Insert an empty <a>array</a> <var>A</var> into the JSON output. The <a title="object">objects</a> containing the name-value pairs associated with the <a title="cell value">cell values</a> will be subsequently inserted into this <a>array</a>.</p>
@@ -219,8 +218,7 @@ var respecConfig = {
               <p>Each <a title="annotated table">table</a> is processed sequentially in the order they are referenced in the <a>table group description</a>. For each <a title="annotated table">table</a> where the value of property <a href="http://www.w3.org/TR/tabular-metadata/#table-suppressOutput"><code>suppressOutput</code></a> is <var>false</var>:</p>
               <ol class="algorithm">
                 <li>
-                  <p>Each <a>row</a> within the <a title="annotated table">table</a> is processed sequentially in order.</p>
-                  <p>For each <a>row</a> in the current <a title="annotated table">table</a>:</p>
+                  <p>Each <a>row</a> within the <a title="annotated table">table</a> is processed sequentially in order. For each <a>row</a> in the current <a title="annotated table">table</a>:</p>
                   <ol class="algorithm">
                     <li>
                       <p>The <a title="subject">subject(s)</a> described by each <a>row</a> are determined according to the <a>aboutUrl</a> property for each <a>cell</a> in the current <a>row</a>. Where <a>aboutUrl</a> is undefined, a default <a>subject</a> for the <a>row</a> is used.</p>
@@ -248,6 +246,7 @@ var respecConfig = {
 
         <section>
           <h3>Standard mode</h3>
+          <p>The steps in the algorithm defined here apply to <a title="standard mode">standard</a> mode.</p>
           <ol class="algorithm">
             <li>
               <p>Insert an empty <a>object</a> <var>G</var> into the JSON output which is associated with the <a>table group</a>.</p>
@@ -275,8 +274,7 @@ var respecConfig = {
               <p>where <var>A<sub>T</sub></var> is an <a>array</a> into which the <a title="object">objects</a> describing the <a title="annotated table">annotated tables</a> will be subsequently inserted.</p>
             </li>
             <li>
-              <p>Each <a title="annotated table">table</a> is processed sequentially in the order they are referenced in the <a>table group description</a>.</p>
-              <p>For each <a title="annotated table">table</a> where the value of property <a href="http://www.w3.org/TR/tabular-metadata/#table-suppressOutput"><code>suppressOutput</code></a> is <var>false</var>:</p>
+              <p>Each <a title="annotated table">table</a> is processed sequentially in the order they are referenced in the <a>table group description</a>. For each <a title="annotated table">table</a> where the value of property <a href="http://www.w3.org/TR/tabular-metadata/#table-suppressOutput"><code>suppressOutput</code></a> is <var>false</var>:</p>
               <ol class="algorithm">
                 <li>
                   <p>Insert an empty <a>object</a> <var>T</var> into the <a>array</a> <var>A<sub>T</sub></var> to represent the <a title="annotated table">table</a>.</p>
@@ -314,8 +312,7 @@ var respecConfig = {
                   <p>where <var>A<sub>R</sub></var> is an <a>array</a> into which the <a title="object">objects</a> describing the <a title="row">rows</a> will be subsequently inserted.</p>
                 </li>
                 <li>
-                  <p>Each <a>row</a> within the <a title="annotated table">table</a> is processed sequentially in order.</p>
-                  <p>For each <a>row</a> in the current <a title="annotated table">table</a>:</p>
+                  <p>Each <a>row</a> within the <a title="annotated table">table</a> is processed sequentially in order. For each <a>row</a> in the current <a title="annotated table">table</a>:</p>
                   <ol class="algorithm">
                     <li>
                       <p>Insert an empty <a>object</a> <var>R</var> into the <a>array</a> <var>A<sub>R</sub></var> to represent the <a>row</a>.</p>
@@ -376,19 +373,15 @@ var respecConfig = {
       <section id="gen-subj-cells">
           <h2>Generating Objects</h2>
 
-          <p>This algorithm generates a sequence of <var>S<sub>i</sub></var> <a title="object">objects</a>, each corresponding to <a>subject</a> <var>i</var> of the current row. The algorithm inserts name-value pairs into <var>S<sub>i</sub></var> depending on the cell values; note that the term “insert” must be understood as:</p>
+          <p>The steps in the algorithm defined herein apply to both <a title="standard mode">standard</a> <em>and</em> <a title="minimal mode">minimal</a> modes.</p>
 
-          <ol class="algorithm">
-            <li>If the <a>name</a> <var>N</var> is used only once in <var>S<sub>i</sub></var>, then the value <var>V</var> is the value of the name-value pair within the JSON <a>object</a>.</li>
-            <li>Otherwise <var>V</var> should be an array, and the (new) value should be added to <var>V</var>.</li>
-          </ol>
-
-          <p>The algorithm performs the following steps. For each <a>subject</a> that the current <a>row</a> describes where at least one of the <a title="cell">cells</a> that refers to that <a>subject</a> has a <a title="cell value">value</a> that is not <code>null</code>, and is associated with a <a>column</a> where the value of property <a href="http://www.w3.org/TR/tabular-metadata/#column-suppressOutput"><code>suppressOutput</code></a> has value <var>false</var>:</p>
+          <p>This algorithm generates a sequence of <var>S<sub>i</sub></var> <a title="object">objects</a>, each corresponding to <a>subject</a> <var>i</var> of the current row. The algorithm inserts name-value pairs into <var>S<sub>i</sub></var> depending on the cell values as outlined in the following steps.</p>
+          <p>For each <a>subject</a> that the current <a>row</a> describes where at least one of the <a title="cell">cells</a> that refers to that <a>subject</a> has a <a title="cell value">value</a> that is not <code>null</code>, and is associated with a <a>column</a> where the value of property <a href="http://www.w3.org/TR/tabular-metadata/#column-suppressOutput"><code>suppressOutput</code></a> has value <var>false</var>:</p>
           <ol class="algorithm">
             <li>
               <p>Create an empty <a>object</a> <var>S<sub>i</sub></var> to represent the <a>subject</a> <var>i</var>.</p>
               <p>(<var>i</var> is the index number with values from <var>1</var> to <var>n</var>, where <var>n</var> is the number of <a title="subject">subjects</a> for the <a>row</a>)</p>
-              <p><a title="subject">Subject</a> <var>i</var> is identified according to the <a>aboutUrl</a> property of its associated <a title="cell">cells</a>: <var>@id<sub>s</sub></var>. For a <em>default</em> <a>subject</a> where <a>aboutUrl</a> is not specified by its <a title="cell">cells</a>, <var>@id<sub>s</sub></var> is <code>null</code>.</p>
+              <p><a title="subject">Subject</a> <var>i</var> is identified according to the <a>aboutUrl</a> property of its associated <a title="cell">cells</a>: <var>I<sub>s</sub></var>. For a <em>default</em> <a>subject</a> where <a>aboutUrl</a> is not specified by its <a title="cell">cells</a>, <var>I<sub>s</sub></var> is <code>null</code>.</p>
             </li>
             <li>
               <p>If the identifier for <a>subject</a> <var>i</var>, <var>@id<sub>s</sub></var>, is not <code>null</code>, then insert the following name-value pair into <a>object</a> <var>S<sub>i</sub></var>:</p>
@@ -396,7 +389,7 @@ var respecConfig = {
                 <dt>name</dt>
                 <dd><code>@id</code></dd>
                 <dt>value</dt>
-                <dd><var>@id<sub>s</sub></var></dd>
+                <dd><var>I<sub>s</sub></var></dd>
               </dl>
             </li>
             <li>
@@ -425,6 +418,7 @@ var respecConfig = {
                     <dt>value</dt>
                     <dd><var>A<sub>v</sub></var></dd>
                   </dl>
+                  <p class="note">In the case where a sequence of values is provided, the <code>datatype</code> applies to all members of the sequence.</p>
                   <p class="note">Since <a title="array">arrays</a> are implicitly <em>ordered</em> in JSON, the <a href="http://www.w3.org/TR/tabular-metadata/#cell-ordered"><code>ordered</code></a> property, if specified, has no effect on the JSON output.</p>
                 </li>
                 <li>
@@ -439,15 +433,18 @@ var respecConfig = {
                   <p>Value <var>V</var> derived from the <a title="cell value">cell values</a> MUST be expressed in the JSON output according to the <a href="http://www.w3.org/TR/tabular-metadata/#cell-datatype"><code>datatype</code></a> property of the cell as defined below: <a href="#datatypes">Interpreting datatypes</a>.</p> 
                 </li>
               </ol>
-
-              <p class="note">In the case where a sequence of values is provided, the <code>datatype</code> applies to all members of the sequence.</p>
-              
+            </li>
+            <li>
+              <p>If <a>name</a> <var>N</var> occurs more than once within <a>object</a> <var>S<sub>i</sub></var>, the name-value pairs from each occurrence of <a>name</a> <var>N</var> MUST be compacted to form a single name-value pair with <a>name</a> <var>N</var> and whose value is an array containing all values from each of those name-value pairs.</p>
             </li>
           </ol>
       </section>
 
       <section id="nesting-objects">
         <h2>Generating Nested Objects</h2>
+
+        <p>The steps in the algorithm defined here apply to both <a title="standard mode">standard</a> <em>and</em> <a title="minimal mode">minimal</a> modes.</p>
+
         <p>This algorithm considers a sequence of <var>S<sub>i</sub></var> <a title="object">objects</a>, each corresponding to <a>subject</a> <var>i</var> of the current row, and as generated by <a href="#gen-subj-cells"></a>. It generates a new <var>S<sub>i</sub></var> sequence, where, if possible, an <var>S<sub>j</sub></var> with an explicit <code>@id<sub>i</sub></code>, referred to <em>once and only once</em> by another object <var>S<sub>k</sub></var> through a reference originating from an <code>valueUrl</code> value, is directly added into <var>S<sub>k</sub></var>.</p>
 
         <div class="issue" data-number="299">
