@@ -172,7 +172,7 @@ var respecConfig = {
           <dd>A list of <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table-notes" class="externalDFN">notes</a>, as defined in [[!tabular-data-model]], attached to an <a title="annotated table">annotated table</a> using the <code>notes</code> property. This may be an empty list.</dd>
 
           <dt><dfn>object</dfn></dt>
-          <dd>An <a>object</a> is defined in JSON ([[!RFC7159]]) as unordered collection of zero or more name-value pairs, where a where a name is a string and a value is a string, number, boolean, null, <a>object</a>, or <a>array</a>.</dd>
+          <dd>An <a>object</a> is defined in JSON ([[!RFC7159]]) as unordered collection of zero or more name-value pairs, where a name is a string and a value is a string, number, boolean, null, <a>object</a>, or <a>array</a>.</dd>
 
           <dt><dfn>propertyUrl</dfn></dt>
           <dd>The <a>propertyUrl</a> is the evaluation of the <code>propertyUrl</code> property of the current <a href="http://www.w3.org/TR/tabular-data-model/#dfn-cell" class="externalDFN">cell</a> as defined in <cite><a href="http://www.w3.org/TR/tabular-metadata/#dfn-uri-template-property">URI template properties</a></cite> in [[!tabular-metadata]].</dd>
@@ -205,12 +205,11 @@ var respecConfig = {
 
         <p>A conformant JSON conversion application MUST produce output conforming to this algorithm according to the chosen mode of conversion: <a title="standard mode">standard</a> or <a title="minimal mode">minimal</a>.</p>
 
-        <p>Unless specified otherwise, the steps in the algorithm defined herein apply to both <a title="standard mode">standard</a> <em>and</em> <a title="minimal mode">minimal</a> modes.</p>
-
         <p class="note">Where an <a>annotated table</a> is defined in isolation (e.g. in the absence of a <a>table group description</a>), a default <a>table group description</a> is provided with a single <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table-group-resources" class="externalDFN"><code>resources</code></a> annotation that refers to that <a title="annotated table">table</a>.</p>
 
         <section>
           <h3>Minimal mode</h3>
+          <p>The steps in the algorithm defined here apply to <a title="minimal mode">minimal</a> mode.</p>
           <ol class="algorithm">
             <li>
               <p>Insert an empty <a>array</a> <var>A</var> into the JSON output. The <a title="object">objects</a> containing the name-value pairs associated with the <a title="cell value">cell values</a> will be subsequently inserted into this <a>array</a>.</p>
@@ -219,25 +218,20 @@ var respecConfig = {
               <p>Each <a title="annotated table">table</a> is processed sequentially in the order they are referenced in the <a>table group description</a>. For each <a title="annotated table">table</a> where the value of property <a href="http://www.w3.org/TR/tabular-metadata/#table-suppressOutput"><code>suppressOutput</code></a> is <var>false</var>:</p>
               <ol class="algorithm">
                 <li>
-                  <p>Each <a>row</a> within the <a title="annotated table">table</a> is processed sequentially in order.</p>
-                  <p>For each <a>row</a> in the current <a title="annotated table">table</a>:</p>
+                  <p>Each <a>row</a> within the <a title="annotated table">table</a> is processed sequentially in order. For each <a>row</a> in the current <a title="annotated table">table</a>:</p>
                   <ol class="algorithm">
                     <li>
-                      <p>The <a title="subject">subject(s)</a> described by each <a>row</a> are determined according to the <a>aboutUrl</a> property for each <a>cell</a> in the current <a>row</a>. Where <a>aboutUrl</a> is undefined, a default <a>subject</a> for the <a>row</a> is used.</p>
+                      <p>Generate a sequence of <a title="object">objects</a>, <var>S<sub>1</sub></var> to <var>S<sub>n</sub></var>, each of which corresponds to a <a>subject</a> described by the current <a>row</a>, as described in <a href="#gen-subj-cells"></a>.</p>
 
-                      <p class="note">A <a>row</a> MAY describe multiple interrelated <a title="subject">subjects</a>; where the <a>valueUrl</a> property for one cell matches the <a>aboutUrl</a> property for another <a>cell</a> in the same <a>row</a>.</p>
-                      
-                      <p>Determine the unique <a title="subject">subjects</a> for the current <a>row</a>—including a default <a>subject</a> if <a>aboutUrl</a> is unspecified for any <a title="cell">cells</a> in the <a>row</a>.</p>
+                      <p class="note">The <a title="subject">subject(s)</a> described by each <a>row</a> are determined according to the <a>aboutUrl</a> property for each <a>cell</a> in the current <a>row</a>. Where <a>aboutUrl</a> is undefined, a default <a>subject</a> for the <a>row</a> is used.</p>
                     </li>
                     <li>
-                      <p>Generate a sequence of <var>S<sub>i</sub></var> <a title="object">objects</a>, each corresponding to <a>subject</a> <var>i</var> of the current row, as
-                        described in <a href="#gen-subj-cells"></a>.</p>
+                      <p>As described in <a href="#nesting-objects"></a>, process the sequence of <a title="object">objects</a>, <var>S<sub>1</sub></var> to <var>S<sub>n</sub></var>, to produce a new sequence of <em>root</em> <a title="object">objects</a>, <var>S<sup>R</sup><sub>1</sub></var> to <var>S<sup>R</sup><sub>m</sub></var>, that MAY include <em>nested</em> <a title="object">objects</a>.</p>
+
+                      <p class="note">A <a>row</a> MAY describe multiple interrelated <a title="subject">subjects</a>; where the <a>valueUrl</a> property for one <a>cell</a> matches the <a>aboutUrl</a> property for another <a>cell</a> in the same <a>row</a>.</p>
                     </li>
                     <li>
-                      <p>Transform the sequence <var>S<sub>i</sub></var> into the final sequence of possibly nested <a title="object">objects</a> for the current row, as described in <a href="#nesting-objects"></a>.</p>
-                    </li>
-                    <li>
-                      <p>Insert each <a>object</a> <var>S<sub>i</sub></var> into <a>array</a> <var>A</var>.</p>
+                      <p>Insert each <em>root</em> <a>object</a>, <var>S<sup>R</sup><sub>1</sub></var> to <var>S<sup>R</sup><sub>m</sub></var>, into <a>array</a> <var>A</var>.</p>
                     </li>
                   </ol>
                 </li>
@@ -248,6 +242,7 @@ var respecConfig = {
 
         <section>
           <h3>Standard mode</h3>
+          <p>The steps in the algorithm defined here apply to <a title="standard mode">standard</a> mode.</p>
           <ol class="algorithm">
             <li>
               <p>Insert an empty <a>object</a> <var>G</var> into the JSON output which is associated with the <a>table group</a>.</p>
@@ -314,8 +309,7 @@ var respecConfig = {
                   <p>where <var>A<sub>R</sub></var> is an <a>array</a> into which the <a title="object">objects</a> describing the <a title="row">rows</a> will be subsequently inserted.</p>
                 </li>
                 <li>
-                  <p>Each <a>row</a> within the <a title="annotated table">table</a> is processed sequentially in order.</p>
-                  <p>For each <a>row</a> in the current <a title="annotated table">table</a>:</p>
+                  <p>Each <a>row</a> within the <a title="annotated table">table</a> is processed sequentially in order. For each <a>row</a> in the current <a title="annotated table">table</a>:</p>
                   <ol class="algorithm">
                     <li>
                       <p>Insert an empty <a>object</a> <var>R</var> into the <a>array</a> <var>A<sub>R</sub></var> to represent the <a>row</a>.</p>
@@ -349,21 +343,17 @@ var respecConfig = {
                       <p>where <var>A</var> is an <a>array</a>. The <a title="object">objects</a> containing the name-value pairs associated with the <a title="cell value">cell values</a> will be subsequently inserted into this <a>array</a>.</p>
                     </li>
                     <li>
-                      <p>The <a title="subject">subject(s)</a> described by each <a>row</a> are determined according to the <a>aboutUrl</a> property for each <a>cell</a> in the current <a>row</a>. Where <a>aboutUrl</a> is undefined, a default <a>subject</a> for the <a>row</a> is used.</p>
+                      <p>Generate a sequence of <a title="object">objects</a>, <var>S<sub>1</sub></var> to <var>S<sub>n</sub></var>, each of which corresponds to a <a>subject</a> described by the current <a>row</a>, as described in <a href="#gen-subj-cells"></a>.</p>
 
-                      <p class="note">A <a>row</a> MAY describe multiple interrelated <a title="subject">subjects</a>; where the <a>valueUrl</a> property for one cell matches the <a>aboutUrl</a> property for another <a>cell</a> in the same <a>row</a>.</p>
-                      
-                      <p>Determine the unique <a title="subject">subjects</a> for the current <a>row</a>—including a default <a>subject</a> if <a>aboutUrl</a> is unspecified for any <a title="cell">cells</a> in the <a>row</a>.</p>
+                      <p class="note">The <a title="subject">subject(s)</a> described by each <a>row</a> are determined according to the <a>aboutUrl</a> property for each <a>cell</a> in the current <a>row</a>. Where <a>aboutUrl</a> is undefined, a default <a>subject</a> for the <a>row</a> is used.</p>
                     </li>
                     <li>
-                      <p>Generate a sequence of <var>S<sub>i</sub></var> <a title="object">objects</a>, each corresponding to <a>subject</a> <var>i</var> of the current row, as
-                        described in <a href="#gen-subj-cells"></a>.</p>
+                      <p>As described in <a href="#nesting-objects"></a>, process the sequence of <a title="object">objects</a>, <var>S<sub>1</sub></var> to <var>S<sub>n</sub></var>, to produce a new sequence of <em>root</em> <a title="object">objects</a>, <var>S<sup>R</sup><sub>1</sub></var> to <var>S<sup>R</sup><sub>m</sub></var>, that MAY include <em>nested</em> <a title="object">objects</a>.</p>
+
+                      <p class="note">A <a>row</a> MAY describe multiple interrelated <a title="subject">subjects</a>; where the <a>valueUrl</a> property for one <a>cell</a> matches the <a>aboutUrl</a> property for another <a>cell</a> in the same <a>row</a>.</p>
                     </li>
                     <li>
-                      <p>Transform the sequence <var>S<sub>i</sub></var> into the final sequence of possibly nested <a title="object">objects</a> for the current row, as described in <a href="#nesting-objects"></a>.</p>
-                    </li>
-                    <li>
-                      <p>Insert each <a>object</a> <var>S<sub>i</sub></var> into <a>array</a> <var>A</var>.</p>
+                      <p>Insert each <em>root</em> <a>object</a>, <var>S<sup>R</sup><sub>1</sub></var> to <var>S<sup>R</sup><sub>m</sub></var>, into <a>array</a> <var>A</var>.</p>
                     </li>
                   </ol>
                 </li>
@@ -374,93 +364,179 @@ var respecConfig = {
       </section>
 
       <section id="gen-subj-cells">
-          <h2>Generating Objects</h2>
+        <h2>Generating Objects</h2>
+        <p>The steps in the algorithm defined here apply to both <a title="standard mode">standard</a> <em>and</em> <a title="minimal mode">minimal</a> modes.</p>
 
-          <p>This algorithm generates a sequence of <var>S<sub>i</sub></var> <a title="object">objects</a>, each corresponding to <a>subject</a> <var>i</var> of the current row. The algorithm inserts name-value pairs into <var>S<sub>i</sub></var> depending on the cell values; note that the term “insert” must be understood as:</p>
+        <p>This algorithm generates a sequence of <a title="object">objects</a>, <var>S<sub>1</sub></var> to <var>S<sub>n</sub></var>, each of which corresponds to a <a>subject</a> described by the current <a>row</a>. The algorithm inserts name-value pairs into <var>S<sub>i</sub></var> depending on the cell values as outlined in the following steps.</p>
 
-          <ol class="algorithm">
-            <li>If the <a>name</a> <var>N</var> is used only once in <var>S<sub>i</sub></var>, then the value <var>V</var> is the value of the name-value pair within the JSON <a>object</a>.</li>
-            <li>Otherwise <var>V</var> should be an array, and the (new) value should be added to <var>V</var>.</li>
-          </ol>
+        <ol class="algorithm">
+          <li>
+            <p>Determine the unique <a title="subject">subjects</a> for the current <a>row</a>. The <a title="subject">subject(s)</a> described by each <a>row</a> are determined according to the <a>aboutUrl</a> property for each <a>cell</a> in the current <a>row</a>. A default <a>subject</a> for the <a>row</a> is used for any <a title="cell">cells</a> where <a>aboutUrl</a> is undefined.</p>
+          </li>
+          <li>
+            <p>For each <a>subject</a> that the current <a>row</a> describes where at least one of the <a title="cell">cells</a> that refers to that <a>subject</a> has a <a title="cell value">value</a> or <a>valueUrl</a> that is not <code>null</code>, and is associated with a <a>column</a> where the value of property <a href="http://www.w3.org/TR/tabular-metadata/#column-suppressOutput"><code>suppressOutput</code></a> has value <var>false</var>:</p>
+            <ol class="algorithm">
+              <li>
+                <p>Create an empty <a>object</a> <var>S<sub>i</sub></var> to represent the <a>subject</a> <var>i</var>.</p>
+                <p>(<var>i</var> is the index number with values from <var>1</var> to <var>n</var>, where <var>n</var> is the number of <a title="subject">subjects</a> for the <a>row</a>)</p>
+                <p><a title="subject">Subject</a> <var>i</var> is identified according to the <a>aboutUrl</a> property of its associated <a title="cell">cells</a>: <var>I<sub>S</sub></var>. For a <em>default</em> <a>subject</a> where <a>aboutUrl</a> is not specified by its <a title="cell">cells</a>, <var>I<sub>S</sub></var> is <code>null</code>.</p>
+              </li>
+              <li>
+                <p>If the identifier for <a>subject</a> <var>i</var>, <var>I<sub>S</sub></var>, is not <code>null</code>, then insert the following name-value pair into <a>object</a> <var>S<sub>i</sub></var>:</p>
+                <dl class="nvp">
+                  <dt>name</dt>
+                  <dd><code>@id</code></dd>
+                  <dt>value</dt>
+                  <dd><var>I<sub>S</sub></var></dd>
+                </dl>
+              </li>
+              <li>
+                <p>Each <a>cell</a> referring to <a>subject</a> <var>i</var> is then processed sequentially according to the order of the <a title="column">columns</a>.</p>
+                <p>For each <a>cell</a> referring to <a>subject</a> <var>i</var>, where the value of property <a href="http://www.w3.org/TR/tabular-metadata/#column-suppressOutput"><code>suppressOutput</code></a> for the <a>column</a> associated with that <a>cell</a> is <var>false</var>, insert a name-value pair into <a>object</a> <var>S<sub>i</sub></var> as described below:</p>
+                <ol class="algorithm">
+                  <li>
+                    <p>If the value of <a>propertyUrl</a> for the <a>cell</a> is not <code>null</code>, then <a>name</a> <var>N</var> takes the value of <a>propertyUrl</a>.</p>
+                    <p>Else, <a>name</a> <var>N</var> takes the value of the <a href="http://www.w3.org/TR/tabular-metadata/#column-name"><code>name</code></a> property for the column associated with the <a>cell</a>.</p>
+                  </li>
+                  <li>
+                    <p>If the <a>valueUrl</a> for the current <a>cell</a> is not <code>null</code>, then insert the following name-value pair into <a>object</a> <var>S<sub>i</sub></var>:</p>
+                    <dl class="nvp">
+                      <dt>name</dt>
+                      <dd><var>N</var></dd>
+                      <dt>value</dt>
+                      <dd><var>V<sub>url</sub></var></dd>
+                    </dl>
+                    <p>where <var>V<sub>url</sub></var> is the value of <a>valueUrl</a> property for the current <a>cell</a>, is expressed as a string in the JSON output.</p>
+                  </li>
+                  <li>
+                    <p>Else, if the <a>cell</a> specifies a <a href="http://www.w3.org/TR/tabular-metadata/#cell-separator"><code>separator</code></a> property and the <a>cell value</a> is not an empty sequence, then the <a>cell value</a> provides a sequence of values for inclusion within the JSON output; insert an <a>array</a> <var>A<sub>v</sub></var> containing each value <var>V</var> of the sequence into <a>object</a> <var>S<sub>i</sub></var>:</p>
+                    <dl class="nvp">
+                      <dt>name</dt>
+                      <dd><var>N</var></dd>
+                      <dt>value</dt>
+                      <dd><var>A<sub>v</sub></var></dd>
+                    </dl>
+                    <p>Each of the values <var>V</var> derived from the sequence MUST be expressed in the JSON output according to the <a href="http://www.w3.org/TR/tabular-metadata/#cell-datatype"><code>datatype</code></a> property of the cell as defined below: <a href="#datatypes"></a>.</p>
+                    <p class="note">Since <a title="array">arrays</a> are implicitly <em>ordered</em> in JSON, the <a href="http://www.w3.org/TR/tabular-metadata/#cell-ordered"><code>ordered</code></a> property, if specified, has no effect on the JSON output.</p>
+                  </li>
+                  <li>
+                    <p>Else, if the <a>cell value</a> is not <code>null</code>, then the <a>cell value</a> provides a single value <var>V</var> for inclusion within the JSON output; insert the following name-value pair into <a>object</a> <var>S<sub>i</sub></var>:</p>
+                    <dl class="nvp">
+                      <dt>name</dt>
+                      <dd><var>N</var></dd>
+                      <dt>value</dt>
+                      <dd><var>V</var></dd>
+                    </dl>
 
-          <p>The algorithm performs the following steps. For each <a>subject</a> that the current <a>row</a> describes where at least one of the <a title="cell">cells</a> that refers to that <a>subject</a> has a <a title="cell value">value</a> that is not <code>null</code>, and is associated with a <a>column</a> where the value of property <a href="http://www.w3.org/TR/tabular-metadata/#column-suppressOutput"><code>suppressOutput</code></a> has value <var>false</var>:</p>
-          <ol class="algorithm">
-            <li>
-              <p>Create an empty <a>object</a> <var>S<sub>i</sub></var> to represent the <a>subject</a> <var>i</var>.</p>
-              <p>(<var>i</var> is the index number with values from <var>1</var> to <var>n</var>, where <var>n</var> is the number of <a title="subject">subjects</a> for the <a>row</a>)</p>
-              <p><a title="subject">Subject</a> <var>i</var> is identified according to the <a>aboutUrl</a> property of its associated <a title="cell">cells</a>: <var>@id<sub>s</sub></var>. For a <em>default</em> <a>subject</a> where <a>aboutUrl</a> is not specified by its <a title="cell">cells</a>, <var>@id<sub>s</sub></var> is <code>null</code>.</p>
-            </li>
-            <li>
-              <p>If the identifier for <a>subject</a> <var>i</var>, <var>@id<sub>s</sub></var>, is not <code>null</code>, then insert the following name-value pair into <a>object</a> <var>S<sub>i</sub></var>:</p>
-              <dl class="nvp">
-                <dt>name</dt>
-                <dd><code>@id</code></dd>
-                <dt>value</dt>
-                <dd><var>@id<sub>s</sub></var></dd>
-              </dl>
-            </li>
-            <li>
-              <p>Each <a>cell</a> referring to <a>subject</a> <var>i</var> is then processed sequentially according to the order of the <a title="column">columns</a> (e.g. <var>1</var> to <var>n</var>).</p>
-              <p>For each <a>cell</a> referring to <a>subject</a> <var>i</var>, where the value of property <a href="http://www.w3.org/TR/tabular-metadata/#column-suppressOutput"><code>suppressOutput</code></a> for the <a>column</a> associated with that <a>cell</a> is <var>false</var>, insert a name-value pair into <a>object</a> <var>S<sub>i</sub></var> as described below:</p>
-              <ol class="algorithm">
-                <li>
-                  <p>If the value of <a>propertyUrl</a> for the <a>cell</a> is not <code>null</code>, then <a>name</a> <var>N</var> takes the value of <a>propertyUrl</a>.</p>
-                  <p>Else, <a>name</a> <var>N</var> takes the value of the <a href="http://www.w3.org/TR/tabular-metadata/#column-name"><code>name</code></a> property for the column associated with the <a>cell</a>.</p>
-                </li>
-                <li>
-                  <p>If the <a>valueUrl</a> for the current <a>cell</a> is not <code>null</code>, then insert the following name-value pair into <a>object</a> <var>S<sub>i</sub></var>:</p>
-                  <dl class="nvp">
-                    <dt>name</dt>
-                    <dd><var>N</var></dd>
-                    <dt>value</dt>
-                    <dd><var>V<sub>url</sub></var></dd>
-                  </dl>
-                  <p>where <var>V<sub>url</sub></var> is the value of <a>valueUrl</a> property for the current <a>cell</a>, is expressed as a string in the JSON output.</p>
-                </li>
-                <li>
-                  <p>Else, if the <a>cell</a> specifies a <a href="http://www.w3.org/TR/tabular-metadata/#cell-separator"><code>separator</code></a> property and the <a>cell value</a> is not an empty sequence, then the <a>cell value</a> provides a sequence of values for inclusion within the JSON output; insert an <a>array</a> <var>A<sub>v</sub></var> containing each value <var>V</var> of the sequence into <a>object</a> <var>S<sub>i</sub></var>:</p>
-                  <dl class="nvp">
-                    <dt>name</dt>
-                    <dd><var>N</var></dd>
-                    <dt>value</dt>
-                    <dd><var>A<sub>v</sub></var></dd>
-                  </dl>
-                  <p class="note">Since <a title="array">arrays</a> are implicitly <em>ordered</em> in JSON, the <a href="http://www.w3.org/TR/tabular-metadata/#cell-ordered"><code>ordered</code></a> property, if specified, has no effect on the JSON output.</p>
-                </li>
-                <li>
-                  <p>Else, if the <a>cell value</a> is not <code>null</code>, then the <a>cell value</a> provides a single value <var>V</var> for inclusion within the JSON output; insert the following name-value pair into <a>object</a> <var>S<sub>i</sub></var>:</p>
-                  <dl class="nvp">
-                    <dt>name</dt>
-                    <dd><var>N</var></dd>
-                    <dt>value</dt>
-                    <dd><var>V</var></dd>
-                  </dl>
-
-                  <p>Value <var>V</var> derived from the <a title="cell value">cell values</a> MUST be expressed in the JSON output according to the <a href="http://www.w3.org/TR/tabular-metadata/#cell-datatype"><code>datatype</code></a> property of the cell as defined below: <a href="#datatypes">Interpreting datatypes</a>.</p> 
-                </li>
-              </ol>
-
-              <p class="note">In the case where a sequence of values is provided, the <code>datatype</code> applies to all members of the sequence.</p>
-              
-            </li>
-          </ol>
+                    <p>Value <var>V</var> derived from the <a title="cell value">cell values</a> MUST be expressed in the JSON output according to the <a href="http://www.w3.org/TR/tabular-metadata/#cell-datatype"><code>datatype</code></a> property of the cell as defined below: <a href="#datatypes"></a>.</p> 
+                  </li>
+                </ol>
+              </li>
+              <li>
+                <p>If <a>name</a> <var>N</var> occurs more than once within <a>object</a> <var>S<sub>i</sub></var>, the name-value pairs from each occurrence of <a>name</a> <var>N</var> MUST be compacted to form a single name-value pair with <a>name</a> <var>N</var> and whose value is an array containing all values from each of those name-value pairs.</p>
+              </li>
+            </ol>
+          </li>
+        </ol>
       </section>
 
       <section id="nesting-objects">
         <h2>Generating Nested Objects</h2>
-        <p>This algorithm considers a sequence of <var>S<sub>i</sub></var> <a title="object">objects</a>, each corresponding to <a>subject</a> <var>i</var> of the current row, and as generated by <a href="#gen-subj-cells"></a>. It generates a new <var>S<sub>i</sub></var> sequence, where, if possible, an <var>S<sub>j</sub></var> with an explicit <code>@id<sub>i</sub></code>, referred to <em>once and only once</em> by another object <var>S<sub>k</sub></var> through a reference originating from an <code>valueUrl</code> value, is directly added into <var>S<sub>k</sub></var>.</p>
+        <p>The steps in the algorithm defined herein apply to both <a title="standard mode">standard</a> <em>and</em> <a title="minimal mode">minimal</a> modes.</p>
 
-        <div class="issue" data-number="299">
-          <p>Do we want to create nested objects in the JSON output where a row describes multiple resources?</p>
-          <p>Nesting relies on recursion through the <a title="object">objects</a> defined for each <a>subject</a> within a <a>row</a> in order to "plug" related <a title="object">objects</a> together in a hierarchy. This adds a little complexity - but is worth doing (I think) to create graph-like output familiar to most JSON users. Without this recursion, the JSON output would just be a flat set of <a title="object">objects</a>.</p>
-          <p>The text below is outdated and is only a placeholder for now; the issue comments contain some proposals for a possible replacement of this text.</p>
-        </div>
+        <p>Where the current <a>row</a> describes multiple <a title="subject">subjects</a>, it MAY be possible to organise the <a title="object">objects</a> associated with those <a title="subject">subjects</a> such that some <a title="object">objects</a> are <em>nested</em> within others; e.g. where the <a>valueUrl</a> property for one <a>cell</a> matches the <a>aboutUrl</a> property for another <a>cell</a> in the same <a>row</a>.</p>
 
+        <p>This algorithm considers a sequence of <a title="object">objects</a> generated according to <a href="#gen-subj-cells"></a>, <var>S<sub>1</sub></var> to <var>S<sub>n</sub></var>, each of which corresponds to a <a>subject</a> described by the current <a>row</a>. It generates a new sequence of <a>root</a> <a title="object">objects</a>, <var>S<sup>R</sup><sub>1</sub></var> to <var>S<sup>R</sup><sub>m</sub></var>, that MAY include <em>nested</em> <a title="object">objects</a>.</p>
 
+        <p class="note">Where the current <a>row</a> describes only a single <a>subject</a>, this algorithm may be bypassed as no nesting is possible. In such a case, the <a>root</a> <a>object</a> <var>S<sup>R</sup><sub>1</sub></var> is identical to the original <a>object</a> <var>S<sub>1</sub></var>.</p>
 
-        <p>For each <a>subject</a> <var>i</var> associated with the current <a>row</a>, recurse through the name-value pairs in the <a title="object">objects</a> associated with that <a>row</a> to determine if <a>subject</a> <var>i</var> is referenced—excluding the <a>object</a> describing <a>subject</a> <var>i</var> itself (<a>object</a> <var>S<sub>i</sub></var>).</p>
-        <p>If <a>subject</a> <var>i</var> is referenced once <em>and only once</em>, then <a>object</a> <var>S<sub>i</sub></var> becomes the value of the referring name-value pair in place of the reference in order to create a nested <a>object</a>.</p>
+        <p class="note">This nesting algorithm is based on the interrelationships between <a title="subject">subjects</a> described within a given <a>row</a> that are specified using the <a>valueUrl</a> property. <a title="cell value">Cell values</a> expressing the identity of a <a>subject</a> in the current <a>row</a> (e.g. as a simple literal) will be ignored by this algorithm.</p>
 
+        <p>The algorithm uses the following terms:</p>
+        <dl>
+          <dt><dfn>child</dfn></dt>
+          <dd>If two <a title="vertex">vertices</a> are connected in a <a>tree</a>, the one which is further away from the <a>root</a> of the <a>tree</a> is referred to as the <em>child</em> of the other.</dd>
+
+          <dt><dfn>descendant</dfn></dt>
+          <dd>A <a>vertex</a> <var>N</var> is a <em>descendant</em> of a <a>vertex</a> <var>M</var> if either <var>N</var> is the <a>child</a> <var>M</var>, or there are <a title="vertex">vertices</a> <var>V<sub>1</sub>,…,V<sub>k</sub></var>, such that <var>V<sub>1</sub>=M</var>, <var>V<sub>k</sub>=N</var>, and <var>V<sub>k+1</sub></var> is a <a>child</a> of <var>V<sub>k</sub></var>.</dd>
+
+          <dt><dfn>edge</dfn></dt>
+          <dd>One of the main constituents of <a title="graph">graphs</a>; in such data structures <em>edges</em> are used to establish relationships among <a title="vertex">vertices</a>. In the context of this algorithm, <em>edges</em> are expressed in JSON using a name-value pair whose value is another <a>object</a> or an <a>array</a> of <a title="object">objects</a>.</dd>
+
+          <dt><dfn>forest</dfn></dt>
+          <dd>A collection of disjoint <a title="tree">trees</a>. For the purpose of this algorithm, the order of the <a title="tree">trees</a> are important, i.e., forests can also be viewed as a sequence of <a title="root">roots</a>.</dd>
+
+          <dt><dfn>graph</dfn></dt>
+          <dd>Data structure consisting of <a title="vertex">vertices</a> (or "nodes") and <a title="edge">edges</a>. See, for example,&nbsp;[[Knuth]] for further details.</dd>
+
+          <dt><dfn>node</dfn></dt>
+          <dd>Synonym of <a>vertex</a>.</dd>
+
+          <dt><dfn>root</dfn></dt>
+          <dd>A dedicated <a>vertex</a> in a <a>tree</a>; a root is not the <a>child</a> of any <a>vertex</a>.</dd>
+
+          <dt><dfn>tree</dfn></dt>
+          <dd>A <em>tree</em> (or <em>rooted tree</em>) is a connected, acyclic <a>graph</a> where one <a>vertex</a> has been designated as the <a>root</a>, in which case the <a title="edge">edges</a> have a natural orientation <em>towards</em> or <em>away</em> from the <a>root</a>.</dd>
+
+          <dt><dfn>vertex</dfn></dt>
+          <dd>One of the main constituents of <a title="graph">graphs</a>; in such data structures a <em>vertex</em> usually holds further information or data. In the context of this algorithm, <em>vertices</em> are used to represent the JSON <a title="object">objects</a>.</dd>
+        </dl>
+
+        <p>The nesting algorithm is defined as follows:</p>
+
+        <ol class="algorithm">
+          <li>
+            <p>For all <a title="cell">cells</a> in the current <a>row</a>, determine the <a title="valueUrl">valueUrls</a>, <var>V<sub>url</sub></var>, that occur <em>only once</em>. The list of these uniquely occurring <a title="valueUrl">valueUrls</a> is referred to as the <em>URL-list</em>.</p>
+          </li>
+          <li>
+            <p>Create an empty <a>forest</a> <var>F</var>. <a title="vertex">Vertices</a> in the <a title="tree">trees</a> of this <a>forest</a> represent the <a title="subject">subjects</a> described by the current <a>row</a>.</p>
+          </li>
+          <li>
+            <p>For each <a>object</a> <var>S<sub>i</sub></var> in the sequence <var>S<sub>1</sub></var> to <var>S<sub>n</sub></var>:</p>
+            <ol class="algorithm">
+              <li>
+                <p>Determine the identity of <a>object</a> <var>S<sub>i</sub></var>: <var>I<sub>S</sub></var>. If present in <a>object</a> <var>S<sub>i</sub></var>, the name-value pair with <a>name</a> <code>@id</code> provides the value of <var>I<sub>S</sub></var>. Else, <a>object</a> <var>S<sub>i</sub></var> is not explicitly identified and <var>I<sub>S</sub></var> is <code>null</code>.</p>
+              </li>
+              <li>
+                <p>Check whether there is a <a>vertex</a> <var>N</var> in <a>forest</a> <var>F</var> that represents <a>object</a> <var>S<sub>i</sub></var>. If none of the existing <a title="vertex">vertices</a> in <a>forest</a> <var>F</var> represent <a>object</a> <var>S<sub>i</sub></var>, then insert a new <a>tree</a> into <a>forest</a> <var>F</var> whose <a>root</a> is a <a>vertex</a> <var>N</var> that represents <a>object</a> <var>S<sub>i</sub></var> and has identity <var>I<sub>S</sub></var>.</p>
+              </li>
+              <li>
+                <p>For all <a title="cell">cells</a> associated with the current <a>object</a> <var>S<sub>i</sub></var> (e.g. whose <a>aboutUrl</a> property matches <var>I<sub>S</sub></var>):</p>
+                <ol class="algorithm">
+                  <li>
+                    <p>If the <a>valueUrl</a> property of the current <a>cell</a> is defined and its value, <var>V<sub>url</sub></var>, appears in the <em>URL-list</em>, then check each of the <em>other</em> <a title="object">objects</a> in the sequence <var>S<sub>1</sub></var> to <var>S<sub>n</sub></var> to determine if <var>V<sub>url</sub></var> identifies one of those <a title="object">objects</a>.</p>
+                    <p>For <a>object</a> <var>S<sub>j</sub></var>, if the name-value pair with <a>name</a> <code>@id</code> is present and its value matches <var>V<sub>url</sub></var>, then:</p>
+                    <ol class="algorithm">
+                      <li>
+                        <p>If the <a>root</a> of the <a>tree</a> containing <a>vertex</a> <var>N</var> is a <a>vertex</a> that represents <a>object</a> <var>S<sub>j</sub></var>, then <a>object</a> <var>S<sub>i</sub></var> is already a <a>descendant</a> of <a>object</a> <var>S<sub>j</sub></var>; no further action can be taken for this instance of <var>V<sub>url</sub></var>.</p>
+                        <div class="note">
+                          <p>This clause in the algorithm prevents circular loops being created.</p>
+                          <p>Furthermore, because the <em>URL-list</em> contains <a title="valueUrl">valueUrls</a> that occur only once for the current <a>row</a>, <a>object</a> <var>S<sub>i</sub></var> cannot be a <a>descendant</a> of an intermediate <a title="vertex">vertices</a> in the <a>tree</a>.</p>
+                        </div>
+                      </li>
+                      <li>
+                        <p>Else, if there is a <a>root</a> <a>vertex</a> <var>M</var> in <a>forest</a> <var>F</var> that represents <a>object</a> <var>S<sub>j</sub></var>, then set <a>vertex</a> <var>M</var> as a <a>child</a> of <a>vertex</a> <var>N</var> and remove <a>vertex</a> <var>M</var> from the list of <a title="root">roots</a> in <a>forest</a> <var>F</var> (e.g. the <a>tree</a> rooted by <var>M</var> becomes a sub-tree of <var>N</var>).</p>
+                      </li>
+                      <li>
+                        <p>Else, create a new <a>vertex</a> <var>M</var> that represents <a>object</a> <var>S<sub>j</sub></var> as a <a>child</a> of <a>vertex</a> <var>N</var>.</p>
+                      </li>
+                    </ol>
+                  </li>
+                </ol>
+              </li>
+            </ol>
+          </li>
+          <li>
+            <p>Each <a>vertex</a> in <a>forest</a> <var>F</var> represents an object in the original sequence of <a title="object">objects</a> <var>S<sub>1</sub></var> to <var>S<sub>n</sub></var> and is associated with a <a>subject</a> described by the current <a>row</a>. Rearrange <a title="object">objects</a> <var>S<sub>1</sub></var> to <var>S<sub>n</sub></var> such that they mirror the structure of the <a title="tree">trees</a> in <a>forest</a> <var>F</var>.</p> 
+            <p>If <a>vertex</a> <var>M</var>, representing <a>object</a> <var>S<sub>i</sub></var>, is a <a>child</a> of <a>vertex</a> <var>N</var>, representing <a>object</a> <var>S<sub>j</sub></var>, then the name-value pair in <a>object</a> <var>S<sub>j</sub></var> associated with the <a>edge</a> relating <var>M</var> and <var>N</var> MUST be modifed such that the (literal) value, <var>V<sub>url</sub></var>, from that name-value pair is replaced by <a>object</a> <var>S<sub>i</sub></var> thus creating a <em>nested</em> <a>object</a>.</p>
+            <p class="note"><a title="object">Objects</a> represented by <a>root</a> <a title="vertex">vertices</a> are referred to as <em><a>root</a> <a title="object">objects</a></em>.</p>
+          </li>
+          <li>
+            <p>Return the sequence of <a>root</a> <a title="object">objects</a>, <var>S<sup>R</sup><sub>1</sub></var> to <var>S<sup>R</sup><sub>m</sub></var>.</p>
+          </li>
+        </ol>
+
+        <p class="note">An implementation may be able to optimize the algorithm by skipping branches (e.g. if <var>URL-list</var> is empty) or by other means.</p>
 
       </section>
 
