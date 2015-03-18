@@ -444,11 +444,6 @@ var respecConfig = {
         <h2>Generating Nested Objects</h2>
         <p>The steps in the algorithm defined herein apply to both <a title="standard mode">standard</a> <em>and</em> <a title="minimal mode">minimal</a> modes.</p>
 
-        <div class="issue" data-number="299">
-          <p>Do we want to create nested objects in the JSON output where a row describes multiple resources?</p>
-          <p>Nesting relies on recursion through the <a title="object">objects</a> defined for each <a>subject</a> within a <a>row</a> in order to "plug" related <a title="object">objects</a> together in a hierarchy. This adds a little complexity - but is worth doing (I think) to create graph-like output familiar to most JSON users. Without this recursion, the JSON output would just be a flat set of <a title="object">objects</a>.</p>
-        </div>
-
         <p>Where the current <a>row</a> describes multiple <a title="subject">subjects</a>, it MAY be possible to organise the <a title="object">objects</a> associated with those <a title="subject">subjects</a> such that some <a title="object">objects</a> are <em>nested</em> within others; e.g. where the <a>valueUrl</a> property for one <a>cell</a> matches the <a>aboutUrl</a> property for another <a>cell</a> in the same <a>row</a>.</p>
 
         <p>This algorithm considers a sequence of <a title="object">objects</a> generated according to <a href="#gen-subj-cells"></a>, <var>S<sub>1</sub></var> to <var>S<sub>n</sub></var>, each of which corresponds to a <a>subject</a> described by the current <a>row</a>. It generates a new sequence of <a>root</a> <a title="object">objects</a>, <var>S<sup>R</sup><sub>1</sub></var> to <var>S<sup>R</sup><sub>m</sub></var>, that MAY include <em>nested</em> <a title="object">objects</a>.</p>
@@ -460,7 +455,10 @@ var respecConfig = {
         <p>The algorithm uses the following terms:</p>
         <dl>
           <dt><dfn>child</dfn></dt>
-          <dd>If two <a title="vertex">vertices</a> are connected in a <a>tree</a>, the one which is further away from the <a>root</a> of the <a>tree</a> is referred to as the child of the other.</dd>
+          <dd>If two <a title="vertex">vertices</a> are connected in a <a>tree</a>, the one which is further away from the <a>root</a> of the <a>tree</a> is referred to as the <em>child</em> of the other.</dd>
+
+          <dt><dfn>descendant</dfn></dt>
+          <dd>A <a>vertex</a> <var>N</var> is a <em>descendant</em> of a <a>vertex</a> <var>M</var> if either <var>N</var> is the <a>child</a> <var>M</var>, or there are <a title="vertex">vertices</a> <var>V<sub>1</sub>,…,V<sub>k</sub></var>, such that <var>V<sub>1</sub>=M</var>, <var>V<sub>k</sub>=N</var>, and <var>V<sub>k+1</sub></var> is a <a>child</a> of <var>V<sub>k</sub></var>.</dd>
 
           <dt><dfn>edge</dfn></dt>
           <dd>One of the main constituents of <a title="graph">graphs</a>; in such data structures <em>edges</em> are used to establish relationships among <a title="vertex">vertices</a>. In the context of this algorithm, <em>edges</em> are expressed in JSON using a name-value pair whose value is another <a>object</a> or an <a>array</a> of <a title="object">objects</a>.</dd>
@@ -469,13 +467,13 @@ var respecConfig = {
           <dd>A collection of disjoint <a title="tree">trees</a>. For the purpose of this algorithm, the order of the <a title="tree">trees</a> are important, i.e., forests can also be viewed as a sequence of <a title="root">roots</a>.</dd>
 
           <dt><dfn>graph</dfn></dt>
-          <dd>Data structure consisting of <a title="vertex">vertices</a> (or "nodes") and edges. See, for example,&nbsp;[[Knuth]] for further details.</dd>
+          <dd>Data structure consisting of <a title="vertex">vertices</a> (or "nodes") and <a title="edge">edges</a>. See, for example,&nbsp;[[Knuth]] for further details.</dd>
 
           <dt><dfn>node</dfn></dt>
           <dd>Synonym of <a>vertex</a>.</dd>
 
           <dt><dfn>root</dfn></dt>
-          <dd>A dedicated <a>vertex</a> in a <a>tree</a>.</dd>
+          <dd>A dedicated <a>vertex</a> in a <a>tree</a>; a root is not the <a>child</a> of any <a>vertex</a>.</dd>
 
           <dt><dfn>tree</dfn></dt>
           <dd>A <em>tree</em> (or <em>rooted tree</em>) is a connected, acyclic <a>graph</a> where one <a>vertex</a> has been designated as the <a>root</a>, in which case the <a title="edge">edges</a> have a natural orientation <em>towards</em> or <em>away</em> from the <a>root</a>.</dd>
@@ -506,14 +504,14 @@ var respecConfig = {
                 <p>For all <a title="cell">cells</a> associated with the current <a>object</a> <var>S<sub>i</sub></var> (e.g. whose <a>aboutUrl</a> property matches <var>I<sub>S</sub></var>, or, if <var>I<sub>S</sub></var> is <code>null</code>, then whose <a>aboutUrl</a> property is undefined):</p>
                 <ol class="algorithm">
                   <li>
-                    <p>If the <a>valueUrl</a> property of the current <a>cell</a> is defined and its value, <var>V<sub>url</sub></var>, appears in the <em>URL-list</em>, then recurse through each of the <em>other</em> <a title="object">objects</a> in the sequence <var>S<sub>1</sub></var> to <var>S<sub>n</sub></var> to determine if <var>V<sub>url</sub></var> identifies one of those <a title="object">objects</a>.</p>
+                    <p>If the <a>valueUrl</a> property of the current <a>cell</a> is defined and its value, <var>V<sub>url</sub></var>, appears in the <em>URL-list</em>, then check each of the <em>other</em> <a title="object">objects</a> in the sequence <var>S<sub>1</sub></var> to <var>S<sub>n</sub></var> to determine if <var>V<sub>url</sub></var> identifies one of those <a title="object">objects</a>.</p>
                     <p>For <a>object</a> <var>S<sub>j</sub></var>, if the name-value pair with <a>name</a> <code>@id</code> is present and its value matches <var>V<sub>url</sub></var>, then:</p>
                     <ol class="algorithm">
                       <li>
-                        <p>If the <a>root</a> of the <a>tree</a> containing <a>vertex</a> <var>N</var> is a <a>vertex</a> that represents <a>object</a> <var>S<sub>j</sub></var>, then <a>object</a> <var>S<sub>i</sub></var> is already a descendant of <a>object</a> <var>S<sub>j</sub></var>; no further action can be taken for this instance of <var>V<sub>url</sub></var>.</p>
+                        <p>If the <a>root</a> of the <a>tree</a> containing <a>vertex</a> <var>N</var> is a <a>vertex</a> that represents <a>object</a> <var>S<sub>j</sub></var>, then <a>object</a> <var>S<sub>i</sub></var> is already a <a>descendant</a> of <a>object</a> <var>S<sub>j</sub></var>; no further action can be taken for this instance of <var>V<sub>url</sub></var>.</p>
                         <div class="note">
                           <p>This clause in the algorithm prevents circular loops being created.</p>
-                          <p>Furthermore, because the <em>URL-list</em> contains <a title="valueUrl">valueUrls</a> that occur only once for the current <a>row</a>, <a>object</a> <var>S<sub>i</sub></var> cannot be a descendant of an intermediate <a title="vertex">vertices</a> in the <a>tree</a>.</p>
+                          <p>Furthermore, because the <em>URL-list</em> contains <a title="valueUrl">valueUrls</a> that occur only once for the current <a>row</a>, <a>object</a> <var>S<sub>i</sub></var> cannot be a <a>descendant</a> of an intermediate <a title="vertex">vertices</a> in the <a>tree</a>.</p>
                         </div>
                       </li>
                       <li>
