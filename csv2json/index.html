@@ -4,6 +4,27 @@
     <meta content="text/html; charset=utf-8" http-equiv="content-type">
     <meta content="width=device-width,initial-scale=1" name="viewport">
     <title>Generating JSON from Tabular Data on the Web</title>
+
+    <script type="text/javascript">
+        var visibility_flags = {};
+        var show_text = "Show detailed annotations";
+        var hide_text = "Hide detailed annotations"
+        var hide = function(target) {
+          var flag   = visibility_flags[target];
+          var tohide = document.getElementById(target);
+          tohide.style.display = flag ? "none" : "inherit";
+
+          // Change the button content
+          var buttons = document.getElementsByTagName("button");
+          for( var i = 0; i < buttons.length; i++ ) {
+            if( target === buttons[i].getAttribute("data-anno-target") ) {
+              buttons[i].innerHTML = flag ? show_text : hide_text;
+            }
+          }
+          visibility_flags[target] = !flag;
+        }
+    </script>
+
     <script src="../local-biblio.js" class="remove"></script>
     <script class="remove" src="https://www.w3.org/Tools/respec/respec-w3c-common">
 	  </script>
@@ -632,6 +653,8 @@ var respecConfig = {
 
         <p>The <a>annotated table</a> generated from parsing the CSV+ file is shown below and provides the basis for the conversion to JSON.</p>
 
+        <button data-anno-target="ex-countries-annotation">empty</button>
+<div id="ex-countries-annotation">
         <p>Annotations for the resulting <a title="annotated table">table</a> <var>T</var>, with 4 columns and 3 rows, are shown below:</p>
 
         <table style="width: 100%; text-align: left">
@@ -698,6 +721,8 @@ var respecConfig = {
         </table>
 
         <p class="note">As the value of <a href="http://www.w3.org/TR/tabular-metadata/#cell-propertyUrl"><code>propertyUrl</code></a> has not been set within the metadata description it defaults to the URI Template (see [[RFC6570]]) <code>#{<em>[column-name]</em>}</code>, where <code><em>[column-name]</em></code> is the value of the <a href="http://www.w3.org/TR/tabular-metadata/#column-name"><code>name</code></a> property for the column associated with the cell. For example, the value of <a href="http://www.w3.org/TR/tabular-metadata/#cell-propertyUrl"><code>propertyUrl</code></a> for all <a title="cell">cells</a> in <a>column</a> <var>C1</var> (<code>"name": "countryCode"</code>) is <code>http://example.org/countries.csv#countryCode</code>.</p>
+
+</div>
 
         <p><strong><a title="minimal mode">Minimal mode</a></strong> output for this example is provided below:</p>
 
@@ -1220,5 +1245,18 @@ var respecConfig = {
       </section>
 
     </section>
+    <script type="text/javascript">
+      (function(){
+        var buttons = document.getElementsByTagName("button");
+        for( var i = 0; i < buttons.length; i++ ) {
+          var id = buttons[i].getAttribute("data-anno-target");
+          visibility_flags[id] = false;
+          buttons[i].innerHTML = show_text;
+          buttons[i].setAttribute("onclick", "hide('" + id + "');")
+          var tohide = document.getElementById(id);
+          tohide.style.display = "none";
+        }
+      })();
+    </script>
   </body>
 </html>
