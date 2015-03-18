@@ -257,7 +257,7 @@ var respecConfig = {
               </dl>
             </li>
             <li>
-              <p>Insert any <a>notes</a> and <a>common properties</a> specified for the <a>table group</a> into <a>object</a> <var>G</var>. Name-value pairs relating to <a>notes</a> and <a>common properties</a> are copied verbatim from the metadata description—noting that prefixes defined within the <a href="http://www.w3.org/2011/rdfa-context/rdfa-1.1">RDFa 1.1 Initial Context</a> ([[rdfa-core]]) are not expanded.</p>
+              <p>Insert any <a>notes</a> and <a>common properties</a> specified for the <a>table group</a> into <a>object</a> <var>G</var> according to the rules provided in <a href="#json-ld-to-json"></a>.</p>
             </li>
             <li>
               <p>Insert the following name-value pair into <a>object</a> <var>G</var>:</p>
@@ -295,7 +295,7 @@ var respecConfig = {
                   </dl>
                 </li>
                 <li>
-                  <p>Insert any <a>notes</a> and <a>common properties</a> specified for the <a title="annotated table">table</a> into <a>object</a> <var>T</var>. Name-value pairs relating to <a>notes</a> and <a>common properties</a> are copied verbatim from the metadata description—noting that prefixes defined within the <a href="http://www.w3.org/2011/rdfa-context/rdfa-1.1">RDFa 1.1 Initial Context</a> ([[rdfa-core]]) are not expanded.</p>
+                  <p>Insert any <a>notes</a> and <a>common properties</a> specified for the <a title="annotated table">table</a> into <a>object</a> <var>T</var>. according to the rules provided in <a href="#json-ld-to-json"></a>.</p>
                   <p class="note">All other annotations for the <a title="annotated table">table</a> are ignored during the conversion; including information about <a href="http://www.w3.org/TR/tabular-metadata/#dfn-tableschema" class="externalDFN">table schemas</a> and <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description" class="externalDFN">column descriptions</a> specified therein, <a href="http://www.w3.org/TR/tabular-metadata/#dfn-dialect-description" class="externalDFN">dialect descriptions</a>, <a href="http://www.w3.org/TR/tabular-metadata/#dfn-foreign-key-definition" class="externalDFN">foreign-key-definitions</a> etc.</p>
                 </li>
                 <li>
@@ -611,6 +611,50 @@ var respecConfig = {
         </table>
       </section>
 
+    </section>
+
+    <section>
+      <h3>JSON-LD to JSON</h3>
+      <p>This section defines a mechanism for transforming the [[json-ld]] Dialect used for <a>common properties</a> and <a><code>notes</code></a> into <em>plain-old</em> JSON.</p>
+
+      <p>Name-value pairs from <a>notes</a> and <a>common properties</a> annotations are generally copied verbatim from the metadata description subject to the exceptions below:</p>
+      <ol>
+        <li>
+          <p>Name-value pairs whose value is an <a>object</a> using the [[json-ld]] keyword <code>@value</code>, for example:</p>
+          <dl class="nvp">
+            <dt>name</dt>
+            <dd><var>N</var></dd>
+            <dt>value</dt>
+            <dd><code>{ "@value": "</code><var>V</var><code>" }</code></dd>
+          </dl>
+          <p>are transformed to:</p>
+          <dl class="nvp">
+            <dt>name</dt>
+            <dd><var>N</var></dd>
+            <dt>value</dt>
+            <dd><var>V</var></dd>
+          </dl>
+          <p>Name-value pairs occurring within the value object that use [[json-ld]] keywords <code>@language</code> and <code>@type</code> are ignored.</p>
+        </li>
+        <li>
+          <p>Name-value pairs whose value is an <a>object</a> using the [[json-ld]] keyword <code>@id</code> to coerce a string-value to be interpreted as an IRI, for example:</p>
+          <dl class="nvp">
+            <dt>name</dt>
+            <dd><var>N</var></dd>
+            <dt>value</dt>
+            <dd><code>{ "@id": "</code><var>V<sub>url</sub></var><code>" }</code></dd>
+          </dl>
+          <p>are transformed to:</p>
+          <dl class="nvp">
+            <dt>name</dt>
+            <dd><var>N</var></dd>
+            <dt>value</dt>
+            <dd><var>V<sub>url</sub></var></dd>
+          </dl>
+        </li>
+      </ol>
+
+      <p>Terms defined within the <a href="http://www.w3.org/2011/rdfa-context/rdfa-1.1">RDFa 1.1 Initial Context</a> ([[rdfa-core]]) are not expanded during the transformation.</p>
     </section>
 
     <section id="examples" class="informative">
