@@ -169,7 +169,7 @@ var respecConfig = {
           <dd>In the context of this specification, <a>name</a> is used as defined in JSON ([[!RFC7159]]); that is, that <a>name</a> is a string that provides a unique key within a set of name-value pairs within a JSON <a>object</a>.</dd>
 
           <dt><dfn>notes</dfn></dt>
-          <dd>A list of <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table-notes" class="externalDFN">notes</a>, as defined in [[!tabular-data-model]], attached to an <a title="annotated table">annotated table</a> using the <code>notes</code> property. This may be an empty list.</dd>
+          <dd>A list of <a href="http://www.w3.org/TR/tabular-data-model/#dfn-table-notes" class="externalDFN">notes</a>, as defined in [[!tabular-data-model]], attached to an <a title="annotated table">annotated table</a> or <a>table group</a> using the <code>notes</code> property. This may be an empty list.</dd>
 
           <dt><dfn>object</dfn></dt>
           <dd>An <a>object</a> is defined in JSON ([[!RFC7159]]) as unordered collection of zero or more name-value pairs, where a name is a string and a value is a string, number, boolean, null, <a>object</a>, or <a>array</a>.</dd>
@@ -257,7 +257,7 @@ var respecConfig = {
               </dl>
             </li>
             <li>
-              <p>Insert any <a>common properties</a> specified for the <a>table group</a> into <a>object</a> <var>G</var>. Name-value pairs relating to <a>common properties</a> are copied verbatim from the metadata description—noting that prefixes defined within the <a href="http://www.w3.org/2011/rdfa-context/rdfa-1.1">RDFa 1.1 Initial Context</a> ([[rdfa-core]]) are not expanded.</p>
+              <p>Insert any <a>notes</a> and <a>common properties</a> specified for the <a>table group</a> into <a>object</a> <var>G</var> according to the rules provided in <a href="#json-ld-to-json"></a>.</p>
             </li>
             <li>
               <p>Insert the following name-value pair into <a>object</a> <var>G</var>:</p>
@@ -295,7 +295,7 @@ var respecConfig = {
                   </dl>
                 </li>
                 <li>
-                  <p>Insert any <a>notes</a> and <a>common properties</a> specified for the <a title="annotated table">table</a> into <a>object</a> <var>T</var>. Name-value pairs relating to <a>notes</a> and <a>common properties</a> are copied verbatim from the metadata description—noting that prefixes defined within the <a href="http://www.w3.org/2011/rdfa-context/rdfa-1.1">RDFa 1.1 Initial Context</a> ([[rdfa-core]]) are not expanded.</p>
+                  <p>Insert any <a>notes</a> and <a>common properties</a> specified for the <a title="annotated table">table</a> into <a>object</a> <var>T</var>. according to the rules provided in <a href="#json-ld-to-json"></a>.</p>
                   <p class="note">All other annotations for the <a title="annotated table">table</a> are ignored during the conversion; including information about <a href="http://www.w3.org/TR/tabular-metadata/#dfn-tableschema" class="externalDFN">table schemas</a> and <a href="http://www.w3.org/TR/tabular-metadata/#dfn-column-description" class="externalDFN">column descriptions</a> specified therein, <a href="http://www.w3.org/TR/tabular-metadata/#dfn-dialect-description" class="externalDFN">dialect descriptions</a>, <a href="http://www.w3.org/TR/tabular-metadata/#dfn-foreign-key-definition" class="externalDFN">foreign-key-definitions</a> etc.</p>
                 </li>
                 <li>
@@ -611,6 +611,50 @@ var respecConfig = {
         </table>
       </section>
 
+    </section>
+
+    <section>
+      <h3>JSON-LD to JSON</h3>
+      <p>This section defines a mechanism for transforming the [[json-ld]] Dialect used for <a>common properties</a> and <a><code>notes</code></a> into <em>plain-old</em> JSON.</p>
+
+      <p>Name-value pairs from <a>notes</a> and <a>common properties</a> annotations are generally copied verbatim from the metadata description subject to the exceptions below:</p>
+      <ol>
+        <li>
+          <p>Name-value pairs whose value is an <a>object</a> using the [[json-ld]] keyword <code>@value</code>, for example:</p>
+          <dl class="nvp">
+            <dt>name</dt>
+            <dd><var>N</var></dd>
+            <dt>value</dt>
+            <dd><code>{ "@value": "</code><var>V</var><code>" }</code></dd>
+          </dl>
+          <p>are transformed to:</p>
+          <dl class="nvp">
+            <dt>name</dt>
+            <dd><var>N</var></dd>
+            <dt>value</dt>
+            <dd><var>V</var></dd>
+          </dl>
+          <p>Name-value pairs occurring within the value object that use [[json-ld]] keywords <code>@language</code> and <code>@type</code> are ignored.</p>
+        </li>
+        <li>
+          <p>Name-value pairs whose value is an <a>object</a> using the [[json-ld]] keyword <code>@id</code> to coerce a string-value to be interpreted as an IRI, for example:</p>
+          <dl class="nvp">
+            <dt>name</dt>
+            <dd><var>N</var></dd>
+            <dt>value</dt>
+            <dd><code>{ "@id": "</code><var>V<sub>url</sub></var><code>" }</code></dd>
+          </dl>
+          <p>are transformed to:</p>
+          <dl class="nvp">
+            <dt>name</dt>
+            <dd><var>N</var></dd>
+            <dt>value</dt>
+            <dd><var>V<sub>url</sub></var></dd>
+          </dl>
+        </li>
+      </ol>
+
+      <p>Terms defined within the <a href="http://www.w3.org/2011/rdfa-context/rdfa-1.1">RDFa 1.1 Initial Context</a> ([[rdfa-core]]) are not expanded during the transformation.</p>
     </section>
 
     <section id="examples" class="informative">
@@ -1005,7 +1049,7 @@ var respecConfig = {
         <div class="note">
           <p>Three resources are defined for each row within the table; event, location and offer - therefore three <a title="object">objects</a> are created for each <a>row</a>.</p>
           <p>Each <a>column</a> explicitly defines both <a href="http://www.w3.org/TR/tabular-metadata/#cell-aboutUrl"><code>aboutUrl</code></a> and <a href="http://www.w3.org/TR/tabular-metadata/#cell-propertyUrl"><code>propertyUrl</code></a> properties which are inherited by the column's <a title="cell">cells</a>.</p>
-          <p><a title="column">Columns</a> <var>C6</var>, <var>C7</var> and <var>C8</var> (<code>{ "name": "type-event"}</code>, <code>{ "name": "type-place"}</code> and <code>{ "name": "type-offer"}</code>) define the semantic types of the resources described by each <a>row</a>: <code>schema:MusicEvent</code>, <code>schema:Place</code> and <code>schema:Offer</code> respectively—noting that the use of <code>rdf:type</code> is not converted to the <a>name</a> <code>@type</code> (as used in [[json-ld]]) by this conversion application as it is not, and does not need to be, JSON-LD-aware.</p>
+          <p><a title="column">Columns</a> <var>C6</var>, <var>C7</var> and <var>C8</var> (<code>{ "name": "type-event"}</code>, <code>{ "name": "type-place"}</code> and <code>{ "name": "type-offer"}</code>) define the semantic types of the resources described by each <a>row</a>: <code>schema:MusicEvent</code>, <code>schema:Place</code> and <code>schema:Offer</code> respectively—noting that the use of <code>rdf:type</code> is converted to the <a>name</a> <code>@type</code> (as used in [[json-ld]]) by this conversion application.</p>
           <p><a title="column">Column</a> <var>C9</var> (<code>{ "name": "location"}</code>) uses the <a href="http://www.w3.org/TR/tabular-metadata/#cell-aboutUrl"><code>aboutUrl</code></a> and <a href="http://www.w3.org/TR/tabular-metadata/#cell-valueUrl"><code>valueUrl</code></a> to assert the relationship between the event and location resources.</p>
           <p><a title="column">Column</a> <var>C10</var> (<code>{ "name": "offer"}</code>) uses the <a href="http://www.w3.org/TR/tabular-metadata/#cell-aboutUrl"><code>aboutUrl</code></a> and <a href="http://www.w3.org/TR/tabular-metadata/#cell-valueUrl"><code>valueUrl</code></a> to assert the relationship between the event and offer resources.</p>
         </div>
@@ -1032,7 +1076,7 @@ var respecConfig = {
         </p>
 
         <p> 
-          The input CSV+ files and the associated metadata description are provided below:
+          The input CSV+ files and associated metadata descriptions are provided below:
         </p>
         <pre class="example"
              id="example-public-sector-roles-and-salaries-csv+-professions"
@@ -1057,6 +1101,18 @@ var respecConfig = {
              data-include="../examples/metadata.json"
              data-oninclude="updateExample"
              title="http://example.org/metadata.json">
+        </pre>
+        <pre class="example highlight"
+             id="example-public-sector-roles-and-salaries-metadata-senior"
+             data-include="../examples/senior-roles.json"
+             data-oninclude="updateExample"
+             title="http://example.org/senior-roles.json">
+        </pre>
+        <pre class="example highlight"
+             id="example-public-sector-roles-and-salaries-metadata-junior"
+             data-include="../examples/junior-roles.json"
+             data-oninclude="updateExample"
+             title="http://example.org/junior-roles.json">
         </pre>
 
         <p class="note">In this example, the resource <code>gov.uk/professions.csv</code> is identified using a relative URL to host <code>http://example.org</code>. In reality this resource would be published centrally by government and served from some remote host. Similarly, the metadata description resource <code>metadata.json</code> would be also be centrally published. Government departments seeking to validate their role and salary data would download a copy of this metadata description and place it, without modification, in the same directory as their CSV+ files whose names MUST match those specified in the metadata description; <code>senior-roles.csv</code> and <code>junior-roles.csv</code>.</p>
@@ -1192,6 +1248,8 @@ var respecConfig = {
             <tr><td><var>Cc2.7</var></td><td><var>Tc</var></td><td><var>Cc7</var></td><td><var>Rc2</var></td><td><code>"Operational Delivery"</code></td><td><code>"Operational Delivery"</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/def/profession&gt;</code></td><td></td></tr>
           </tbody>
         </table>
+
+        <p class="note">Notice that <a>valueUrl</a> is not specified for <a>cell</a> <var>Cb2.5</var> because the <a>cell value</a> is <code>null</code> and the <a href="http://www.w3.org/TR/tabular-metadata/#column-virtual"><code>virtual</code></a> property of <a>column</a> <var>Cb5</var> is <em>not</em> specified.</p>
 
         <p><strong><a title="minimal mode">Minimal mode</a></strong> output for this example is provided below:</p>
 
