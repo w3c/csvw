@@ -9,11 +9,11 @@
 @prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
 @prefix :       <http://w3c.github.io/csvw/tests/vocab#> .
 
-: rdfs:comment     "Manifest vocabulary for CSVW test cases" ;
+: dc:title         "CSVW Test Vocabulary" ;
   dc:creator       "Gregg Kellogg" ;
   dc:publisher     "W3C Data on the Web Working Group" ;
-  dc:title         "Test case manifest vocabulary extensions" ;
   dc:description   "Test case manifest vocabulary extensions" ;
+  rdfs:comment     "Test case manifest vocabulary extensions" ;
   dc:date          "2015-01-05" ;
   dc:identifier    : .
 
@@ -108,7 +108,7 @@
   rdfs:label "Metadata to RDF Test" ;
   rdfs:subClassOf :PositiveEvaluationTest;
   rdfs:comment """
-    A `Metadata2RdfTest` takes an input file (`mf:accept`) in application/ld+json format to produce
+    A `Metadata2RdfTest` takes an input file (`mf:accept`) in application/csvm+json format to produce
     a an RDF graph which is [isomorphic](http://www.w3.org/TR/rdf11-concepts/#graph-isomorphism) to the graph generated from the result file (`mf:result`)
     (see [[RDF-CONCEPTS]]). The test entry MAY use `:implicit` files.
   """ .
@@ -117,7 +117,7 @@
   rdfs:label "Metadata SPARQL Test" ;
   rdfs:subClassOf :PositiveEvaluationTest;
   rdfs:comment """
-    A `MetadataSparqlTest` takes an input file (`mf:accept`) in application/ld+json format to produce
+    A `MetadataSparqlTest` takes an input file (`mf:accept`) in application/csvm+json format to produce
     a an RDF graph which used as the default graph of a SPARQL `ASK` query contained in `mf:result`. The test entry MAY use `:implicit` files, have user-specified `:metadata`,
     and have a `:httpLink` header defining a `describedBy` relationship. Test Processors SHOULD
     act as if the file referenced via `mf:action` is returned using such a link header if it
@@ -133,24 +133,52 @@
     The expected results are compared using JSON object comparison with the processor output.
   """ .
 
+:CsvValidationTest a rdfs:Class ;
+  rdfs:subClassOf :PositiveEvaluationTest ;
+  rdfs:label "CSV Validation Test" ;
+  rdfs:comment """
+    A `CsvValidationTest` takes an input file(`mf:accept`) in text/csv format to produce
+    a JSON representation of the [annotated tabular data model](http://w3c.github.io/csvw/syntax/#dfn-annotated-tabular-data-model)
+    as defined in [[csvw-test-suite]]. The test entry MAY use `:implicit` files.
+    The expected results are compared using JSON object comparison with the processor output.
+  """ .
+
+:ManifestValidationTest a rdfs:Class ;
+  rdfs:subClassOf :PositiveEvaluationTest ;
+  rdfs:label "Manifest Validation Test" ;
+  rdfs:comment """
+    A `ManifestValidationTest` takes an input file(`mf:accept`) in application/csvm+json format to produce
+    a JSON representation of the [annotated tabular data model](http://w3c.github.io/csvw/syntax/#dfn-annotated-tabular-data-model)
+    as defined in [[csvw-test-suite]]. The test entry MAY use `:implicit` files.
+    The expected results are compared using JSON object comparison with the processor output.
+  """ .
+
 :Option a rdfs:Class ;
   rdfs:label "Processor Options" ;
   rdfs:comment "Options passed to the test runner to affect invocation of the appropriate API method." .
 
-:noProv a rdf:Property
+:noProv a rdf:Property ;
   rdfs:label "No Provenance";
   rdfs:comment """
-    Processor should run without generating provenance triples
+    Processor should run without generating provenance triples.
   """;
-  rdfs:domain :Option
+  rdfs:domain :Option;
   rdfs:range xsd:boolean .
 
-:metadata a rdf:Property
+:minimal a rdf:Property ;
+  rdfs:label "Minimal";
+  rdfs:comment """
+    Generate minimal vs. standard output.
+  """;
+  rdfs:domain :Option;
+  rdfs:range xsd:boolean .
+
+:metadata a rdf:Property ;
   rdfs:label "Metadata";
   rdfs:comment """
     URL of User supplied metadata.
   """;
-  rdfs:domain :Option
+  rdfs:domain :Option;
   rdfs:range xsd:anyUri .
 
 ## ---- Property declarations for each test ----

@@ -53,6 +53,14 @@ var localBibliography = {
       "href" : "http://www.w3.org/ns/csvw",
       "publisher": "W3C"
   },
+  "csvw-tests": {
+      "authors": [
+        "Gregg Kellogg"
+      ],
+      "title": "CSVW Test Suite",
+      "href" : "http://www.w3.org/ns/csvw",
+      "publisher": "W3C"
+  },
   "EBNF-NOTATION" : {
     "authors" : [
       "Tim Bray",

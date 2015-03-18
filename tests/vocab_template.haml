@@ -1,0 +1,138 @@
+!!! 5
+%html{:prefix => "csvwt: http://w3c.github.io/csvw/tests/vocab# mf: http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#"}
+  %head
+    %meta{"http-equiv" => "Content-Type", :content => "text/html;charset=utf-8"}
+    %meta{:name => "viewport", :content => "width=device-width, initial-scale=1.0"}
+    %link{:rel => "stylesheet", :type => "text/css", :href => "http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"}
+    %script{:type => "text/javascript", :src => "http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"}
+    %script{:type => "text/javascript", :src => "http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"}
+    %script{:type => "text/javascript", :src => "http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"}
+    :css
+      dd code {display: inline;}
+      footer {text-align: center;}
+    %title
+      = ontology['dc:title']
+  %body{resource: ontology['@id'], role: :document}
+    %meta{property: "dc:creator", value: ontology["dc:creator"]}
+    %link{property: "dc:identifier", href: ontology["@id"]}
+    %nav.navbar{role: :navigation}
+      %div.container-fluid
+        %div.navbar-header
+          %button.navbar-toggle{type: "button"}
+            %span.sr-only="Toggle Navigation"
+            %span.icon-bar
+            %span.icon-bar
+            %span.icon-bar
+          %a.navbar-brand{:href => "index.html"}
+            CSVW Test Suite
+        %ul.nav.navbar-nav
+          %li
+            %a{:href => "index.html"}
+              %span.icon-beer
+              Test Suite
+          %li
+            %a{:href => "vocab.html"}
+              %span.icon-beer
+              Test Vocabulary
+          %li.dropdown
+            %a.dropdown-toggle{:href => "#", "data-toggle" => "dropdown"}
+              %span.icon-folder-open
+              Specifications
+              %b.caret
+            %ul.dropdown-menu
+              %li.nav-header
+                %strong
+                  Latest
+              %li
+                %a{:href => "http://w3c.github.io/csvw/model/"}
+                  Model for Tabular Data and Metadata on the Web
+              %li
+                %a{:href => "http://w3c.github.io/csvw/metadata/"}
+                  Metadata Vocabulary for Tabular Data
+              %li
+                %a{:href => "http://w3c.github.io/csvw/csv2json/"}
+                  Generating JSON from Tabular Data on the Web
+              %li
+                %a{:href => "http://w3c.github.io/csvw/csv2rdf/"}
+                  Generating RDF from Tabular Data on the Web
+              %li
+                %a{:href => "http://w3c.github.io/csvw/ns/"}
+                  Tabular Data Namespace
+              %li
+                %a{:href => "http://w3c.github.io/csvw/use-cases-and-requirements/"}
+                  Use Cases and Requirements
+              %li.divider
+              %li.nav-header
+                %strong
+                  Published Documents
+              %li
+                %a{:href => "http://www.w3.org/TR/tabular-data-model/"}
+                  Model for Tabular Data and Metadata on the Web
+              %li
+                %a{:href => "http://www.w3.org/TR/tabular-metadata/"}
+                  Metadata Vocabulary for Tabular Data
+              %li
+                %a{:href => "http://www.w3.org/TR/csv2json/"}
+                  Generating JSON from Tabular Data on the Web
+              %li
+                %a{:href => "http://www.w3.org/TR/csv2rdf/"}
+                  Generating RDF from Tabular Data on the Web
+              %li
+                %a{:href => "http://www.w3.org/ns/csvw/"}
+                  Tabular Data Namespace
+              %li
+                %a{:href => "http://www.w3.org/TR/csvw-ucr/"}
+                  Use Cases and Requirements
+    %div.hero-unit
+      %h1{:property => "dc:title"}<= ontology["dc:title"]
+      %p{:property => "dc:description rdfs:comment"}<=ontology["dc:description"]
+
+    %div.container
+      %div.row
+        %h2.span12#classes{:style => "text-align: center;"}
+          Test Case Classes
+        :markdown
+          This vocabulary extends the standard [RDF Test Vocabulary](http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#) with CSVW-specific tests.
+      %div.row
+        %section.offset2.span8
+          %dl
+            - classes.each do |cls|
+              %dt{:about => cls['@id'], :typeof => cls['@type'], :property => "rdfs:label"}<~cls["@id"]
+              %dd{:about => cls['@id']}
+                %em{property: "rdfs:label"}<~cls["rdfs:label"]
+                %p{:property => "rdfs:comment"}<
+                  :markdown
+                    #{cls["rdfs:comment"].to_s.gsub(/^\s+/, '')}
+                  - if cls["rdfs:subClassOf"]
+                    %div
+                      %strong
+                        subClassOf:
+                      %code{:property => "rdfs:subClassOf", :resource => cls["rdfs:subClassOf"]}
+                        = cls["rdfs:subClassOf"]
+      %div.row
+        %h2.span12#classes{:style => "text-align: center;"}
+          Test Case Properties
+      %div.row
+        %section.offset2.span8
+          %dl
+            - properties.each do |prop|
+              %dt{:about => prop['@id'], :typeof => prop['@type'], :property => "rdfs:label"}<~prop["@id"][ontology['@id'].length..-1]
+              %dd{:about => prop['@id']}
+                %em{property: "rdfs:label"}<~prop["rdfs:label"]
+                %p{:property => "rdfs:comment"}<
+                  :markdown
+                    #{prop["rdfs:comment"].to_s.gsub(/^\s+/, '')}
+                  - if prop["rdfs:domain"]
+                    %div
+                      %strong
+                        domain:
+                      %code{:property => "rdfs:domain", :resource => prop["rdfs:domain"]}
+                        = prop["rdfs:domain"]
+                  - if prop["rdfs:range"]
+                    %div
+                      %strong
+                        range:
+                      %code{:property => "rdfs:range", :resource => prop["rdfs:range"]}
+                        = prop["rdfs:range"]
+    %footer
+      %span{:property => "dc:publisher"}<= ontology["dc:publisher"]
