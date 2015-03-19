@@ -47,8 +47,6 @@ The key points to note are:
 
 [Source CSV](source/cambornedata.csv) - extract of the full dataset containing only four rows
 
-[Target RDF/turtle output](output/cambornedata-abbreviated.ttl) - abbreviated form of RDF Data Cube
-
 Mapping from the CSV dataset to this 'abbreviated form' of an RDF Data Cube observation is relatively simple. That said, there are a few points to note:
 - the first five rows (before the header-line) need to be ignored
 - the header-line contains only _some_ column titles; additional names need to be added via the CSV metadata
@@ -61,13 +59,10 @@ Mapping from the CSV dataset to this 'abbreviated form' of an RDF Data Cube obse
 
 > Note: The property `headerRowCount` is set as `2` as there are two header rows after the first five rows of descriptive metadata. As a result, values from both header rows will be used as titles for the columns. In this case, the second header row provides details on units of measurement. This does not affect the output as titles are not used.
 
-[CSV+ metadata](source/metadata.json) ... *DISCLAIMER: this is work in progress*
+> Note: In the original CSV file, the `month` value was provided without trailing zeros for January through September. This makes processing the values to create an ISO 8601 compliant date-time difficult because the trailing zeros _are_ required. For the sake of this experiment, we assume that when converting from fixed-format to CSV, values in the `month` column are provided consistently in the two-digit `mm` format.
 
-CSV metadata questions:
+[CSV+ metadata description](source/cambornedata.csv-metadata.json)
 
-1. how to declare the dataset (table) to be @type `qb:DataSet`? ... the [metadata vocabulary](http://w3c.github.io/csvw/metadata/index.html) asserts that @type MUST be `Table`. Should I use `type`?
-2. [DCAT](http://www.w3.org/TR/vocab-dcat/) attaches `dct:license` to a `dcat:Distribution` Class whereas [Jeni's example](https://github.com/w3c/csvw/blob/gh-pages/examples/tests/scenarios/uc-4/attempts/attempt-3/metadata.json) attaches `license` directly to the Table object. Should we follow the DCAT pattern? 
-3. How to express the `dcat:distribution/dcat:downloadURL` property?
-4. How to refer to the RDF Data Cube dataset structure definition? ... it's too big to go in the metadata & it's not a CSV so doesn't seem to fit in the  `resources` section.
-5. Check URI template syntax ...
-6. How to declare 'missing value' token?
+Details of the output from a _standard mode_ conversion can be found [here](output/README.md).
+
+

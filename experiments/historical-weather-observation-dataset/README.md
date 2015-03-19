@@ -4,28 +4,13 @@ This experiement is based on a [historical weather observation dataset for Cambo
 [1]: http://www.metoffice.gov.uk/pub/data/weather/uk/climate/stationdata/cambornedata.txt
 
 ## Transformation experiments ##
-A number of transformation experiments are conducted here, each with increasing complexity:
+Different transformation experiments are conducted here:
 
 1. [Literal transformation to RDF Data Cube using the 'multi-measure' approach](rdf-data-cube-multi-measure-approach/README.md).
-2. Literal transformation to RDF Data Cube using the 'measure-dimension' approach.
-3. Adopting the use of QUDT to describe the measured values.
-4. Adopting the Semantic Sensor Network (SSN) ontology to describe the semantics associated with the observation.
+2. Literal transformation to RDF Data Cube where each observed value is treated as an independent observation [pending].
+3. As (2) except that each observation is expressed according to the [om-lite](http://def.seegrid.csiro.au/ontology/om/om-lite) ontology that is derived from [ISO 19156:2011 Observations and Measurements][om].
 
-?? what about W3C prov-o ??
-
-A "direct mapping", where no metadata is provided, is not included.
-
-Target vocabularies (ontologies) used include:
-- [RDF Data Cube][qb] which is designed to enable the publication of multi-dimensional data, such as statistics, on the web in such a way that it can be linked to related data sets and concepts. Given this design ethos, it seems that tabular data, having 2-dimensions, should be well aligned to the RDF Data Cube model.
-- [Quantities, Units, Dimensions and Data Types][qudt] ontology which provides an standardised mechanism for describing physical properties, measured values thereof and the units used to measure those properties. 
-- [Semantic Sensor Network ontology][ssno] (SSN) which provides rich semantics specifically relating to the observation of physical values using the "sensor-stimulus-observation" pattern.
-
-Note that SSN is strongly related to [ISO 19156:2011 Observations and Measurements][om] (O&M) which is widely used in the Geospatial Information community and is used as the basis for data models emerging from the World Meteorological Organization (WMO).
-
-[qb]: http://www.w3.org/TR/vocab-data-cube/
-[qudt]: http://qudt.org/
 [om]: http://www.opengeospatial.org/standards/om
-[ssno]: http://www.w3.org/2005/Incubator/ssn/ssnx/ssn
 
 ## Describing the source dataset ##
 
