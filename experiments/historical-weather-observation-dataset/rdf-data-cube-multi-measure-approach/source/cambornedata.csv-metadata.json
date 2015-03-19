@@ -1,0 +1,143 @@
+{
+  "@context": ["http://www.w3.org/ns/csvw", {"@language": "en"}],
+  "@id": "http://example.org/cambornedata",
+  "url": "cambornedata.csv",
+  "dc:title": "Camborne data",
+  "dc:description": "Historical observation weather data for Camborne",
+  "dc:publisher": [{
+    "schema:name": "Met Office",
+    "schema:url": {"@id": "http://www.metoffice.gov.uk"}
+  }],
+  "dcat:distribution": {
+  	"dcat:license": {"@id": "http://www.nationalarchives.gov.uk/doc/open-government-licence/version/2/"},
+  	"dcat:downloadURL": {"@id": "http://www.metoffice.gov.uk/pub/data/weather/uk/climate/stationdata/cambornedata.txt"}
+  },
+  "dc:spatial": [{
+  	"@id": "http://data.ordnancesurvey.co.uk/id/50kGazetteer/42095"
+  }, { 
+  	"@id": "http://example.org/cambornepoint",
+  	"@type": "http://www.w3.org/2003/01/geo/wgs84_pos#Point",
+  	"http://www.w3.org/2003/01/geo/wgs84_pos#alt": {"@type": "xsd:double" , "@value": "87"},
+  	"http://www.w3.org/2003/01/geo/wgs84_pos#lat": {"@type": "xsd:double" , "@value": "49.770856"},
+  	"http://www.w3.org/2003/01/geo/wgs84_pos#lon": {"@type": "xsd:double" , "@value": "7.533833"}
+  }],
+  "qb:structure": {"@id": "http://www.example.org/def/historical-data#dsd"}, 
+  "notes": [{
+    "@type": "oa:Annotation",
+    "oa:hasTarget": {"@id": "cambornedata.csv#row=1-5"},
+    "oa:hasBody": {
+      "@type": "oa:EmbeddedContent",
+      "rdf:value": "The first five rows of the CSV file contain the following descriptive metadata:
+
+Camborne
+Location 1627E 407N 87m amsl
+Estimated data is marked with a * after the  value.
+Missing  data (more than 2 days missing in month) is  marked by  ---.
+Sunshine data taken from an automatic Kipp & Zonen sensor marked with a #, otherwise sunshine data taken from a Campbell Stokes recorder.",
+      "dc:format": {"@value": "text/plain"}
+    }
+  },{
+  	"@type": "oa:Annotation",
+    "oa:hasTarget": {"@id": "cambornedata.csv#row=7"},
+    "oa:hasBody": {
+      "@type": "oa:EmbeddedContent",
+      "rdf:value": "The seventh row of the CSV file defines the units of measure used for the observed values.",
+      "dc:format": {"@value": "text/plain"}
+    }
+  }],
+  "dialect": {
+  	"skipRows": 5,
+  	"headerRowCount": 2
+  },
+  "tableSchema": {
+    "columns": [{
+	  "name": "year",
+	  "dc:title": "Year",
+	  "dc:description": "Year of observation",
+	  "datatype": "integer",
+	  "required": true,
+	  "propertyUrl": "http://purl.org/linked-data/sdmx/2009/dimension#refPeriod",
+	  "valueUrl": "http://reference.data.gov.uk/id/gregorian-interval/{year}-{month}-01T00:00:00/P1M"
+	}, {
+	  "name": "month",
+	  "dc:title": "Month",
+	  "dc:description": "Month of observation",
+	  "datatype": "integer",
+	  "required": true,
+      "suppressOutput": true,
+      "rdfs:comment": "'year' and 'month' columns are combined to form the URI for the 'refPeriod'; an instance of w3time:Interval"
+    }, {
+      "name": "tmax",
+	  "dc:title": "Maximum temperature",
+	  "dc:description": "Mean daily maximum temperature",
+	  "datatype": "decimal",
+      "propertyUrl": "http://www.example.org/def/historical-data#tmax"
+	},{
+      "name": "tmax-obsStatus",
+      "dc:description": "status of the observed value of mean daily maximum temperature",
+      "propertyUrl": "http://www.example.org/def/historical-data#tmax-obsStatus",
+      "valueUrl": "http://purl.org/linked-data/sdmx/2009/code#obsStatus-E"
+	}, {
+      "name": "tmin",
+	  "dc:title": "Minimum temperature",
+	  "dc:description": "Mean daily minimum temperature",
+	  "datatype": "decimal",
+      "propertyUrl": "http://www.example.org/def/historical-data#tmin"
+	},{
+      "name": "tmin-obsStatus",
+      "dc:description": "status of the observed value of mean daily minimum temperature",
+      "propertyUrl": "http://www.example.org/def/historical-data#tmin-obsStatus",
+      "valueUrl": "http://purl.org/linked-data/sdmx/2009/code#obsStatus-E"
+	}, {
+      "name": "af",
+	  "dc:title": "Air frost days",
+      "dc:description": "Number of days of air frost",
+      "datatype": "nonNegativeInteger",
+      "propertyUrl": "http://www.example.org/def/historical-data#af"
+	},{
+      "name": "af-obsStatus",
+      "dc:description": "status of the observed value of number of days of air frost",
+      "propertyUrl": "http://www.example.org/def/historical-data#af-obsStatus",
+      "valueUrl": "http://purl.org/linked-data/sdmx/2009/code#obsStatus-E"
+	}, {
+      "name": "rain",
+	  "dc:title": "Rainfall accumulation",
+      "dc:description": "Total rain accumulation",
+	  "datatype": "decimal",
+      "propertyUrl": "http://www.example.org/def/historical-data#rain"
+	}, {
+      "name": "rain-obsStatus",
+      "dc:description": "status of the observed value of total rain accumulation",
+      "propertyUrl": "http://www.example.org/def/historical-data#rain-obsStatus",
+      "valueUrl": "http://purl.org/linked-data/sdmx/2009/code#obsStatus-E"
+	}, {
+      "name": "sun",
+	  "dc:title": "Sunshine duration",
+      "dc:description": "Total sunshine duration",
+      "datatype": "decimal",
+      "propertyUrl": "http://www.example.org/def/historical-data#sun"
+	}, {
+      "name": "sun-alternative-instrument",
+      "dc:description": "assertion of whether the 'Kipp & Zonen' instrument is used in place of the normal 'Campbell Stokes' instrument for recording sunshine duration",
+      "rdfs:comment": "a value of 'true' indicates use of 'Kipp & Zonen' instrument",
+      "datatype": {"base": "boolean", "format": "#|-"},
+      "propertyUrl": "http://www.example.org/def/historical-data#sun-alternative-instrument"
+	}, {
+      "name": "obsStatus",
+      "dc:description": "status of the observation result",
+      "datatype": "string",
+      "default": "Approved",
+      "propertyUrl": "http://purl.org/linked-data/sdmx/2009/attribute#obsStatus",
+      "valueUrl": "http://purl.org/linked-data/sdmx/2009/code#obsStatus-{obsStatus:1}"
+    }, {
+      "name": "dataset-ref",
+      "rdfs:comment": "this 'virtual' column allows the qb:Observation instance that is the subject of the current row to be related to the qb:dataset",
+      "virtual": true,
+      "propertyUrl": "qb:dataSet",
+      "valueUrl": "http://example.org/cambornedata"
+    }],
+    "primaryKey": [ "year", "month" ],
+    "aboutUrl": "http://example.org/cambornedata#record-{year}-{month}",
+    "null": "---"
+  }
+}

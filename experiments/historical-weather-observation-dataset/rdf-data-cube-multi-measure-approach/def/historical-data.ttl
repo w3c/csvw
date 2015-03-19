@@ -1,0 +1,101 @@
+@prefix dc:             <http://purl.org/dc/terms/> .
+@prefix exd:            <http://www.example.org/def/historical-data#> .
+@prefix oml:            <http://def.seegrid.csiro.au/ontology/om/om-lite#> .
+@prefix owl:            <http://www.w3.org/2002/07/owl#> .
+@prefix qb:             <http://purl.org/linked-data/cube#> .
+@prefix rdf:            <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:           <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sdmx-attribute: <http://purl.org/linked-data/sdmx/2009/attribute#> .
+@prefix sdmx-code:      <http://purl.org/linked-data/sdmx/2009/code#> .
+@prefix sdmx-dimension: <http://purl.org/linked-data/sdmx/2009/dimension#> .
+@prefix skos:           <http://www.w3.org/2004/02/skos/core#> .
+@prefix time:           <http://www.w3.org/2006/time#> .
+@prefix xsd:            <http://www.w3.org/2001/XMLSchema#> .
+
+exd:dsd a qb:DataStructureDefinition ;
+    rdfs:comment "historical monthly observations (multi-measure approach)"@en ;
+    qb:component
+        [ qb:dimension sdmx-dimension:refPeriod ],
+        [ qb:measure   exd:tmax ] ,
+        [ qb:measure   exd:tmin ] ,
+        [ qb:measure   exd:af ] ,
+        [ qb:measure   exd:rain ] ,
+        [ qb:measure   exd:sun ] ,
+        [ qb:attribute oml:uom ;
+                       qb:componentRequired "true"^^xsd:boolean ;
+                       qb:componentAttachment qb:MeasureProperty ] ,
+        [ qb:attribute exd:tmax-obsStatus ] ,
+        [ qb:attribute exd:tmin-obsStatus ] ,
+        [ qb:attribute exd:af-obsStatus ] ,
+        [ qb:attribute exd:rain-obsStatus ] ,
+        [ qb:attribute exd:sun-alternative-instrument ] ,
+        [ qb:attribute sdmx-attribute:obsStatus ] ,
+        [ qb:attribute dc:spatial ;
+                       qb:componentRequired "true"^^xsd:boolean ;
+                       qb:componentAttachment qb:DataSet ] .
+
+sdmx-dimension:refPeriod  a qb:DimensionProperty;
+    rdfs:label "reference period for observation value"@en;
+    rdfs:range time:Interval . 
+
+oml:uom a qb:AttributeProperty ;
+    rdfs:label "unit of measurement"@en .
+
+exd:tmax a owl:DatatypeProperty, qb:MeasureProperty ;
+	rdfs:label "mean daily maximum temperature"@en ;
+	skos:notation "tmax" ;
+	oml:uom <http://qudt.org/vocab/unit#DegreeCelsius> ;
+	rdfs:range xsd:decimal .
+
+exd:tmax-obsStatus a owl:ObjectProperty, qb:AttributeProperty, qb:CodedProperty ;
+    rdfs:label "status of the observed value of mean daily maximum temperature"@en ;
+    qb:codeList sdmx-code:obsStatus ;
+    rdfs:range sdmx-code:ObsStatus .
+
+exd:tmin a owl:DatatypeProperty, qb:MeasureProperty ;
+    rdfs:label "mean daily minimum temperature"@en ;
+	skos:notation "tmin" ;
+	oml:uom <http://qudt.org/vocab/unit#DegreeCelsius> ;
+    rdfs:range xsd:decimal .
+
+exd:tmin-obsStatus a owl:ObjectProperty, qb:AttributeProperty, qb:CodedProperty ;
+    rdfs:label "status of the observed value of mean daily minimum temperature"@en ;
+    qb:codeList sdmx-code:obsStatus ;
+    rdfs:range sdmx-code:ObsStatus .
+
+exd:af a owl:DatatypeProperty, qb:MeasureProperty ;
+    rdfs:label "number of days of air frost"@en ;
+	skos:notation "af" ;
+	oml:uom <http://qudt.org/vocab/unit#Day> ;
+    rdfs:range xsd:nonNegativeInteger .
+
+exd:af-obsStatus a owl:ObjectProperty, qb:AttributeProperty, qb:CodedProperty ;
+    rdfs:label "status of the observed value of number of days of air frost"@en ;
+    qb:codeList sdmx-code:obsStatus ;
+    rdfs:range sdmx-code:ObsStatus .
+
+exd:rain a owl:DatatypeProperty, qb:MeaureProperty ;
+    rdfs:label "total rain accumulation"@en ;
+	skos:notation "rain" ;
+	oml:uom <http://qudt.org/vocab/unit#Millimeter> ;
+    rdfs:range xsd:decimal .
+
+exd:rain-obsStatus a owl:ObjectProperty, qb:AttributeProperty, qb:CodedProperty ;
+    rdfs:label "status of the observed value of total rain accumulation"@en ;
+    qb:codeList sdmx-code:obsStatus ;
+    rdfs:range sdmx-code:ObsStatus .
+
+exd:sun a owl:DatatypeProperty, qb:MeasureProperty ;
+    rdfs:label "total sunshine duration"@en ;
+	skos:notation "sun" ;
+	oml:uom <http://qudt.org/vocab/unit#Hour> ;
+    rdfs:range xsd:decimal .
+
+exd:sun-alternative-instrument a owl:ObjectProperty, qb:AttributeProperty ;
+    rdfs:label """assertion of whether the "Kipp & Zonen" instrument is used in place of the normal "Campbell Stokes" instrument for recording sunshine duration"""@en ;
+    rdfs:range xsd:boolean .
+
+sdmx-attribute:obsStatus a qb:AttributeProperty, qb:CodedProperty ;
+    rdfs:label "status of the observation result"@en ;
+    qb:codeList sdmx-code:obsStatus ;
+    rdfs:range sdmx-code:ObsStatus .
