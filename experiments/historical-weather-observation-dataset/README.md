@@ -7,8 +7,8 @@ This experiement is based on a [historical weather observation dataset for Cambo
 Different transformation experiments are conducted here:
 
 1. [Literal transformation to RDF Data Cube using the 'multi-measure' approach](rdf-data-cube-multi-measure-approach/README.md).
-2. Literal transformation to RDF Data Cube where each observed value is treated as an independent observation [pending].
-3. As (2) except that each observation is expressed according to the [om-lite](http://def.seegrid.csiro.au/ontology/om/om-lite) ontology that is derived from [ISO 19156:2011 Observations and Measurements][om].
+2. Literal transformation to RDF Data Cube where each observed value is treated as an independent observation (pending).
+3. As (2) except that each observation is expressed according to the [om-lite](http://def.seegrid.csiro.au/ontology/om/om-lite) ontology that is derived from [ISO 19156:2011 Observations and Measurements][om] (pending).
 
 [om]: http://www.opengeospatial.org/standards/om
 
