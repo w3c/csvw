@@ -1,4 +1,4 @@
-The target output is an [abbreviated RDF Data Cube](cambornedata-standard-qbAbbr.ttl) published using _standard mode_ conversion. _Standard mode_ is required because we want the _common properties_ from metadata description to propagate into the RDF output.
+The target output is an [abbreviated RDF Data Cube representation of the Camborne data](cambornedata-standard-qbAbbr.ttl) published using _standard mode_ conversion. _Standard mode_ is required because we want the _common properties_ from metadata description to propagate into the RDF output.
 
 For information, details of the "Camborne" object, a `NamedPlace`, as defined by Ordnance Survey is provided below:
 
@@ -14,7 +14,7 @@ For information, details of the "Camborne" object, a `NamedPlace`, as defined by
 
 > Note: The eagle-eyed amongst you will notice that the coordinates of Camborne as defined by Ordnance Survey don't quite match those expressed within the [CSV](../source/cambornedata.csv). This is because the location where the observation occurs is actually a representative sampling point for the Camborne area - not the centroid of the geographic area.
 
-For completeness, a [normalized_ version](cambornedata-standard-qbAbbr.ttl) of the data-cube observations is provided.
+For completeness, a [normalized RDF Data Cube representation of the Camborne data](cambornedata-standard-qbAbbr.ttl) is also provided.
 
 The data-cube normalization adds the following triples:
 - The `Table` (`{"@id": "http://example.org/cambornedata"}`) is now specified as a `qb:DataSet`
