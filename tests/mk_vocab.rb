@@ -6,10 +6,11 @@
 #    jsonld --compact --context vocab_context.jsonld --input-format ttl vocab.ttl  -o vocab.jsonld
 require 'linkeddata'
 require 'haml'
+require 'active_support'
 
 File.open("vocab.jsonld", "w") do |f|
   r = RDF::Repository.load("vocab.ttl")
-  JSON::LD::API.fromRDF(r, :useNativeTypes => true) do |expanded|
+  JSON::LD::API.fromRDF(r, useNativeTypes: true) do |expanded|
     # Remove leading/trailing and multiple whitespace from rdf:comments
     expanded.each do |o|
       c = o[RDF::RDFS.comment.to_s].first['@value']
@@ -23,9 +24,9 @@ File.open("vocab.jsonld", "w") do |f|
       template = File.read("vocab_template.haml")
       
       html = Haml::Engine.new(template, :format => :html5).render(self,
-        :ontology => compacted['@graph'].detect {|o| o['@id'] == "http://w3c.github.io/csvw/tests/vocab#"},
-        :classes => compacted['@graph'].select {|o| o['@type'] == "rdfs:Class"}.sort_by {|o| o['rdfs:label']},
-        :properties => compacted['@graph'].select {|o| o['@type'] == "rdf:Property"}.sort_by {|o| o['rdfs:label']}
+        ontology:   compacted['@graph'].detect {|o| o['@id'] == "http://w3c.github.io/csvw/tests/vocab#"},
+        classes:    compacted['@graph'].select {|o| o['@type'] == "rdfs:Class"}.sort_by {|o| o['rdfs:label']},
+        properties: compacted['@graph'].select {|o| o['@type'] == "rdf:Property"}.sort_by {|o| o['rdfs:label']}
       )
       File.open("vocab.html", "w") {|fh| fh.write html}
     end

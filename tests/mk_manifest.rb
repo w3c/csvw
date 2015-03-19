@@ -4,7 +4,7 @@
 require 'getoptlong'
 require 'csv'
 require 'json'
-require 'erubis'
+require 'haml'
 
 class Manifest
   JSON_STATE = JSON::State.new(
@@ -18,10 +18,12 @@ class Manifest
   TITLE = {
     json: "CSVW JSON tests",
     rdf: "CSVW RDF tests",
+    validation: "CSVW validation tests"
   }
   DESCRIPTION = {
     json: "Tests transformation of CSV to JSON",
     rdf: "Tests transformation of CSV to RDF",
+    validation: "Tests CSV validation using metadata"
   }
   attr_accessor :prefixes, :terms, :properties, :classes, :instances, :datatypes
 
@@ -139,6 +141,10 @@ class Manifest
   end
 
   def to_html(variant)
+    Haml::Engine.new(template, :format => :html5).render(self,
+      man: "",
+      manifests: ""
+    )
     json = JSON.parse(to_jsonld(variant))
     eruby = Erubis::Eruby.new(File.read("template.html"))
     eruby.result(ont: json['@graph'], context: json['@context'])
