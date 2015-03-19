@@ -1841,10 +1841,6 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
         <h3>Normalization</h3>
         <p>Prior to merging, each description object is expanded relative to its <code>@context</code> and values are <dfn title="normalization">normalized</dfn> as follows:</p>
         <ol class="algorithm">
-          <li>If the property is a <a>link property</a> the value is turned into an absolute URL using the <a>base URL</a>.</li>
-          <li>If the property is an <a>object property</a> with a string value, the string is a URL referencing a JSON document containing a single object. Dereference this URL and replace the string value with that object.</li>
-          <li>If the property is a <a>natural language property</a> and the value is not already an object, it is turned into an object whose properties are language codes and where the values of those properties are arrays. The suitable language code for the values is determined through the <a>default language</a>; if it can't be determined the language code <code>und</code> MUST be used.</li>
-          <li>If the property is an <a>atomic property</a> that can be a string or an object, normalize to the object form as described for that property.</li>
           <li>
             If the property is a <a>common property</a> or <a href="#table-notes"><code>notes</code></a> the value MUST be normalized as follows:
             <ol class="algorithm">
@@ -1861,6 +1857,11 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
               <li>Otherwise, the value remains as is.</li>
             </ol>
           </li>
+          <li>If the property is an <a>array property</a> each element of the value is normalized using this algorithm.</li>
+          <li>If the property is a <a>link property</a> the value is turned into an absolute URL using the <a>base URL</a>.</li>
+          <li>If the property is an <a>object property</a> with a string value, the string is a URL referencing a JSON document containing a single object. Dereference this URL and replace the string value with that object.</li>
+          <li>If the property is a <a>natural language property</a> and the value is not already an object, it is turned into an object whose properties are language codes and where the values of those properties are arrays. The suitable language code for the values is determined through the <a>default language</a>; if it can't be determined the language code <code>und</code> MUST be used.</li>
+          <li>If the property is an <a>atomic property</a> that can be a string or an object, normalize to the object form as described for that property.</li>
         </ol>
         <p>
           Following this normalization process, the <code>@base</code> and <code>@language</code> properties within the <code>@context</code> are no longer relevant; the normalized metadata can have its <code>@context</code> set to <code>http://www.w3.org/ns/csvw</code>.
