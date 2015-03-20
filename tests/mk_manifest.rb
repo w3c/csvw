@@ -85,18 +85,22 @@ class Manifest
       "action": {"@id": "mf:action",  "@type": "@id"},
       "approval": {"@id": "csvt:approval", "@type": "@id"},
       "comment": "rdfs:comment",
+      "contentType": "csvt:contentType",
       "entries": {"@id": "mf:entries", "@type": "@id", "@container": "@list"},
-      "label": "rdfs:label",
       "httpLink": "csvt:httpLink",
+      "implicit": {"@id": "mf:implicit", "@type": "@id", "@container": "@set"},
+      "label": "rdfs:label",
+      "metadata": {"@id": "csvt:metadata", "@type": "@id"},
+      "minimal": "csvt:minimal",
       "name": "mf:name",
+      "noProv": "csvt:noProv",
       "option": "csvt:option",
-      "result": {"@id": "mf:result", "@type": "@id"},
-      "user_metadata": {"@id": "csvt:metadata", "@type": "@id"}
+      "result": {"@id": "mf:result", "@type": "@id"}
     })
 
     manifest = {
       "@context" => context,
-      "id" => "",
+      "id" => "metadata-#{variant}",
       "type" => "mf:Manifest",
       "label" => TITLE[variant],
       "comment" => DESCRIPTION[variant],
@@ -112,19 +116,19 @@ class Manifest
       next unless test.option[variant.to_sym]
 
       entry = {
-        "id" => "##{test.id}",
+        "id" => "metadata-#{variant}##{test.id}",
         "type" => test_type,
         "name" => test.name,
         "comment" => test.comment,
         "approval" => (test.approval ? "csvt:#{test.approval}" : "csvt:Proposed"),
-        "option" => {"csvt:noProv" => true},
+        "option" => {"noProv" => true},
         "action" => test.action,
         "result" => "#{test.result}#{variant}",
         "implicit" => []
       }
 
       entry["implicit"] << test.option[:implicit] if test.option[:implicit]
-      entry["implicit"] << (entry["option"]["user_metadata"] = test.user_metadata) if test.user_metadata
+      entry["implicit"] << (entry["option"]["metadata"] = test.user_metadata) if test.user_metadata
       if test.link_metadata
         entry["implicit"] << test.link_metadata
         entry["httpLink"] = %(<#{test.link_metadata.split('/').last}>; rel="describedby")
@@ -133,7 +137,7 @@ class Manifest
       entry["implicit"] << test.directory_metadata if test.directory_metadata
       entry.delete("implicit") if entry["implicit"].empty?
 
-      entry["csvt:contentType"] = test.option[:contentType] if test.option[:contentType]
+      entry["contentType"] = test.option[:contentType] if test.option[:contentType]
       manifest["entries"] << entry
     end
 
@@ -170,13 +174,13 @@ class Manifest
 ## * CsvToRdfTest   - tests CSV evaluation to RDF using graph isomorphism
 ## * CsvSparqlTest - tests CSV evaulation to RDF using SPARQL ASK query
 
-@prefix : <#> .
+@prefix : <metadata-#{variant}#> .
 @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix mf:   <http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#> .
 @prefix csvt: <http://w3c.github.io/csvw/tests/vocab#> .
 
-<>  a mf:Manifest ;
+<metadata-#{variant}>  a mf:Manifest ;
 )
     output << %(  rdfs:label "#{TITLE[variant]}";)
     output << %(  rdfs:comment "#{DESCRIPTION[variant]}";)
@@ -270,7 +274,7 @@ else
       end
     end
   end
-  File.open("manifest.html", "w") do |output|
+  File.open("index.html", "w") do |output|
     output.puts(vocab.to_html)
   end
 end
