@@ -14,20 +14,24 @@ var hide_text = "Hide detailed annotations";
 /**
 * This function is invoked when the button is pushed
 *
-* @param {String} target: the id value of the <div> element to be switched, also the value of the @data-anno-target for the button
+* @param {Object} event: the event that triggered the handler
 */
-var hide = function(target) {
-  var flag   = visibility_flags[target];
+var hide = function(event) {
+  /* Get the button that is at the origin of the event */
+  var button = event.currentTarget;
+  /* get the target, ie, the id of the div element */
+  var target = button.getAttribute("data-anno-target");
   var tohide = document.getElementById(target);
+  /* get the current visibility flag */
+  var flag   = visibility_flags[target];
+
+  /* hide the target */
   tohide.style.display = flag ? "none" : "inherit";
 
-  // Change the button content
-  var buttons = document.getElementsByTagName("button");
-  for( var i = 0; i < buttons.length; i++ ) {
-    if( target === buttons[i].getAttribute("data-anno-target") ) {
-      buttons[i].innerHTML = flag ? show_text : hide_text;
-    }
-  }
+  /* Change the button's content */
+  button.innerHTML = flag ? show_text : hide_text;
+
+  /* Reset the visibility flag*/
   visibility_flags[target] = !flag;
 }
 
@@ -49,16 +53,17 @@ var hide = function(target) {
 */
 var hide_init = function() {
   var buttons = document.getElementsByTagName("button");
+  var match = window.matchMedia("screen");
   for( var i = 0; i < buttons.length; i++ ) {
     var id = buttons[i].getAttribute("data-anno-target");
-    var tohide = document.getElementById(id);
-    if( tohide === undefined ) {
-      buttons[i].style.display = "none";
-    } else {
+    if( match.matches ) {
+      var tohide = document.getElementById(id);
       visibility_flags[id] = false;
       buttons[i].innerHTML = show_text;
-      buttons[i].setAttribute("onclick", "hide('" + id + "');")
+      buttons[i].addEventListener("click", hide);
       tohide.style.display = "none";
+    } else {
+      buttons[i].style.display = "none";      
     }
   }
 }
