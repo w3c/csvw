@@ -19,10 +19,6 @@
 *    </script>
 *
 *
-* I work with a separate internal flags instead of toggling a class and let CSS work its way, before I hope
-* to find a way to be able to print with some sort of an initial state and not with the current status of the DOM.
-* That would require that the event handlers for 'beforeprint' and 'afterprint' should work, but, at present, they do not:-(
-*
 * * Author: Ivan Herman
 * * Licence: © Copyright W3C® SOFTWARE NOTICE AND LICENSE <http://www.w3.org/Consortium/Legal/2002/copyright-software-20021231>, Ivan Herman, 2015
 * 
@@ -57,7 +53,7 @@ var hide = function(event) {
   var flag   = visibility_flags[target];
 
   /* hide the target */
-  tohide.style.display = flag ? "none" : "block";
+  tohide.setAttribute("class", flag ? "to-toggle" : "to-toggle visible");
 
   /* Change the button's content */
   button.innerHTML = flag ? show_text : hide_text;
@@ -65,15 +61,6 @@ var hide = function(event) {
   /* Reset the visibility flag */
   visibility_flags[target] = !flag;
 }
-
-
-// var before_print = function(event) {
-//   alert("printing!")
-// }
-
-// var after_print = function(event) {
-//   alert("printed!")
-// }
 
 /**
 * This method is invoked *at the end* of the file; 
@@ -101,9 +88,4 @@ var hide_init = function() {
       buttons[i].addEventListener("click", hide);      
     }
   }
-
-  /* Take care of the before and after print events */
-  /** These do not work yet, unfortunately:-( */
-  // document.addEventListener("beforeprint",before_print);
-  // document.addEventListener("afterprint",after_print)
 }
