@@ -4,7 +4,7 @@
 require 'getoptlong'
 require 'csv'
 require 'json'
-require 'erubis'
+require 'haml'
 
 class Manifest
   JSON_STATE = JSON::State.new(
@@ -17,11 +17,17 @@ class Manifest
 
   TITLE = {
     json: "CSVW JSON tests",
-    rdf: "CSVW RDF tests",
+    rdf: "CSVW RDF Tests",
+    validation: "CSVW Validation Tests"
   }
   DESCRIPTION = {
-    json: "Tests transformation of CSV to JSON",
-    rdf: "Tests transformation of CSV to RDF",
+    json: "Tests transformation of CSV to JSON.",
+    rdf: "Tests transformation of CSV to RDF.",
+    validation: "Tests CSV validation using metadata."
+  }
+  EXTENTIONS = {
+    json: 'json',
+    rdf: 'ttl'
   }
   attr_accessor :prefixes, :terms, :properties, :classes, :instances, :datatypes
 
@@ -83,18 +89,22 @@ class Manifest
       "action": {"@id": "mf:action",  "@type": "@id"},
       "approval": {"@id": "csvt:approval", "@type": "@id"},
       "comment": "rdfs:comment",
+      "contentType": "csvt:contentType",
       "entries": {"@id": "mf:entries", "@type": "@id", "@container": "@list"},
-      "label": "rdfs:label",
       "httpLink": "csvt:httpLink",
+      "implicit": {"@id": "mf:implicit", "@type": "@id", "@container": "@set"},
+      "label": "rdfs:label",
+      "metadata": {"@id": "csvt:metadata", "@type": "@id"},
+      "minimal": "csvt:minimal",
       "name": "mf:name",
+      "noProv": "csvt:noProv",
       "option": "csvt:option",
-      "result": {"@id": "mf:result", "@type": "@id"},
-      "user_metadata": {"@id": "csvt:metadata", "@type": "@id"}
+      "result": {"@id": "mf:result", "@type": "@id"}
     })
 
     manifest = {
       "@context" => context,
-      "id" => "",
+      "id" => "manifest-#{variant}",
       "type" => "mf:Manifest",
       "label" => TITLE[variant],
       "comment" => DESCRIPTION[variant],
@@ -102,27 +112,27 @@ class Manifest
     }
 
     test_type = case variant
-    when :rdf then "csvt:CSVtoRdfTest"
-    when :json then "csvt:CSVtoJsonTest"
+    when :rdf then "csvt:CsvToRdfTest"
+    when :json then "csvt:CsvToJsonTest"
     end
 
     tests.each do |test|
       next unless test.option[variant.to_sym]
 
       entry = {
-        "id" => "##{test.id}",
+        "id" => "manifest-#{variant}##{test.id}",
         "type" => test_type,
         "name" => test.name,
         "comment" => test.comment,
         "approval" => (test.approval ? "csvt:#{test.approval}" : "csvt:Proposed"),
-        "option" => {"csvt:noProv" => true},
+        "option" => {"noProv" => true},
         "action" => test.action,
-        "result" => "#{test.result}#{variant}",
+        "result" => "#{test.result}#{EXTENTIONS[variant]}",
         "implicit" => []
       }
 
       entry["implicit"] << test.option[:implicit] if test.option[:implicit]
-      entry["implicit"] << (entry["option"]["user_metadata"] = test.user_metadata) if test.user_metadata
+      entry["implicit"] << (entry["option"]["metadata"] = test.user_metadata) if test.user_metadata
       if test.link_metadata
         entry["implicit"] << test.link_metadata
         entry["httpLink"] = %(<#{test.link_metadata.split('/').last}>; rel="describedby")
@@ -131,17 +141,25 @@ class Manifest
       entry["implicit"] << test.directory_metadata if test.directory_metadata
       entry.delete("implicit") if entry["implicit"].empty?
 
-      entry["csvt:contentType"] = test.option[:contentType] if test.option[:contentType]
+      entry["contentType"] = test.option[:contentType] if test.option[:contentType]
       manifest["entries"] << entry
     end
 
     manifest.to_json(JSON_STATE)
   end
 
-  def to_html(variant)
-    json = JSON.parse(to_jsonld(variant))
-    eruby = Erubis::Eruby.new(File.read("template.html"))
-    eruby.result(ont: json['@graph'], context: json['@context'])
+  def to_html
+    # Create vocab.html using vocab_template.haml and compacted vocabulary
+    template = File.read("template.haml")
+    manifests = %w(json rdf).inject({}) do |memo, v|
+      memo["manifest-#{v}"] = ::JSON.load(File.read("manifest-#{v}.jsonld"))
+      memo
+    end
+
+    Haml::Engine.new(template, :format => :html5).render(self,
+      man: ::JSON.load(File.read("manifest.jsonld")),
+      manifests: manifests
+    )
   end
 
   def to_ttl(variant)
@@ -160,13 +178,13 @@ class Manifest
 ## * CsvToRdfTest   - tests CSV evaluation to RDF using graph isomorphism
 ## * CsvSparqlTest - tests CSV evaulation to RDF using SPARQL ASK query
 
-@prefix : <#> .
+@prefix : <manifest-#{variant}#> .
 @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix mf:   <http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#> .
 @prefix csvt: <http://w3c.github.io/csvw/tests/vocab#> .
 
-<>  a mf:Manifest ;
+<manifest-#{variant}>  a mf:Manifest ;
 )
     output << %(  rdfs:label "#{TITLE[variant]}";)
     output << %(  rdfs:comment "#{DESCRIPTION[variant]}";)
@@ -178,8 +196,8 @@ class Manifest
     output << %(  \) .)
 
     test_type = case variant
-    when :rdf then "csvt:CSVtoRdfTest"
-    when :json then "csvt:CSVtoJsonTest"
+    when :rdf then "csvt:CsvToRdfTest"
+    when :json then "csvt:CsvToJsonTest"
     end
 
     tests.select {|t| t.option[variant]}.each do |test|
@@ -193,7 +211,7 @@ class Manifest
       output << %(  ];)
       output << %(  csvt:httpLink "<#{test.link_metadata.split('/').last}>; rel=\\"describedby\\"";) if test.link_metadata
       output << %(  mf:action <#{test.action}>;)
-      output << %(  mf:result <#{test.result}#{variant}>;)
+      output << %(  mf:result <#{test.result}#{EXTENTIONS[variant]}>;)
       output << %(  csvt:contentType "#{test.option[:contentType]}";) if test.option[:contentType]
 
       implicit = [test.option[:implicit], test.user_metadata, test.link_metadata, test.file_metadata, test.directory_metadata].
@@ -249,7 +267,7 @@ if options[:format] || options[:variant]
   case options[:format]
   when :jsonld  then options[:output].puts(vocab.to_jsonld(options[:variant]))
   when :ttl     then options[:output].puts(vocab.to_ttl(options[:variant]))
-  when :html    then options[:output].puts(vocab.to_html(options[:variant]))
+  when :html    then options[:output].puts(vocab.to_html)
   else  STDERR.puts "Unknown format #{options[:format].inspect}"
   end
 else
@@ -259,5 +277,8 @@ else
         output.puts(vocab.send("to_#{format}".to_sym, variant.to_sym))
       end
     end
+  end
+  File.open("index.html", "w") do |output|
+    output.puts(vocab.to_html)
   end
 end
