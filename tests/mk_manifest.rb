@@ -25,6 +25,10 @@ class Manifest
     rdf: "Tests transformation of CSV to RDF.",
     validation: "Tests CSV validation using metadata."
   }
+  EXTENTIONS = {
+    json: 'json',
+    rdf: 'ttl'
+  }
   attr_accessor :prefixes, :terms, :properties, :classes, :instances, :datatypes
 
   Test = Struct.new(:id, :type, :name, :comment, :approval, :option, :action, :result, :user_metadata, :link_metadata, :file_metadata, :directory_metadata)
@@ -100,7 +104,7 @@ class Manifest
 
     manifest = {
       "@context" => context,
-      "id" => "metadata-#{variant}",
+      "id" => "manifest-#{variant}",
       "type" => "mf:Manifest",
       "label" => TITLE[variant],
       "comment" => DESCRIPTION[variant],
@@ -108,22 +112,22 @@ class Manifest
     }
 
     test_type = case variant
-    when :rdf then "csvt:CSVtoRdfTest"
-    when :json then "csvt:CSVtoJsonTest"
+    when :rdf then "csvt:CsvToRdfTest"
+    when :json then "csvt:CsvToJsonTest"
     end
 
     tests.each do |test|
       next unless test.option[variant.to_sym]
 
       entry = {
-        "id" => "metadata-#{variant}##{test.id}",
+        "id" => "manifest-#{variant}##{test.id}",
         "type" => test_type,
         "name" => test.name,
         "comment" => test.comment,
         "approval" => (test.approval ? "csvt:#{test.approval}" : "csvt:Proposed"),
         "option" => {"noProv" => true},
         "action" => test.action,
-        "result" => "#{test.result}#{variant}",
+        "result" => "#{test.result}#{EXTENTIONS[variant]}",
         "implicit" => []
       }
 
@@ -174,13 +178,13 @@ class Manifest
 ## * CsvToRdfTest   - tests CSV evaluation to RDF using graph isomorphism
 ## * CsvSparqlTest - tests CSV evaulation to RDF using SPARQL ASK query
 
-@prefix : <metadata-#{variant}#> .
+@prefix : <manifest-#{variant}#> .
 @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix mf:   <http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#> .
 @prefix csvt: <http://w3c.github.io/csvw/tests/vocab#> .
 
-<metadata-#{variant}>  a mf:Manifest ;
+<manifest-#{variant}>  a mf:Manifest ;
 )
     output << %(  rdfs:label "#{TITLE[variant]}";)
     output << %(  rdfs:comment "#{DESCRIPTION[variant]}";)
@@ -192,8 +196,8 @@ class Manifest
     output << %(  \) .)
 
     test_type = case variant
-    when :rdf then "csvt:CSVtoRdfTest"
-    when :json then "csvt:CSVtoJsonTest"
+    when :rdf then "csvt:CsvToRdfTest"
+    when :json then "csvt:CsvToJsonTest"
     end
 
     tests.select {|t| t.option[variant]}.each do |test|
@@ -207,7 +211,7 @@ class Manifest
       output << %(  ];)
       output << %(  csvt:httpLink "<#{test.link_metadata.split('/').last}>; rel=\\"describedby\\"";) if test.link_metadata
       output << %(  mf:action <#{test.action}>;)
-      output << %(  mf:result <#{test.result}#{variant}>;)
+      output << %(  mf:result <#{test.result}#{EXTENTIONS[variant]}>;)
       output << %(  csvt:contentType "#{test.option[:contentType]}";) if test.option[:contentType]
 
       implicit = [test.option[:implicit], test.user_metadata, test.link_metadata, test.file_metadata, test.directory_metadata].
