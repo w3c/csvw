@@ -69,7 +69,7 @@ class Manifest
 
         test.user_metadata = "#{test.id}/user-metadata.json" if entry[:"user-metadata"] == "TRUE"
         test.link_metadata = "#{test.id}/linked-metadata.json" if entry[:"link-metadata"] == "TRUE"
-        test.file_metadata = "#{test.id}/action.csv-metadata.json" if entry[:"file-metadata"] == "TRUE"
+        test.file_metadata = "#{test.action}-metadata.json" if entry[:"file-metadata"] == "TRUE"
         test.directory_metadata = "#{test.id}/metadata.json" if entry[:"directory-metadata"] == "TRUE"
       else
         test.action = extras.fetch(:action, "#{test.id}.csv")
@@ -77,7 +77,7 @@ class Manifest
         
         test.user_metadata = "#{test.id}-user-metadata.json" if entry[:"user-metadata"] == "TRUE"
         test.link_metadata = "#{test.id}-linked-metadata.json" if entry[:"link-metadata"] == "TRUE"
-        test.file_metadata = "#{test.id}.csv-metadata.json" if entry[:"file-metadata"] == "TRUE"
+        test.file_metadata = "#{test.action}-metadata.json" if entry[:"file-metadata"] == "TRUE"
       end
       test.option[:implicit] = Array(test.option[:implicit])
       test.option[:implicit] += [test.user_metadata, test.link_metadata, test.file_metadata, test.directory_metadata].compact
