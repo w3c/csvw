@@ -5,6 +5,7 @@ require 'getoptlong'
 require 'csv'
 require 'json'
 require 'haml'
+require 'fileutils'
 
 class Manifest
   JSON_STATE = JSON::State.new(
@@ -47,33 +48,65 @@ class Manifest
       # Create entry as object indexed by symbolized column name
       line.each_with_index {|v, i| entry[columns[i]] = v ? v.gsub("\r", "\n").gsub("\\", "\\\\") : nil}
 
-      extras = entry[:extra].to_s.split("\n").inject({}) do |memo, e|
+      extras = entry[:extra].to_s.split(/\s+/).inject({}) do |memo, e|
         k, v = e.split("=", 2)
         v = v[1..-2] if v =~ /^".*"$/
-        memo[k.to_sym] = v
+        memo[k.to_sym] = v.include?(',') ? v.split(',') : v
         memo
       end
-      extras[:rdf] = entry[:rdf]
-      extras[:json] = entry[:json]
+      case entry[:type]
+      when /Validation/
+        extras[:validation] = true
+      else
+        extras[:rdf] = !entry[:rdf].empty?
+        extras[:json] = !entry[:json].empty?
+      end
       test = Test.new(entry[:test], entry[:type], entry[:name], entry[:comment], entry[:approval], extras)
 
-      if entry[:"directory-metadata"] == "TRUE"
+      if entry[:"directory-metadata"] == "TRUE" || test.option[:dir]
         test.action = extras.fetch(:action, "#{test.id}/action.csv")
-        test.result = extras.fetch(:result, "#{test.id}/result.")
+        test.result = extras.fetch(:result, "#{test.id}/result.") unless %w(Validation Syntax).include?(test.type)
 
         test.user_metadata = "#{test.id}/user-metadata.json" if entry[:"user-metadata"] == "TRUE"
         test.link_metadata = "#{test.id}/linked-metadata.json" if entry[:"link-metadata"] == "TRUE"
-        test.file_metadata = "#{test.id}/action.csv-metadata.json" if entry[:"file-metadata"] == "TRUE"
-        test.directory_metadata = "#{test.id}/metadata.json"
+        test.file_metadata = "#{test.action}-metadata.json" if entry[:"file-metadata"] == "TRUE"
+        test.directory_metadata = "#{test.id}/metadata.json" if entry[:"directory-metadata"] == "TRUE"
       else
         test.action = extras.fetch(:action, "#{test.id}.csv")
-        test.result = extras.fetch(:result, "#{test.id}.")
+        test.result = extras.fetch(:result, "#{test.id}.") unless %w(Validation Syntax).include?(test.type)
         
         test.user_metadata = "#{test.id}-user-metadata.json" if entry[:"user-metadata"] == "TRUE"
         test.link_metadata = "#{test.id}-linked-metadata.json" if entry[:"link-metadata"] == "TRUE"
-        test.file_metadata = "#{test.id}.csv-metadata.json" if entry[:"file-metadata"] == "TRUE"
+        test.file_metadata = "#{test.action}-metadata.json" if entry[:"file-metadata"] == "TRUE"
       end
+      test.option[:implicit] = Array(test.option[:implicit])
+      test.option[:implicit] += [test.user_metadata, test.link_metadata, test.file_metadata, test.directory_metadata].compact
       test
+    end
+  end
+
+  # Create files referenced in the manifest
+  def create_files
+    tests.each do |test|
+      FileUtils.mkdir(test.id.to_s) unless Dir.exist?(test.id.to_s) if test.directory_metadata || test.option[:dir]
+      files = [test.action] + test.option[:implicit]
+      files << "#{test.result}ttl"  if test.result && test.option[:rdf]
+      files << "#{test.result}json" if test.result && test.option[:json]
+      files.compact.select {|f| !File.exist?(f)}.each do |f|
+        File.open(f, "w") {|io| io.puts( f.end_with?('.json') ? "{}" : "")}
+      end
+    end
+  end
+
+  def test_class(test, variant)
+    case variant
+    when :rdf then "csvt:ToRdfTest" if test.type == "Eval"
+    when :json then "csvt:ToJsonTest" if test.type == "Eval"
+    when :validation
+      case test.type
+      when "Validation" then "csvt:PositiveValidationTest"
+      when "NegativeValidation" then "csvt:NegativeValidationTest"
+      end
     end
   end
 
@@ -111,36 +144,25 @@ class Manifest
       "entries" => []
     }
 
-    test_type = case variant
-    when :rdf then "csvt:CsvToRdfTest"
-    when :json then "csvt:CsvToJsonTest"
-    end
-
     tests.each do |test|
       next unless test.option[variant.to_sym]
 
       entry = {
         "id" => "manifest-#{variant}##{test.id}",
-        "type" => test_type,
+        "type" => test_class(test, variant),
         "name" => test.name,
         "comment" => test.comment,
         "approval" => (test.approval ? "csvt:#{test.approval}" : "csvt:Proposed"),
         "option" => {"noProv" => true},
         "action" => test.action,
-        "result" => "#{test.result}#{EXTENTIONS[variant]}",
-        "implicit" => []
       }
 
-      entry["implicit"] << test.option[:implicit] if test.option[:implicit]
-      entry["implicit"] << (entry["option"]["metadata"] = test.user_metadata) if test.user_metadata
-      if test.link_metadata
-        entry["implicit"] << test.link_metadata
-        entry["httpLink"] = %(<#{test.link_metadata.split('/').last}>; rel="describedby")
-      end
-      entry["implicit"] << test.file_metadata if test.file_metadata
-      entry["implicit"] << test.directory_metadata if test.directory_metadata
-      entry.delete("implicit") if entry["implicit"].empty?
+      entry["result"] = "#{test.result}#{EXTENTIONS[variant]}" if test.type == "Eval"
+      entry["implicit"] = test.option[:implicit] unless test.option[:implicit].empty?
+      entry["httpLink"] = %(<#{test.link_metadata.split('/').last}>; rel="describedby") if test.link_metadata
 
+      entry["option"]["metadata"] = test.user_metadata if test.user_metadata
+      entry["option"]["minimal"] = true if test.option[:minimal]
       entry["contentType"] = test.option[:contentType] if test.option[:contentType]
       manifest["entries"] << entry
     end
@@ -195,28 +217,22 @@ class Manifest
     end
     output << %(  \) .)
 
-    test_type = case variant
-    when :rdf then "csvt:CsvToRdfTest"
-    when :json then "csvt:CsvToJsonTest"
-    end
-
     tests.select {|t| t.option[variant]}.each do |test|
       output << "" # separator
-      output << ":#{test.id} a #{test_type};"
+      output << ":#{test.id} a #{test_class(test, variant)};"
       output << %(  mf:name "#{test.name}";)
       output << %(  rdfs:comment "#{test.comment}";)
       output << %(  csvt:approval #{(test.approval ? "csvt:#{test.approval}" : "csvt:Proposed")};)
       output << %(  csvt:option [\n    csvt:noProv true;)
       output << %(    csvt:metadata <#{test.user_metadata}>;) if test.user_metadata
+      output << %(    csvt:minimal true;) if test.option[:minimal]
       output << %(  ];)
       output << %(  csvt:httpLink "<#{test.link_metadata.split('/').last}>; rel=\\"describedby\\"";) if test.link_metadata
       output << %(  mf:action <#{test.action}>;)
-      output << %(  mf:result <#{test.result}#{EXTENTIONS[variant]}>;)
+      output << %(  mf:result <#{test.result}#{EXTENTIONS[variant]}>;) if test.type == "Eval"
       output << %(  csvt:contentType "#{test.option[:contentType]}";) if test.option[:contentType]
 
-      implicit = [test.option[:implicit], test.user_metadata, test.link_metadata, test.file_metadata, test.directory_metadata].
-        compact.map {|f| "<#{f}>"}.
-        join(",\n    ")
+      implicit = test.option[:implicit].map {|f| "<#{f}>"}.join(",\n    ")
       output << %(  csvt:implicit #{implicit};) unless implicit.empty?
       output << %(  .)
     end
@@ -232,6 +248,7 @@ OPT_ARGS = [
   ["--format", "-f",  GetoptLong::REQUIRED_ARGUMENT,"Output format, default #{options[:format].inspect}"],
   ["--output", "-o",  GetoptLong::REQUIRED_ARGUMENT,"Output to the specified file path"],
   ["--quiet",         GetoptLong::NO_ARGUMENT,      "Supress most output other than progress indicators"],
+  ["--touch",         GetoptLong::NO_ARGUMENT,      "Create referenced files and directories if missing"],
   ["--variant",       GetoptLong::REQUIRED_ARGUMENT,"Test variant, 'rdf' or 'json'"],
   ["--help", "-?",    GetoptLong::NO_ARGUMENT,      "This message"]
 ]
@@ -257,6 +274,7 @@ opts.each do |opt, arg|
   when '--format'       then options[:format] = arg.to_sym
   when '--output'       then options[:output] = File.open(arg, "w")
   when '--quiet'        then options[:quiet] = true
+  when '--touch'        then options[:touch] = true
   when '--variant'      then options[:variant] = arg.to_sym
   when '--help'         then usage
   end
@@ -270,6 +288,8 @@ if options[:format] || options[:variant]
   when :html    then options[:output].puts(vocab.to_html)
   else  STDERR.puts "Unknown format #{options[:format].inspect}"
   end
+elsif options[:touch]
+  vocab.create_files
 else
   %w(json rdf).each do |variant|
     %w(jsonld ttl).each do |format|
