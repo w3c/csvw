@@ -48,10 +48,10 @@ class Manifest
       # Create entry as object indexed by symbolized column name
       line.each_with_index {|v, i| entry[columns[i]] = v ? v.gsub("\r", "\n").gsub("\\", "\\\\") : nil}
 
-      extras = entry[:extra].to_s.split("\n").inject({}) do |memo, e|
+      extras = entry[:extra].to_s.split(/\s+/).inject({}) do |memo, e|
         k, v = e.split("=", 2)
         v = v[1..-2] if v =~ /^".*"$/
-        memo[k.to_sym] = v
+        memo[k.to_sym] = v.include?(',') ? v.split(',') : v
         memo
       end
       case entry[:type]
@@ -63,14 +63,14 @@ class Manifest
       end
       test = Test.new(entry[:test], entry[:type], entry[:name], entry[:comment], entry[:approval], extras)
 
-      if entry[:"directory-metadata"] == "TRUE"
+      if entry[:"directory-metadata"] == "TRUE" || test.option[:dir]
         test.action = extras.fetch(:action, "#{test.id}/action.csv")
         test.result = extras.fetch(:result, "#{test.id}/result.") unless %w(Validation Syntax).include?(test.type)
 
         test.user_metadata = "#{test.id}/user-metadata.json" if entry[:"user-metadata"] == "TRUE"
         test.link_metadata = "#{test.id}/linked-metadata.json" if entry[:"link-metadata"] == "TRUE"
         test.file_metadata = "#{test.id}/action.csv-metadata.json" if entry[:"file-metadata"] == "TRUE"
-        test.directory_metadata = "#{test.id}/metadata.json"
+        test.directory_metadata = "#{test.id}/metadata.json" if entry[:"directory-metadata"] == "TRUE"
       else
         test.action = extras.fetch(:action, "#{test.id}.csv")
         test.result = extras.fetch(:result, "#{test.id}.") unless %w(Validation Syntax).include?(test.type)
@@ -79,6 +79,8 @@ class Manifest
         test.link_metadata = "#{test.id}-linked-metadata.json" if entry[:"link-metadata"] == "TRUE"
         test.file_metadata = "#{test.id}.csv-metadata.json" if entry[:"file-metadata"] == "TRUE"
       end
+      test.option[:implicit] = Array(test.option[:implicit])
+      test.option[:implicit] += [test.user_metadata, test.link_metadata, test.file_metadata, test.directory_metadata].compact
       test
     end
   end
@@ -86,8 +88,8 @@ class Manifest
   # Create files referenced in the manifest
   def create_files
     tests.each do |test|
-      FileUtils.mkdir(test.id.to_s) unless Dir.exist?(test.id.to_s) if test.directory_metadata
-      files = [test.action, test.user_metadata, test.link_metadata, test.file_metadata, test.directory_metadata]
+      FileUtils.mkdir(test.id.to_s) unless Dir.exist?(test.id.to_s) if test.directory_metadata || test.option[:dir]
+      files = [test.action] + test.option[:implicit]
       files << "#{test.result}ttl"  if test.result && test.option[:rdf]
       files << "#{test.result}json" if test.result && test.option[:json]
       files.compact.select {|f| !File.exist?(f)}.each do |f|
@@ -156,17 +158,10 @@ class Manifest
       }
 
       entry["result"] = "#{test.result}#{EXTENTIONS[variant]}" if test.type == "Eval"
-      entry["implicit"] = []
-      entry["implicit"] << test.option[:implicit] if test.option[:implicit]
-      entry["implicit"] << (entry["option"]["metadata"] = test.user_metadata) if test.user_metadata
-      if test.link_metadata
-        entry["implicit"] << test.link_metadata
-        entry["httpLink"] = %(<#{test.link_metadata.split('/').last}>; rel="describedby")
-      end
-      entry["implicit"] << test.file_metadata if test.file_metadata
-      entry["implicit"] << test.directory_metadata if test.directory_metadata
-      entry.delete("implicit") if entry["implicit"].empty?
+      entry["implicit"] = test.option[:implicit] unless test.option[:implicit].empty?
+      entry["httpLink"] = %(<#{test.link_metadata.split('/').last}>; rel="describedby") if test.link_metadata
 
+      entry["option"]["metadata"] = test.user_metadata if test.user_metadata
       entry["option"]["minimal"] = true if test.option[:minimal]
       entry["contentType"] = test.option[:contentType] if test.option[:contentType]
       manifest["entries"] << entry
@@ -237,9 +232,7 @@ class Manifest
       output << %(  mf:result <#{test.result}#{EXTENTIONS[variant]}>;) if test.type == "Eval"
       output << %(  csvt:contentType "#{test.option[:contentType]}";) if test.option[:contentType]
 
-      implicit = [test.option[:implicit], test.user_metadata, test.link_metadata, test.file_metadata, test.directory_metadata].
-        compact.map {|f| "<#{f}>"}.
-        join(",\n    ")
+      implicit = test.option[:implicit].map {|f| "<#{f}>"}.join(",\n    ")
       output << %(  csvt:implicit #{implicit};) unless implicit.empty?
       output << %(  .)
     end
