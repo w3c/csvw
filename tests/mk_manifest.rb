@@ -32,7 +32,7 @@ class Manifest
   }
   attr_accessor :prefixes, :terms, :properties, :classes, :instances, :datatypes
 
-  Test = Struct.new(:id, :type, :name, :comment, :approval, :option, :action, :result, :user_metadata, :link_metadata, :file_metadata, :directory_metadata)
+  Test = Struct.new(:id, :name, :comment, :approval, :option, :action, :result, :user_metadata, :link_metadata, :file_metadata, :directory_metadata)
 
   attr_accessor :tests
 
@@ -54,18 +54,15 @@ class Manifest
         memo[k.to_sym] = v.include?(',') ? v.split(',') : v
         memo
       end
-      case entry[:type]
-      when /Validation/
-        extras[:validation] = true
-      else
-        extras[:rdf] = !entry[:rdf].empty?
-        extras[:json] = !entry[:json].empty?
-      end
-      test = Test.new(entry[:test], entry[:type], entry[:name], entry[:comment], entry[:approval], extras)
+      extras[:rdf] = !entry[:rdf].empty?
+      extras[:json] = !entry[:json].empty?
+      extras[:validation] = !entry[:validate].empty?
+      extras[:negative] = !entry[:negative].empty?
+      test = Test.new(entry[:test], entry[:name], entry[:comment], entry[:approval], extras)
 
       if entry[:"directory-metadata"] == "TRUE" || test.option[:dir]
         test.action = extras.fetch(:action, "#{test.id}/action.csv")
-        test.result = extras.fetch(:result, "#{test.id}/result.") unless %w(Validation Syntax).include?(test.type)
+        test.result = extras.fetch(:result, "#{test.id}/result.") if extras[:rdf] || extras[:json]
 
         test.user_metadata = "#{test.id}/user-metadata.json" if entry[:"user-metadata"] == "TRUE"
         test.link_metadata = "#{test.id}/linked-metadata.json" if entry[:"link-metadata"] == "TRUE"
@@ -73,7 +70,7 @@ class Manifest
         test.directory_metadata = "#{test.id}/metadata.json" if entry[:"directory-metadata"] == "TRUE"
       else
         test.action = extras.fetch(:action, "#{test.id}.csv")
-        test.result = extras.fetch(:result, "#{test.id}.") unless %w(Validation Syntax).include?(test.type)
+        test.result = extras.fetch(:result, "#{test.id}.") if extras[:rdf] || extras[:json]
         
         test.user_metadata = "#{test.id}-user-metadata.json" if entry[:"user-metadata"] == "TRUE"
         test.link_metadata = "#{test.id}-linked-metadata.json" if entry[:"link-metadata"] == "TRUE"
@@ -99,13 +96,17 @@ class Manifest
   end
 
   def test_class(test, variant)
-    case variant
-    when :rdf then "csvt:ToRdfTest" if test.type == "Eval"
-    when :json then "csvt:ToJsonTest" if test.type == "Eval"
-    when :validation
-      case test.type
-      when "Validation" then "csvt:PositiveValidationTest"
-      when "NegativeValidation" then "csvt:NegativeValidationTest"
+    if test.option[:negative]
+      case variant
+      when :rdf         then "csvt:ToRdfTest"
+      when :json        then "csvt:ToJsonTest"
+      when :validation  then "csvt:PositiveValidationTest"
+      end
+    else
+      case variant
+      #when :rdf         then "csvt:ToRdfTest"
+      #when :json        then "csvt:ToJsonTest"
+      when :validation  then "csvt:NegativeValidationTest"
       end
     end
   end
@@ -145,7 +146,7 @@ class Manifest
     }
 
     tests.each do |test|
-      next unless test.option[variant.to_sym]
+      next unless test.option[variant]
 
       entry = {
         "id" => "manifest-#{variant}##{test.id}",
@@ -157,7 +158,7 @@ class Manifest
         "action" => test.action,
       }
 
-      entry["result"] = "#{test.result}#{EXTENTIONS[variant]}" if test.type == "Eval"
+      entry["result"] = "#{test.result}#{EXTENTIONS[variant]}" if [:rdf, :json].include?(variant)
       entry["implicit"] = test.option[:implicit] unless test.option[:implicit].empty?
       entry["httpLink"] = %(<#{test.link_metadata.split('/').last}>; rel="describedby") if test.link_metadata
 
@@ -229,7 +230,7 @@ class Manifest
       output << %(  ];)
       output << %(  csvt:httpLink "<#{test.link_metadata.split('/').last}>; rel=\\"describedby\\"";) if test.link_metadata
       output << %(  mf:action <#{test.action}>;)
-      output << %(  mf:result <#{test.result}#{EXTENTIONS[variant]}>;) if test.type == "Eval"
+      output << %(  mf:result <#{test.result}#{EXTENTIONS[variant]}>;) if [:rdf, :json].include?(variant)
       output << %(  csvt:contentType "#{test.option[:contentType]}";) if test.option[:contentType]
 
       implicit = test.option[:implicit].map {|f| "<#{f}>"}.join(",\n    ")
@@ -291,7 +292,7 @@ if options[:format] || options[:variant]
 elsif options[:touch]
   vocab.create_files
 else
-  %w(json rdf).each do |variant|
+  %w(json rdf validation).each do |variant|
     %w(jsonld ttl).each do |format|
       File.open("manifest-#{variant}.#{format}", "w") do |output|
         output.puts(vocab.send("to_#{format}".to_sym, variant.to_sym))
