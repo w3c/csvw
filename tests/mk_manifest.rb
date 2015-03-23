@@ -174,7 +174,7 @@ class Manifest
   def to_html
     # Create vocab.html using vocab_template.haml and compacted vocabulary
     template = File.read("template.haml")
-    manifests = %w(json rdf).inject({}) do |memo, v|
+    manifests = %w(json rdf validation).inject({}) do |memo, v|
       memo["manifest-#{v}"] = ::JSON.load(File.read("manifest-#{v}.jsonld"))
       memo
     end
