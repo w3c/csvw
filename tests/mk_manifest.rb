@@ -54,10 +54,10 @@ class Manifest
         memo[k.to_sym] = v.include?(',') ? v.split(',') : v
         memo
       end
-      extras[:rdf] = !entry[:rdf].empty?
-      extras[:json] = !entry[:json].empty?
-      extras[:validation] = !entry[:validate].empty?
-      extras[:negative] = !entry[:negative].empty?
+      extras[:rdf] = entry[:rdf] == "TRUE"
+      extras[:json] = entry[:json] == "TRUE"
+      extras[:validation] = entry[:validate] == "TRUE"
+      extras[:negative] = entry[:negative] == "TRUE"
       test = Test.new(entry[:test], entry[:name], entry[:comment], entry[:approval], extras)
 
       if entry[:"directory-metadata"] == "TRUE" || test.option[:dir]
@@ -98,15 +98,15 @@ class Manifest
   def test_class(test, variant)
     if test.option[:negative]
       case variant
-      when :rdf         then "csvt:ToRdfTest"
-      when :json        then "csvt:ToJsonTest"
-      when :validation  then "csvt:PositiveValidationTest"
-      end
-    else
-      case variant
       #when :rdf         then "csvt:ToRdfTest"
       #when :json        then "csvt:ToJsonTest"
       when :validation  then "csvt:NegativeValidationTest"
+      end
+    else
+      case variant
+      when :rdf         then "csvt:ToRdfTest"
+      when :json        then "csvt:ToJsonTest"
+      when :validation  then "csvt:PositiveValidationTest"
       end
     end
   end
