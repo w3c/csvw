@@ -282,6 +282,7 @@ opts.each do |opt, arg|
 end
 
 vocab = Manifest.new
+vocab.create_files if options[:touch]
 if options[:format] || options[:variant]
   case options[:format]
   when :jsonld  then options[:output].puts(vocab.to_jsonld(options[:variant]))
@@ -289,8 +290,6 @@ if options[:format] || options[:variant]
   when :html    then options[:output].puts(vocab.to_html)
   else  STDERR.puts "Unknown format #{options[:format].inspect}"
   end
-elsif options[:touch]
-  vocab.create_files
 else
   %w(json rdf validation).each do |variant|
     %w(jsonld ttl).each do |format|
