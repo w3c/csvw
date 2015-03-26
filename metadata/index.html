@@ -1230,73 +1230,71 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
         <p>
           A <dfn>column description</dfn> is a simple JSON object that describes a single column. The description provides additional human-readable documentation for a column, as well as additional information that may be used to validate the cells within the column, create a user interface for data entry, or inform conversion into other formats.
         </p>
-        <section>
-          <h4>Optional Properties</h4>
-          <dl>
-            <dt id="column-name"><code>name</code></dt>
-            <dd>
-              <p>
-                An <a>atomic property</a> that gives a single canonical name for the column. The value of this property is used to create the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-name" class="externalDFN">name</a> annotation for the described column. This MUST be a string. Conversion specifications MUST use this property as the basis for the names of properties/elements/attributes in the results of conversions.
-              </p>
-              <p>The <a>property value</a> of <code>name</code> is that defined within metadata, if it exists. Otherwise, it is the first value from the <a>property value</a> of <code>title</code> having the same language tag as <a>default language</a> or <code>und</code> of not specified percent-encoded as necessary to conform to the syntactic requirements described below, as a string without language, if any. Otherwise, it is the string <code>"_col.<em>[N]</em>"</code> where <code><em>[N]</em></code> is the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-number" class="externalDFN">column number</a>.
-              </p>
-              <p>
-                For ease of reference within <a title="URI template property">URI template properties</a>, column names are restricted as defined in <cite><a href="https://tools.ietf.org/html/rfc6570#page-14">Variables</a></cite> in [[!URI-TEMPLATE]] with the additional provision that names beginning with <code>"_"</code> are reserved by this specification and MUST NOT be used.
-              </p>
-            </dd>
-            <dt id="column-title"><code>title</code></dt>
-            <dd>
-              <p>
-                A <a>natural language property</a> that provides possible alternative names for the column. The value of this property is used to create the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-titles" class="externalDFN">titles</a> annotation for the described column.
-              </p>
-            </dd>
-            <dt id="column-required"><code>required</code></dt>
-            <dd>
-              <p>A boolean <a>atomic property</a> taking a single value which indicates whether every cell within the column must have a non-null value. The value of this property is used to create the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-required" class="externalDFN">required</a> annotation for the described column.</p>
-            </dd>
-            <dt id="column-suppressOutput"><code>suppressOutput</code></dt>
-            <dd>
-              <p>A boolean <a>atomic property</a>. If <code>true</code>, suppresses any output that would be generated when converting cells in this column. The value of this property is used to create the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-suppress-output" class="externalDFN">suppress output</a> annotation for the described column.</p>
-            </dd>
-            <dt id="column-virtual"><code>virtual</code></dt>
-            <dd>
-              <p>A boolean <a>atomic property</a> taking a single value which indicates whether the column is a <a href="http://w3c.github.io/csvw/syntax/#dfn-virtual-column" class="externalDFN">virtual column</a> not present in the original source. The value of this property is used to create the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-virtual" class="externalDFN">virtual</a> annotation for the described column. If present, a virtual column MUST appear after all other non-virtual column definitions.</p>
-              <p class="note">Virtual columns are useful for inserting cells with default values into an <a href="http://w3c.github.io/csvw/syntax/#dfn-annotated-table" class="externalDFN">annotated table</a> to control the results of conversions.</p>
-              <p class="issue" data-number="179">We invite comment on whether <a href="http://w3c.github.io/csvw/syntax/#dfn-virtual-column" class="externalDFN">virtual columns</a> are useful enough to include in the final recommendation in spite of the added complexity.</p>
-            </dd>
-            <dt id="column-ld-id"><code>@id</code></dt>
-            <dd>
-              <p>If included, <code>@id</code> is a <a>link property</a> that identifies the <a href="http://w3c.github.io/csvw/syntax/#dfn-column" class="externalDFN">columns</a>, as defined in [[!tabular-data-model]] and potentially appearing across separate tables, described by this <a>column description</a>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.</p>
-            </dd>
-            <dt id="column-ld-type"><code>@type</code></dt>
-            <dd>
-              <p>
-                If included, <code>@type</code> is an <a>atomic property</a> that MUST be set to <code>"Column"</code>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.
-              </p>
-            </dd>
-          </dl>
-          <p>
-            The description MAY contain any <a title="common property">common properties</a> to provide extra metadata about the column as a whole, such as a full description.
-          </p>
-          <p>
-            The description MAY contain <a title="inherited property">inherited properties</a> to describe cells within the column.
-          </p>
-          <section class="informative">
-            <h3>Examples</h3>
-            <section>
-              <h4>Use of <code>virtual</code> columns</h4>
-              <p>
-                Virtual columns are useful when data needs to be added as part of an output transformation that doesn't exist in the source file. This may be to add type information to a column, or to relate different columns having different <code>aboutUrl</code>. For example, the <code>http://example.org/tree-ops.csv</code> example used in the introduction can be used with the following metadata:
-              </p>
-              <pre class="example highlight"
-                   title="http://example.org/tree-ops-virtual.json"
-                   data-include="../examples/tree-ops-virtual.json"
-                   data-oninclude="updateExample">
-              </pre>
-              <p>
-                This metadata creates a relationship model between data in each column by different combinations of <code>aboutUrl</code>, <code>propertyUrl</code>, and <code>valueUrl</code> on existing columns, and defining new <em>virtual</em> columns to supply additional information. In this case, the <code>on_street</code> and <code>inventory_date</code> values are split into separate entities, each having their own <code>aboutUrl</code>. New <em>virtual</em> columns are defined to provide a location type, and to relate the main row entity to the event and location associated with it. The result of converting the table to RDF would include the following, for the first row, with the contributions from the <a href="http://w3c.github.io/csvw/syntax/#dfn-virtual-column" class="externalDFN">virtual columns</a> highlighted:
-              </p>
-              <pre class="example highlight">
+        <dl>
+          <dt id="column-name"><code>name</code></dt>
+          <dd>
+            <p>
+              An <a>atomic property</a> that gives a single canonical name for the column. The value of this property is used to create the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-name" class="externalDFN">name</a> annotation for the described column. This MUST be a string. Conversion specifications MUST use this property as the basis for the names of properties/elements/attributes in the results of conversions.
+            </p>
+            <p>The <a>property value</a> of <code>name</code> is that defined within metadata, if it exists. Otherwise, it is the first value from the <a>property value</a> of <code>title</code> having the same language tag as <a>default language</a> or <code>und</code> of not specified percent-encoded as necessary to conform to the syntactic requirements described below, as a string without language, if any. Otherwise, it is the string <code>"_col.<em>[N]</em>"</code> where <code><em>[N]</em></code> is the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-number" class="externalDFN">column number</a>.
+            </p>
+            <p>
+              For ease of reference within <a title="URI template property">URI template properties</a>, column names are restricted as defined in <cite><a href="https://tools.ietf.org/html/rfc6570#page-14">Variables</a></cite> in [[!URI-TEMPLATE]] with the additional provision that names beginning with <code>"_"</code> are reserved by this specification and MUST NOT be used.
+            </p>
+          </dd>
+          <dt id="column-title"><code>title</code></dt>
+          <dd>
+            <p>
+              A <a>natural language property</a> that provides possible alternative names for the column. The value of this property is used to create the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-titles" class="externalDFN">titles</a> annotation for the described column.
+            </p>
+          </dd>
+          <dt id="column-required"><code>required</code></dt>
+          <dd>
+            <p>A boolean <a>atomic property</a> taking a single value which indicates whether every cell within the column must have a non-null value. The value of this property is used to create the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-required" class="externalDFN">required</a> annotation for the described column.</p>
+          </dd>
+          <dt id="column-suppressOutput"><code>suppressOutput</code></dt>
+          <dd>
+            <p>A boolean <a>atomic property</a>. If <code>true</code>, suppresses any output that would be generated when converting cells in this column. The value of this property is used to create the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-suppress-output" class="externalDFN">suppress output</a> annotation for the described column.</p>
+          </dd>
+          <dt id="column-virtual"><code>virtual</code></dt>
+          <dd>
+            <p>A boolean <a>atomic property</a> taking a single value which indicates whether the column is a <a href="http://w3c.github.io/csvw/syntax/#dfn-virtual-column" class="externalDFN">virtual column</a> not present in the original source. The value of this property is used to create the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-virtual" class="externalDFN">virtual</a> annotation for the described column. If present, a virtual column MUST appear after all other non-virtual column definitions.</p>
+            <p class="note">Virtual columns are useful for inserting cells with default values into an <a href="http://w3c.github.io/csvw/syntax/#dfn-annotated-table" class="externalDFN">annotated table</a> to control the results of conversions.</p>
+            <p class="issue" data-number="179">We invite comment on whether <a href="http://w3c.github.io/csvw/syntax/#dfn-virtual-column" class="externalDFN">virtual columns</a> are useful enough to include in the final recommendation in spite of the added complexity.</p>
+          </dd>
+          <dt id="column-ld-id"><code>@id</code></dt>
+          <dd>
+            <p>If included, <code>@id</code> is a <a>link property</a> that identifies the <a href="http://w3c.github.io/csvw/syntax/#dfn-column" class="externalDFN">columns</a>, as defined in [[!tabular-data-model]] and potentially appearing across separate tables, described by this <a>column description</a>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.</p>
+          </dd>
+          <dt id="column-ld-type"><code>@type</code></dt>
+          <dd>
+            <p>
+              If included, <code>@type</code> is an <a>atomic property</a> that MUST be set to <code>"Column"</code>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.
+            </p>
+          </dd>
+        </dl>
+        <p>
+          The description MAY contain any <a title="common property">common properties</a> to provide extra metadata about the column as a whole, such as a full description.
+        </p>
+        <p>
+          The description MAY contain <a title="inherited property">inherited properties</a> to describe cells within the column.
+        </p>
+        <section class="informative">
+          <h3>Examples</h3>
+          <section>
+            <h4>Use of <code>virtual</code> columns</h4>
+            <p>
+              Virtual columns are useful when data needs to be added as part of an output transformation that doesn't exist in the source file. This may be to add type information to a column, or to relate different columns having different <code>aboutUrl</code>. For example, the <code>http://example.org/tree-ops.csv</code> example used in the introduction can be used with the following metadata:
+            </p>
+            <pre class="example highlight"
+                 title="http://example.org/tree-ops-virtual.json"
+                 data-include="../examples/tree-ops-virtual.json"
+                 data-oninclude="updateExample">
+            </pre>
+            <p>
+              This metadata creates a relationship model between data in each column by different combinations of <code>aboutUrl</code>, <code>propertyUrl</code>, and <code>valueUrl</code> on existing columns, and defining new <em>virtual</em> columns to supply additional information. In this case, the <code>on_street</code> and <code>inventory_date</code> values are split into separate entities, each having their own <code>aboutUrl</code>. New <em>virtual</em> columns are defined to provide a location type, and to relate the main row entity to the event and location associated with it. The result of converting the table to RDF would include the following, for the first row, with the contributions from the <a href="http://w3c.github.io/csvw/syntax/#dfn-virtual-column" class="externalDFN">virtual columns</a> highlighted:
+            </p>
+            <pre class="example highlight">
 &lt;#gid-1&gt;
   schema:url &lt;#gid-1&gt; ;
   schema:name "Celtis australis" ;
@@ -1312,11 +1310,11 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
 <b>&lt;#location-1&gt; a schema:PostalAddress ;</b>
   schema:streetAddress "ADDISON AV" ;
   .
-              </pre>
-              <p>
-                The JSON would similarly include, again with the contributions from the <a href="http://w3c.github.io/csvw/syntax/#dfn-virtual-column" class="externalDFN">virtual columns</a> highlighted:
-              </p>
-              <pre class="example highlight">
+            </pre>
+            <p>
+              The JSON would similarly include, again with the contributions from the <a href="http://w3c.github.io/csvw/syntax/#dfn-virtual-column" class="externalDFN">virtual columns</a> highlighted:
+            </p>
+            <pre class="example highlight">
 {
   "@id": "#gid-1",
   "schema:url": "#gid-1",
@@ -1333,8 +1331,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
     "schema:streetAddress": "ADDISON AV"
   }
 }
-              </pre>
-            </section>
+            </pre>
           </section>
         </section>
       </section>
