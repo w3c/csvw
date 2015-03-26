@@ -12,7 +12,6 @@ var localBibliography = {
   },
   "tabular-metadata": {
       "authors": [
-        "Rufus Pollock",
         "Jeni Tennison",
         "Gregg Kellogg"
       ],
