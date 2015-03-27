@@ -233,7 +233,7 @@ var respecConfig = {
 }
       </pre>
       <p>
-        the properties <code>name</code>, <code>title</code>, and <code>dc:description</code> are used to create the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-name" class="externalDFN">name</a>, <a href="http://w3c.github.io/csvw/syntax/#dfn-column-titles" class="externalDFN">titles</a>, and <code>dc:description</code> annotations on the <a href="http://w3c.github.io/csvw/syntax/#dfn-column" class="externalDFN">column</a> in the data model. The <code>datatype</code> and <code>format</code> properties are <a title="inherited property">inherited properties</a> that affect the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">value</a> of each <a href="http://w3c.github.io/csvw/syntax/#dfn-cell" class="externalDFN">cell</a> in that column.
+        the properties <code>name</code>, <code>title</code>, and <code>dc:description</code> are used to create the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-name" class="externalDFN">name</a>, <a href="http://w3c.github.io/csvw/syntax/#dfn-column-titles" class="externalDFN">titles</a>, and <code>dc:description</code> annotations on the <a href="http://w3c.github.io/csvw/syntax/#dfn-column" class="externalDFN">column</a> in the data model. The <code>datatype</code>  property is an <a>inherited property</a> that affects the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">value</a> of each <a href="http://w3c.github.io/csvw/syntax/#dfn-cell" class="externalDFN">cell</a> in that column (see <a href="#inherited-properties" class="sectionRef"></a> for more on <a title="inherited property">inherited properties</a>).
       </p>
       <p>The <dfn>property value</dfn> of an annotation is that defined in the metadata, unless otherwise noted.</p>
     </section>
@@ -1409,6 +1409,107 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           </dd>
         </dl>
         <p>The value of an <a>inherited property</a> is the first value, if any, found by looking in the current description object through all of its containing objects: a <a>inherited property</a> defined in a <a>column description</a> takes precedence of one defined in a <a>schema description</a>, which in turn takes precedence of one defined in a <a>table description</a>, which in turn takes precedence of one defined in a <a>table group description</a>.</p>
+        <section class="informative">
+          <h3>Examples</h3>
+          <p>In the following example, <a href="#cell-aboutUrl"><code>aboutUrl</code></a> property is defined on the <a href="#table-schema"><code>tableSchema</code></a>, and therefore affects all cells for that table.</p>
+          <pre class="example highlight"
+               title="http://example.org/tree-ops.csv-metadata.json">
+{
+  "@context": ["http://www.w3.org/ns/csvw", {"@language": "en"}],
+  "url": "tree-ops.csv",
+  "dc:title": "Tree Operations",
+  "dc:keywords": ["tree", "street", "maintenance"],
+  "dc:publisher": {
+    "schema:name": "Example Municipality",
+    "schema:url": {"@id": "http://example.org"}
+  },
+  "dc:license": {"@id": "http://opendefinition.org/licenses/cc-by/"},
+  "dc:modified": {"@value": "2010-12-31", "@type": "xsd:date"},
+  "tableSchema": {
+    "columns": [{
+      "name": "GID",
+      "title": ["GID", "Generic Identifier"],
+      "dc:description": "An identifier for the operation on a tree.",
+      "datatype": "string",
+      "required": true
+    }, {
+      "name": "on_street",
+      "title": "On Street",
+      "dc:description": "The street that the tree is on.",
+      "datatype": "string"
+    }, {
+      "name": "species",
+      "title": "Species",
+      "dc:description": "The species of the tree.",
+      "datatype": "string"
+    }, {
+      "name": "trim_cycle",
+      "title": "Trim Cycle",
+      "dc:description": "The operation performed on the tree.",
+      "datatype": "string"
+    }, {
+      "name": "inventory_date",
+      "title": "Inventory Date",
+      "dc:description": "The date of the operation that was performed.",
+      "datatype": {"base": "date", "format": "M/d/yyyy"}
+    }],
+    "primaryKey": "GID",
+    <strong>"aboutUrl": "#gid-{GID}"</strong>
+  }
+}
+          </pre>
+          <p>The equivalent effect could be achieved by using the <a href="#cell-aboutUrl"><code>aboutUrl</code></a> property on each column:</p>
+          <pre class="example highlight"
+               title="http://example.org/tree-ops.csv-metadata.json">
+{
+  "@context": ["http://www.w3.org/ns/csvw", {"@language": "en"}],
+  "url": "tree-ops.csv",
+  "dc:title": "Tree Operations",
+  "dc:keywords": ["tree", "street", "maintenance"],
+  "dc:publisher": {
+    "schema:name": "Example Municipality",
+    "schema:url": {"@id": "http://example.org"}
+  },
+  "dc:license": {"@id": "http://opendefinition.org/licenses/cc-by/"},
+  "dc:modified": {"@value": "2010-12-31", "@type": "xsd:date"},
+  "tableSchema": {
+    "columns": [{
+      "name": "GID",
+      "title": ["GID", "Generic Identifier"],
+      <strong>"aboutUrl": "#gid-{GID}"</strong>,
+      "dc:description": "An identifier for the operation on a tree.",
+      "datatype": "string",
+      "required": true
+    }, {
+      "name": "on_street",
+      "title": "On Street",
+      <strong>"aboutUrl": "#gid-{GID}"</strong>,
+      "dc:description": "The street that the tree is on.",
+      "datatype": "string"
+    }, {
+      "name": "species",
+      "title": "Species",
+      <strong>"aboutUrl": "#gid-{GID}"</strong>,
+      "dc:description": "The species of the tree.",
+      "datatype": "string"
+    }, {
+      "name": "trim_cycle",
+      "title": "Trim Cycle",
+      <strong>"aboutUrl": "#gid-{GID}"</strong>,
+      "dc:description": "The operation performed on the tree.",
+      "datatype": "string"
+    }, {
+      "name": "inventory_date",
+      "title": "Inventory Date",
+      <strong>"aboutUrl": "#gid-{GID}"</strong>,
+      "dc:description": "The date of the operation that was performed.",
+      "datatype": {"base": "date", "format": "M/d/yyyy"}
+    }],
+    "primaryKey": "GID"
+  }
+}
+          </pre>
+        </section>
       </section>
       <section>
         <h2>Datatypes</h2>
@@ -1551,7 +1652,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
       <section>
         <h2>Parsing cells</h2>
         <p>
-          Unlike many other data formats, tabular data is designed to be read by humans. For that reason, it's common for data to be represented within tabular data in a human-readable way. The <a href="#cell-null"><code>null</code></a>, <a href="#cell-default"><code>default</code></a>, <a href="#cell-separator"><code>separator</code></a>, <a href="#cell-datatype"><code>datatype</code></a>, <a href="#datatype-format"><code>format</code></a>, and <a href="#cell-lang"><code>lang</code></a> properties provide the information needed to parse the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-string-value" class="externalDFN">string value</a> of a cell into its (semantic) <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">value</a>. This is used:
+          Unlike many other data formats, tabular data is designed to be read by humans. For that reason, it's common for data to be represented within tabular data in a human-readable way. The <a href="#cell-null"><code>null</code></a>, <a href="#cell-default"><code>default</code></a>, <a href="#cell-separator"><code>separator</code></a>, <a href="#cell-datatype"><code>datatype</code></a>, and <a href="#cell-lang"><code>lang</code></a> properties provide the information needed to parse the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-string-value" class="externalDFN">string value</a> of a cell into its (semantic) <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">value</a>. This is used:
         </p>
         <ul>
           <li>by <strong>validators</strong> to check that the data in the table is in the expected format</li>
