@@ -12,10 +12,11 @@ the ``/publishing-snapshot`` directory contains specific milestone publications,
 
 (Obviously, many of these steps are typically done in your local repo and then committed to github when appropriate.)
 
+1. Update the ``/local-biblio.js`` and change the URL-s in the ``conversions`` array to reflect the right URI for the ``/TR`` document. This step will ensure that the right cross references will be generated in the final document (by the ``/replace-ed-uris.js`` script). (Note that this step is very specific to this repository, and may not be relevant for others.)
 1. Create a new subdirectory in ``/publishing-snapshot``, say, ``publishing-snapshot/WD-syntax-2014-12-12``. 
-2. Copy all the auxiliary files (e.g., data files, BNF files, etc) from the main repo area.
-3. (Before you forget:-) add an entry to the new directory in ``index.html`` on the top of the repository
-4. Generate the pure HTML file:
+1. Copy all the auxiliary files (e.g., data files, BNF files, etc) from the main repo area. Note that not *all* the files are necessary for final publications; e.g., the diagrams have a ``.key`` and ``.pdf`` versions that are used in the process of creating those diagrams, but only the ``.svg`` and ``.png`` files are used in the final document.
+1. (Before you forget:-) add an entry to the new directory in ``/index.html`` on the top of the repository
+1. Generate the pure HTML file:
 	1. Finalize/change the ``index.html`` file in ``/syntax``
 	1. Commit all the files to github
 	1. From your Web browser, use the following URI: ``http://w3c.github.io/csvw/syntax/index.html?specStatus=WD;publishDate=2014-12-12`` (note the URI parameters to set the ``specStatus`` and ``publishDate`` values!). You should see the final format on your screen.
