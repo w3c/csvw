@@ -61,7 +61,15 @@ class Manifest
       test = Test.new(entry[:test], entry[:name], entry[:comment], entry[:approval], extras)
 
       if entry[:"directory-metadata"] == "TRUE" || test.option[:dir]
-        test.action = extras.fetch(:action, "#{test.id}/action.csv")
+        test.action = extras.fetch(:action) do
+          if entry[:"action-metadata"] == "TRUE"
+            test.option[:implicit] ||= "#{test.id}/action.csv"
+            "#{test.id}/metadata.json"
+          else
+            "#{test.id}/action.csv"
+          end
+        end
+        
         test.result = extras.fetch(:result, "#{test.id}/result.") if extras[:rdf] || extras[:json]
 
         test.user_metadata = "#{test.id}/user-metadata.json" if entry[:"user-metadata"] == "TRUE"
@@ -69,7 +77,15 @@ class Manifest
         test.file_metadata = "#{test.action}-metadata.json" if entry[:"file-metadata"] == "TRUE"
         test.directory_metadata = "#{test.id}/metadata.json" if entry[:"directory-metadata"] == "TRUE"
       else
-        test.action = extras.fetch(:action, "#{test.id}.csv")
+        test.action = extras.fetch(:action) do
+          entry[:"action-metadata"] == "TRUE" ? "#{test.id}-metadata.json" : "#{test.id}.csv"
+          if entry[:"action-metadata"] == "TRUE"
+            test.option[:implicit] ||= "#{test.id}.csv"
+            "#{test.id}-metadata.json"
+          else
+            "#{test.id}.csv"
+          end
+        end
         test.result = extras.fetch(:result, "#{test.id}.") if extras[:rdf] || extras[:json]
         
         test.user_metadata = "#{test.id}-user-metadata.json" if entry[:"user-metadata"] == "TRUE"
