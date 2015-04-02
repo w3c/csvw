@@ -323,7 +323,7 @@
             <dt><code>_sourceRow</code></dt>
             <dd><code>_sourceRow</code> is set to the <a href="http://w3c.github.io/csvw/syntax/#dfn-row-source-number" class="externalDFN">source number</a> of the row that is currently being processed; this usually varies from <code>_row</code> by <a href="http://w3c.github.io/csvw/syntax/#dfn-skip-rows" class="externalDFN">skip rows</a> and <a href="http://w3c.github.io/csvw/syntax/#dfn-header-rows" class="externalDFN">header rows</a></dd>
             <dt><code>_name</code></dt>
-            <dd><code>_name</code> is set to the URI decoded <a>property value</a> of the <code>name</code> property on the cell column that is currently being processed. (URI decoding is necessary as <code>name</code> may have been encoded if taken from <code>title</code>; this prevents double percent encoding.)
+            <dd><code>_name</code> is set to the URI decoded <a>property value</a> of the <code>name</code> property on the cell column that is currently being processed. (Percent-decoding is necessary as <code>name</code> may have been encoded if taken from <code>title</code>; this prevents double percent-encoding.)
             </dd>
           </dl>
           <p>
@@ -721,8 +721,7 @@ CSVW,foaf:Project,table;data;conversion
               When an array of column descriptions <code>B</code> is <a>merged</a> into an original array of column descriptions <code>A</code>, each column description within <code>B</code> is combined into the original array <code>A</code>, based on the index of each column description, as follows:
             </p>
             <ol class="algorithm">
-              <li>if the column descriptions at the same index within <code>A</code> and <code>B</code> have the same <a href="#column-name"><code>name</code></a>, the column description from <code>B</code> is <a>merged</a> into the matching column description in <code>A</code>.</li>
-              <li>otherwise, if the column descriptions at the same index within <code>A</code> and <code>B</code> have matching <a href="#column-title"><code>titles</code></a> (both titles are the same and either they both have the same language or one of them has an undefined language (<code>und</code>)), the column description from <code>B</code> is <a>merged</a> into the matching column description in <code>A</code>.</li>
+              <li>if there is a non-empty case-insensitive intersection between the percent-decoded <a href="#column-name"><code>name</code></a> and <a href="#column-title"><code>titles</code></a> values for the column description at the same index within <code>A</code> and <code>B</code>, the column description from <code>B</code> is <a>merged</a> into the matching column description in <code>A</code>.</li>
               <li>otherwise, if there are column descriptions at the same index within <code>A</code> and <code>B</code>, <a>validators</a> and <a>converters</a> MUST generate an error.</li>
               <li>otherwise, if at a given index there is no column description within A, but there is a column description within <code>B</code>, then:
                 <ol class="algorithm">
@@ -983,7 +982,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             <p>
               For ease of reference within <a title="URI template property">URI template properties</a>, column names are restricted as defined in <cite><a href="https://tools.ietf.org/html/rfc6570#page-14">Variables</a></cite> in [[!URI-TEMPLATE]] with the additional provision that names beginning with <code>"_"</code> are reserved by this specification and MUST NOT be used.
             </p>
-            <p>The <a>property value</a> of <code>name</code> is that defined within metadata, if it exists. Otherwise, it is the first value from the <a>property value</a> of <code>title</code>, having the same language tag as <a>default language</a> or <code>und</code> if not specified, percent-encoded as necessary to conform to the syntactic requirements as a string without language. Otherwise, it is the string <code>"_col.<em>[N]</em>"</code> where <code><em>[N]</em></code> is the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-number" class="externalDFN">column number</a>.
+            <p>The <a>property value</a> of <code>name</code> is that defined within metadata, if it exists. Otherwise, it is the first value from the <a>property value</a> of <code>title</code>, having the same language tag as <a>default language</a> or <code>und</code> if not specified, <a href="https://tools.ietf.org/html/rfc3986#page-12" class="externalDFN">percent-encoded</a> as necessary to conform to the syntactic requirements as a string without language, as defined in [[!RFC3986]]. Otherwise, it is the string <code>"_col.<em>[N]</em>"</code> where <code><em>[N]</em></code> is the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-number" class="externalDFN">column number</a>.
             </p>
           </dd>
           <dt id="column-required"><code>required</code></dt>
