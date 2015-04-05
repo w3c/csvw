@@ -114,15 +114,15 @@
         Tabular data is routinely transferred on the web in a variety of formats, including variants on CSV, tab-delimited files, fixed field formats, spreadsheets, HTML tables, and SQL dumps. This document outlines a data model or infoset for tabular data and metadata about that tabular data that can be used as a basis for validation, display, or creating other formats. It also contains some non-normative guidance for publishing tabular data as CSV and how that maps into the tabular data model.
       </p>
       <p>
-        Creating an annotated model of tabular data relies on the provision of separate metadata about the table. This specification defines how implementations should locate that metadata, given a file containing tabular data. The syntax for that metadata is defined in [[!tabular-metadata]].
+        An annotated model of tabular data can be supplemented by separate metadata about the table. This specification defines how implementations should locate that metadata, given a file containing tabular data. The syntax for that metadata is defined in [[!tabular-metadata]].
       </p>
     </section>
     <section id="sotd">
       <p>
-        The CSV on the Web Working Group was chartered to produce a Recommendation "Access methods for CSV Metadata" as well as Recommendations for "Metadata vocabulary for CSV data" and "Mapping mechanism to transforming CSV into various Formats (e.g., RDF, JSON, or XML)". This document aims to primarily satisfy the first of those Recommendations (see <a href="#locating-metadata" class="sectionRef"></a>), though it also specifies an underlying model and is therefore a basis for the other chartered Recommendations.
+        The CSV on the Web Working Group was chartered to produce a Recommendation "Access methods for CSV Metadata" as well as Recommendations for "Metadata vocabulary for CSV data" and "Mapping mechanism to transforming CSV into various Formats (e.g., RDF, JSON, or XML)". This document aims to primarily satisfy the first of those Recommendations (see <a href="#locating-metadata" class="sectionRef"></a>), though it also specifies an underlying model for tabular data and is therefore a basis for the other chartered Recommendations.
       </p>
       <p>
-        This definition of CSV used in this document is based on IETF's [[!RFC4180]] which is an Informational RFC. The working group's expectation is that future suggestions to refine RFC 4180 will be relayed to the IETF (e.g. around I18N and multi-part packaging) and contribute to its discussions about moving CSV to the Standards track.
+        This definition of CSV used in this document is based on IETF's [[!RFC4180]] which is an Informational RFC. The working group's expectation is that future suggestions to refine RFC 4180 will be relayed to the IETF (e.g. around encoding and line endings) and contribute to its discussions about moving CSV to the Standards track.
       </p>
       <p>
         Many files containing tabular data embed metadata, for example in lines before the header row of an otherwise standard CSV document. This specification does not define any formats for embedding metadata within CSV files, aside from the titles of columns in the header row which is defined in CSV. We would encourage groups that define tabular data formats to also define a mapping into the annotated tabular data model defined in this document.
@@ -131,13 +131,10 @@
     <section id="intro">
       <h2>Introduction</h2>
       <p>
-        <dfn title="tabular data">Tabular data</dfn> is data that is structured into rows, each of which contains information about some thing. Each row contains the same number of cells (although some of these cells may be empty), which provide values of properties of the thing described by the row. In tabular data, cells within the same column provide values for the same property of the thing described by the particular row. This is what differentiates tabular data from other line-oriented formats. 
+        <dfn title="tabular data">Tabular data</dfn> is data that is structured into rows, each of which contains information about some thing. Each row contains the same number of cells (although some of these cells may be empty), which provide values of properties of the thing described by the row. In tabular data, cells within the same column provide values for the same property of the things described by each row. This is what differentiates tabular data from other line-oriented formats. 
       </p>
     	<p>
-        Tabular data is routinely transferred on the web in a textual format called "CSV", but the definition of "CSV" in practice is very loose. Some people use the term to mean any delimited text file. Others stick more closely to the most standard definition of CSV that there is, [[!RFC4180]]. <a href="#standards" class="sectionRef">Appendix A</a> describes the various ways in which CSV is defined. This specification refers to such files as <dfn title="tabular data file">tabular data files</dfn>.
-      </p>
-      <p>
-        Tabular data is also transferred on the web in tab-delimited files, fixed field formats, spreadsheets, HTML tables, and SQL dumps.
+        Tabular data is routinely transferred on the web in a textual format called CSV, but the definition of CSV in practice is very loose. Some people use the term to mean any delimited text file. Others stick more closely to the most standard definition of CSV that there is, [[!RFC4180]]. <a href="#standards" class="sectionRef">Appendix A</a> describes the various ways in which CSV is defined. This specification refers to such files, as well as tab-delimited files, fixed field formats, spreadsheets, HTML tables, and SQL dumps as <dfn title="tabular data file">tabular data files</dfn>.
       </p>
       <p>
         In <a href="#model" class="sectionRef"></a>, this document defines a model for tabular data that abstracts away from the varying syntaxes that are used for when exchanging tabular data. The model includes annotations, or metadata, about collections of individual tables, rows, columns, and cells. These annotations are typically supplied through separate metadata files; <a href="#locating-metadata" class="sectionRef"></a> defines how these metadata files can be located, while [[!tabular-metadata]] defines what they contain.
@@ -152,7 +149,7 @@
     <section id="conformance">
       <p>This specification makes use of the <dfn title="compact IRI">compact IRI Syntax</dfn>; please refer to the <a href="http://www.w3.org/TR/json-ld/#compact-iris">Compact IRIs</a> from [[!JSON-LD]].</p>
      
-      <p>This specification makes use of the following namespaces:</p>
+      <p>Within examples, this specification makes use of the following namespaces:</p>
       <dl>
         <dt><code>dc</code>:</dt>
         <dd><code>http://purl.org/dc/terms/</code></dd>
@@ -179,7 +176,7 @@
       <section>
         <h3>Table groups</h3>
         <p>
-          A <dfn>group of tables</dfn> comprises a set of <a title="annotated table">annotated tables</a> and a set of annotations that relate to those tables. The <a>core annotations</a> of a group of tables are:
+          A <dfn>group of tables</dfn> comprises a set of <a title="annotated table">annotated tables</a> and a set of annotations that relate to that group of tables. The <a>core annotations</a> of a group of tables are:
         </p>
         <ul>
           <li><dfn title="table group id">id</dfn> &mdash; an identifier for this group of tables, or <code>null</code> if this is undefined</li>
@@ -190,9 +187,13 @@
           Groups of tables MAY in addition have any number of <a title="annotation">annotations</a> which provide information about the group of tables. Annotations on a group of tables may include:
         </p>
         <ul>
+          <li>titles or descriptions of the group of tables</li>
           <li>information about the source or provenance of the group of tables</li>
           <li>links to other groups of tables (eg to those that provide similar data from a different time period)</li>
         </ul>
+        <p>
+          These arise from <a href="http://w3c.github.io/csvw/metadata/#dfn-common-property" class="externalDFN">common properties</a> defined within metadata documents, as defined in [[!tabular-metadata]].
+        </p>
       </section>
       <section>
         <h3>Tables</h3>
