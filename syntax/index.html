@@ -591,20 +591,20 @@ Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
     <section id="syntax" class="informative">
       <h2>Best Practice CSV</h2>
       <p>
-        There is no standard for CSV, and there are many variants of CSV used on the web today. This section defines a method for expressing tabular data adhering to the <a>annotated tabular data model</a> defined in <a href="#annotated-tabular-data-model" class="sectionRef"></a> in CSV. Authors are encouraged to adhere to the constraints described in this section as implementations should process such CSV files consistently.
+        There is no standard for CSV, and there are many variants of CSV used on the web today. This section defines a method for expressing tabular data adhering to the <a>annotated tabular data model</a> in CSV. Authors are encouraged to adhere to the constraints described in this section as implementations should process such CSV files consistently.
       </p>
       <div class="note">
         <p>
-          This syntax is not compliant with <code>text/csv</code> as defined in [[!RFC4180]] in that it permits line endings other than <code>CRLF</code>. Supporting <code>LF</code> line endings are important characteristics for data formats that are used on non-Windows platforms. However, all files that adhere to [[!RFC4180]]'s definition of CSV meet the constraints described in this section.
+          This syntax is not compliant with <code>text/csv</code> as defined in [[!RFC4180]] in that it permits line endings other than <code>CRLF</code>. Supporting <code>LF</code> line endings is important for data formats that are used on non-Windows platforms. However, all files that adhere to [[!RFC4180]]'s definition of CSV meet the constraints described in this section.
         </p>
         <p>
-          We are actively working with the IETF to develop a standard for CSV, which is outside the scope of the Working Group. The details here aim to help shape that standard based on our requirements.
+          Developing a standard for CSV is outside the scope of the Working Group. The details here aim to help shape any future standard.
         </p>
       </div>
       <section id="content-type">
         <h3>Content Type</h3>
         <p>
-          The appropriate content type for a CSV file is <code>text/csv</code>. For example, when a CSV file is transmitted via HTTP, the HTTP response MUST include a <code>Content-Type</code> header with the value <code>text/csv</code>:
+          The appropriate content type for a CSV file is <code>text/csv</code>. For example, when a CSV file is transmitted via HTTP, the HTTP response should include a <code>Content-Type</code> header with the value <code>text/csv</code>:
         </p>
         <pre>
 Content-Type: text/csv
@@ -613,7 +613,7 @@ Content-Type: text/csv
       <section id="encoding">
         <h3>Encoding</h3>
         <p>
-          CSV files SHOULD be encoded using UTF-8. If a CSV file is not encoded using UTF-8, the encoding MUST be specified through the <code>charset</code> parameter in the <code>Content-Type</code> header:
+          CSV files should be encoded using UTF-8. If a CSV file is not encoded using UTF-8, the encoding should be specified through the <code>charset</code> parameter in the <code>Content-Type</code> header:
         </p>
         <pre>
 Content-Type: text/csv;charset=ISO-8859-1
@@ -622,234 +622,28 @@ Content-Type: text/csv;charset=ISO-8859-1
       <section id="line-endings">
         <h3>Line Endings</h3>
         <p>
-          The ends of rows in a CSV file MUST be either <code>CRLF</code> (<code>U+000D U+000A</code>) or <code>LF</code> (<code>U+000A</code>). Line endings within escaped <a title="cell">cells</a> are not normalised.
+          The ends of rows in a CSV file should be either <code>CRLF</code> (<code>U+000D U+000A</code>) or <code>LF</code> (<code>U+000A</code>). Line endings within escaped <a title="cell">cells</a> are not normalised.
         </p>
       </section>
       <section id="lines">
         <h3>Lines</h3>
         <p>
-          Each line of a CSV file MUST contain the same number of comma-separated values.
+          Each line of a CSV file should contain the same number of comma-separated values.
         </p>
         <p>
-          Values that contain commas, line endings, or double quotes MUST be escaped by having the entire value wrapped in double quotes. There MUST NOT be whitespace before or after the double quotes. Within these escaped cells, any double quotes MUST be escaped with two double quotes (<code>""</code>).
+          Values that contain commas, line endings, or double quotes should be escaped by having the entire value wrapped in double quotes. There should not be whitespace before or after the double quotes. Within these escaped cells, any double quotes should be escaped with two double quotes (<code>""</code>).
         </p>
         <section id="headers">
           <h4>Headers</h4>
           <p>
-            The first line of a CSV file SHOULD contain a comma-separated list of names of <a title="column">columns</a>. This is known as the <dfn>header line</dfn> and provides titles for the columns. There are no constraints on these titles.
+            The first line of a CSV file should contain a comma-separated list of names of <a title="column">columns</a>. This is known as the <dfn>header line</dfn> and provides titles for the columns. There are no constraints on these titles.
           </p>
           <p>
-            If a CSV file does not include a header line, this MUST be specified using the <code>header</code> parameter of the media type:
+            If a CSV file does not include a header line, this should be specified using the <code>header</code> parameter of the media type:
           </p>
           <pre>
 Content-Type: text/csv;header=absent
           </pre>
-        </section>
-        <section>
-          <h4>Bidirectionality in CSV Files</h4>
-          <p>
-            Bidirectional content does not alter the definition of rows or the assignment of cells to columns. Whether or not a CSV file contains right-to-left characters, the first column's content is the first cell of each row, which is the text prior to the first occurrence of a comma within that row.
-          </p>
-          <div class="example" title="Bidirectional CSV file">
-            <p>
-              For example, <a href="http://referendum2012.elections.eg/results/referendum-results">Egyptian Referendum results</a> are available as a CSV file at <a href="https://egelections-2011.appspot.com/Referendum2012/results/csv/EG.csv">https://egelections-2011.appspot.com/Referendum2012/results/csv/EG.csv</a>. Over the wire and in non-Unicode-aware text editors, the CSV looks like:
-            </p>
-            <pre>
-              <bdo dir="ltr">
-&#8204;ا&#8204;ل&#8204;م&#8204;ح&#8204;ا&#8204;ف&#8204;ظ&#8204;ة&#8204;,&#8204;ن&#8204;س&#8204;ب&#8204;ة&#8204; &#8204;م&#8204;و&#8204;ا&#8204;ف&#8204;ق&#8204;,&#8204;ن&#8204;س&#8204;ب&#8204;ة&#8204; &#8204;غ&#8204;ي&#8204;ر&#8204; &#8204;م&#8204;و&#8204;ا&#8204;ف&#8204;ق&#8204;,&#8204;ع&#8204;د&#8204;د&#8204; &#8204;ا&#8204;ل&#8204;ن&#8204;ا&#8204;خ&#8204;ب&#8204;ي&#8204;ن&#8204;,&#8204;ا&#8204;ل&#8204;أ&#8204;ص&#8204;و&#8204;ا&#8204;ت&#8204; &#8204;ا&#8204;ل&#8204;ص&#8204;ح&#8204;ي&#8204;ح&#8204;ة&#8204;,&#8204;ا&#8204;ل&#8204;أ&#8204;ص&#8204;و&#8204;ا&#8204;ت&#8204; &#8204;ا&#8204;ل&#8204;ب&#8204;ا&#8204;ط&#8204;ل&#8204;ة&#8204;,&#8204;ن&#8204;س&#8204;ب&#8204;ة&#8204; &#8204;ا&#8204;ل&#8204;م&#8204;ش&#8204;ا&#8204;ر&#8204;ك&#8204;ة&#8204;,&#8204;م&#8204;و&#8204;ا&#8204;ف&#8204;ق&#8204;,&#8204;غ&#8204;ي&#8204;ر&#8204; &#8204;م&#8204;و&#8204;ا&#8204;ف&#8204;ق&#8204;
-&#8204;ا&#8204;ل&#8204;ق&#8204;ل&#8204;ي&#8204;و&#8204;ب&#8204;ي&#8204;ة&#8204;,60.0,40.0,"2,639,808","853,125","15,224",32.9,"512,055","341,070"
-&#8204;ا&#8204;ل&#8204;ج&#8204;ي&#8204;ز&#8204;ة&#8204;,66.7,33.3,"4,383,701","1,493,092","24,105",34.6,"995,417","497,675"
-&#8204;ا&#8204;ل&#8204;ق&#8204;ا&#8204;ه&#8204;ر&#8204;ة&#8204;,43.2,56.8,"6,580,478","2,254,698","36,342",34.8,"974,371","1,280,327"
-&#8204;ق&#8204;ن&#8204;ا&#8204;,84.5,15.5,"1,629,713","364,509","6,743",22.8,"307,839","56,670"
-...
-              </bdo>
-            </pre>
-            <p>
-              Within this CSV file, the first column appears as the content of each line before the first comma and is named <code>المحافظة</code> (appearing at the start of each row as <code><bdo dir="ltr">&#8204;ا&#8204;ل&#8204;م&#8204;ح&#8204;ا&#8204;ف&#8204;ظ&#8204;ة&#8204;</bdo></code> in the example, which is displaying the relevant characters from left to right in the order they appear "on the wire").
-            </p>
-            <p>
-              The CSV translates to a table model that looks like:
-            </p>
-            <table style="width: 100%; text-align: right">
-              <col style="width: 10%"/>
-              <col style="width: 10%"/>
-              <col style="width: 10%"/>
-              <col style="width: 10%"/>
-              <col style="width: 10%"/>
-              <col style="width: 10%"/>
-              <col style="width: 10%"/>
-              <col style="width: 10%"/>
-              <col style="width: 10%"/>
-              <col style="width: 10%"/>
-              <thead>
-                <tr style="text-align: center">
-                  <th>Column / Row</th>
-                  <th>column 1</th>
-                  <th>column 2</th>
-                  <th>column 3</th>
-                  <th>column 4</th>
-                  <th>column 5</th>
-                  <th>column 6</th>
-                  <th>column 7</th>
-                  <th>column 8</th>
-                  <th>column 9</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th>column names</th><th>المحافظة</th><th>نسبة موافق</th><th>نسبة غير موافق</th><th>عدد الناخبين</th><th>الأصوات الصحيحة</th><th>الأصوات الباطلة</th><th>نسبة المشاركة</th><th>موافق</th><th>غير موافق</th>
-                </tr>
-                <tr>
-                  <th>row 1</th><td>القليوبية</td><td>60.0</td><td>40.0</td><td>2,639,808</td><td>853,125</td><td>15,224</td><td>32.9</td><td>512,055</td><td>341,070</td>
-                </tr>
-                <tr>
-                  <th>row 2</th><td>الجيزة</td><td>66.7</td><td>33.3</td><td>4,383,701</td><td>1,493,092</td><td>24,105</td><td>34.6</td><td>995,417</td><td>497,675</td>
-                </tr>
-                <tr>
-                  <th>row 3</th><td>القاهرة</td><td>43.2</td><td>56.8</td><td>6,580,478</td><td>2,254,698</td><td>36,342</td><td>34.8</td><td>974,371</td><td>1,280,327</td>
-                </tr>
-                <tr>
-                  <th>row 4</th><td>قنا</td><td>84.5</td><td>15.5</td><td>1,629,713</td><td>364,509</td><td>6,743</td><td>22.8</td><td>307,839</td><td>56,670</td>
-                </tr>
-              </tbody>
-            </table>
-            <p>
-              The fragment identifier <code>#col=3</code> identifies the third of the columns, named <code>نسبة غير موافق</code> (appearing as <code><bdo dir="ltr">&#8204;ن&#8204;س&#8204;ب&#8204;ة&#8204; &#8204;غ&#8204;ي&#8204;ر&#8204; &#8204;م&#8204;و&#8204;ا&#8204;ف&#8204;ق&#8204;</bdo></code> in the example).
-            </p>
-            <p>
-              <a href="#bidirectional-tables" class="sectionRef"></a> defines how this table model should be displayed by compliant applications, and how metadata can affect the display. The default is for the display to be determined by the content of the table. For example, if this CSV were turned into an HTML table for display into a web page, it should be displayed with the first column on the right and the last on the left, as follows:
-            </p>
-            <table style="width: 100%; text-align: right">
-              <thead>
-                <tr>
-                  <th>غير موافق</th>
-                  <th>موافق</th>
-                  <th>نسبة المشاركة</th>
-                  <th>الأصوات الباطلة</th>
-                  <th>الأصوات الصحيحة</th>
-                  <th>عدد الناخبين</th>
-                  <th>نسبة غير موافق</th>
-                  <th>نسبة موافق</th>
-                  <th>المحافظة</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>341,070</td>
-                  <td>512,055</td>
-                  <td>32.9</td>
-                  <td>15,224</td>
-                  <td>853,125</td>
-                  <td>2,639,808</td>
-                  <td>40.0</td>
-                  <td>60.0</td>
-                  <td>القليوبية</td>
-                </tr>
-                <tr>
-                  <td>497,675</td>
-                  <td>995,417</td>
-                  <td>34.6</td>
-                  <td>24,105</td>
-                  <td>1,493,092</td>
-                  <td>4,383,701</td>
-                  <td>33.3</td>
-                  <td>66.7</td>
-                  <td>الجيزة</td>
-                </tr>
-                <tr>
-                  <td>1,280,327</td>
-                  <td>974,371</td>
-                  <td>34.8</td>
-                  <td>36,342</td>
-                  <td>2,254,698</td>
-                  <td>6,580,478</td>
-                  <td>56.8</td>
-                  <td>43.2</td>
-                  <td>القاهرة</td>
-                </tr>
-                <tr>
-                  <td>56,670</td>
-                  <td>307,839</td>
-                  <td>22.8</td>
-                  <td>6,743</td>
-                  <td>364,509</td>
-                  <td>1,629,713</td>
-                  <td>15.5</td>
-                  <td>84.5</td>
-                  <td>قنا</td>
-                </tr>
-              </tbody>
-            </table>
-            <p>
-              The fragment identifier <code>#col=3</code> still identifies the third of the columns, named <code>نسبة غير موافق</code>, which appears in the HTML display as the third column from the right and is what those who read right-to-left would think of as the third column.
-            </p>
-            <p>
-              Note that this display matches that shown <a href="http://referendum2012.elections.eg/results/referendum-results">on the original website</a>.
-            </p>
-          </div>
-          <div class="issue" data-number="46">
-            <p>
-              An alternative approach is for the CSV to be parsed into a table model in which the columns are numbered in the reverse, for tables which are either marked as or detected to be right-to-left tables. For example, we could introduce a <code>bidi=rtl</code> or similar media type parameter, and use this to determine whether the first column in table generated from the CSV is the text before the first comma in each line or the text after the last comma in the line.
-            </p>
-            <p>
-             In the example above, if the CSV were served with <code>bidi=rtl</code>, or the table was detected as being a right-to-left table, then the column numbering in the model would be reversed:
-            </p>
-            <table style="width: 100%; text-align: right">
-              <col style="width: 10%"/>
-              <col style="width: 10%"/>
-              <col style="width: 10%"/>
-              <col style="width: 10%"/>
-              <col style="width: 10%"/>
-              <col style="width: 10%"/>
-              <col style="width: 10%"/>
-              <col style="width: 10%"/>
-              <col style="width: 10%"/>
-              <col style="width: 10%"/>
-              <thead>
-                <tr style="text-align: center">
-                  <th>Column / Row</th>
-                  <th>column 9</th>
-                  <th>column 8</th>
-                  <th>column 7</th>
-                  <th>column 6</th>
-                  <th>column 5</th>
-                  <th>column 4</th>
-                  <th>column 3</th>
-                  <th>column 2</th>
-                  <th>column 1</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th>row 1 (header)</th><th>المحافظة</th><th>نسبة موافق</th><th>نسبة غير موافق</th><th>عدد الناخبين</th><th>الأصوات الصحيحة</th><th>الأصوات الباطلة</th><th>نسبة المشاركة</th><th>موافق</th><th>غير موافق</th>
-                </tr>
-                <tr>
-                  <th>row 2</th><td>القليوبية</td><td>60.0</td><td>40.0</td><td>2,639,808</td><td>853,125</td><td>15,224</td><td>32.9</td><td>512,055</td><td>341,070</td>
-                </tr>
-                <tr>
-                  <th>row 3</th><td>الجيزة</td><td>66.7</td><td>33.3</td><td>4,383,701</td><td>1,493,092</td><td>24,105</td><td>34.6</td><td>995,417</td><td>497,675</td>
-                </tr>
-                <tr>
-                  <th>row 4</th><td>القاهرة</td><td>43.2</td><td>56.8</td><td>6,580,478</td><td>2,254,698</td><td>36,342</td><td>34.8</td><td>974,371</td><td>1,280,327</td>
-                </tr>
-                <tr>
-                  <th>row 5</th><td>قنا</td><td>84.5</td><td>15.5</td><td>1,629,713</td><td>364,509</td><td>6,743</td><td>22.8</td><td>307,839</td><td>56,670</td>
-                </tr>
-              </tbody>
-            </table>
-            <p>
-              This would require a change to [[RFC7111]] but that might be required by updates to the definition of <code>text/csv</code> in any case. With the change, the fragment identifier <code>#col=3</code> would then refer to the third column from the right, named <code>نسبة المشاركة</code>.
-            </p>
-            <p>
-              If the model were defined in this way, there would be no need to determine the order of the columns when displayed using a metadata property. Columns would always be displayed with the first column (numbered 1 in the model) on the left. The final display in HTML, for example, would be exactly as above. The only difference would be that <code>#col=3</code> would refer to the third column from the left.
-            </p>
-            <p>
-              We note that using media type parameters is problematic because publishers might not have the ability to set them on their servers, and because they can easily get lost as a file is republished or emailed between people.
-            </p>
-            <p>
-              We invite comment on the best way to approach bidirectionality in CSV files.
-            </p>
-          </div>
         </section>
       </section>
 
@@ -1107,6 +901,212 @@ Content-Type: text/csv;header=absent
         <p class="note">
         This parsing algorithm does not account for the possibility of there being more than one area of tabular data within a single CSV file.
       </p>
+      <section>
+        <h3>Bidirectionality in CSV Files</h3>
+        <p>
+          Bidirectional content does not alter the definition of rows or the assignment of cells to columns. Whether or not a CSV file contains right-to-left characters, the first column's content is the first cell of each row, which is the text prior to the first occurrence of a comma within that row.
+        </p>
+        <div class="example" title="Bidirectional CSV file">
+          <p>
+            For example, <a href="http://referendum2012.elections.eg/results/referendum-results">Egyptian Referendum results</a> are available as a CSV file at <a href="https://egelections-2011.appspot.com/Referendum2012/results/csv/EG.csv">https://egelections-2011.appspot.com/Referendum2012/results/csv/EG.csv</a>. Over the wire and in non-Unicode-aware text editors, the CSV looks like:
+          </p>
+          <pre>
+            <bdo dir="ltr">
+&#8204;ا&#8204;ل&#8204;م&#8204;ح&#8204;ا&#8204;ف&#8204;ظ&#8204;ة&#8204;,&#8204;ن&#8204;س&#8204;ب&#8204;ة&#8204; &#8204;م&#8204;و&#8204;ا&#8204;ف&#8204;ق&#8204;,&#8204;ن&#8204;س&#8204;ب&#8204;ة&#8204; &#8204;غ&#8204;ي&#8204;ر&#8204; &#8204;م&#8204;و&#8204;ا&#8204;ف&#8204;ق&#8204;,&#8204;ع&#8204;د&#8204;د&#8204; &#8204;ا&#8204;ل&#8204;ن&#8204;ا&#8204;خ&#8204;ب&#8204;ي&#8204;ن&#8204;,&#8204;ا&#8204;ل&#8204;أ&#8204;ص&#8204;و&#8204;ا&#8204;ت&#8204; &#8204;ا&#8204;ل&#8204;ص&#8204;ح&#8204;ي&#8204;ح&#8204;ة&#8204;,&#8204;ا&#8204;ل&#8204;أ&#8204;ص&#8204;و&#8204;ا&#8204;ت&#8204; &#8204;ا&#8204;ل&#8204;ب&#8204;ا&#8204;ط&#8204;ل&#8204;ة&#8204;,&#8204;ن&#8204;س&#8204;ب&#8204;ة&#8204; &#8204;ا&#8204;ل&#8204;م&#8204;ش&#8204;ا&#8204;ر&#8204;ك&#8204;ة&#8204;,&#8204;م&#8204;و&#8204;ا&#8204;ف&#8204;ق&#8204;,&#8204;غ&#8204;ي&#8204;ر&#8204; &#8204;م&#8204;و&#8204;ا&#8204;ف&#8204;ق&#8204;
+&#8204;ا&#8204;ل&#8204;ق&#8204;ل&#8204;ي&#8204;و&#8204;ب&#8204;ي&#8204;ة&#8204;,60.0,40.0,"2,639,808","853,125","15,224",32.9,"512,055","341,070"
+&#8204;ا&#8204;ل&#8204;ج&#8204;ي&#8204;ز&#8204;ة&#8204;,66.7,33.3,"4,383,701","1,493,092","24,105",34.6,"995,417","497,675"
+&#8204;ا&#8204;ل&#8204;ق&#8204;ا&#8204;ه&#8204;ر&#8204;ة&#8204;,43.2,56.8,"6,580,478","2,254,698","36,342",34.8,"974,371","1,280,327"
+&#8204;ق&#8204;ن&#8204;ا&#8204;,84.5,15.5,"1,629,713","364,509","6,743",22.8,"307,839","56,670"
+...
+            </bdo>
+          </pre>
+          <p>
+            Within this CSV file, the first column appears as the content of each line before the first comma and is named <code>المحافظة</code> (appearing at the start of each row as <code><bdo dir="ltr">&#8204;ا&#8204;ل&#8204;م&#8204;ح&#8204;ا&#8204;ف&#8204;ظ&#8204;ة&#8204;</bdo></code> in the example, which is displaying the relevant characters from left to right in the order they appear "on the wire").
+          </p>
+          <p>
+            The CSV translates to a table model that looks like:
+          </p>
+          <table style="width: 100%; text-align: right">
+            <col style="width: 10%"/>
+            <col style="width: 10%"/>
+            <col style="width: 10%"/>
+            <col style="width: 10%"/>
+            <col style="width: 10%"/>
+            <col style="width: 10%"/>
+            <col style="width: 10%"/>
+            <col style="width: 10%"/>
+            <col style="width: 10%"/>
+            <col style="width: 10%"/>
+            <thead>
+              <tr style="text-align: center">
+                <th>Column / Row</th>
+                <th>column 1</th>
+                <th>column 2</th>
+                <th>column 3</th>
+                <th>column 4</th>
+                <th>column 5</th>
+                <th>column 6</th>
+                <th>column 7</th>
+                <th>column 8</th>
+                <th>column 9</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>column names</th><th>المحافظة</th><th>نسبة موافق</th><th>نسبة غير موافق</th><th>عدد الناخبين</th><th>الأصوات الصحيحة</th><th>الأصوات الباطلة</th><th>نسبة المشاركة</th><th>موافق</th><th>غير موافق</th>
+              </tr>
+              <tr>
+                <th>row 1</th><td>القليوبية</td><td>60.0</td><td>40.0</td><td>2,639,808</td><td>853,125</td><td>15,224</td><td>32.9</td><td>512,055</td><td>341,070</td>
+              </tr>
+              <tr>
+                <th>row 2</th><td>الجيزة</td><td>66.7</td><td>33.3</td><td>4,383,701</td><td>1,493,092</td><td>24,105</td><td>34.6</td><td>995,417</td><td>497,675</td>
+              </tr>
+              <tr>
+                <th>row 3</th><td>القاهرة</td><td>43.2</td><td>56.8</td><td>6,580,478</td><td>2,254,698</td><td>36,342</td><td>34.8</td><td>974,371</td><td>1,280,327</td>
+              </tr>
+              <tr>
+                <th>row 4</th><td>قنا</td><td>84.5</td><td>15.5</td><td>1,629,713</td><td>364,509</td><td>6,743</td><td>22.8</td><td>307,839</td><td>56,670</td>
+              </tr>
+            </tbody>
+          </table>
+          <p>
+            The fragment identifier <code>#col=3</code> identifies the third of the columns, named <code>نسبة غير موافق</code> (appearing as <code><bdo dir="ltr">&#8204;ن&#8204;س&#8204;ب&#8204;ة&#8204; &#8204;غ&#8204;ي&#8204;ر&#8204; &#8204;م&#8204;و&#8204;ا&#8204;ف&#8204;ق&#8204;</bdo></code> in the example).
+          </p>
+          <p>
+            <a href="#bidirectional-tables" class="sectionRef"></a> defines how this table model should be displayed by compliant applications, and how metadata can affect the display. The default is for the display to be determined by the content of the table. For example, if this CSV were turned into an HTML table for display into a web page, it should be displayed with the first column on the right and the last on the left, as follows:
+          </p>
+          <table style="width: 100%; text-align: right">
+            <thead>
+              <tr>
+                <th>غير موافق</th>
+                <th>موافق</th>
+                <th>نسبة المشاركة</th>
+                <th>الأصوات الباطلة</th>
+                <th>الأصوات الصحيحة</th>
+                <th>عدد الناخبين</th>
+                <th>نسبة غير موافق</th>
+                <th>نسبة موافق</th>
+                <th>المحافظة</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>341,070</td>
+                <td>512,055</td>
+                <td>32.9</td>
+                <td>15,224</td>
+                <td>853,125</td>
+                <td>2,639,808</td>
+                <td>40.0</td>
+                <td>60.0</td>
+                <td>القليوبية</td>
+              </tr>
+              <tr>
+                <td>497,675</td>
+                <td>995,417</td>
+                <td>34.6</td>
+                <td>24,105</td>
+                <td>1,493,092</td>
+                <td>4,383,701</td>
+                <td>33.3</td>
+                <td>66.7</td>
+                <td>الجيزة</td>
+              </tr>
+              <tr>
+                <td>1,280,327</td>
+                <td>974,371</td>
+                <td>34.8</td>
+                <td>36,342</td>
+                <td>2,254,698</td>
+                <td>6,580,478</td>
+                <td>56.8</td>
+                <td>43.2</td>
+                <td>القاهرة</td>
+              </tr>
+              <tr>
+                <td>56,670</td>
+                <td>307,839</td>
+                <td>22.8</td>
+                <td>6,743</td>
+                <td>364,509</td>
+                <td>1,629,713</td>
+                <td>15.5</td>
+                <td>84.5</td>
+                <td>قنا</td>
+              </tr>
+            </tbody>
+          </table>
+          <p>
+            The fragment identifier <code>#col=3</code> still identifies the third of the columns, named <code>نسبة غير موافق</code>, which appears in the HTML display as the third column from the right and is what those who read right-to-left would think of as the third column.
+          </p>
+          <p>
+            Note that this display matches that shown <a href="http://referendum2012.elections.eg/results/referendum-results">on the original website</a>.
+          </p>
+        </div>
+        <div class="issue" data-number="46">
+          <p>
+            An alternative approach is for the CSV to be parsed into a table model in which the columns are numbered in the reverse, for tables which are either marked as or detected to be right-to-left tables. For example, we could introduce a <code>bidi=rtl</code> or similar media type parameter, and use this to determine whether the first column in table generated from the CSV is the text before the first comma in each line or the text after the last comma in the line.
+          </p>
+          <p>
+           In the example above, if the CSV were served with <code>bidi=rtl</code>, or the table was detected as being a right-to-left table, then the column numbering in the model would be reversed:
+          </p>
+          <table style="width: 100%; text-align: right">
+            <col style="width: 10%"/>
+            <col style="width: 10%"/>
+            <col style="width: 10%"/>
+            <col style="width: 10%"/>
+            <col style="width: 10%"/>
+            <col style="width: 10%"/>
+            <col style="width: 10%"/>
+            <col style="width: 10%"/>
+            <col style="width: 10%"/>
+            <col style="width: 10%"/>
+            <thead>
+              <tr style="text-align: center">
+                <th>Column / Row</th>
+                <th>column 9</th>
+                <th>column 8</th>
+                <th>column 7</th>
+                <th>column 6</th>
+                <th>column 5</th>
+                <th>column 4</th>
+                <th>column 3</th>
+                <th>column 2</th>
+                <th>column 1</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>row 1 (header)</th><th>المحافظة</th><th>نسبة موافق</th><th>نسبة غير موافق</th><th>عدد الناخبين</th><th>الأصوات الصحيحة</th><th>الأصوات الباطلة</th><th>نسبة المشاركة</th><th>موافق</th><th>غير موافق</th>
+              </tr>
+              <tr>
+                <th>row 2</th><td>القليوبية</td><td>60.0</td><td>40.0</td><td>2,639,808</td><td>853,125</td><td>15,224</td><td>32.9</td><td>512,055</td><td>341,070</td>
+              </tr>
+              <tr>
+                <th>row 3</th><td>الجيزة</td><td>66.7</td><td>33.3</td><td>4,383,701</td><td>1,493,092</td><td>24,105</td><td>34.6</td><td>995,417</td><td>497,675</td>
+              </tr>
+              <tr>
+                <th>row 4</th><td>القاهرة</td><td>43.2</td><td>56.8</td><td>6,580,478</td><td>2,254,698</td><td>36,342</td><td>34.8</td><td>974,371</td><td>1,280,327</td>
+              </tr>
+              <tr>
+                <th>row 5</th><td>قنا</td><td>84.5</td><td>15.5</td><td>1,629,713</td><td>364,509</td><td>6,743</td><td>22.8</td><td>307,839</td><td>56,670</td>
+              </tr>
+            </tbody>
+          </table>
+          <p>
+            This would require a change to [[RFC7111]] but that might be required by updates to the definition of <code>text/csv</code> in any case. With the change, the fragment identifier <code>#col=3</code> would then refer to the third column from the right, named <code>نسبة المشاركة</code>.
+          </p>
+          <p>
+            If the model were defined in this way, there would be no need to determine the order of the columns when displayed using a metadata property. Columns would always be displayed with the first column (numbered 1 in the model) on the left. The final display in HTML, for example, would be exactly as above. The only difference would be that <code>#col=3</code> would refer to the third column from the left.
+          </p>
+          <p>
+            We note that using media type parameters is problematic because publishers might not have the ability to set them on their servers, and because they can easily get lost as a file is republished or emailed between people.
+          </p>
+          <p>
+            We invite comment on the best way to approach bidirectionality in CSV files.
+          </p>
+        </div>
+      </section>
       <section>
         <h3>Examples</h3>
         <section>
