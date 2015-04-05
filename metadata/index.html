@@ -985,10 +985,6 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             <p>The <a>property value</a> of <code>name</code> is that defined within metadata, if it exists. Otherwise, it is the first value from the <a>property value</a> of <code>title</code>, having the same language tag as <a>default language</a> or <code>und</code> if not specified, <a href="https://tools.ietf.org/html/rfc3986#page-12" class="externalDFN">percent-encoded</a> as necessary to conform to the syntactic requirements as a string without language, as defined in [[!RFC3986]]. Otherwise, it is the string <code>"_col.<em>[N]</em>"</code> where <code><em>[N]</em></code> is the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-number" class="externalDFN">column number</a>.
             </p>
           </dd>
-          <dt id="column-required"><code>required</code></dt>
-          <dd>
-            <p>A boolean <a>atomic property</a> taking a single value which indicates whether every cell within the column must have a non-null value. The value of this property is used to create the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-required" class="externalDFN">required</a> annotation for the described column.</p>
-          </dd>
           <dt id="column-suppressOutput"><code>suppressOutput</code></dt>
           <dd>
             <p>A boolean <a>atomic property</a>. If <code>true</code>, suppresses any output that would be generated when converting cells in this column. The value of this property is used to create the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-suppress-output" class="externalDFN">suppress output</a> annotation for the described column.</p>
@@ -1104,6 +1100,10 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
               A value for this property is <a>compatible with</a> an inherited value if they are identical, or if the value is a subtype within the datatype hierarchy defined in <a href="#datatypes" class="sectionRef"></a>, including if the inherited value is explicitly specified as the <a href="#datatype-base"><code>base</code></a> of this value.
             </p>
             <p class="issue" data-number="223">We invite comment on whether <a href="#cell-datatype"><code>datatype</code></a> should allow for a "union" of types for a cell; this would allow for a set of datatypes that could be matched against the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-string-value" class="externalDFN">string value</a> of a cell, choosing the first match; e.g., to match either a <code>date</code> or <code>datetime</code>.</p>
+          </dd>
+          <dt id="cell-required"><code>required</code></dt>
+          <dd>
+            <p>A boolean <a>atomic property</a> taking a single value which indicates whether the cell must have a non-null value. The default is <code>false</code>. A value for this property is <a>compatible with</a> an inherited value only if they are identical.</p>
           </dd>
           <dt id="cell-default"><code>default</code></dt>
           <dd>
@@ -1655,7 +1655,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
     <section>
       <h2>Parsing cells</h2>
       <p>
-        Unlike many other data formats, tabular data is designed to be read by humans. For that reason, it's common for data to be represented within tabular data in a human-readable way. The <a href="#cell-null"><code>null</code></a>, <a href="#cell-default"><code>default</code></a>, <a href="#cell-separator"><code>separator</code></a>, <a href="#cell-datatype"><code>datatype</code></a>, and <a href="#cell-lang"><code>lang</code></a> properties provide the information needed to parse the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-string-value" class="externalDFN">string value</a> of a cell into its (semantic) <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">value</a>. This is used:
+        Unlike many other data formats, tabular data is designed to be read by humans. For that reason, it's common for data to be represented within tabular data in a human-readable way. The <a href="#cell-null"><code>null</code></a>, <a href="#cell-required"><code>required</code></a>, <a href="#cell-default"><code>default</code></a>, <a href="#cell-separator"><code>separator</code></a>, <a href="#cell-datatype"><code>datatype</code></a>, and <a href="#cell-lang"><code>lang</code></a> properties provide the information needed to parse the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-string-value" class="externalDFN">string value</a> of a cell into its (semantic) <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">value</a>. This is used:
       </p>
       <ul>
         <li>by <strong>validators</strong> to check that the data in the table is in the expected format,</li>
@@ -1678,7 +1678,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
         <li>unless the <a href="#cell-datatype"><code>datatype</code></a> is <code>string</code>, <code>json</code>, <code>xml</code>, <code>html</code>, <code>anyAtomicType</code>, or <code>any</code>, replace all carriage return (<code>#xD</code>), line feed (<code>#xA</code>), and tab (<code>#x9</code>) characters with space characters.</li>
         <li>unless the <a href="#cell-datatype"><code>datatype</code></a> is <code>string</code>, <code>json</code>, <code>xml</code>, <code>html</code>, <code>anyAtomicType</code>, <code>any</code>, or <code>normalizedString</code>, strip leading and trailing whitespace from the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-string-value" class="externalDFN">string value</a> and replace all instances of two or more whitespace characters with a single space character.</li>
         <li>if the resulting string is an empty string, apply the remaining steps to the string given by the <a href="#cell-default"><code>default</code></a> property.</li>
-        <li>if the <a href="#cell-separator"><code>separator</code></a> property is not <code>null</code> and the resulting string is an empty string, the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">cell value</a> is an empty list.</li>
+        <li>if the <a href="#cell-separator"><code>separator</code></a> property is not <code>null</code> and the resulting string is an empty string, the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">cell value</a> is an empty list. If the <a href="#cell-required"><code>required</code></a> property is <code>true</code>, add an error to the list of <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-errors" class="externalDFN">errors</a> for the cell.</li>
         <li>if the <a href="#cell-separator"><code>separator</code></a> property is not <code>null</code>, the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">cell value</a> is a list of values created by:
           <ol class="algorithm">
             <li>if the normalized string is an empty string, apply the remaining steps to the string given by the <a href="#cell-default"><code>default</code></a> property.</li>
@@ -1689,7 +1689,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           </ol>
         </li>
         <li>if the string is an empty string, apply the remaining steps to the string given by the <a href="#cell-default"><code>default</code></a> property.</li>
-        <li>if the string is the same as any one of the values of the <a href="#cell-null"><code>null</code></a> property, then the resulting value is <code>null</code>.</li>
+        <li>if the string is the same as any one of the values of the <a href="#cell-null"><code>null</code></a> property, then the resulting value is <code>null</code>. If the <a href="#cell-separator"><code>separator</code></a> property is <code>null</code> and the <a href="#cell-required"><code>required</code></a> property is <code>true</code>, add an error to the list of <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-errors" class="externalDFN">errors</a> for the cell.</li>
         <li>validate the string based on the datatype, using the <a href="#datatype-format"><code>format</code></a> property if one is specified, as described below, and then against the constraints described in <a href="#datatypes" class="sectionRef"></a>; if there are any errors, add them to the list of <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-errors" class="externalDFN">errors</a> for the cell; the resulting value is typed as a <code>string</code> with the language provided by the <a href="#cell-lang"><code>lang</code></a> property.</li>
         <li>otherwise, if there are no errors, parse the string using the <a href="#datatype-format"><code>format</code></a> if one is specified, as described below; the resulting value is typed according to the <a href="#cell-datatype"><code>datatype</code></a> and if the <code>datatype</code> is <code>string</code>, or there is no <code>datatype</code>, it has the language provided by the <a href="#cell-lang"><code>lang</code></a> property.</li>
       </ol>
