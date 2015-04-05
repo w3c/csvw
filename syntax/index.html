@@ -202,7 +202,7 @@
         </p>
         <ul>
           <li><dfn title="table columns">columns</dfn> &mdash; the list of <a title="column">columns</a> in the table. A table MUST have one or more columns and the order of the columns within the list is significant and MUST be preserved by applications</li>
-          <li><dfn title="table rows">rows</dfn> &mdash; the list of <a title="row">rows</a> in the table</li>
+          <li><dfn title="table rows">rows</dfn> &mdash; the list of <a title="row">rows</a> in the table. A table MUST have one or more rows and the order of the rows within the list is significant and MUST be preserved by applications</li>
           <li><dfn title="table id">id</dfn> &mdash; an identifier for this table, or <code>null</code> if this is undefined</li>
           <li><dfn title="table url">url</dfn> &mdash; the URL of the source of the data in the table, or <code>null</code> if this is undefined</li>
           <li><dfn title="table direction">direction</dfn> &mdash; the direction in which the columns in the table should be displayed, as described in <a href="#bidirectional-tables" class="sectionRef"></a></li>
@@ -234,7 +234,6 @@
           <li><dfn title="column source number">source number</dfn> &mdash; the position of the column in the file at the <a title="table url">url</a> of the table, or <code>null</code></li>
           <li><dfn title="column name">name</dfn> &mdash; the name of the column</li>
           <li><dfn title="column titles">titles</dfn> &mdash; any number of human-readable titles for the column, each of which has an associated language</li>
-          <li><dfn title="column required">required</dfn> &mdash; a boolean that indicates whether cells within the column can be <code>null</code>; if <code>false</code> then they cannot be</li>
           <li><dfn title="column datatype">datatype</dfn> &mdash; the expected datatype for the <a title="cell value">values</a> of <a title="cell">cells</a> in this column, as defined in [[!tabular-metadata]]</li>
           <li><dfn title="column virtual">virtual</dfn> &mdash; a boolean that indicates whether the column is a <a>virtual column</a>. <dfn title="virtual column">Virtual columns</dfn> are used to extend the source data with additional empty columns to support more advanced conversions; when this annotation is <code>false</code>, the column is a <dfn>real column</dfn>, which exists in the source data for the table.</li>
           <li><dfn title="column suppress output">suppress output</dfn> &mdash; a boolean that indicates whether or not this column should be suppressed in any output generated from converting the table, as described in <a href="#converting-tables" class="sectionRef"></a></li>
@@ -517,22 +516,22 @@ Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
           In the case of starting with a metadata file, <code>UM<sub>M</sub></code> will describe a <a>table</a> or <a>group of tables</a>, and no other metadata files will be retrieved. Thus the metadata file must provide all applicable metadata aside from that embedded within the tabular data files themselves.
         </p>
       </section>
-      <section>
+      <section class="informative">
         <h3>Displaying Tables</h3>
-        <div class="issue">
-          <p>
-            We intend to include other sections here about:
-          </p>
-          <ul>
-            <li>displaying metadata about groups of tables, tables, columns, rows, and cells</li>
-            <li>what headings to use for columns when displaying tabular content</li>
-            <li>how to format values in cells</li>
-          </ul>
-          <p>
-            These sections are planned to be non-normative. We invite comment on whether it's useful to provide this kind of guidance.
-          </p>
-        </div>
-        <section class="informative">
+        <p>
+          When displaying tables, implementations should:
+        </p>
+        <ul>
+          <li>use the <a title="table direction">direction</a> annotation on each <a>table</a>, and the <a title="cell text direction">text direction</a> annotation on each cell, to determine the ordering of columns and characters within cells, as described in <a href="#bidirectional-tables" class="sectionRef"></a></li>
+          <li>use the <a title="column titles">titles</a> annotation on each <a>column</a> to provide a header for the column, selecting the first title in a language based on the user's locale and preferences</li>
+          <li>add links to headers based on the <a title="cell property URL">property URLs</a> of the cells in the first row of the table</li>
+          <li>display <a title="cell value">cell values</a>, particularly boolean, numeric and date/time values, in a lexical form based on the user's locale and preferences</li>
+          <li>add links to the display of rows and cells based on the <a title="cell about URL">about URL</a> and <a title="cell value URL">value URL</a> annotations on cells</li>
+          <li>highlight or otherwise indicate cells with <a title="cell errors">errors</a></li>
+          <li>provide a way of viewing non-core <a title="annotation">annotations</a> on table groups, tables, columns, rows and cells</li>
+          <li>provide links to download the raw <a>tabular data file</a> that is being displayed</li>
+        </ul>
+        <section>
           <h4>Bidirectional Tables</h4>
           <p>
             There are two levels of bidirectionality to consider when displaying tables: the directionality of the table (i.e., whether the columns should be arranged left-to-right or right-to-left) and the directionality of the content of individual cells.
@@ -561,8 +560,7 @@ Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
         </p>
         <ul>
           <li>if there is more than one <a>row</a> with the same <a title="row primary key">primary key</a>, that is where the <a title="cell">cells</a> listed for the primary key for the row have the same <a title="cell value">values</a> as the cells listed for the primary key for another row,</li>
-          <li>for each <a>row</a> that does not have a <a title="row referenced rows">referenced row</a> for each of the <a title="table foreign keys">foreign keys</a> on the <a>table</a> the row appears in,</li>
-          <li>for each <a>cell</a> in a <a>column</a> whose <a title="column required">required</a> annotation is <code>true</code> and whose <a title="cell value">value</a> is <code>null</code>, or</li>
+          <li>for each <a>row</a> that does not have a <a title="row referenced rows">referenced row</a> for each of the <a title="table foreign keys">foreign keys</a> on the <a>table</a> the row appears in, or</li>
           <li>for each <a title="cell errors">error</a> on each <a>cell</a>.</li>
         </ul>
         <p>
@@ -795,7 +793,6 @@ Content-Type: text/csv;header=absent
                             <li><a title="column source number">source number</a> set to <a>source column number</a></li>
                             <li><a title="column name">name</a> set to <code>null</code></li>
                             <li><a title="column titles">titles</a> set to an empty list</li>
-                            <li><a title="column required">required</a> set to <code>false</code></li>
                             <li><a title="column datatype">datatype</a> set to <code>string</code></li>
                             <li><a title="column virtual">virtual</a> set to <code>false</code></li>
                             <li><a title="column suppress output">suppress output</a> set to <code>false</code></li>
