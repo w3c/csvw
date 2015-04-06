@@ -650,9 +650,6 @@ Content-Type: text/csv;header=absent
         <p>This grammar is a generalization of that defined in [[!RFC4180]] and is included for reference only.</p>
         <p>The <abbr title="Extended Backus–Naur Form">EBNF</abbr> used here is defined in XML 1.0 [[EBNF-NOTATION]].</p>
         <div data-include="csv-plus.html"></div>
-        <p class="note">
-          We should probably place further restrictions on QCHAR and SCHAR to avoid control characters. If header weren’t optional, it would be better defined as in RFC4180, but if the syntax allows it to be optional, this would make it not an LL(1) grammar, which isn’t too much of an issue.
-        </p>
       </section>
     </section>
     <section id="parsing" class="informative">
@@ -675,8 +672,6 @@ Content-Type: text/csv;header=absent
         <dd>The character encoding for the file, one of the encodings listed in [[!encoding]], set by the <a href="http://w3c.github.io/csvw/metadata/#dialect-encoding"><code>encoding</code></a> property of a <a href="http://w3c.github.io/csvw/metadata/#dfn-dialect-description" class="externalDFN">dialect description</a>. The default is <code>utf-8</code>.</dd>
         <dt><dfn>escape character</dfn></dt>
         <dd>The character that is used to escape the <a>quote character</a> within escaped cells, set by the <a href="http://w3c.github.io/csvw/metadata/#dialect-doubleQuote"><code>doubleQuote</code></a> property of a <a href="http://w3c.github.io/csvw/metadata/#dfn-dialect-description" class="externalDFN">dialect description</a>. The default is <code>"</code> (such that <code>""</code> is used to escape <code>"</code> within an escaped cell).</dd>
-        <dt><dfn>header column count</dfn></dt>
-        <dd>The number of <dfn title="header column">header columns</dfn> (following the skipped columns) in each row, set by the <a href="http://w3c.github.io/csvw/metadata/#dialect-headerColumnCount"><code>headerColumnCount</code></a> property of a <a href="http://w3c.github.io/csvw/metadata/#dfn-dialect-description" class="externalDFN">dialect description</a>. The default is <code>0</code>. A value other than <code>0</code> will mean that the <a title="column source number">source numbers</a> of <a title="column">columns</a> will be different from their <a title="column number">numbers</a>.</dd>
         <dt><dfn>header row count</dfn></dt>
         <dd>The number of <dfn title="header row">header rows</dfn> (following the skipped rows) in the file, set by the <a href="http://w3c.github.io/csvw/metadata/#dialect-header"><code>header</code></a> or <a href="http://w3c.github.io/csvw/metadata/#dialect-headerRowCount"><code>headerRowCount</code></a> property of a <a href="http://w3c.github.io/csvw/metadata/#dfn-dialect-description" class="externalDFN">dialect description</a>. The default is <code>1</code>. A value other than <code>0</code> will mean that the <a title="row source number">source numbers</a> of <a title="row">rows</a> will be different from their <a title="row number">numbers</a>.</dd>
         <dt><dfn>line terminator</dfn></dt>
@@ -686,7 +681,7 @@ Content-Type: text/csv;header=absent
         <dt><dfn>skip blank rows</dfn></dt>
         <dd>Indicates whether to ignore wholly empty rows (ie rows in which all the cells are empty), set by the <a href="http://w3c.github.io/csvw/metadata/#dialect-skipBlankRows"><code>skipBlankRows</code></a> property of a <a href="http://w3c.github.io/csvw/metadata/#dfn-dialect-description" class="externalDFN">dialect description</a>. The default is <code>false</code>. A value other than <code>false</code> may mean that the <a title="row source number">source numbers</a> of <a title="row">rows</a> are different from their <a title="row number">numbers</a>.</dd>
         <dt><dfn>skip columns</dfn></dt>
-        <dd>The number of columns to skip at the beginning of each row, before any <a title="header column">header columns</a>, set by the <a href="http://w3c.github.io/csvw/metadata/#dialect-skipColumns"><code>skipColumns</code></a> property of a <a href="http://w3c.github.io/csvw/metadata/#dfn-dialect-description" class="externalDFN">dialect description</a>. The default is <code>0</code>. A value other than <code>0</code> will mean that the <a title="column source number">source numbers</a> of <a title="column">columns</a> will be different from their <a title="column number">numbers</a>.</dd>
+        <dd>The number of columns to skip at the beginning of each row, set by the <a href="http://w3c.github.io/csvw/metadata/#dialect-skipColumns"><code>skipColumns</code></a> property of a <a href="http://w3c.github.io/csvw/metadata/#dfn-dialect-description" class="externalDFN">dialect description</a>. The default is <code>0</code>. A value other than <code>0</code> will mean that the <a title="column source number">source numbers</a> of <a title="column">columns</a> will be different from their <a title="column number">numbers</a>.</dd>
         <dt><dfn>skip rows</dfn></dt>
         <dd>The number of rows to skip at the beginning of the file, before a header row or tabular data, set by the <a href="http://w3c.github.io/csvw/metadata/#dialect-skipRows"><code>skipRows</code></a> property of a <a href="http://w3c.github.io/csvw/metadata/#dfn-dialect-description" class="externalDFN">dialect description</a>. The default is <code>0</code>. A value greater than <code>0</code> will mean that the <a title="row source number">source numbers</a> of <a title="row">rows</a> will be different from their <a title="row number">numbers</a>.</dd>
         <dt><dfn>trim</dfn></dt>
@@ -746,7 +741,6 @@ Content-Type: text/csv;header=absent
             <li>Otherwise, <a title="parse a row">parse the row</a> to provide a <a>list of cell values</a>, and:
               <ol class="algorithm">
                 <li>Remove the first <a>skip columns</a> number of values from the <a>list of cell values</a>.</li>
-                <li>Remove the first <a>header column count</a> number of values from the <a>list of cell values</a>.</li>
                 <li>For each of the remaining values at index <em>i</em> in the <a>list of cell values</a>:
                   <ol class="algorithm">
                     <li>If the value at index <em>i</em> in the <a>list of cell values</a> is an empty string or consists only of whitespace, do nothing.</li>
@@ -781,7 +775,6 @@ Content-Type: text/csv;header=absent
                 </li>
                 <li>Append <em>R</em> to the <a title="table rows">rows</a> of <a>table</a> <em>T</em>.</li>
                 <li>Remove the first <a>skip columns</a> number of values from the <a>list of cell values</a> and add that number to the <a>source column number</a>.</li>
-                <li>Remove the first <a>header column count</a> number of values from the <a>list of cell values</a> and add that number to the <a>source column number</a>.</li>
                 <li>For each of the remaining values at index <em>i</em> in the <a>list of cell values</a> (where <em>i</em> starts at <code>1</code>):
                   <ol class="algorithm">
                     <li>Identify the <a>column</a> <em>C</em> at index <em>i</em> within the <a title="table columns">columns</a> of <a>table</a> <em>T</em>. If there is no such column:
