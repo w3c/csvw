@@ -503,11 +503,18 @@ Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
           <li>For each <a>table</a> in <code>UM<sub>M</sub></code> in order, create one or more <a title="annotated table">annotated tables</a>:
             <ol class="algorithm">
               <li>Extract the <a href="http://w3c.github.io/csvw/metadata/#dialect-descriptions">dialect description</a> (<code>DD</code>) from <code>UM<sub>M</sub></code> for the <a>table</a> associated with the tabular data file. If there is no such dialect description, extract the first available dialect description from a <a>group of tables</a> in which the tabular data file is described. Otherwise use the default dialect description.</li>
-              <li>If the tabular data file was retrieved with <code>Content-Type</code> including the <code>header=absent</code> parameter set <code>header</code> to <code>false</code> in <code>DD</code>.</li>
+              <li>Override default values in <code>DD</code> based on HTTP headers found when retrieving the tabular data file:
+                <ul>
+                  <li>If the media type from the <code>Content-Type</code> header is <code>text/tsv</code>, set <a href="http://w3c.github.io/csvw/metadata/#dialect-delimiter" class="externalDFN">delimiter</a> to <code>TAB</code> in <code>DD</code>.</li>
+                  <li>If the <code>Content-Type</code> header includes the <code>header</code> parameter with a value of <code>absent</code>, set <a href="http://w3c.github.io/csvw/metadata/#dialect-header" class="externalDFN">header</a> to <code>false</code> in <code>DD</code>.</li>
+                  <li>If the <code>Content-Type</code> header includes the <code>charset</code> parameter, set <a href="http://w3c.github.io/csvw/metadata/#dialect-encoding" class="externalDFN">encoding</a> to this value in <code>DD</code>.</li>
+                </ul>
+              </li>
               <li>
                 <p>Parse the tabular data file, using <code>DD</code> as a guide, to create a basic tabular data model (<code>T</code>) and extract <a>embedded metadata</a> (<code>EM</code>), for example from the <a>header line</a>.</p>
                 <p class="note">This specification provides a non-normative definition for parsing CSV-based files, including the extraction of <a>embedded metadata</a>, in <a href="#parsing" class="sectionRef"></a>. This specification does not define any syntax for embedded metadata beyond this; whatever syntax is used, it's assumed that metadata can be mapped to the vocabulary defined in [[!tabular-metadata]].</p>
               </li>
+              <li>If a <code>Content-Language</code> HTTP header was found when retrieving the tabular data file, and the value provides a single language, set the <a href="http://w3c.github.io/csvw/metadata/#cell-language" class="externalDFN">lang</a> inherited property to this value in <code>EM</code>.</li>
               <li>Create the merged metadata <code>M = merge(UM<sub>M</sub>, EM)</code> using the <a href="http://w3c.github.io/csvw/metadata/#dfn-merged" class="externalDFN">merge algorithm</a> defined in [[!tabular-metadata]].</li>
               <li>Use the metadata <code>M</code> to add annotations to the tabular data model <code>T</code> as described in <a href="http://w3c.github.io/csvw/metadata/#annotating-tables">Section 2 Annotating Tables</a> in [[!tabular-metadata]].</li>
             </ol>
