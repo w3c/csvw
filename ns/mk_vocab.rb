@@ -82,7 +82,7 @@ class Vocab
     end
 
     classes.each  do |id, entry|
-      term = entry.fetch(:term, id)
+      term = entry[:term] || id
       context[term] = namespaced(id)
 
       # Class definition
@@ -108,7 +108,7 @@ class Vocab
       defn['@container'] = entry[:@container] if entry[:@container]
       defn['@type'] = entry[:@type] if entry[:@type]
 
-      term = entry.fetch(:term, id)
+      term = entry[:term] || id
       context[term] = defn
 
       # Property definition
