@@ -40,7 +40,7 @@ File: `wx-obs-dec2013-site22580943.json`:
 
     {
        "name": "wx-obs-dec2013-site22580943",
-       "title": "Weather observations for site 22580943 (Exeter Airport, UK)",
+       "titles": "Weather observations for site 22580943 (Exeter Airport, UK)",
        "keywords": [
            "Air temperature",
            "Dew-point temperature",
@@ -58,7 +58,7 @@ File: `wx-obs-dec2013-site22580943.json`:
            "tableSchema": {"columns": [
                {
                    "name": "datetime",
-                   "title": {
+                   "titles": {
                        "en": "Date-time",
                        "fr": "Date et l'heure"
                    },
@@ -69,7 +69,7 @@ File: `wx-obs-dec2013-site22580943.json`:
                },
                {
                    "name": "air-temp",
-                   "title": {
+                   "titles": {
                        "en": "Air temperature (Cel)",
                        "fr": "La température d'air (C)"
                    },
@@ -79,7 +79,7 @@ File: `wx-obs-dec2013-site22580943.json`:
                },
                {
                    "name": "dew-point-temp",
-                   "title": {
+                   "titles": {
                        "en": "Dew-point temperature (Cel)",
                        "fr": "Température du point de rosée (C)"
                    },
@@ -247,7 +247,7 @@ So we might define in the `columns` section of the metadata document a `microsyn
            "columns": [
                {
                    "name": "datetime",
-                   "title": {
+                   "titles": {
                        "en": "Date-time",
                        "fr": "Date et l'heure"
                    },
@@ -305,7 +305,7 @@ with their own unique variable name; e.g.
            "columns": [
                {
                    "name": "datetime",
-                   "title": {
+                   "titles": {
                        "en": "Date-time",
                        "fr": "Date et l'heure"
                    },
