@@ -52,7 +52,7 @@ Here's the metadata description for the resource:
         "name": "US Bureau of Labor Statistics",
         "web": "http://www.bls.gov/ "
     }],
-    "resources": [{
+    "tables": [{
         "name": "soc-2010-csv",
         "path": "soc_structure_2010.csv",
         "tableSchema": {"columns": [
@@ -251,7 +251,7 @@ O*NET-SOC 2010 Code,O*NET-SOC 2010 Title,O*NET-SOC 2010 Description
 
 This time I want to trigger a one template if the Occupation is a main category (e.g. Code = `15-1199.00`), else I want to trigger a different category. A main category is denoted with the final two digits of the code being `00`. 
 
-*(Aside 3: of course, as these two files are likely to be packaged together, I could have had just a single metadata description describing BOTH resources!)*
+*(Aside 3: of course, as these two files are likely to be packaged together, I could have had just a single metadata description describing BOTH tables!)*
 
 Here's the metadata description for the resource:
 
@@ -263,7 +263,7 @@ Here's the metadata description for the resource:
         "name": "O*Net Resource Center",
         "web": " http://www.onetcenter.org/ "
     }],
-    "resources": [{
+    "tables": [{
         "name": "2010_Occupations-csv",
         "path": "2010_Occupations.csv",
         "tableSchema": {"columns": [

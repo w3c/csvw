@@ -51,7 +51,7 @@ File: `wx-obs-dec2013-site22580943.json`:
            "web": "http://www.metoffice.gov.uk"
        }],
        "license": "ogl",
-       "resources": [{
+       "tables": [{
            "name": "wx-obs-dec2013-site22580943",
            "path": "site22580943-2013-dec.csv",
            "modified": "2013-12-31",
