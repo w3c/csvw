@@ -168,7 +168,7 @@
         This section defines an <dfn>annotated tabular data model</dfn>: a model for tables that are annotated with metadata. <dfn title="annotation">Annotations</dfn> provide information about the cells, rows, columns, tables, and groups of tables with which they are associated. The <dfn title="value">values</dfn> of these annotations may be lists, structured objects, or atomic values. <dfn>Core annotations</dfn> are those that affect the behavior of processors defined in this specification, but other annotations may also be present on any of the components of the model.
       </p>
       <p>
-        Annotations may be described directly in [[!tabular-metadata]], be embedded in a tabular data file, or created during the process of generating an <a>annotated table</a>.
+        Annotations may be described directly in [[!tabular-metadata]], be embedded in a <a>tabular data file</a>, or created during the process of generating an <a>annotated table</a>.
       </p>
       <p class="note">
         In this document, the term <a>annotation</a> refers to any metadata associated with an object in the annotated tabular data model. These are not necessarily web annotations in the sense of [[annotation-model]].
@@ -323,18 +323,18 @@
       <ol>
         <li>metadata supplied by the user of the implementation that is processing the tabular data, see <a href="#overriding-metadata" class="sectionRef"></a></li>
         <li>metadata embedded within the <a>tabular data file</a> itself, see <a href="#embedded-metadata" class="sectionRef"></a></li>
-        <li>metadata in a document linked to using a <code>Link</code> header associated with the tabular data file, see <a href="#link-header" class="sectionRef"></a></li>
-        <li>file-specific metadata in a document located based on the location of the tabular data file, see <a href="#standard-file-metadata" class="sectionRef"></a></li>
-        <li>directory-specific metadata in a document located based on the location of the tabular data file, see <a href="#standard-directory-metadata" class="sectionRef"></a></li>
+        <li>metadata in a document linked to using a <code>Link</code> header associated with the <a>tabular data file</a>, see <a href="#link-header" class="sectionRef"></a></li>
+        <li>file-specific metadata in a document located based on the location of the <a>tabular data file</a>, see <a href="#standard-file-metadata" class="sectionRef"></a></li>
+        <li>directory-specific metadata in a document located based on the location of the <a>tabular data file</a>, see <a href="#standard-directory-metadata" class="sectionRef"></a></li>
       </ol>
       <p>
         Processors MUST always use overriding metadata and embedded metadata. If the overriding metadata does not originate from a complete metadata file itself (for example, if it is generated from command-line options when invoking the implementation), processors MUST attempt to locate the first metadata document from the <code>Link</code> header, the file-specific metadata, or the directory-specific metadata. The located metadata from these locations MUST be merged as defined in [[!tabular-metadata]].
       </p>
-      <p>If no metadata is supplied or found, then the following Metadata is used as the default for extracted <a>embedded metadata</a>:</p>
+      <p>If no metadata is supplied or found, then the following Metadata is used as the <dfn>default metadata</dfn>:</p>
       <pre>
 {
   "@type": "TableGroup",
-  "resources": []
+  "tables": []
 }
       </pre>
       <section>
@@ -472,7 +472,7 @@ Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
       <pre class="example highlight" title="Metadata file referencing multiple tabular data files sharing a schema">
 {
   "tableSchema": "government-spending.csv",
-  "resources": [{
+  "tables": [{
     "url": "http://example.org/east-sussex-2015-03.csv",
   }, {
     "url": "http://example.org/east-sussex-2015-02.csv"
@@ -481,7 +481,7 @@ Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
 }
       </pre>
       <p>
-        the validator would validate all the listed resources, using the locally defined schema at <code>government-spending.csv</code>. It would also use the metadata embedded in the referenced CSV files; for example, when processing <code>http://example.org/east-sussex-2015-03.csv</code>, it would use <a>embedded metadata</a> within that file.
+        the validator would validate all the listed tables, using the locally defined schema at <code>government-spending.csv</code>. It would also use the metadata embedded in the referenced CSV files; for example, when processing <code>http://example.org/east-sussex-2015-03.csv</code>, it would use <a>embedded metadata</a> within that file.
       </p>
       <p>
         If a validator is passed a <a>tabular data file</a> <code>http://example.org/east-sussex-2015-03.csv</code>,
@@ -501,6 +501,7 @@ Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
               <li>metadata referenced from a <em>Link Header</em> that may be returned when retrieving the tabular data file (see <a href="#link-header" class="sectionRef"></a>).</li>
               <li>file-specific metadata in a document located based on the location of the tabular data file (see <a href="#standard-file-metadata" class="sectionRef"></a>).</li>
               <li>directory-specific metadata in a document located based on the location of the tabular data file (see <a href="#standard-directory-metadata" class="sectionRef"></a>).</li>
+              <li><a>default metadata</a> as defined in <a href="#locating-metadata" class="sectionRef"></a> with a single <code>tables</code> entry where the <code>url</code> property is set from that of the <a>tabular data file</a>.</li>
             </ol>
           </li>
           <li>Proceed as if the process starts with a metadata file using the merged metadata <code>UM<sub>M</sub> = merge(UM<sub>T</sub>, FM)</code> or <code>UM<sub>T</sub></code> if no <code>FM</code> is loaded.</li>
@@ -511,11 +512,18 @@ Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
           <li>For each <a>table</a> in <code>UM<sub>M</sub></code> in order, create one or more <a title="annotated table">annotated tables</a>:
             <ol class="algorithm">
               <li>Extract the <a href="http://w3c.github.io/csvw/metadata/#dialect-descriptions">dialect description</a> (<code>DD</code>) from <code>UM<sub>M</sub></code> for the <a>table</a> associated with the tabular data file. If there is no such dialect description, extract the first available dialect description from a <a>group of tables</a> in which the tabular data file is described. Otherwise use the default dialect description.</li>
-              <li>If the tabular data file was retrieved with <code>Content-Type</code> including the <code>header=absent</code> parameter set <code>header</code> to <code>false</code> in <code>DD</code>.</li>
+              <li>If using the default <a href="http://w3c.github.io/csvw/metadata/#dialect-descriptions">dialect description</a>, override default values in <code>DD</code> based on HTTP headers found when retrieving the tabular data file:
+                <ul>
+                  <li>If the media type from the <code>Content-Type</code> header is <code>text/tsv</code>, set <a href="http://w3c.github.io/csvw/metadata/#dialect-delimiter" class="externalDFN">delimiter</a> to <code>TAB</code> in <code>DD</code>.</li>
+                  <li>If the <code>Content-Type</code> header includes the <code>header</code> parameter with a value of <code>absent</code>, set <a href="http://w3c.github.io/csvw/metadata/#dialect-header" class="externalDFN">header</a> to <code>false</code> in <code>DD</code>.</li>
+                  <li>If the <code>Content-Type</code> header includes the <code>charset</code> parameter, set <a href="http://w3c.github.io/csvw/metadata/#dialect-encoding" class="externalDFN">encoding</a> to this value in <code>DD</code>.</li>
+                </ul>
+              </li>
               <li>
                 <p>Parse the tabular data file, using <code>DD</code> as a guide, to create a basic tabular data model (<code>T</code>) and extract <a>embedded metadata</a> (<code>EM</code>), for example from the <a>header line</a>.</p>
                 <p class="note">This specification provides a non-normative definition for parsing CSV-based files, including the extraction of <a>embedded metadata</a>, in <a href="#parsing" class="sectionRef"></a>. This specification does not define any syntax for embedded metadata beyond this; whatever syntax is used, it's assumed that metadata can be mapped to the vocabulary defined in [[!tabular-metadata]].</p>
               </li>
+              <li>If a <code>Content-Language</code> HTTP header was found when retrieving the tabular data file, and the value provides a single language, set the <a href="http://w3c.github.io/csvw/metadata/#cell-language" class="externalDFN">lang</a> inherited property to this value in <code>EM</code>.</li>
               <li>Create the merged metadata <code>M = merge(UM<sub>M</sub>, EM)</code> using the <a href="http://w3c.github.io/csvw/metadata/#dfn-merged" class="externalDFN">merge algorithm</a> defined in [[!tabular-metadata]].</li>
               <li>Use the metadata <code>M</code> to add annotations to the tabular data model <code>T</code> as described in <a href="http://w3c.github.io/csvw/metadata/#annotating-tables">Section 2 Annotating Tables</a> in [[!tabular-metadata]].</li>
             </ol>
@@ -1141,11 +1149,11 @@ Content-Type: text/csv;header=absent
   "url": "http://example.org/tree-ops.csv",
   "tableSchema": {
     "columns": [
-      {"title": [ "GID" ]},
-      {"title": [ "On Street" ]},
-      {"title": [ "Species" ]},
-      {"title": [ "Trim Cycle" ]},
-      {"title": [ "Inventory Date" ]}
+      {"titles": [ "GID" ]},
+      {"titles": [ "On Street" ]},
+      {"titles": [ "Species" ]},
+      {"titles": [ "Trim Cycle" ]},
+      {"titles": [ "Inventory Date" ]}
     ]
   }
 }
@@ -1239,23 +1247,23 @@ data.parse({
   "tableSchema": {
     "columns": [{
       "name": "GID", 
-      "title": "GID", 
+      "titles": "GID", 
       "datatype": "string"
     }, {
       "name": "on_street", 
-      "title": "On Street", 
+      "titles": "On Street", 
       "datatype": "string"
     }, {
       "name": "species", 
-      "title": "Species", 
+      "titles": "Species", 
       "datatype": "string"
     }, {
       "name": "trim_cycle", 
-      "title": "Trim Cycle", 
+      "titles": "Trim Cycle", 
       "datatype": "string"
     }, {
       "name": "inventory_date",
-      "title": "Inventory Date",
+      "titles": "Inventory Date",
       "datatype": {
         "base": "date", 
         "format": "M/d/yyyy"
@@ -1570,23 +1578,23 @@ GID,On Street,Species,Trim Cycle,Inventory Date
   "tableSchema": {
     "columns": [{
       "name": "GID",
-      "title": "GID",
+      "titles": "GID",
       "datatype": "string",
     }, {
       "name": "on_street",
-      "title": "On Street",
+      "titles": "On Street",
       "datatype": "string"
     }, {
       "name": "species",
-      "title": "Species",
+      "titles": "Species",
       "datatype": "string"
     }, {
       "name": "trim_cycle",
-      "title": "Trim Cycle",
+      "titles": "Trim Cycle",
       "datatype": "string"
     }, {
       "name": "inventory_date",
-      "title": "Inventory Date",
+      "titles": "Inventory Date",
       "datatype": {
         "base": "date", 
         "format": "M/d/yyyy"
@@ -1700,11 +1708,11 @@ UNICEF,Education,Teacher training,Chocó,Bojayá
 {
   "tableSchema": {
     "columns": [
-      { "title": ["Organisation", "#org"] }, 
-      { "title": ["Sector", "#sector"] }, 
-      { "title": ["Subsector", "#subsector"] }, 
-      { "title": ["Department", "#adm1"] }, 
-      { "title": ["Municipality", "#adm2"] }, 
+      { "titles": ["Organisation", "#org"] }, 
+      { "titles": ["Sector", "#sector"] }, 
+      { "titles": ["Subsector", "#subsector"] }, 
+      { "titles": ["Department", "#adm1"] }, 
+      { "titles": ["Municipality", "#adm2"] }, 
     ]
   }
 }
@@ -1716,11 +1724,11 @@ UNICEF,Education,Teacher training,Chocó,Bojayá
 {
   "tableSchema": {
     "columns": [
-      { "name": "org", "title": #org" }, 
-      { "name": "sector", "title": #sector" }, 
-      { "name": "subsector", "title": #subsector" }, 
-      { "name": "adm1", "title": #adm1" }, 
-      { "name": "adm2", "title": #adm2" }, 
+      { "name": "org", "titles": #org" }, 
+      { "name": "sector", "titles": #sector" }, 
+      { "name": "subsector", "titles": #subsector" }, 
+      { "name": "adm1", "titles": #adm1" }, 
+      { "name": "adm2", "titles": #adm2" }, 
     ]
   }
 }
@@ -1839,7 +1847,7 @@ TEXTDATA =  %x20-21 / %x23-2B / %x2D-7E
               </ul>
             </li>
             <li><p>Rows in the file MUST NOT contain more fields than are in the header row (though they may contain less).</p></li>
-            <li><p>Each file MUST have an entry in the <code>resources</code> array in the <code>datapackage.json</code> file.</p></li>
+            <li><p>Each file MUST have an entry in the <code>tables</code> array in the <code>datapackage.json</code> file.</p></li>
             <li><p>The resource metadata MUST include a <code>tableSchema</code> attribute whose value MUST be a valid <a href="http://w3c.github.io/csvw/metadata/#dfn-schema-description" class="externalDFN">schema description</a>.</p></li>
             <li><p>All fields in the CSV files MUST be described in the <a href="http://w3c.github.io/csvw/metadata/#dfn-schema-description" class="externalDFN">schema description</a>.</p></li>
           </ul>
