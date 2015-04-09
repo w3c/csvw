@@ -939,7 +939,7 @@
       <section id="example-events-listing">
         <h3>Example with single table and using <em>virtual columns</em> to produce multiple subjects per row</h3>
         <p>
-          This example uses a single <a>annotated table</a> describing a listing of music events. Each <a>row</a> from the tabular data file corresponds to three resources; the music event itself, the location where that event occurs and the offer to sell tickets for that event. The goal is to convert the CSV content into <a href="http://schema.org">schema.org</a> markup that a search engine such as <a href="http://www.google.com">Google</a>can use to index music events. Details of how Google expects this information to be structured can be found <a href="https://support.google.com/webmasters/answer/4620133?hl=en">here</a>.
+          This example uses a single <a>annotated table</a> describing a listing of music events. Each <a>row</a> from the tabular data file corresponds to three resources; the music event itself, the location where that event occurs and the offer to sell tickets for that event. The goal is to convert the CSV content into <a href="http://schema.org">schema.org</a> markup that a search engine such as <a href="http://www.google.com">Google</a> can use to index music events. Details of how Google expects this information to be structured can be found <a href="https://support.google.com/webmasters/answer/4620133?hl=en">here</a>.
         </p>
         <p> 
           The input tabular data file, published at <code>http://example.org/events-listing.csv</code>, and the associated metadata description <code>http://example.org/events-listing.csv-metadata.json</code> are provided below:
@@ -1082,19 +1082,33 @@
       </section>
 
       <section id="example-public-sector-roles-and-salaries">
-        <h3>Example with table group comprising three interrelated tables</h3>
+        <h3>Example with table group comprising four interrelated tables</h3>
         <p>
-          This example is based on <a href="http://w3c.github.io/csvw/use-cases-and-requirements/#UC-OrganogramData">Use Case #4 - Publication of public sector roles and salaries</a> and uses three <a title="annotated table">annotated tables</a> published within a <a>table group</a>. Information about senior roles and junior roles within a government department are published in CSV format by each department. These are validated against a centrally published <a href="http://w3c.github.io/csvw/metadata/#dfn-tableschema" class="externalDFN">schema</a> to ensure that all the data published by departments is consistent. Additionally, a list of professions is also published centrally, providing a <em>controlled vocabulary</em> against which departmental submissions are validated.
+          This example is based on <a href="http://w3c.github.io/csvw/use-cases-and-requirements/#UC-OrganogramData">Use Case #4 - Publication of public sector roles and salaries</a> and uses four <a title="annotated table">annotated tables</a> published within a <a>table group</a>. Information about senior roles and junior roles within a government department or organization are published in CSV format by each department. These are validated against a centrally published <a href="http://w3c.github.io/csvw/metadata/#dfn-tableschema" class="externalDFN">schema</a> to ensure that all the data published by departments is consistent. Additionally, lists of organizations and professions are also published centrally, providing <em>controlled vocabularies</em> against which departmental submissions are validated.
+        </p>
+
+        <p>
+          Information published about junior and senior roles provides summary information for each post within the government department or organization. Whilst the junior role information is anonymous, providing only an indication of the number of full-time-equivalent (FTE) staff occupying a given post, the senior role information specifies the named individual occupying each post. As such, each <a>row</a> from the tabular data file describing senior roles corresponds to two resources; the <em>post</em> and the <em>person</em> occupying that post.
+        </p>
+
+        <p>
+          This example is concerned only with converting the information provided each government department or organization not the centrally published information listing organizations and professions.
         </p>
 
         <p> 
           The input tabular data files and associated metadata descriptions are provided below:
         </p>
         <pre class="example"
-             id="example-public-sector-roles-and-salaries-csv+-professions"
-             data-include="../examples/gov.uk/professions.csv"
+             id="example-public-sector-roles-and-salaries-csv+-organizations"
+             data-include="../examples/gov.uk/data/organizations.csv"
              data-oninclude="updateExample"
-             title="http://example.org/gov.uk/professions.csv">
+             title="http://example.org/gov.uk/data/organizations.csv">
+        </pre>
+        <pre class="example"
+             id="example-public-sector-roles-and-salaries-csv+-professions"
+             data-include="../examples/gov.uk/data/professions.csv"
+             data-oninclude="updateExample"
+             title="http://example.org/gov.uk/data/professions.csv">
         </pre>
         <pre class="example"
              id="example-public-sector-roles-and-salaries-csv+-senior-roles"
@@ -1115,34 +1129,50 @@
              title="http://example.org/metadata.json">
         </pre>
         <pre class="example highlight"
-             id="example-public-sector-roles-and-salaries-metadata-senior"
-             data-include="../examples/senior-roles.json"
+             id="example-public-sector-roles-and-salaries-metadata-organizations"
+             data-include="../examples/gov.uk/schema/organizations.json"
              data-oninclude="updateExample"
-             title="http://example.org/senior-roles.json">
+             title="http://example.org/gov.uk/schema/organizations.json">
+        </pre>
+        <pre class="example highlight"
+             id="example-public-sector-roles-and-salaries-metadata-professions"
+             data-include="../examples/gov.uk/schema/professions.json"
+             data-oninclude="updateExample"
+             title="http://example.org/gov.uk/schema/professions.json">
+        </pre>
+        <pre class="example highlight"
+             id="example-public-sector-roles-and-salaries-metadata-senior"
+             data-include="../examples/gov.uk/schema/senior-roles.json"
+             data-oninclude="updateExample"
+             title="http://example.org/gov.uk/schema/senior-roles.json">
         </pre>
         <pre class="example highlight"
              id="example-public-sector-roles-and-salaries-metadata-junior"
-             data-include="../examples/junior-roles.json"
+             data-include="../examples/gov.uk/schema/junior-roles.json"
              data-oninclude="updateExample"
-             title="http://example.org/junior-roles.json">
+             title="http://example.org/gov.uk/schema/junior-roles.json">
         </pre>
 
-        <p class="note">In this example, the resource <code>gov.uk/professions.csv</code> is identified using a relative URL to host <code>http://example.org</code>. In reality this resource would be published centrally by government and served from some remote host. Similarly, the metadata description resource <code>metadata.json</code> would be also be centrally published. Government departments seeking to validate their role and salary data would download a copy of this metadata description and place it, without modification, in the same directory as their tabular data files whose names MUST match those specified in the metadata description; <code>senior-roles.csv</code> and <code>junior-roles.csv</code>.</p>
+        <div class="note">
+          <p>This example makes extensive use of the <code>example.org</code> domain. As described in [[RFC6761]], this domain is used for illustrative examples within documentation. In reality, the resources described here with the URL path <code>/gov.uk</code> would be centrally published by the UK Government at, say, the domain <code>data.gov.uk</code>.</p>
+          <p>Given that these resources are centrally published with an aspiration for reuse, the <a href="http://w3c.github.io/csvw/metadata/#dfn-tableschema" class="externalDFN">table schema</a> descriptions have been factored out into separate resources. As such, the top-level metadata description resource <code>metadata.json</code> simply provides the list of <a href="http://w3c.github.io/csvw/syntax/#dfn-table" class="externalDFN">tables</a> and binds each of them to the appropriate <a href="http://w3c.github.io/csvw/metadata/#dfn-tableschema" class="externalDFN">table schema</a> that is defined elsewhere.</p>
+          <p>Finally, note that because the centrally published metadata descriptions are intended to be reused across many government departments and organizations, extra consideration has been given to defining URIs for the <em>person</em> and <em>post</em> resources defined in each row of the senior roles tabular data and subsequently referenced from the junior roles tabular data. To ensure that naming clashes are avoided, the unique reference for the organization to which the <em>person</em> or <em>post</em> belongs has been included in a path segment of the identifier. For example, the <a href="http://w3c.github.io/csvw/metadata/#dfn-uri-template-property">URI template property</a> <a href="http://w3c.github.io/csvw/metadata/#cell-aboutUrl"><code>aboutUrl</code></a> used to identify the senior <em>post</em> is specified as <code>http://example.org/organization/{organizationRef}/post/{ref}</code>, thus yielding the URI <code>http://example.org/organization/hefce.ac.uk/post/90115</code> for the <em>post</em> described in the first <a>row</a> of the senior roles tabular data.</p>
+        </div>
 
         <p>The <a>table group</a> generated from parsing the tabular data files and associated metadata is shown below and provides the basis for the conversion to JSON.</p>
 
         <button class="toggle" data-toggle-target="ex-groups-annotation">empty</button>
         <div id="ex-groups-annotation" class="to-toggle">
-          <p>Annotations for the <a>table group</a> <var>G</var> and the three <a title="annotated table">tables</a> <var>Ta</var>, <var>Tb</var>, and <var>Tc</var> are shown below.</p>
+          <p>Annotations for the <a>table group</a> <var>G</var> and the four <a title="annotated table">tables</a> <var>Ta</var>, <var>Tb</var>, <var>Tc</var>, and <var>Td</var> are shown below.</p>
 
           <p><a title="table group">Table Group</a> annotations:</p>
           <table>
             <thead>
-              <tr><th rowspan="2">id</th><th>core annotations</th><th rowspan="2" colspan="2">annotations</th></tr>
-              <tr><th><code>tables</code></th>
+              <tr><th rowspan="2">id</th><th>core annotations</th><th>annotations</th></tr>
+              <tr><th><code>tables</code></th><th><code>@type</code></th></tr>
             </thead>
             <tbody>
-              <tr><td><var>G</var></td><td><var>Ta</var>, <var>Tb</var>, <var>Tc</var></td><td><strong><code>@type</code></strong></td><td><code>TableGroup</code></td></tr>
+              <tr><td><var>G</var></td><td><var>Ta</var>, <var>Tb</var>, <var>Tc</var>, <var>Td</var></td><td><code>TableGroup</code></td></tr>
             </tbody>
           </table>
 
@@ -1154,45 +1184,58 @@
               <tr><th><code>columns</code></th><th><code>reference</code></th></tr>
             </thead>
             <tbody>
-              <tr><td><var>Ta</var></td><td><code>http://example.org/gov.uk/professions.csv</code></td><td><var>Ca1</var></td><td><var>Ra1</var>, <var>Ra2</var>, <var>Ra3</var>, <var>Ra4</var></td><td><var>Ca1</var></td><td><code>true</code></td><td></td><td></td></tr>
+              <tr><td><var>Ta</var></td><td><code>http://example.org/gov.uk/data/organizations.csv</code></td><td><var>Ca1</var>, <var>Ca2</var>, <var>Ca3</var></td><td><var>Ra1</var>, <var>Ra2</var></td><td><var>Ca1</var></td><td><code>true</code></td><td><var>Ca3</var></td><td><var>Ca1</var></td></tr>
 
-              <tr><td><var>Tb</var></td><td><code>http://example.org/senior-roles.csv</code></td><td><var>Cb1</var>, <var>Cb2</var>, <var>Cb3</var>, <var>Cb4</var>, <var>Cb5</var>, <var>Cb6</var></td><td><var>Rb1</var>, <var>Rb2</var></td><td><var>Cb1</var></td><td></td><td><var>Cb5</var></td><td><var>Cb1</var></td></tr>
-              <tr><td></td><td></td><td></td><td></td><td></td><td></td><td><var>Cb6</var></td><td><var>Ca1</var></td></tr>
-              
-              <tr><td><var>Tc</var></td><td><code>http://example.org/junior-roles.csv</code></td><td><var>Cc1</var>, <var>Cc2</var>, <var>Cc3</var>, <var>Cc4</var>, <var>Cc5</var>, <var>Cc6</var>, <var>Cc7</var></td><td><var>Rc1</var>, <var>Rc2</var></td><td></td><td></td><td><var>Cc1</var></td><td><var>Cb1</var></td></tr>
+              <tr><td><var>Tb</var></td><td><code>http://example.org/gov.uk/data/professions.csv</code></td><td><var>Cb1</var></td><td><var>Rb1</var>, <var>Rb2</var>, <var>Rb3</var>, <var>Rb4</var></td><td><var>Cb1</var></td><td><code>true</code></td><td></td><td></td></tr>
+
+              <tr><td><var>Tc</var></td><td><code>http://example.org/senior-roles.csv</code></td><td><var>Cc1</var>, <var>Cc2</var>, <var>Cc3</var>, <var>Cc4</var>, <var>Cc5</var>, <var>Cc6</var>, <var>Cc7</var>, <var>Cc8</var></td><td><var>Rc1</var>, <var>Rc2</var></td><td><var>Cc1</var></td><td></td><td><var>Cc5</var></td><td><var>Cc1</var></td></tr>
+              <tr><td></td><td></td><td></td><td></td><td></td><td></td><td><var>Cc6</var></td><td><var>Cb1</var></td></tr>
               <tr><td></td><td></td><td></td><td></td><td></td><td></td><td><var>Cc7</var></td><td><var>Ca1</var></td></tr>
+              
+              <tr><td><var>Td</var></td><td><code>http://example.org/junior-roles.csv</code></td><td><var>Cd1</var>, <var>Cd2</var>, <var>Cd3</var>, <var>Cd4</var>, <var>Cd5</var>, <var>Cd6</var>, <var>Cd7</var>, <var>Cd8</var></td><td><var>Rd1</var>, <var>Rd2</var></td><td></td><td></td><td><var>Cd1</var></td><td><var>Cc1</var></td></tr>
+              <tr><td></td><td></td><td></td><td></td><td></td><td></td><td><var>Cd7</var></td><td><var>Cb1</var></td></tr>
+              <tr><td></td><td></td><td></td><td></td><td></td><td></td><td><var>Cd8</var></td><td><var>Ca1</var></td></tr>
             </tbody>
           </table>
 
-          <p class="note">In this example, output for the centrally published list of professions, table <var>Ta</var> (<code>http://example.org/gov.uk/professions.csv</code>), is not required; only information from the departmental submissions is to be translated to JSON. Note the <a href="http://w3c.github.io/csvw/metadata/#table-suppressOutput"><code>suppressOutput</code></a> annotation on this <a title="annotated table">table</a>.</p>
+          <p class="note">In this example, output for the centrally published lists of organizations and professions, tables <var>Ta</var> and <var>Tb</var> (<code>http://example.org/gov.uk/data/organizations.csv</code> and <code>http://example.org/gov.uk/data/professions.csv</code> respectively), are not required; only information from the departmental submissions is to be translated to JSON. Note the <a href="http://w3c.github.io/csvw/metadata/#table-suppressOutput"><code>suppressOutput</code></a> annotation on this <a title="annotated table">table</a>.</p>
 
           <p>Annotations for the <a title="column">columns</a>, <a title="row">rows</a> and <a title="cell">cells</a> in <a title="annotated table">table</a> <var>T</var> are shown in the tables below.</p>
 
           <p><a title="column">Column</a> annotations:</p>
           <table style="width: 100%; text-align: left">
             <thead>
-              <tr><th rowspan="2">id</th><th colspan="4">core annotations</th><th colspan="3">annotations</th></tr>
-              <tr><th>table</th><th>number</th><th>source number</th><th>cells</th><th><code>name</code></th><th><code>titles</code></th></tr>
+              <tr><th rowspan="2">id</th><th colspan="4">core annotations</th><th colspan="4">annotations</th></tr>
+              <tr><th>table</th><th>number</th><th>source number</th><th>cells</th><th><code>name</code></th><th><code>titles</code></th><th><code>required</code></th><th><code>virtual</code></th></tr>
             </thead>
             <tbody>
-              <tr><td><var>Ca1</var></td><td><var>Ta</var></td><td>1</td><td>1</td><td><var>Ca1.1</var>, <var>Ca2.1</var>, <var>Ca3.1</var>, <var>Ca4.1</var></td><td><code>name</code></td><td><code>Profession</code></td></tr>
+              <tr><td><var>Ca1</var></td><td><var>Ta</var></td><td>1</td><td>1</td><td><var>Ca1.1</var>, <var>Ca2.1</var></td><td><code>ref</code></td><td><code>Organization Unique Reference</code></td><td><code>true</code></td><td></td></tr>
+              <tr><td><var>Ca2</var></td><td><var>Ta</var></td><td>1</td><td>1</td><td><var>Ca1.2</var>, <var>Ca2.2</var></td><td><code>name</code></td><td><code>Organization Name</code></td><td></td><td></td></tr>
+              <tr><td><var>Ca3</var></td><td><var>Ta</var></td><td>1</td><td>1</td><td><var>Ca1.3</var>, <var>Ca2.3</var></td><td><code>department</code></td><td><code>Department Reference</code></td><td></td><td></td></tr>
 
-              <tr><td><var>Cb1</var></td><td><var>Tb</var></td><td>1</td><td>1</td><td><var>Cb1.1</var>, <var>Cb2.1</var></td><td><code>ref</code></td><td><code>Post Unique Reference</code></td></tr>
-              <tr><td><var>Cb2</var></td><td><var>Tb</var></td><td>2</td><td>2</td><td><var>Cb1.2</var>, <var>Cb2.2</var></td><td><code>name</code></td><td><code>Name</code></td></tr>
-              <tr><td><var>Cb3</var></td><td><var>Tb</var></td><td>3</td><td>3</td><td><var>Cb1.3</var>, <var>Cb2.3</var></td><td><code>grade</code></td><td><code>Grade</code></td></tr>
-              <tr><td><var>Cb4</var></td><td><var>Tb</var></td><td>4</td><td>4</td><td><var>Cb1.4</var>, <var>Cb2.4</var></td><td><code>job</code></td><td><code>Job Title</code></td></tr>
-              <tr><td><var>Cb5</var></td><td><var>Tb</var></td><td>5</td><td>5</td><td><var>Cb1.5</var>, <var>Cb2.5</var></td><td><code>reportsTo</code></td><td><code>Reports to Senior Post</code></td></tr>
-              <tr><td><var>Cb6</var></td><td><var>Tb</var></td><td>6</td><td>6</td><td><var>Cb1.6</var>, <var>Cb2.6</var></td><td><code>profession</code></td><td><code>Profession</code></td></tr>
+              <tr><td><var>Cb1</var></td><td><var>Tb</var></td><td>1</td><td>1</td><td><var>Cb1.1</var>, <var>Cb2.1</var>, <var>Cb3.1</var>, <var>Cb4.1</var></td><td><code>name</code></td><td><code>Profession</code></td><td><code>true</code></td><td></td></tr>
 
-              <tr><td><var>Cc1</var></td><td><var>Tc</var></td><td>1</td><td>1</td><td><var>Cc1.1</var>, <var>Cc2.1</var></td><td><code>reportsToSenior</code></td><td><code>Reporting Senior Post</code></td><td></td></tr>
-              <tr><td><var>Cc2</var></td><td><var>Tc</var></td><td>2</td><td>2</td><td><var>Cc1.2</var>, <var>Cc2.2</var></td><td><code>grade</code></td><td><code>Grade</code></td></tr>
-              <tr><td><var>Cc3</var></td><td><var>Tc</var></td><td>3</td><td>3</td><td><var>Cc1.3</var>, <var>Cc2.3</var></td><td><code>min_pay</code></td><td><code>Payscale Minimum (£)</code></td></tr>
-              <tr><td><var>Cc4</var></td><td><var>Tc</var></td><td>4</td><td>4</td><td><var>Cc1.4</var>, <var>Cc2.4</var></td><td><code>max_pay</code></td><td><code>Payscale Maximum (£)</code></td></tr>
-              <tr><td><var>Cc5</var></td><td><var>Tc</var></td><td>5</td><td>5</td><td><var>Cc1.5</var>, <var>Cc2.5</var></td><td><code>job</code></td><td><code>Generic Job Title</code></td></tr>
-              <tr><td><var>Cc6</var></td><td><var>Tc</var></td><td>6</td><td>6</td><td><var>Cc1.6</var>, <var>Cc2.6</var></td><td><code>number</code></td><td><code>Number of Posts (FTE)</code></td></tr>
-              <tr><td><var>Cc7</var></td><td><var>Tc</var></td><td>7</td><td>7</td><td><var>Cc1.7</var>, <var>Cc2.7</var></td><td><code>profession</code></td><td><code>Profession</code></td></tr>
+              <tr><td><var>Cc1</var></td><td><var>Tc</var></td><td>1</td><td>1</td><td><var>Cc1.1</var>, <var>Cc2.1</var></td><td><code>ref</code></td><td><code>Post Unique Reference</code></td><td><code>true</code></td><td></td></tr>
+              <tr><td><var>Cc2</var></td><td><var>Tc</var></td><td>2</td><td>2</td><td><var>Cc1.2</var>, <var>Cc2.2</var></td><td><code>name</code></td><td><code>Name</code></td><td></td><td></td></tr>
+              <tr><td><var>Cc3</var></td><td><var>Tc</var></td><td>3</td><td>3</td><td><var>Cc1.3</var>, <var>Cc2.3</var></td><td><code>grade</code></td><td><code>Grade</code></td><td></td><td></td></tr>
+              <tr><td><var>Cc4</var></td><td><var>Tc</var></td><td>4</td><td>4</td><td><var>Cc1.4</var>, <var>Cc2.4</var></td><td><code>job</code></td><td><code>Job Title</code></td><td></td><td></td></tr>
+              <tr><td><var>Cc5</var></td><td><var>Tc</var></td><td>5</td><td>5</td><td><var>Cc1.5</var>, <var>Cc2.5</var></td><td><code>reportsTo</code></td><td><code>Reports to Senior Post</code></td><td></td><td></td></tr>
+              <tr><td><var>Cc6</var></td><td><var>Tc</var></td><td>6</td><td>6</td><td><var>Cc1.6</var>, <var>Cc2.6</var></td><td><code>profession</code></td><td><code>Profession</code></td><td></td><td></td></tr>
+              <tr><td><var>Cc7</var></td><td><var>Tc</var></td><td>7</td><td>7</td><td><var>Cc1.7</var>, <var>Cc2.7</var></td><td><code>organizationRef</code></td><td><code>Organization Reference</code></td><td><code>true</code></td><td></td></tr>
+              <tr><td><var>Cc8</var></td><td><var>Tc</var></td><td>8</td><td>8</td><td><var>Cc1.8</var>, <var>Cc2.8</var></td><td><code>post_holder</code></td><td></td><td></td><td><code>true</code></td></tr>
+
+              <tr><td><var>Cd1</var></td><td><var>Td</var></td><td>1</td><td>1</td><td><var>Cd1.1</var>, <var>Cd2.1</var></td><td><code>reportsToSenior</code></td><td><code>Reporting Senior Post</code></td><td><code>true</code></td><td></td></tr>
+              <tr><td><var>Cd2</var></td><td><var>Td</var></td><td>2</td><td>2</td><td><var>Cd1.2</var>, <var>Cd2.2</var></td><td><code>grade</code></td><td><code>Grade</code></td><td></td><td></td></tr>
+              <tr><td><var>Cd3</var></td><td><var>Td</var></td><td>3</td><td>3</td><td><var>Cd1.3</var>, <var>Cd2.3</var></td><td><code>min_pay</code></td><td><code>Payscale Minimum (£)</code></td><td></td><td></td></tr>
+              <tr><td><var>Cd4</var></td><td><var>Td</var></td><td>4</td><td>4</td><td><var>Cd1.4</var>, <var>Cd2.4</var></td><td><code>max_pay</code></td><td><code>Payscale Maximum (£)</code></td><td></td><td></td></tr>
+              <tr><td><var>Cd5</var></td><td><var>Td</var></td><td>5</td><td>5</td><td><var>Cd1.5</var>, <var>Cd2.5</var></td><td><code>job</code></td><td><code>Generic Job Title</code></td><td></td><td></td></tr>
+              <tr><td><var>Cd6</var></td><td><var>Td</var></td><td>6</td><td>6</td><td><var>Cd1.6</var>, <var>Cd2.6</var></td><td><code>number</code></td><td><code>Number of Posts (FTE)</code></td><td></td><td></td></tr>
+              <tr><td><var>Cd7</var></td><td><var>Td</var></td><td>7</td><td>7</td><td><var>Cd1.7</var>, <var>Cd2.7</var></td><td><code>profession</code></td><td><code>Profession</code></td><td></td><td></td></tr>
+              <tr><td><var>Cd8</var></td><td><var>Td</var></td><td>8</td><td>8</td><td><var>Cd1.8</var>, <var>Cd2.8</var></td><td><code>organizationRef</code></td><td><code>Organization Reference</code></td><td><code>true</code></td><td></td></tr>
             </tbody>
           </table>
+
+          <p class="note"><a title="column">Column</a> <var>Cc8</var>, with the <a href="http://w3c.github.io/csvw/metadata/#column-virtual"><code>virtual</code></a> annotation specified as <var>true</var>, is used to relate the <em>person</em> resource, whose name is provided in <a>column</a> <var>Cc2</var>, to the associated <em>post</em> resource within the current <a>row</a> of <a title="annotated table">table</a> <var>Tc</var> (<code>{ "url": "http://example.org/senior-roles.csv" }</code>).</p>
 
           <p><a title="row">Row</a> annotations:</p>
           <table style="width: 100%; text-align: left">
@@ -1201,16 +1244,19 @@
               <tr><th>table</th><th>number</th><th>source number</th><th>cells</th></tr>
             </thead>
             <tbody>
-              <tr><td><var>Ra1</var></td><td><var>Ta</var></td><td>1</td><td>2</td><td><var>Ca1.1</var></td></tr>
-              <tr><td><var>Ra2</var></td><td><var>Ta</var></td><td>2</td><td>3</td><td><var>Ca2.1</var></td></tr>
-              <tr><td><var>Ra3</var></td><td><var>Ta</var></td><td>3</td><td>4</td><td><var>Ca3.1</var></td></tr>
-              <tr><td><var>Ra4</var></td><td><var>Ta</var></td><td>4</td><td>5</td><td><var>Ca4.1</var></td></tr>
+              <tr><td><var>Ra1</var></td><td><var>Ta</var></td><td>1</td><td>2</td><td><var>Ca1.1</var>, <var>Ca1.2</var>, <var>Ca1.3</var></td></tr>
+              <tr><td><var>Ra2</var></td><td><var>Ta</var></td><td>2</td><td>3</td><td><var>Ca2.1</var>, <var>Ca2.2</var>, <var>Ca2.3</var></td></tr>
 
-              <tr><td><var>Rb1</var></td><td><var>Tb</var></td><td>1</td><td>2</td><td><var>Cb1.1</var>, <var>Cb1.2</var>, <var>Cb1.3</var>, <var>Cb1.4</var>, <var>Cb1.5</var>, <var>Cb1.6</var></td></tr>
-              <tr><td><var>Rb2</var></td><td><var>Tb</var></td><td>2</td><td>3</td><td><var>Cb2.1</var>, <var>Cb2.2</var>, <var>Cb2.3</var>, <var>Cb2.4</var>, <var>Cb2.5</var>, <var>Cb2.6</var></td></tr>
+              <tr><td><var>Rb1</var></td><td><var>Tb</var></td><td>1</td><td>2</td><td><var>Cb1.1</var></td></tr>
+              <tr><td><var>Rb2</var></td><td><var>Tb</var></td><td>2</td><td>3</td><td><var>Cb2.1</var></td></tr>
+              <tr><td><var>Rb3</var></td><td><var>Tb</var></td><td>3</td><td>4</td><td><var>Cb3.1</var></td></tr>
+              <tr><td><var>Rb4</var></td><td><var>Tb</var></td><td>4</td><td>5</td><td><var>Cb4.1</var></td></tr>
 
-              <tr><td><var>Rc1</var></td><td><var>Tc</var></td><td>1</td><td>2</td><td><var>Cc1.1</var>, <var>Cc1.2</var>, <var>Cc1.3</var>, <var>Cc1.4</var>, <var>Cc1.5</var>, <var>Cc1.6</var>, <var>Cc1.7</var></td></tr>
-              <tr><td><var>Rc2</var></td><td><var>Tc</var></td><td>2</td><td>3</td><td><var>Cc2.1</var>, <var>Cc2.2</var>, <var>Cc2.3</var>, <var>Cc2.4</var>, <var>Cc2.5</var>, <var>Cc2.6</var>, <var>Cc2.7</var></td></tr>
+              <tr><td><var>Rc1</var></td><td><var>Tc</var></td><td>1</td><td>2</td><td><var>Cc1.1</var>, <var>Cc1.2</var>, <var>Cc1.3</var>, <var>Cc1.4</var>, <var>Cc1.5</var>, <var>Cc1.6</var>, <var>Cc1.7</var>, <var>Cc1.8</var></td></tr>
+              <tr><td><var>Rc2</var></td><td><var>Tc</var></td><td>2</td><td>3</td><td><var>Cc2.1</var>, <var>Cc2.2</var>, <var>Cc2.3</var>, <var>Cc2.4</var>, <var>Cc2.5</var>, <var>Cc2.6</var>, <var>Cc2.7</var>, <var>Cc2.8</var></td></tr>
+
+              <tr><td><var>Rd1</var></td><td><var>Td</var></td><td>1</td><td>2</td><td><var>Cd1.1</var>, <var>Cd1.2</var>, <var>Cd1.3</var>, <var>Cd1.4</var>, <var>Cd1.5</var>, <var>Cd1.6</var>, <var>Cd1.7</var>, <var>Cd1.8</var></td></tr>
+              <tr><td><var>Rd2</var></td><td><var>Td</var></td><td>2</td><td>3</td><td><var>Cd2.1</var>, <var>Cd2.2</var>, <var>Cd2.3</var>, <var>Cd2.4</var>, <var>Cd2.5</var>, <var>Cd2.6</var>, <var>Cd2.7</var>, <var>Cd2.8</var></td></tr>
             </tbody>
           </table>
 
@@ -1221,49 +1267,63 @@
               <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th><th>errors</th><th><code>datatype</code></th><th><code>aboutUrl</code></th><th><code>propertyUrl</code></th><th><code>valueUrl</code></th></tr>
             </thead>
             <tbody>
-              <tr><td><var>Ca1.1</var></td><td><var>Ta</var></td><td><var>Ca1</var></td><td><var>Ra1</var></td><td><code>"Finance"</code></td><td><code>"Finance"</code></td><td></td><td><code>string</code></td><td></td><td></td><td></td></tr>
+              <tr><td><var>Ca1.1</var></td><td><var>Ta</var></td><td><var>Ca1</var></td><td><var>Ra1</var></td><td><code>"hefce.ac.uk"</code></td><td><code>"hefce.ac.uk"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk&gt;</code></td><td><code>dc:identifier</code></td><td></td></tr>
+              <tr><td><var>Ca1.2</var></td><td><var>Ta</var></td><td><var>Ca2</var></td><td><var>Ra1</var></td><td><code>"Higher Education Funding Council for England"</code></td><td><code>"Higher Education Funding Council for England"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk&gt;</code></td><td><code>foaf:name</code></td><td></td></tr>
+              <tr><td><var>Ca1.3</var></td><td><var>Ta</var></td><td><var>Ca3</var></td><td><var>Ra1</var></td><td><code>"bis.gov.uk"</code></td><td><code>"bis.gov.uk"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk&gt;</code></td><td><code>org:subOrganizationOf</code></td><td><code>&lt;http://example.org/organization/bis.gov.uk&gt;</code></td></tr>
 
-              <tr><td><var>Ca2.1</var></td><td><var>Ta</var></td><td><var>Ca1</var></td><td><var>Ra2</var></td><td><code>"Information Technology"</code></td><td><code>"Information Techology"</code></td><td></td><td><code>string</code></td><td></td><td></td><td></td></tr>
+              <tr><td><var>Ca2.1</var></td><td><var>Ta</var></td><td><var>Ca1</var></td><td><var>Ra2</var></td><td><code>"bis.gov.uk"</code></td><td><code>"bis.gov.uk"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/organization/bis.gov.uk&gt;</code></td><td><code>dc:identifier</code></td><td></td></tr>
+              <tr><td><var>Ca2.2</var></td><td><var>Ta</var></td><td><var>Ca2</var></td><td><var>Ra2</var></td><td><code>"Department for Business, Innovation and Skills"</code></td><td><code>"Department for Business, Innovation and Skills"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/organization/bis.gov.uk&gt;</code></td><td><code>foaf:name</code></td><td></td></tr>
+              <tr><td><var>Ca2.3</var></td><td><var>Ta</var></td><td><var>Ca3</var></td><td><var>Ra2</var></td><td><code>"xx"</code></td><td><code>null</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/organization/bis.gov.uk&gt;</code></td><td><code>org:subOrganizationOf</code></td><td></td></tr>
 
-              <tr><td><var>Ca3.1</var></td><td><var>Ta</var></td><td><var>Ca1</var></td><td><var>Ra3</var></td><td><code>"Operational Delivery"</code></td><td><code>"Operational Delivery"</code></td><td></td><td><code>string</code></td><td></td><td></td><td></td></tr>
+              <tr><td><var>Cb1.1</var></td><td><var>Tb</var></td><td><var>Cb1</var></td><td><var>Rb1</var></td><td><code>"Finance"</code></td><td><code>"Finance"</code></td><td></td><td><code>string</code></td><td></td><td></td><td></td></tr>
 
-              <tr><td><var>Ca4.1</var></td><td><var>Ta</var></td><td><var>Ca1</var></td><td><var>Ra4</var></td><td><code>"Policy"</code></td><td><code>"Policy"</code></td><td></td><td><code>string</code></td><td></td><td></td><td></td></tr>
+              <tr><td><var>Cb2.1</var></td><td><var>Tb</var></td><td><var>Cb1</var></td><td><var>Rb2</var></td><td><code>"Information Technology"</code></td><td><code>"Information Techology"</code></td><td></td><td><code>string</code></td><td></td><td></td><td></td></tr>
 
+              <tr><td><var>Cb3.1</var></td><td><var>Tb</var></td><td><var>Cb1</var></td><td><var>Rb3</var></td><td><code>"Operational Delivery"</code></td><td><code>"Operational Delivery"</code></td><td></td><td><code>string</code></td><td></td><td></td><td></td></tr>
 
-              <tr><td><var>Cb1.1</var></td><td><var>Tb</var></td><td><var>Cb1</var></td><td><var>Rb1</var></td><td><code>"90115"</code></td><td><code>"90115"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/senior-roles.csv#post-90115&gt;</code></td><td><code>dc:identifier</code></td><td></td></tr>
-              <tr><td><var>Cb1.2</var></td><td><var>Tb</var></td><td><var>Cb2</var></td><td><var>Rb1</var></td><td><code>"Steve Egan"</code></td><td><code>"Steve Egan"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/senior-roles.csv#post-90115&gt;</code></td><td><code>foaf:name</code></td><td></td></tr>
-              <tr><td><var>Cb1.3</var></td><td><var>Tb</var></td><td><var>Cb3</var></td><td><var>Rb1</var></td><td><code>"SCS1A"</code></td><td><code>"SCS1A"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/senior-roles.csv#post-90115&gt;</code></td><td><code>&lt;http://example.org/def/grade&gt;</code></td><td></td></tr>
-              <tr><td><var>Cb1.4</var></td><td><var>Tb</var></td><td><var>Cb4</var></td><td><var>Rb1</var></td><td><code>"Deputy Chief Executive"</code></td><td><code>"Deputy Chief Executive"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/senior-roles.csv#post-90115&gt;</code></td><td><code>&lt;http://example.org/def/job&gt;</code></td><td></td></tr>
-              <tr><td><var>Cb1.5</var></td><td><var>Tb</var></td><td><var>Cb5</var></td><td><var>Rb1</var></td><td><code>"90334"</code></td><td><code>"90334"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/senior-roles.csv#post-90115&gt;</code></td><td><code>&lt;http://example.org/def/reportsTo&gt;</code></td><td><code>&lt;http://example.org/senior-roles.csv#post-90334&gt;</code></td></tr>
-              <tr><td><var>Cb1.6</var></td><td><var>Tb</var></td><td><var>Cb6</var></td><td><var>Rb1</var></td><td><code>"Finance"</code></td><td><code>"Finance"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/senior-roles.csv#post-90115&gt;</code></td><td><code>&lt;http://example.org/def/profession&gt;</code></td><td></td></tr>  
-
-              <tr><td><var>Cb2.1</var></td><td><var>Tb</var></td><td><var>Cb1</var></td><td><var>Rb2</var></td><td><code>"90334"</code></td><td><code>"90334"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/senior-roles.csv#post-90334&gt;</code></td><td><code>dc:identifier</code></td><td></td></tr>
-              <tr><td><var>Cb2.2</var></td><td><var>Tb</var></td><td><var>Cb2</var></td><td><var>Rb2</var></td><td><code>"Sir Alan Langlands"</code></td><td><code>"Sir Alan Langlands"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/senior-roles.csv#post-90334&gt;</code></td><td><code>foaf:name</code></td><td></td></tr>
-              <tr><td><var>Cb2.3</var></td><td><var>Tb</var></td><td><var>Cb3</var></td><td><var>Rb2</var></td><td><code>"SCS4"</code></td><td><code>"SCS4"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/senior-roles.csv#post-90334&gt;</code></td><td><code>&lt;http://example.org/def/grade&gt;</code></td><td></td></tr>
-              <tr><td><var>Cb2.4</var></td><td><var>Tb</var></td><td><var>Cb4</var></td><td><var>Rb2</var></td><td><code>"Chief Executive"</code></td><td><code>"Chief Executive"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/senior-roles.csv#post-90334&gt;</code></td><td><code>&lt;http://example.org/def/job&gt;</code></td><td></td></tr>
-              <tr><td><var>Cb2.5</var></td><td><var>Tb</var></td><td><var>Cb5</var></td><td><var>Rb2</var></td><td><code>"xx"</code></td><td><code>null</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/senior-roles.csv#post-90334&gt;</code></td><td><code>&lt;http://example.org/def/reportsTo&gt;</code></td><td></td></tr>
-              <tr><td><var>Cb2.6</var></td><td><var>Tb</var></td><td><var>Cb6</var></td><td><var>Rb2</var></td><td><code>"Policy"</code></td><td><code>"Policy"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/senior-roles.csv#post-90334&gt;</code></td><td><code>&lt;http://example.org/def/profession&gt;</code></td><td></td></tr>
+              <tr><td><var>Cb4.1</var></td><td><var>Tb</var></td><td><var>Cb1</var></td><td><var>Rb4</var></td><td><code>"Policy"</code></td><td><code>"Policy"</code></td><td></td><td><code>string</code></td><td></td><td></td><td></td></tr>
 
 
-              <tr><td><var>Cc1.1</var></td><td><var>Tc</var></td><td><var>Cc1</var></td><td><var>Rc1</var></td><td><code>"90115"</code></td><td><code>"90115"</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/def/reportsTo&gt;</code></td><td><code>&lt;http://example.org/senior-roles.csv#post-90115&gt;</code></td></tr>
-              <tr><td><var>Cc1.2</var></td><td><var>Tc</var></td><td><var>Cc2</var></td><td><var>Rc1</var></td><td><code>"4"</code></td><td><code>"4"</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/def/grade&gt;</code></td><td></td></tr>
-              <tr><td><var>Cc1.3</var></td><td><var>Tc</var></td><td><var>Cc3</var></td><td><var>Rc1</var></td><td><code>"17426"</code></td><td><code>17426</code></td><td></td><td><code>integer</code></td><td></td><td><code>&lt;http://example.org/def/min_pay&gt;</code></td><td></td></tr>
-              <tr><td><var>Cc1.4</var></td><td><var>Tc</var></td><td><var>Cc4</var></td><td><var>Rc1</var></td><td><code>"20002"</code></td><td><code>20002</code></td><td></td><td><code>integer</code></td><td></td><td><code>&lt;http://example.org/def/max_pay&gt;</code></td><td></td></tr>
-              <tr><td><var>Cc1.5</var></td><td><var>Tc</var></td><td><var>Cc5</var></td><td><var>Rc1</var></td><td><code>"Administrator"</code></td><td><code>"Administrator"</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/def/job&gt;</code></td><td></td></tr>
-              <tr><td><var>Cc1.6</var></td><td><var>Tc</var></td><td><var>Cc6</var></td><td><var>Rc1</var></td><td><code>"8.67"</code></td><td><code>8.67</code></td><td></td><td><code>number</code></td><td></td><td><code>&lt;http://example.org/def/number-of-posts&gt;</code></td><td></td></tr>
-              <tr><td><var>Cc1.7</var></td><td><var>Tc</var></td><td><var>Cc7</var></td><td><var>Rc1</var></td><td><code>"Operational Delivery"</code></td><td><code>"Operational Delivery"</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/def/profession&gt;</code></td><td></td></tr>
+              <tr><td><var>Cc1.1</var></td><td><var>Tc</var></td><td><var>Cc1</var></td><td><var>Rc1</var></td><td><code>"90115"</code></td><td><code>"90115"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/post/90115&gt;</code></td><td><code>dc:identifier</code></td><td></td></tr>
+              <tr><td><var>Cc1.2</var></td><td><var>Tc</var></td><td><var>Cc2</var></td><td><var>Rc1</var></td><td><code>"Steve Egan"</code></td><td><code>"Steve Egan"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/person/1&gt;</code></td><td><code>foaf:name</code></td><td></td></tr>
+              <tr><td><var>Cc1.3</var></td><td><var>Tc</var></td><td><var>Cc3</var></td><td><var>Rc1</var></td><td><code>"SCS1A"</code></td><td><code>"SCS1A"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/post/90115&gt;</code></td><td><code>&lt;http://example.org/gov.uk/def/grade&gt;</code></td><td></td></tr>
+              <tr><td><var>Cc1.4</var></td><td><var>Tc</var></td><td><var>Cc4</var></td><td><var>Rc1</var></td><td><code>"Deputy Chief Executive"</code></td><td><code>"Deputy Chief Executive"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/post/90115&gt;</code></td><td><code>&lt;http://example.org/gov.uk/def/job&gt;</code></td><td></td></tr>
+              <tr><td><var>Cc1.5</var></td><td><var>Tc</var></td><td><var>Cc5</var></td><td><var>Rc1</var></td><td><code>"90334"</code></td><td><code>"90334"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/post/90115&gt;</code></td><td><code>org:reportsTo</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/post/90334&gt;</code></td></tr>
+              <tr><td><var>Cc1.6</var></td><td><var>Tc</var></td><td><var>Cc6</var></td><td><var>Rc1</var></td><td><code>"Finance"</code></td><td><code>"Finance"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/post/90115&gt;</code></td><td><code>&lt;http://example.org/gov.uk/def/profession&gt;</code></td><td></td></tr>
+              <tr><td><var>Cc1.7</var></td><td><var>Tc</var></td><td><var>Cc7</var></td><td><var>Rc1</var></td><td><code>"hefce.ac.uk"</code></td><td><code>"hefce.ac.uk"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/post/90115&gt;</code></td><td><code>org:postIn</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk&gt;</code></td></tr>
+              <tr><td><var>Cc1.8</var></td><td><var>Tc</var></td><td><var>Cc8</var></td><td><var>Rc1</var></td><td><code>""</code></td><td><code>null</code></td><td></td><td></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/post/90115&gt;</code></td><td><code>org:heldBy</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/person/1&gt;</code></td></tr>
 
-              <tr><td><var>Cc2.1</var></td><td><var>Tc</var></td><td><var>Cc1</var></td><td><var>Rc2</var></td><td><code>"90115"</code></td><td><code>"90115"</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/def/reportsTo&gt;</code></td><td><code>&lt;http://example.org/senior-roles.csv#post-90115&gt;</code></td></tr>
-              <tr><td><var>Cc2.2</var></td><td><var>Tc</var></td><td><var>Cc2</var></td><td><var>Rc2</var></td><td><code>"5"</code></td><td><code>"5"</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/def/grade&gt;</code></td><td></td></tr>
-              <tr><td><var>Cc2.3</var></td><td><var>Tc</var></td><td><var>Cc3</var></td><td><var>Rc2</var></td><td><code>"19546"</code></td><td><code>19546</code></td><td></td><td><code>integer</code></td><td></td><td><code>&lt;http://example.org/def/min_pay&gt;</code></td><td></td></tr>
-              <tr><td><var>Cc2.4</var></td><td><var>Tc</var></td><td><var>Cc4</var></td><td><var>Rc2</var></td><td><code>"22478"</code></td><td><code>22478</code></td><td></td><td><code>integer</code></td><td></td><td><code>&lt;http://example.org/def/max_pay&gt;</code></td><td></td></tr>
-              <tr><td><var>Cc2.5</var></td><td><var>Tc</var></td><td><var>Cc5</var></td><td><var>Rc2</var></td><td><code>"Administrator"</code></td><td><code>"Administrator"</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/def/job&gt;</code></td><td></td></tr>
-              <tr><td><var>Cc2.6</var></td><td><var>Tc</var></td><td><var>Cc6</var></td><td><var>Rc2</var></td><td><code>"0.5"</code></td><td><code>0.5</code></td><td></td><td><code>number</code></td><td></td><td><code>&lt;http://example.org/def/number-of-posts&gt;</code></td><td></td></tr>
-              <tr><td><var>Cc2.7</var></td><td><var>Tc</var></td><td><var>Cc7</var></td><td><var>Rc2</var></td><td><code>"Operational Delivery"</code></td><td><code>"Operational Delivery"</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/def/profession&gt;</code></td><td></td></tr>
+              <tr><td><var>Cc2.1</var></td><td><var>Tc</var></td><td><var>Cc1</var></td><td><var>Rc2</var></td><td><code>"90334"</code></td><td><code>"90334"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/post/90334&gt;</code></td><td><code>dc:identifier</code></td><td></td></tr>
+              <tr><td><var>Cc2.2</var></td><td><var>Tc</var></td><td><var>Cc2</var></td><td><var>Rc2</var></td><td><code>"Sir Alan Langlands"</code></td><td><code>"Sir Alan Langlands"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/person/2&gt;</code></td><td><code>foaf:name</code></td><td></td></tr>
+              <tr><td><var>Cc2.3</var></td><td><var>Tc</var></td><td><var>Cc3</var></td><td><var>Rc2</var></td><td><code>"SCS4"</code></td><td><code>"SCS4"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/post/90334&gt;</code></td><td><code>&lt;http://example.org/gov.uk/def/grade&gt;</code></td><td></td></tr>
+              <tr><td><var>Cc2.4</var></td><td><var>Tc</var></td><td><var>Cc4</var></td><td><var>Rc2</var></td><td><code>"Chief Executive"</code></td><td><code>"Chief Executive"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/post/90334&gt;</code></td><td><code>&lt;http://example.org/gov.uk/def/job&gt;</code></td><td></td></tr>
+              <tr><td><var>Cc2.5</var></td><td><var>Tc</var></td><td><var>Cc5</var></td><td><var>Rc2</var></td><td><code>"xx"</code></td><td><code>null</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/post/90334&gt;</code></td><td><code>org:reportsTo</code></td><td></td></tr>
+              <tr><td><var>Cc2.6</var></td><td><var>Tc</var></td><td><var>Cc6</var></td><td><var>Rc2</var></td><td><code>"Policy"</code></td><td><code>"Policy"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/post/90334&gt;</code></td><td><code>&lt;http://example.org/gov.uk/def/profession&gt;</code></td><td></td></tr>
+              <tr><td><var>Cc2.7</var></td><td><var>Tc</var></td><td><var>Cc7</var></td><td><var>Rc2</var></td><td><code>"hefce.ac.uk"</code></td><td><code>"hefce.ac.uk"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/post/90334&gt;</code></td><td><code>org:postIn</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk&gt;</code></td></tr>
+              <tr><td><var>Cc2.8</var></td><td><var>Tc</var></td><td><var>Cc8</var></td><td><var>Rc2</var></td><td><code>""</code></td><td><code>null</code></td><td></td><td></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/post/90334&gt;</code></td><td><code>org:heldBy</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/person/2&gt;</code></td></tr>
+
+
+              <tr><td><var>Cd1.1</var></td><td><var>Td</var></td><td><var>Cd1</var></td><td><var>Rd1</var></td><td><code>"90115"</code></td><td><code>"90115"</code></td><td></td><td><code>string</code></td><td></td><td><code>org:reportsTo</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/post/90115&gt;</code></td></tr>
+              <tr><td><var>Cd1.2</var></td><td><var>Td</var></td><td><var>Cd2</var></td><td><var>Rd1</var></td><td><code>"4"</code></td><td><code>"4"</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/gov.uk/def/grade&gt;</code></td><td></td></tr>
+              <tr><td><var>Cd1.3</var></td><td><var>Td</var></td><td><var>Cd3</var></td><td><var>Rd1</var></td><td><code>"17426"</code></td><td><code>17426</code></td><td></td><td><code>integer</code></td><td></td><td><code>&lt;http://example.org/gov.uk/def/min_pay&gt;</code></td><td></td></tr>
+              <tr><td><var>Cd1.4</var></td><td><var>Td</var></td><td><var>Cd4</var></td><td><var>Rd1</var></td><td><code>"20002"</code></td><td><code>20002</code></td><td></td><td><code>integer</code></td><td></td><td><code>&lt;http://example.org/gov.uk/def/max_pay&gt;</code></td><td></td></tr>
+              <tr><td><var>Cd1.5</var></td><td><var>Td</var></td><td><var>Cd5</var></td><td><var>Rd1</var></td><td><code>"Administrator"</code></td><td><code>"Administrator"</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/gov.uk/def/job&gt;</code></td><td></td></tr>
+              <tr><td><var>Cd1.6</var></td><td><var>Td</var></td><td><var>Cd6</var></td><td><var>Rd1</var></td><td><code>"8.67"</code></td><td><code>8.67</code></td><td></td><td><code>number</code></td><td></td><td><code>&lt;http://example.org/gov.uk/def/number_of_posts&gt;</code></td><td></td></tr>
+              <tr><td><var>Cd1.7</var></td><td><var>Td</var></td><td><var>Cd7</var></td><td><var>Rd1</var></td><td><code>"Operational Delivery"</code></td><td><code>"Operational Delivery"</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/gov.uk/def/profession&gt;</code></td><td></td></tr>
+              <tr><td><var>Cd1.8</var></td><td><var>Td</var></td><td><var>Cd8</var></td><td><var>Rd1</var></td><td><code>"hefce.ac.uk"</code></td><td><code>"hefce.ac.uk"</code></td><td></td><td><code>string</code></td><td></td><td><code>org:postIn</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk&gt;</code></td></tr>
+
+              <tr><td><var>Cd2.1</var></td><td><var>Td</var></td><td><var>Cd1</var></td><td><var>Rd2</var></td><td><code>"90115"</code></td><td><code>"90115"</code></td><td></td><td><code>string</code></td><td></td><td><code>org:reportsTo</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/post/90115&gt;</code></td></tr>
+              <tr><td><var>Cd2.2</var></td><td><var>Td</var></td><td><var>Cd2</var></td><td><var>Rd2</var></td><td><code>"5"</code></td><td><code>"5"</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/gov.uk/def/grade&gt;</code></td><td></td></tr>
+              <tr><td><var>Cd2.3</var></td><td><var>Td</var></td><td><var>Cd3</var></td><td><var>Rd2</var></td><td><code>"19546"</code></td><td><code>19546</code></td><td></td><td><code>integer</code></td><td></td><td><code>&lt;http://example.org/gov.uk/def/min_pay&gt;</code></td><td></td></tr>
+              <tr><td><var>Cd2.4</var></td><td><var>Td</var></td><td><var>Cd4</var></td><td><var>Rd2</var></td><td><code>"22478"</code></td><td><code>22478</code></td><td></td><td><code>integer</code></td><td></td><td><code>&lt;http://example.org/gov.uk/def/max_pay&gt;</code></td><td></td></tr>
+              <tr><td><var>Cd2.5</var></td><td><var>Td</var></td><td><var>Cd5</var></td><td><var>Rd2</var></td><td><code>"Administrator"</code></td><td><code>"Administrator"</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/gov.uk/def/job&gt;</code></td><td></td></tr>
+              <tr><td><var>Cd2.6</var></td><td><var>Td</var></td><td><var>Cd6</var></td><td><var>Rd2</var></td><td><code>"0.5"</code></td><td><code>0.5</code></td><td></td><td><code>number</code></td><td></td><td><code>&lt;http://example.org/gov.uk/def/number_of_posts&gt;</code></td><td></td></tr>
+              <tr><td><var>Cd2.7</var></td><td><var>Td</var></td><td><var>Cd7</var></td><td><var>Rd2</var></td><td><code>"Operational Delivery"</code></td><td><code>"Operational Delivery"</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/gov.uk/def/profession&gt;</code></td><td></td></tr>
+              <tr><td><var>Cd2.8</var></td><td><var>Td</var></td><td><var>Cd8</var></td><td><var>Rd2</var></td><td><code>"hefce.ac.uk"</code></td><td><code>"hefce.ac.uk"</code></td><td></td><td><code>string</code></td><td></td><td><code>org:postIn</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk&gt;</code></td></tr>
             </tbody>
           </table>
 
-          <p class="note">Notice that <a>valueUrl</a> is not specified for <a>cell</a> <var>Cb2.5</var> because the <a>cell value</a> is <code>null</code> and the <a href="http://w3c.github.io/csvw/metadata/#column-virtual"><code>virtual</code></a> property of <a>column</a> <var>Cb5</var> is <em>not</em> specified.</p>
+          <p class="note">Notice that <a>valueUrl</a> is not specified for <a title="cell">cells</a> <var>Ca2.3</var> and <var>Cc2.5</var> because in each case the <a>cell value</a> is <code>null</code> and the <a href="http://w3c.github.io/csvw/metadata/#column-virtual"><code>virtual</code></a> property of <a>column</a> <var>Cb5</var> is <em>not</em> specified.</p>
 
         </div>
         <p><strong><a title="minimal mode">Minimal mode</a></strong> output for this example is provided below:</p>
@@ -1277,9 +1337,11 @@
 
         <div class="note">
           <p>Prefixes defined within the <a href="http://www.w3.org/2011/rdfa-context/rdfa-1.1">RDFa 1.1 Initial Context</a> ([[rdfa-core]]) are not expanded; e.g. <code>dc:</code> for &lt;http://purl.org/dc/terms/&gt;.</p>
-          <p>Output for <a title="annotated table">table</a> <var>Ta</var> (<code>{ "url": "http://example.org/gov.uk/professions.csv" }</code>) is not included as property <a href="http://w3c.github.io/csvw/metadata/#table-suppressOutput"><code>suppressOutput</code></a> has value <var>true</var>.</p>
-          <p>The <a href="http://w3c.github.io/csvw/metadata/#cell-propertyUrl"><code>propertyUrl</code></a> is specified for all <a title="cell">cells</a> in <a title="annotated table">tables</a> <var>Tb</var> and <var>Tc</var>.</p>
-          <p><a title="column">Columns</a> <var>Cb5</var> and <var>Cc1</var> (<code>{ "name": "reportsTo" }</code> and <code>{ "name": "reportsToSenior" }</code>) use the <a href="http://w3c.github.io/csvw/metadata/#cell-aboutUrl"><code>aboutUrl</code></a>, <a href="http://w3c.github.io/csvw/metadata/#cell-propertyUrl"><code>propertyUrl</code></a> and <a href="http://w3c.github.io/csvw/metadata/#cell-valueUrl"><code>valueUrl</code></a> properties to assert the relationship between the given post and the senior post it reports to for the <a title="cell">cells</a> therein. However, since senior posts and junior posts are described in different tables so it is not possible to create nested <a title="object">objects</a> for this particular case.</p>
+          <p>Output for <a title="annotated table">tables</a> <var>Ta</var> and <var>Tb</var> (<code>{ "url": "http://example.org/gov.uk/data/organizations.csv" }</code> and <code>{ "url": "http://example.org/gov.uk/data/professions.csv" }</code>) are not included as property <a href="http://w3c.github.io/csvw/metadata/#table-suppressOutput"><code>suppressOutput</code></a> is specified with value <var>true</var> for each of the <a title="annotated table">tables</a>.</p>
+          <p>The <a href="http://w3c.github.io/csvw/metadata/#cell-propertyUrl"><code>propertyUrl</code></a> is specified for all <a title="cell">cells</a> in <a title="annotated table">tables</a> <var>Tc</var> and <var>Td</var>.</p>
+          <p><a title="column">Columns</a> <var>Cc5</var> and <var>Cd1</var> (<code>{ "name": "reportsTo" }</code> and <code>{ "name": "reportsToSenior" }</code>) use the <a href="http://w3c.github.io/csvw/metadata/#cell-aboutUrl"><code>aboutUrl</code></a>, <a href="http://w3c.github.io/csvw/metadata/#cell-propertyUrl"><code>propertyUrl</code></a> and <a href="http://w3c.github.io/csvw/metadata/#cell-valueUrl"><code>valueUrl</code></a> properties to assert the relationship between the given post and the senior post it reports to for the <a title="cell">cells</a> therein. However, since senior posts and junior posts are described in different tables so it is not possible to create nested <a title="object">objects</a> for this particular case.</p>
+          <p>Similarly, <a title="column">columns</a> <var>Cc7</var> and <var>Cd8</var> (both with <code>{ "name": "organizationRef" }</code>) use the <a href="http://w3c.github.io/csvw/metadata/#cell-aboutUrl"><code>aboutUrl</code></a>, <a href="http://w3c.github.io/csvw/metadata/#cell-propertyUrl"><code>propertyUrl</code></a> and <a href="http://w3c.github.io/csvw/metadata/#cell-valueUrl"><code>valueUrl</code></a> properties to assert the relationship between the given post and the organization to which it belongs for the <a title="cell">cells</a> those <a title="column">columns</a>.</p>
+          <p>Finally, note that two resources are created for each <a>row</a> within <a title="annotated table">table</a> <var>Tc</var> (<code>{ "url": "http://example.org/senior-roles.csv" }</code>): the <em>person</em> and the <em>post</em> they occupy. The relationship between these resources is specified via <em>virtual</em> <a>column</a> <var>Cc8</var> (<code>{ "name": "post_holder" }</code>) using the <a href="http://w3c.github.io/csvw/metadata/#cell-aboutUrl"><code>aboutUrl</code></a>, <a href="http://w3c.github.io/csvw/metadata/#cell-propertyUrl"><code>propertyUrl</code></a> and <a href="http://w3c.github.io/csvw/metadata/#cell-valueUrl"><code>valueUrl</code></a> properties. The <em>person</em> <a>object</a> provides the value of the name-value pair with corresponding <a>name</a> <code>org:heldBy</code>, thus nesting the <em>person</em> <a>object</a> within the <em>post</em> <a>object</a>.</p>
         </div>
 
         <p><strong><a title="standard mode">Standard mode</a></strong> output for this example is provided below:</p>
