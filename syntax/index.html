@@ -180,7 +180,7 @@
         </p>
         <ul>
           <li><dfn title="table group id">id</dfn> &mdash; an identifier for this group of tables, or <code>null</code> if this is undefined</li>
-          <li><dfn title="table group resources">resources</dfn> &mdash; the list of <a title="table">tables</a> in the group of tables. A group of tables MUST have one or more tables.</li>
+          <li><dfn title="table group tables">tables</dfn> &mdash; the list of <a title="table">tables</a> in the group of tables. A group of tables MUST have one or more tables.</li>
           <li><dfn title="table group notes">notes</dfn> &mdash; a list of notes on the group of tables, as described in [[!tabular-metadata]], which may be an empty list</li>
         </ul>
         <p>
@@ -325,7 +325,7 @@
       <pre>
 {
   "@type": "TableGroup",
-  "resources": []
+  "tables": []
 }
       </pre>
       <section>
@@ -463,7 +463,7 @@ Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
       <pre class="example highlight" title="Metadata file referencing multiple tabular data files sharing a schema">
 {
   "tableSchema": "government-spending.csv",
-  "resources": [{
+  "tables": [{
     "url": "http://example.org/east-sussex-2015-03.csv",
   }, {
     "url": "http://example.org/east-sussex-2015-02.csv"
@@ -472,7 +472,7 @@ Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
 }
       </pre>
       <p>
-        the validator would validate all the listed resources, using the locally defined schema at <code>government-spending.csv</code>. It would also use the metadata embedded in the referenced CSV files; for example, when processing <code>http://example.org/east-sussex-2015-03.csv</code>, it would use <a>embedded metadata</a> within that file.
+        the validator would validate all the listed tables, using the locally defined schema at <code>government-spending.csv</code>. It would also use the metadata embedded in the referenced CSV files; for example, when processing <code>http://example.org/east-sussex-2015-03.csv</code>, it would use <a>embedded metadata</a> within that file.
       </p>
       <p>
         If a validator is passed a <a>tabular data file</a> <code>http://example.org/east-sussex-2015-03.csv</code>,
@@ -492,7 +492,7 @@ Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
               <li>metadata referenced from a <em>Link Header</em> that may be returned when retrieving the tabular data file (see <a href="#link-header" class="sectionRef"></a>).</li>
               <li>file-specific metadata in a document located based on the location of the tabular data file (see <a href="#standard-file-metadata" class="sectionRef"></a>).</li>
               <li>directory-specific metadata in a document located based on the location of the tabular data file (see <a href="#standard-directory-metadata" class="sectionRef"></a>).</li>
-              <li><a>default metadata</a> as defined in <a href="#locating-metadata" class="sectionRef"></a> with a single <code>resources</code> entry where the <code>url</code> property is set from that of the <a>tabular data file</a>.</li>
+              <li><a>default metadata</a> as defined in <a href="#locating-metadata" class="sectionRef"></a> with a single <code>tables</code> entry where the <code>url</code> property is set from that of the <a>tabular data file</a>.</li>
             </ol>
           </li>
           <li>Proceed as if the process starts with a metadata file using the merged metadata <code>UM<sub>M</sub> = merge(UM<sub>T</sub>, FM)</code> or <code>UM<sub>T</sub></code> if no <code>FM</code> is loaded.</li>
@@ -1140,11 +1140,11 @@ Content-Type: text/csv;header=absent
   "url": "http://example.org/tree-ops.csv",
   "tableSchema": {
     "columns": [
-      {"title": [ "GID" ]},
-      {"title": [ "On Street" ]},
-      {"title": [ "Species" ]},
-      {"title": [ "Trim Cycle" ]},
-      {"title": [ "Inventory Date" ]}
+      {"titles": [ "GID" ]},
+      {"titles": [ "On Street" ]},
+      {"titles": [ "Species" ]},
+      {"titles": [ "Trim Cycle" ]},
+      {"titles": [ "Inventory Date" ]}
     ]
   }
 }
@@ -1238,23 +1238,23 @@ data.parse({
   "tableSchema": {
     "columns": [{
       "name": "GID", 
-      "title": "GID", 
+      "titles": "GID", 
       "datatype": "string"
     }, {
       "name": "on_street", 
-      "title": "On Street", 
+      "titles": "On Street", 
       "datatype": "string"
     }, {
       "name": "species", 
-      "title": "Species", 
+      "titles": "Species", 
       "datatype": "string"
     }, {
       "name": "trim_cycle", 
-      "title": "Trim Cycle", 
+      "titles": "Trim Cycle", 
       "datatype": "string"
     }, {
       "name": "inventory_date",
-      "title": "Inventory Date",
+      "titles": "Inventory Date",
       "datatype": {
         "base": "date", 
         "format": "M/d/yyyy"
@@ -1569,23 +1569,23 @@ GID,On Street,Species,Trim Cycle,Inventory Date
   "tableSchema": {
     "columns": [{
       "name": "GID",
-      "title": "GID",
+      "titles": "GID",
       "datatype": "string",
     }, {
       "name": "on_street",
-      "title": "On Street",
+      "titles": "On Street",
       "datatype": "string"
     }, {
       "name": "species",
-      "title": "Species",
+      "titles": "Species",
       "datatype": "string"
     }, {
       "name": "trim_cycle",
-      "title": "Trim Cycle",
+      "titles": "Trim Cycle",
       "datatype": "string"
     }, {
       "name": "inventory_date",
-      "title": "Inventory Date",
+      "titles": "Inventory Date",
       "datatype": {
         "base": "date", 
         "format": "M/d/yyyy"
@@ -1699,11 +1699,11 @@ UNICEF,Education,Teacher training,Chocó,Bojayá
 {
   "tableSchema": {
     "columns": [
-      { "title": ["Organisation", "#org"] }, 
-      { "title": ["Sector", "#sector"] }, 
-      { "title": ["Subsector", "#subsector"] }, 
-      { "title": ["Department", "#adm1"] }, 
-      { "title": ["Municipality", "#adm2"] }, 
+      { "titles": ["Organisation", "#org"] }, 
+      { "titles": ["Sector", "#sector"] }, 
+      { "titles": ["Subsector", "#subsector"] }, 
+      { "titles": ["Department", "#adm1"] }, 
+      { "titles": ["Municipality", "#adm2"] }, 
     ]
   }
 }
@@ -1715,11 +1715,11 @@ UNICEF,Education,Teacher training,Chocó,Bojayá
 {
   "tableSchema": {
     "columns": [
-      { "name": "org", "title": #org" }, 
-      { "name": "sector", "title": #sector" }, 
-      { "name": "subsector", "title": #subsector" }, 
-      { "name": "adm1", "title": #adm1" }, 
-      { "name": "adm2", "title": #adm2" }, 
+      { "name": "org", "titles": #org" }, 
+      { "name": "sector", "titles": #sector" }, 
+      { "name": "subsector", "titles": #subsector" }, 
+      { "name": "adm1", "titles": #adm1" }, 
+      { "name": "adm2", "titles": #adm2" }, 
     ]
   }
 }
@@ -1838,7 +1838,7 @@ TEXTDATA =  %x20-21 / %x23-2B / %x2D-7E
               </ul>
             </li>
             <li><p>Rows in the file MUST NOT contain more fields than are in the header row (though they may contain less).</p></li>
-            <li><p>Each file MUST have an entry in the <code>resources</code> array in the <code>datapackage.json</code> file.</p></li>
+            <li><p>Each file MUST have an entry in the <code>tables</code> array in the <code>datapackage.json</code> file.</p></li>
             <li><p>The resource metadata MUST include a <code>tableSchema</code> attribute whose value MUST be a valid <a href="http://w3c.github.io/csvw/metadata/#dfn-schema-description" class="externalDFN">schema description</a>.</p></li>
             <li><p>All fields in the CSV files MUST be described in the <a href="http://w3c.github.io/csvw/metadata/#dfn-schema-description" class="externalDFN">schema description</a>.</p></li>
           </ul>

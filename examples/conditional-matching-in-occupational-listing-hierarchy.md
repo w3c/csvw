@@ -47,23 +47,23 @@ Here's the metadata description for the resource:
 ```json
 {
     "name": "soc-2010",
-    "title": "Standard Occupational Classification (2010)",
+    "titles": "Standard Occupational Classification (2010)",
     "publisher": [{
         "name": "US Bureau of Labor Statistics",
         "web": "http://www.bls.gov/ "
     }],
-    "resources": [{
+    "tables": [{
         "name": "soc-2010-csv",
         "path": "soc_structure_2010.csv",
         "tableSchema": {"columns": [
             {
                 "name": "soc-major-group-code",
-                "title": "Major Group",
+                "titles": "Major Group",
                 "type": "string"
             },
             {
                 "name": "soc-minor-group-code",
-                "title": "Minor Group",
+                "titles": "Minor Group",
                 "type": "string",
                 "microsyntax": [{
                     "name": "soc-minor-group-code/major-group-element",
@@ -72,7 +72,7 @@ Here's the metadata description for the resource:
             },
             {
                 "name": "soc-broad-group-code",
-                "title": "Broad Group",
+                "titles": "Broad Group",
                 "type": "string",
                 "microsyntax": [
                     {
@@ -87,7 +87,7 @@ Here's the metadata description for the resource:
             },
             {
                 "name": "soc-detailed-occupation-code",
-                "title": "Detailed Occupation",
+                "titles": "Detailed Occupation",
                 "type": "string",
                 "microsyntax": [
                     {
@@ -106,7 +106,7 @@ Here's the metadata description for the resource:
             },
             {
                 "name": "soc-title",
-                "title": "",
+                "titles": "",
                 "type": "string"
             },
             {"name": "empty(1)"},
@@ -251,25 +251,25 @@ O*NET-SOC 2010 Code,O*NET-SOC 2010 Title,O*NET-SOC 2010 Description
 
 This time I want to trigger a one template if the Occupation is a main category (e.g. Code = `15-1199.00`), else I want to trigger a different category. A main category is denoted with the final two digits of the code being `00`. 
 
-*(Aside 3: of course, as these two files are likely to be packaged together, I could have had just a single metadata description describing BOTH resources!)*
+*(Aside 3: of course, as these two files are likely to be packaged together, I could have had just a single metadata description describing BOTH tables!)*
 
 Here's the metadata description for the resource:
 
 ```json
 {
     "name": "2010_Occupations",
-    "title": "O*NET-SOC Occupational listing for 2010",
+    "titles": "O*NET-SOC Occupational listing for 2010",
     "publisher": [{
         "name": "O*Net Resource Center",
         "web": " http://www.onetcenter.org/ "
     }],
-    "resources": [{
+    "tables": [{
         "name": "2010_Occupations-csv",
         "path": "2010_Occupations.csv",
         "tableSchema": {"columns": [
             {
                 "name": "onet-soc-2010-code",
-                "title": "O*NET-SOC 2010 Code",
+                "titles": "O*NET-SOC 2010 Code",
                 "description": "O*NET Standard Occupational Classification Code (2010).",
                 "type": "string",
                 "required": true,
@@ -294,15 +294,15 @@ Here's the metadata description for the resource:
                 ]
             },
             {
-                "name": "title",
-                "title": "O*NET-SOC 2010 Title",
+                "name": "titles",
+                "titles": "O*NET-SOC 2010 Title",
                 "description": "Title of occupational classification.",
                 "type": "string",
                 "required": true
             },
             {
                 "name": "description",
-                "title": "O*NET-SOC 2010 Description",
+                "titles": "O*NET-SOC 2010 Description",
                 "description": "Description of occupational classification.",
                 "type": "string",
                 "required": true
