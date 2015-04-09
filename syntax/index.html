@@ -168,7 +168,7 @@
         This section defines an <dfn>annotated tabular data model</dfn>: a model for tables that are annotated with metadata. <dfn title="annotation">Annotations</dfn> provide information about the cells, rows, columns, tables, and groups of tables with which they are associated. The <dfn title="value">values</dfn> of these annotations may be lists, structured objects, or atomic values. <dfn>Core annotations</dfn> are those that affect the behavior of processors defined in this specification, but other annotations may also be present on any of the components of the model.
       </p>
       <p>
-        Annotations may be described directly in [[!tabular-metadata]], be embedded in a tabular data file, or created during the process of generating an <a>annotated table</a>.
+        Annotations may be described directly in [[!tabular-metadata]], be embedded in a <a>tabular data file</a>, or created during the process of generating an <a>annotated table</a>.
       </p>
       <p class="note">
         In this document, the term <a>annotation</a> refers to any metadata associated with an object in the annotated tabular data model. These are not necessarily web annotations in the sense of [[annotation-model]].
@@ -314,14 +314,14 @@
       <ol>
         <li>metadata supplied by the user of the implementation that is processing the tabular data, see <a href="#overriding-metadata" class="sectionRef"></a></li>
         <li>metadata embedded within the <a>tabular data file</a> itself, see <a href="#embedded-metadata" class="sectionRef"></a></li>
-        <li>metadata in a document linked to using a <code>Link</code> header associated with the tabular data file, see <a href="#link-header" class="sectionRef"></a></li>
-        <li>file-specific metadata in a document located based on the location of the tabular data file, see <a href="#standard-file-metadata" class="sectionRef"></a></li>
-        <li>directory-specific metadata in a document located based on the location of the tabular data file, see <a href="#standard-directory-metadata" class="sectionRef"></a></li>
+        <li>metadata in a document linked to using a <code>Link</code> header associated with the <a>tabular data file</a>, see <a href="#link-header" class="sectionRef"></a></li>
+        <li>file-specific metadata in a document located based on the location of the <a>tabular data file</a>, see <a href="#standard-file-metadata" class="sectionRef"></a></li>
+        <li>directory-specific metadata in a document located based on the location of the <a>tabular data file</a>, see <a href="#standard-directory-metadata" class="sectionRef"></a></li>
       </ol>
       <p>
         Processors MUST always use overriding metadata and embedded metadata. If the overriding metadata does not originate from a complete metadata file itself (for example, if it is generated from command-line options when invoking the implementation), processors MUST attempt to locate the first metadata document from the <code>Link</code> header, the file-specific metadata, or the directory-specific metadata. The located metadata from these locations MUST be merged as defined in [[!tabular-metadata]].
       </p>
-      <p>If no metadata is supplied or found, then the following Metadata is used as the default for extracted <a>embedded metadata</a>:</p>
+      <p>If no metadata is supplied or found, then the following Metadata is used as the <dfn>default metadata</dfn>:</p>
       <pre>
 {
   "@type": "TableGroup",
@@ -492,6 +492,7 @@ Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
               <li>metadata referenced from a <em>Link Header</em> that may be returned when retrieving the tabular data file (see <a href="#link-header" class="sectionRef"></a>).</li>
               <li>file-specific metadata in a document located based on the location of the tabular data file (see <a href="#standard-file-metadata" class="sectionRef"></a>).</li>
               <li>directory-specific metadata in a document located based on the location of the tabular data file (see <a href="#standard-directory-metadata" class="sectionRef"></a>).</li>
+              <li><a>default metadata</a> as defined in <a href="#locating-metadata" class="sectionRef"></a> with a single <code>resources</code> entry where the <code>url</code> property is set from that of the <a>tabular data file</a>.</li>
             </ol>
           </li>
           <li>Proceed as if the process starts with a metadata file using the merged metadata <code>UM<sub>M</sub> = merge(UM<sub>T</sub>, FM)</code> or <code>UM<sub>T</sub></code> if no <code>FM</code> is loaded.</li>
@@ -674,8 +675,8 @@ Content-Type: text/csv;header=absent
         <dd>The character that is used to escape the <a>quote character</a> within escaped cells, set by the <a href="http://w3c.github.io/csvw/metadata/#dialect-doubleQuote"><code>doubleQuote</code></a> property of a <a href="http://w3c.github.io/csvw/metadata/#dfn-dialect-description" class="externalDFN">dialect description</a>. The default is <code>"</code> (such that <code>""</code> is used to escape <code>"</code> within an escaped cell).</dd>
         <dt><dfn>header row count</dfn></dt>
         <dd>The number of <dfn title="header row">header rows</dfn> (following the skipped rows) in the file, set by the <a href="http://w3c.github.io/csvw/metadata/#dialect-header"><code>header</code></a> or <a href="http://w3c.github.io/csvw/metadata/#dialect-headerRowCount"><code>headerRowCount</code></a> property of a <a href="http://w3c.github.io/csvw/metadata/#dfn-dialect-description" class="externalDFN">dialect description</a>. The default is <code>1</code>. A value other than <code>0</code> will mean that the <a title="row source number">source numbers</a> of <a title="row">rows</a> will be different from their <a title="row number">numbers</a>.</dd>
-        <dt><dfn>line terminator</dfn></dt>
-        <dd>The character that is used at the end of a row, set by the <a href="http://w3c.github.io/csvw/metadata/#dialect-lineTerminator"><code>lineTerminator</code></a> property of a <a href="http://w3c.github.io/csvw/metadata/#dfn-dialect-description" class="externalDFN">dialect description</a>. The default is <code>CRLF</code>.</dd>
+        <dt><dfn>line terminators</dfn></dt>
+        <dd>The characters that can be used at the end of a row, set by the <a href="http://w3c.github.io/csvw/metadata/#dialect-lineTerminators"><code>lineTerminators</code></a> property of a <a href="http://w3c.github.io/csvw/metadata/#dfn-dialect-description" class="externalDFN">dialect description</a>. The default is <code>[CRLF, LF]</code>.</dd>
         <dt><dfn>quote character</dfn></dt>
         <dd>The character that is used around escaped cells, set by the <a href="http://w3c.github.io/csvw/metadata/#dialect-quoteChar"><code>quoteChar</code></a> property of a <a href="http://w3c.github.io/csvw/metadata/#dfn-dialect-description" class="externalDFN">dialect description</a>. The default is <code>"</code>.</dd>
         <dt><dfn>skip blank rows</dfn></dt>
@@ -832,7 +833,7 @@ Content-Type: text/csv;header=absent
             <li>If the character is an <a>escape character</a> followed by the <a>quote character</a>, append both characters to the <a>row content</a>, and move on to process the character following the <a>quote character</a>.</li>
             <li>Otherwise, if the character is an <a>escape character</a> and the <a>escape character</a> is not the same as the <a>quote character</a>, append the <a>escape character</a> and the character following it to the <a>row content</a> and move on to process the next character.</li>
             <li>Otherwise, if the character is a <a>quote character</a>, append the <a>quoted value</a> obtained by <a title="read a quoted value">reading a quoted value</a> to the <a>row content</a> and move on to process the character following the quoted value.</li>
-            <li>Otherwise, if the character is a <a>line terminator</a>, return the <a>row content</a>.</li>
+            <li>Otherwise, if the character is, or starts a sequence that is, a <a title="line terminators">line terminator</a>, return the <a>row content</a>.</li>
             <li>Otherwise, append the character to the <a>row content</a> and move on to process the next character.</li>
           </ol>
         </li>
