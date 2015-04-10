@@ -114,7 +114,7 @@
 
       <p> The [[!tabular-data-model]] defines an <a href="http://w3c.github.io/csvw/syntax/#dfn-annotated-tabular-data-model" class="externalDFN">annotated tabular data model</a> consisting of <a href="http://w3c.github.io/csvw/syntax/#dfn-table" class="externalDFN">tables</a>, <a href="http://w3c.github.io/csvw/syntax/#dfn-column" class="externalDFN">columns</a>, <a href="http://w3c.github.io/csvw/syntax/#dfn-row" class="externalDFN">rows</a>, and <a href="http://w3c.github.io/csvw/syntax/#dfn-cell" class="externalDFN">cells</a>, enriched with <a href="http://w3c.github.io/csvw/syntax/#dfn-annotation" class="externalDFN">annotations</a> that describe the structure of the <a href="http://w3c.github.io/csvw/syntax/#dfn-tabular-data" class="externalDFN">tabular data</a> and the meaning of its content. A <a href="http://w3c.github.io/csvw/syntax/#dfn-group-of-tables" class="externalDFN">table group</a> is a collection of <a href="http://w3c.github.io/csvw/syntax/#dfn-table" class="externalDFN">tables</a> published as a single atomic unit.</p>
 
-      <p>The conversion procedure described in this specification operates on the <a href="http://w3c.github.io/csvw/syntax/#dfn-tabular-data" class="externalDFN">tabular data</a>. This specification does not specify the processes needed to convert CSV-encoded data into tabular data form. Please refer to [[!tabular-data-model]] for details of <a href="http://w3c.github.io/csvw/syntax/#parsing">parsing tabular data</a>.</p>
+      <p>The conversion procedure described in this specification operates on the <a href="http://w3c.github.io/csvw/syntax/#dfn-annotated-tabular-data-model" class="externalDFN">annotated tabular data model</a>. This specification does not specify the processes needed to convert CSV-encoded data into tabular data form. Please refer to [[!tabular-data-model]] for details of <a href="http://w3c.github.io/csvw/syntax/#parsing">parsing tabular data</a>.</p>
 
       <p>Conversion applications MUST provide at least two modes of operation: <a title="standard mode">standard</a> and <a title="minimal mode">minimal</a>.</p>
 
@@ -126,13 +126,14 @@
 
       <p>Conversion applications MAY offer additional implementation specific conversion modes.</p>
 
-      <p><a href="http://w3c.github.io/csvw/metadata/#dfn-conversion-specification" class="externalDFN">Conversion specifications</a>, as defined in [[!tabular-metadata]] MAY be used to specify how <a href="http://w3c.github.io/csvw/syntax/#dfn-tabular-data" class="externalDFN">tabular data</a> can be transformed into another format using a script or template. Such a <a href="http://w3c.github.io/csvw/metadata/#dfn-conversion-specification" class="externalDFN">conversion specification</a> MAY use the JSON output described in this specification as input.</p>
-
-      <p>The conversion procedure described in this specification is considered to be <em>entirely textual</em>. There is no requirement on conversion applications to check the semantic consistency of the data during the conversion, nor to validate the output against JSON syntax rules. Downstream applications SHOULD be aware of the potential for syntax errors and take appropriate action.</p>
+      <p><a href="http://w3c.github.io/csvw/metadata/#dfn-transformation-definition" class="externalDFN">Transformation definitions</a>, as defined in [[!tabular-metadata]] MAY be used to specify how <a href="http://w3c.github.io/csvw/syntax/#dfn-tabular-data" class="externalDFN">tabular data</a> can be transformed into another format using a script or template. Such a <a href="http://w3c.github.io/csvw/metadata/#dfn-transformation-definition" class="externalDFN">transformation definitions</a> MAY use the JSON output described in this specification as input.</p>
     </section>
 
     <section id="conformance">
-      <p><a href="http://w3c.github.io/csvw/syntax/#dfn-tabular-data" class="externalDFN">Tabular data</a> MUST conform to the description from [[!tabular-data-model]]. In particular note that each <a href="http://w3c.github.io/csvw/syntax/#dfn-row" class="externalDFN">row</a> MUST contain the same number of <a href="http://w3c.github.io/csvw/syntax/#dfn-cell" class="externalDFN">cells</a> (although some of these <a href="http://w3c.github.io/csvw/syntax/#dfn-cell" class="externalDFN">cells</a> may be empty). Given this constraint, not all CSV-encoded data can be considered to be tabular data. As such, the conversion procedure described in this specification cannot be applied to all CSV files.</p>
+      <p><a href="http://w3c.github.io/csvw/syntax/#dfn-tabular-data" class="externalDFN">Tabular data</a> MUST conform to the description from [[!tabular-data-model]]. In particular note that each <a href="http://w3c.github.io/csvw/syntax/#dfn-row" class="externalDFN">row</a> MUST contain the same number of <a href="http://w3c.github.io/csvw/syntax/#dfn-cell" class="externalDFN">cells</a> (although some of these <a href="http://w3c.github.io/csvw/syntax/#dfn-cell" class="externalDFN">cells</a> may be empty).</p>
+      <p class="note">
+        Not all CSV-encoded data can be parsed into a tabular data model. An algorithm for parsing CSV-based files is described in [[!tabular-model]].
+      </p>
     </section>
 
     <section id="conversion">
@@ -144,7 +145,7 @@
         <h3>Algorithm terms</h3>
         <dl>
           <dt><dfn>aboutUrl</dfn></dt>
-          <dd><a>aboutUrl</a> is the evaluation of the <a href="http://w3c.github.io/csvw/metadata/#dfn-uri-template-property">URI template property</a> <a href="http://w3c.github.io/csvw/metadata/#cell-aboutUrl"><code>aboutUrl</code></a> for the current <a href="http://w3c.github.io/csvw/syntax/#dfn-cell" class="externalDFN">cell</a>.</dd>
+          <dd><a>aboutUrl</a> is the value of <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-about-url" class="externalDFN">about url</a> annotation for the current <a href="http://w3c.github.io/csvw/syntax/#dfn-cell" class="externalDFN">cell</a>.</dd>
 
           <dt><dfn>annotated table</dfn></dt>
           <dd>The <a href="http://w3c.github.io/csvw/syntax/#dfn-annotated-table" class="externalDFN">annotated table</a> is defined in [[!tabular-data-model]] as describing a particular <a href="http://w3c.github.io/csvw/syntax/#dfn-table" class="externalDFN">table</a> and its metadata.</dd>
@@ -159,19 +160,19 @@
           <dd><a href="http://w3c.github.io/csvw/syntax/#dfn-cell-errors" class="externalDFN">Cell errors</a> are defined in [[!tabular-data-model]] as a (possibly empty) list of validation errors generated while parsing the literal content of a <a>cell</a> to generate the <a title="cell value">semantic value</a>.</dd>
 
           <dt><dfn>cell value</dfn></dt>
-          <dd>A <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">cell value</a> is defined in [[!tabular-data-model]] as the semantic value of the <a>cell</a>; this MAY be <code>null</code> or, in the case that the <a>cell</a> specifies a <a href="http://w3c.github.io/csvw/metadata/#cell-separator"><code>separator</code></a> property, a sequence of values.</dd>
+          <dd>A <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">cell value</a> is defined in [[!tabular-data-model]] as the semantic value of the <a>cell</a>; this MAY be <code>null</code> or a sequence of values.</dd>
 
           <dt><dfn>column</dfn></dt>
           <dd>A <a href="http://w3c.github.io/csvw/syntax/#dfn-column" class="externalDFN">column</a> is defined in [[!tabular-data-model]] as a vertical arrangement of <a title="cell">cells</a> within a <a title="annotated table">table</a>.</dd>
 
-          <dt><dfn>common properties</dfn></dt>
-          <dd>The <a>common properties</a>, defined in <a href="http://w3c.github.io/csvw/metadata/#common-properties">Section 3.3 Common Properties</a> of [[!tabular-metadata]]), may be specified for <a title="annotated table">tables</a> and <a title="table group">table groups</a>.</dd>
-
           <dt><dfn>identifier</dfn></dt>
-          <dd>The identifier is the evaluation of the <code>@id</code> property for the current resource. As defined in [[!tabular-data-model]], the <a>identifier</a> is <code>null</code> if the <code>@id</code> property is undefined. The <a>identifier</a> MAY be applied to either a <a href="http://w3c.github.io/csvw/syntax/#dfn-group-of-tables" class="externalDFN">table group</a> or a <a href="http://w3c.github.io/csvw/syntax/#dfn-annotated-table" class="externalDFN">table</a>.</dd>
+          <dd>The identifier is the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-table-id" class="externalDFN">id</a> annotation for the current object. As defined in [[!tabular-data-model]], the <a>identifier</a> may be <code>null</code>. The <a>identifier</a> MAY be applied to either a <a href="http://w3c.github.io/csvw/syntax/#dfn-group-of-tables" class="externalDFN">table group</a> or a <a href="http://w3c.github.io/csvw/syntax/#dfn-annotated-table" class="externalDFN">table</a>.</dd>
 
           <dt><dfn>name</dfn></dt>
           <dd>In the context of this specification, <a>name</a> is used as defined in JSON ([[!RFC7159]]); that is, that <a>name</a> is a string that provides a unique key within a set of name-value pairs within a JSON <a>object</a>.</dd>
+
+          <dt><dfn>non-core annotations</dfn></dt>
+          <dd>Core annotations are listed in [[!tabular-model]]; <a title="table group">table groups</a> and <a title="annotated table">tables</a> may also have other annotations that are not defined in that specification; these are known as <a>non-core annotations</a>.</dd>
 
           <dt><dfn>notes</dfn></dt>
           <dd>A list of <a href="http://w3c.github.io/csvw/syntax/#dfn-table-notes" class="externalDFN">notes</a>, as defined in [[!tabular-data-model]], attached to an <a title="annotated table">annotated table</a> or <a>table group</a> using the <code>notes</code> property. This may be an empty list.</dd>
@@ -180,7 +181,7 @@
           <dd>An <a>object</a> is defined in JSON ([[!RFC7159]]) as unordered collection of zero or more name-value pairs, where a name is a string and a value is a string, number, boolean, null, <a>object</a>, or <a>array</a>.</dd>
 
           <dt><dfn>propertyUrl</dfn></dt>
-          <dd>The <a>propertyUrl</a> is the evaluation of the <a href="http://w3c.github.io/csvw/metadata/#dfn-uri-template-property">URI template property</a> <a href="http://w3c.github.io/csvw/metadata/#cell-propertyUrl"><code>propertyUrl</code></a> for the current <a href="http://w3c.github.io/csvw/syntax/#dfn-cell" class="externalDFN">cell</a>.</dd>
+          <dd>The <a>propertyUrl</a> is the value of <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-property-url" class="externalDFN">property url</a> annotation for the current <a href="http://w3c.github.io/csvw/syntax/#dfn-cell" class="externalDFN">cell</a>.</dd>
 
           <dt><dfn>row</dfn></dt>
           <dd>The <a href="http://w3c.github.io/csvw/syntax/#dfn-row" class="externalDFN">row</a> is defined in [[!tabular-data-model]] as a horizontal arrangement of <a title="cell">cells</a> within a <a title="annotated table">table</a>.</dd>
@@ -196,12 +197,9 @@
 
           <dt><dfn>table group</dfn></dt>
           <dd>The <a href="http://w3c.github.io/csvw/syntax/#dfn-group-of-tables" class="externalDFN">table group</a> is defined in [[!tabular-data-model]] as comprising a set of <a title="annotated table">annotated tables</a> and a set of annotations that relate to those tables.</dd>
-          
-          <dt><dfn>table group description</dfn></dt>
-          <dd>The <a href="http://w3c.github.io/csvw/metadata/#dfn-table-group-description" class="externalDFN">table group</a> <a href="http://w3c.github.io/csvw/metadata/#dfn-description-object" class="externalDFN">description object</a> as defined in [[!tabular-data-model]].</dd>
 
           <dt><dfn>valueUrl</dfn></dt>
-          <dd>The <a>valueUrl</a> is the evaluation of the <a href="http://w3c.github.io/csvw/metadata/#dfn-uri-template-property">URI template property</a> <a href="http://w3c.github.io/csvw/metadata/#cell-valueUrl"><code>valueUrl</code></a> for the current <a href="http://w3c.github.io/csvw/syntax/#dfn-cell" class="externalDFN">cell</a>.</dd>
+          <dd>The <a>valueUrl</a> is the value of <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value-url" class="externalDFN">value url</a> annotation for the current <a href="http://w3c.github.io/csvw/syntax/#dfn-cell" class="externalDFN">cell</a>.</dd>
         </dl>
       </section>
 
@@ -209,9 +207,7 @@
         <h3>Generating JSON</h3>
 
         <p>A conformant JSON conversion application MUST produce output conforming to this algorithm according to the chosen mode of conversion: <a title="standard mode">standard</a> or <a title="minimal mode">minimal</a>.</p>
-
         <p class="note">Where an <a>annotated table</a> is defined in isolation (e.g. in the absence of a <a>table group description</a>), a default <a>table group description</a> is provided with a single <a href="http://w3c.github.io/csvw/syntax/#dfn-table-group-tables" class="externalDFN"><code>tables</code></a> annotation that refers to that <a title="annotated table">table</a>.</p>
-
         <section>
           <h3>Minimal mode</h3>
           <p>The steps in the algorithm defined here apply to <a title="minimal mode">minimal</a> mode.</p>
@@ -262,7 +258,7 @@
               </dl>
             </li>
             <li>
-              <p>Insert any <a>notes</a> and <a>common properties</a> specified for the <a>table group</a> into <a>object</a> <var>G</var> according to the rules provided in <a href="#json-ld-to-json"></a>.</p>
+              <p>Insert any <a>notes</a> and <a>non-core annotations</a> specified for the <a>table group</a> into <a>object</a> <var>G</var> according to the rules provided in <a href="#json-ld-to-json"></a>.</p>
             </li>
             <li>
               <p>Insert the following name-value pair into <a>object</a> <var>G</var>:</p>
@@ -300,7 +296,7 @@
                   </dl>
                 </li>
                 <li>
-                  <p>Insert any <a>notes</a> and <a>common properties</a> specified for the <a title="annotated table">table</a> into <a>object</a> <var>T</var> according to the rules provided in <a href="#json-ld-to-json"></a>.</p>
+                  <p>Insert any <a>notes</a> and <a>non-core annotations</a> specified for the <a title="annotated table">table</a> into <a>object</a> <var>T</var> according to the rules provided in <a href="#json-ld-to-json"></a>.</p>
                   <p class="note">All other annotations for the <a title="annotated table">table</a> are ignored during the conversion; including information about <a href="http://w3c.github.io/csvw/metadata/#dfn-tableschema" class="externalDFN">table schemas</a> and <a href="http://w3c.github.io/csvw/metadata/#dfn-column-description" class="externalDFN">column descriptions</a> specified therein, <a href="http://w3c.github.io/csvw/metadata/#dfn-dialect-description" class="externalDFN">dialect descriptions</a>, <a href="http://w3c.github.io/csvw/metadata/#dfn-foreign-key-definition" class="externalDFN">foreign-key-definitions</a> etc.</p>
                 </li>
                 <li>
@@ -617,9 +613,9 @@
 
     <section>
       <h3>JSON-LD to JSON</h3>
-      <p>This section defines a mechanism for transforming the [[json-ld]] <a href="http://w3c.github.io/csvw/metadata/#json-ld-dialect">dialect</a> used for <a>common properties</a> and <a><code>notes</code></a> into JSON.</p>
+      <p>This section defines a mechanism for transforming the [[json-ld]] <a href="http://w3c.github.io/csvw/metadata/#json-ld-dialect">dialect</a> used for <a>non-core annotations</a> and <a><code>notes</code></a> into JSON.</p>
 
-      <p>Name-value pairs from <a>notes</a> and <a>common properties</a> annotations are generally copied verbatim from the metadata description subject to the exceptions below:</p>
+      <p>Name-value pairs from <a>notes</a> and <a>non-core annotations</a> annotations are generally copied verbatim from the metadata description subject to the exceptions below:</p>
       <ol>
         <li>
           <p>Name-value pairs whose value is an <a>object</a> using the [[json-ld]] keyword <code>@value</code>, for example:</p>
@@ -656,7 +652,7 @@
         </li>
       </ol>
 
-      <p>In addition to compacting values of <a title="propertyUrl">propertyUrls</a>, URLs which ware the value of <code>@type</code> used within the <a>notes</a> and <a>common properties</a> are compacted according to the rules as defined in <cite><a href="http://w3c.github.io/csvw/metadata/#url-compaction">URL Compaction</a></cite> in [[!tabular-metadata]].</p>
+      <p>In addition to compacting values of <a title="propertyUrl">propertyUrls</a>, URLs which ware the value of <code>@type</code> used within the <a>notes</a> and <a>non-core annotations</a> are compacted according to the rules as defined in <cite><a href="http://w3c.github.io/csvw/metadata/#url-compaction">URL Compaction</a></cite> in [[!tabular-metadata]].</p>
     </section>
 
     <section id="examples" class="informative">
@@ -931,7 +927,7 @@
 
         <div class="note">
           <p><a title="annotated table">Table</a> <var>T</var> (<code>{ "url": "http://example.org/tree-ops-ext.csv"}</code>) has been explicitly identified: <code>{ "@id": "&lt;http://exmple.org/tree-ops-ext&gt;"}</code>.</p>
-          <p><a title="common properties">Common properties</a> and <a>notes</a> specified for <a title="annotated table">table</a> <var>T</var> (<code>{ "url": "http://example.org/tree-ops-ext.csv"}</code>) are included in the output.</p>
+          <p><a title="non-core annotations">Non-core annotations</a> and <a>notes</a> specified for <a title="annotated table">table</a> <var>T</var> (<code>{ "url": "http://example.org/tree-ops-ext.csv"}</code>) are included in the output.</p>
         </div>
 
       </section>
