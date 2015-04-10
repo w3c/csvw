@@ -289,7 +289,7 @@
           <li><dfn title="cell string value">string value</dfn> &mdash; a string that is the original syntactic representation of the value of the cell, eg how the cell appears within a CSV file; this may be an empty string.</li>
           <li><dfn title="cell table">table</dfn> &mdash; the <a>table</a> in which the cell appears.</li>
           <li><dfn title="cell text direction">text direction</dfn> &mdash; which direction the text within the cell should be displayed, as described in <a href="#bidirectional-tables" class="sectionRef"></a>.</li>
-          <li><dfn title="cell value">value</dfn> &mdash; the semantic value of the cell; this MAY be of a datatype other than a string, MAY be a list, and MAY be <code>null</code>. For example, annotations might enable a processor to understand the <a title="cell string value">string value</a> of the cell as representing a number or a date. By default, if the <a title="cell string value">string value</a> is an empty string, the semantic value of the cell is <code>null</code>.</li>
+          <li><dfn title="cell value">value</dfn> &mdash; the semantic value of the cell; this MAY have a <dfn title="cell value datatype">datatype</dfn> other than a string, MAY have a <dfn title="cell value language">language</dfn>, MAY be a <dfn title="cell value list">list</dfn>, and MAY be <code>null</code>. For example, annotations might enable a processor to understand the <a title="cell string value">string value</a> of the cell as representing a number or a date. By default, if the <a title="cell string value">string value</a> is an empty string, the semantic value of the cell is <code>null</code>.</li>
           <li><dfn title="cell value URL">value URL</dfn> &mdash; an absolute URL for this cell's value, or <code>null</code>.</li>
         </ul>
         <p class="note">
@@ -309,7 +309,7 @@
       <section>
         <h2>Datatypes</h2>
         <p>
-          Cells within tables may be annotated with a <dfn>datatype</dfn> which indicates the type of the values obtained by parsing the <a title="cell string value">string value</a> of the cell.
+          Columns and Cells within tables may be annotated with a <dfn>datatype</dfn> which indicates the type of the values obtained by parsing the <a title="cell string value">string value</a> of the cell.
         </p>
         <p>
           Datatypes are based on a subset of those defined in [[!xmlschema11-2]] with aliases. The <a>annotated tabular data model</a> limits <a title="cell value">cell values</a> to have datatypes as shown on <a href="#fig-datatypes" class="sectionRef">the diagram</a>:
@@ -633,7 +633,7 @@ Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
           <li>unless the <a>datatype base</a> is <code>string</code>, <code>json</code>, <code>xml</code>, <code>html</code>, <code>anyAtomicType</code>, <code>any</code>, or <code>normalizedString</code>, strip leading and trailing whitespace from the <a title="cell string value">string value</a> and replace all instances of two or more whitespace characters with a single space character.</li>
           <li>if the resulting string is an empty string, apply the remaining steps to the string given by the <a>column default</a> annotation.</li>
           <li>if the <a>column separator</a> annotation is not <code>null</code> and the resulting string is an empty string, the <a>cell value</a> is an empty list. If the <a>column required</a> annotation is <code>true</code>, add an error to the list of <a title="cell errors">errors</a> for the cell.</li>
-          <li>if the <a>column separator</a> annotation is not <code>null</code>, the <a>cell value</a> is a list of values created by:
+          <li>if the <a>column separator</a> annotation is not <code>null</code>, the <a>cell value</a> is a list of values; set the <a title="cell value list">list</a> annotation on the <a>cell</a> to <code>true</code>, and create the <a>cell value</a> created by:
             <ol class="algorithm">
               <li>if the normalized string is an empty string, apply the remaining steps to the string given by the <a>column default</a> annotation.</li>
               <li>if the normalized string is the same as any one of the values of the <a>column null</a> annotation, then the resulting value is <code>null</code>.</li>
@@ -644,8 +644,8 @@ Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
           </li>
           <li>if the string is an empty string, apply the remaining steps to the string given by the <a>column default</a> annotation.</li>
           <li>if the string is the same as any one of the values of the <a>column null</a> annotation, then the resulting value is <code>null</code>. If the <a>column separator</a> annotation is <code>null</code> and the <a>column required</a> annotation is <code>true</code>, add an error to the list of <a title="cell errors">errors</a> for the cell.</li>
-          <li>validate the string based on the datatype, using the <a>datatype format</a> annotation if one is specified, as described below, and then against the constraints described in <a href="#datatypes" class="sectionRef"></a>; if there are any errors, add them to the list of <a title="cell errors">errors</a> for the cell; the resulting value is typed as a <code>string</code> with the language provided by the <a>column lang</a> annotation.</li>
-          <li>otherwise, if there are no errors, parse the string using the <a>datatype format</a> if one is specified, as described below; the resulting value is typed according to the <a>datatype base</a> and if the <a>datatype base</a> is <code>string</code>, or there is no <code>datatype</code>, it has the language provided by the <a>column lang</a> annotation.</li>
+          <li>validate the string based on the datatype, using the <a>datatype format</a> annotation if one is specified, as described below, and then against the constraints described in <a href="#datatypes" class="sectionRef"></a>; if there are any errors, add them to the list of <a title="cell errors">errors</a> for the cell; the resulting value has a <a title="cell value datatype">datatype</a> annotation of <code>string</code> with the <a title="cell value language">language</a> annotation provided by the <a>column lang</a> annotation.</li>
+          <li>otherwise, if there are no errors, parse the string using the <a>datatype format</a> if one is specified, as described below; the resulting value sets a <a title="cell value datatype">datatype</a> annotation according to the <a>datatype base</a> and if the <a>datatype base</a> is <code>string</code>, or there is no <code>datatype</code>, it sets the <a title="cell value language">language</a> annotation from the <a>column lang</a> annotation.</li>
         </ol>
         <p>The final value (or values) become the <a title="cell value">value</a> annotation on the <a>cell</a>.</p>
         <p>If there is a <a title="column about URL">about URL</a> annotation on the <a>column</a>, it becomes the <a title="cell about URL">about URL</a> annotation on the <a>cell</a>, after being transformed into an absolute URL as described in <cite><a href="http://w3c.github.io/csvw/metadata/#uri-template-properties">URI Template Properties</a></cite> of [[!tabular-metadata]].</p>
