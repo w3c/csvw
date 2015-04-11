@@ -1,10 +1,10 @@
 # Repo organization and the publishing process
 
-The working directories are on the 'top level', like ``/syntax`` (this one will be used as an example in what follows). The ``index.html`` file in those directories are the [``respec``](http://www.w3.org/respec/) sources, plus the possible other accompanying files. The ``respec`` config typically says
+The working directories are on the 'top level', like ``/syntax`` (this one will be used as an example in what follows). The ``index.html`` file in those directories are the [``respec``](http://www.w3.org/respec/) sources, plus the possible other accompanying files. The ``respec`` config typically says something like
 
 	specStatus: "ED",
 	// publishDate: "",
-	previousPublishDate: "2014-03-04", // whatever is appropriate, commented for a FPWD
+	previousPublishDate: "2014-03-04"
 
 the ``/publishing-snapshot`` directory contains specific milestone publications, e.g., ``FPWD-syntax`` or, later, ``WD-syntax-2014-XX-XX`` for a copy of what is officially published at W3C. This means all the relevant data files from ``/syntax``, plus a **generated** ``Overview.html`` file as a pure HTML5 file (i.e., **not** a ``respec`` source).
 
@@ -14,7 +14,7 @@ the ``/publishing-snapshot`` directory contains specific milestone publications,
 
 1. Update the ``/local-biblio.js`` and change the URL-s in the ``conversions`` array to reflect the right URI for the ``/TR`` document. This step will ensure that the right cross references will be generated in the final document (by the ``/replace-ed-uris.js`` script). (Note that this step is very specific to this repository, and may not be relevant for others.)
 1. Create a new subdirectory in ``/publishing-snapshot``, say, ``publishing-snapshot/WD-syntax-2014-12-12``. 
-1. Copy all the auxiliary files (e.g., data files, BNF files, etc) from the main repo area. Note that not *all* the files are necessary for final publications; e.g., the diagrams have a ``.key`` and ``.pdf`` versions that are used in the process of creating those diagrams, but only the ``.svg`` and ``.png`` files are used in the final document.
+1. Copy all the auxiliary files (e.g., data files, BNF files, images, etc.) from the main repo area. Note that not *all* the files may be necessary for final publications; e.g., the diagrams may have a ``.key`` and/or ``.pdf`` versions that are used in the process of creating the diagrams, but only the ``.svg`` and ``.png`` files are used in the final document.
 1. (Before you forget:-) add an entry to the new directory in ``/index.html`` on the top of the repository
 1. Generate the pure HTML file:
 	1. Finalize/change the ``index.html`` file in ``/syntax``
@@ -23,22 +23,21 @@ the ``/publishing-snapshot`` directory contains specific milestone publications,
 	1. Check whether ``respec`` signals a possible problem (a red or orange button should appear on the upper right hand corner for errors or warnings, respectively).
 	1. Push the button called ``respec`` on the upper right hand corner, choose ``Save Snapshot``, then ``Save as HTML``. You should either see the HTML source in your screen (e.g., in Safari or IE) or asked to download the HTML file on your disk.
 	1. Create/update a file called ``Overview.html`` file in the snapshot directory, and commit it to github
-	1. Search & replace any links in `Overview.html` that are referring to Github space (eg `http://w3c.github.io/csvw/syntax/#dfn-cell-value`) to point to the relevant edition of the relevant draft (eg `http://www.w3.org/TR/2015/WD-tabular-data-model-20150108/#dfn-cell-value`)
-	1. ``http://w3c.github.io/csvw/publishing-snapshots/WD-syntax-2014-12-12/Overview.html`` is a local copy of the publication-to-be in pure HTML. 
-		* Note that if you're working in an alternative branch, the content will not be available at ``http://w3c.github.io/[...]``. Instead, use the service at https://rawgit.com/ - paste the URL of the raw file into the RawGit page, e.g. the raw URL ``https://raw.githubusercontent.com/w3c/csvw/my-branch/publishing-snapshots/WD-syntax-2014-12-12/Overview.html`` will publish content at the "development" URL ``https://rawgit.com/w3c/csvw/my-branch/publishing-snapshots/WD-syntax-2014-12-12/Overview.html``.
+		1. If you are in the main (i.e., ``gh-pages``) branch, ``http://w3c.github.io/csvw/publishing-snapshots/WD-syntax-2014-12-12/Overview.html`` is a copy of the publication-to-be in pure HTML. 
+		* If you're working in an alternative branch, the content will *not* be available at ``http://w3c.github.io/[...]``. Instead, use the service at ``https://rawgit.com/``—paste the URL of the raw file into the RawGit page, and you can use the content at the "development" URL ``https://rawgit.com/w3c/csvw/my-branch/publishing-snapshots/WD-syntax-2014-12-12/Overview.html``.
 	1. Use the [W3C pub rules checker](http://www.w3.org/2005/07/pubrules) with this URI to check the validity of the document. If there are problems, go back to the first step.
 	1. Use the [W3C link checker](http://validator.w3.org/checklink) with this URI to check the links in the document (there is a link to the checker from the result generated by the pub rules checker). If there are problems, go back to the first step.
 1. Generate diff from previous version:
 	1. Push the button called ``respec`` on the upper right hand corner, choose ``Save Snapshot`` then ``Diff``,
  	1. Save diff to publication directory using path set in ``otherLinks/Changes/Diff to previous version/href``.
 1. Update working version of file, preferably when the publication is done:
-	1. Set ``otherLinks/Changes/Diff to previous version/href`` based on last publication date.
-	1. Update ``previousPublishDate``, ``previousSpecStatus`` and ``previousURI`` to based on publication snapshot.
-1. Once all pubrule issues are solved, you are ready. The next step is for the staff contact to make a copy of the snapshot and put it on the W3C server at ``http://www.w3.org/TR/2014/...``
+	1. Set ``otherLinks/Changes/Diff previous version/href`` based on last publication date (in case the choice is to include a date in the ``diff`` file’s name)
+	1. Update ``previousPublishDate``, ``previousSpecStatus`` and ``previousURI`` based on the publication snapshot.
+1. Once all pubrules issues are solved, you are ready. The next step is for the staff contact to make a copy of the snapshot and push it on the W3C server at ``http://www.w3.org/TR/2014/...``
 
-The process may become slightly simpler if you run a local Web server on your machine that has an access to the local github repository. Indeed, in that case, step 4.2. can be omitted, i.e., the ``Overview.html`` file can be generated locally. Alternatively, you may choose to make a local copy of ``index.html`` and open the file from your browser locally. The danger, in this case, is to loose sync with the "master" copy.
+The process may become slightly simpler if you run a local Web server on your machine that has an access to the local github repository. Indeed, in that case, step 5.2. can be omitted, i.e., the ``Overview.html`` file can be generated locally. Alternatively, you may choose to make a local copy of ``index.html`` and open the file from your browser locally. The danger, in this case, is to loose sync with the "master" copy, but if you are sure you have that under control, then this is probably the simplest approach. (Note, however, that you still have to push the new version to github to let the W3C rule checkers do their work…)
 
-This process is based on the assumption that ``index.html`` (i.e., ``respec`` format) differs from the final document only in terms of the specification status and date (or other configuration option can be set in the URI). If that is not the case, then a local copy of the file has to be added to the snapshot and be manipulated in that directory; of course, in that case the simplest is to set the ``specStatus`` and other options in that copy. Again, the danger of course is to loose sync with the "master" copy.
+This process is based on the assumption that ``index.html`` (i.e., ``respec`` format) differs from the final document only in terms of the specification status and date (or other configuration option that can be set in the URI). If that is not the case, then a local copy of the file has to be added to the snapshot and be manipulated in that directory; of course, in that case the simplest is to set the ``specStatus`` and other options in that copy. Again, the danger of course is to loose sync with the "master" copy.
 
  
 
