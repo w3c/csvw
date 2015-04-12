@@ -27,7 +27,7 @@
 *
 */
 respecEvents.sub("save", function() {
-  $("a").not( $("div.head a") ).each( function(index) {
+  $("a[href]").not( $("div.head a") ).each( function(index) {
     var href = $(this).attr("href");
     for( var i = 0; i < conversions.length; i++ ) {
       var to_be_replaced = conversions[i][0];
