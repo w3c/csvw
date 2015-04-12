@@ -1086,9 +1086,9 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           <dt id="column-titles"><code>titles</code></dt>
           <dd>
             <p>
-              A <a>natural language property</a> that provides possible alternative names for the column. The value of this property becomes the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-titles" class="externalDFN">titles</a> annotation for the described <a href="http://w3c.github.io/csvw/syntax/#dfn-column" class="externalDFN">column</a>.
+              A <a>natural language property</a> that provides possible alternative names for the column. The string values of this property, along with their associated language tags, become the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-titles" class="externalDFN">titles</a> annotation for the described <a href="http://w3c.github.io/csvw/syntax/#dfn-column" class="externalDFN">column</a>.
             </p>
-            <p>If there is no <code>name</code> property defined on this column, the first <code>titles</code> string value having the same language tag as <a>default language</a> or <code>und</code> or if no default language is specified, becomes the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-name" class="externalDFN">name</a> annotation for the described <a href="http://w3c.github.io/csvw/syntax/#dfn-column" class="externalDFN">column</a>. This annotation MUST be <a href="https://tools.ietf.org/html/rfc3986#page-12" class="externalDFN">percent-encoded</a> as necessary to conform to the syntactic requirements defined in [[!RFC3986]].</p>
+            <p>If there is no <code>name</code> property defined on this column, the first <code>titles</code> value having the same language tag as <a>default language</a>, or <code>und</code> or if no default language is specified, becomes the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-name" class="externalDFN">name</a> annotation for the described <a href="http://w3c.github.io/csvw/syntax/#dfn-column" class="externalDFN">column</a>. This annotation MUST be <a href="https://tools.ietf.org/html/rfc3986#page-12" class="externalDFN">percent-encoded</a> as necessary to conform to the syntactic requirements defined in [[!RFC3986]]</p>
           </dd>
           <dt id="column-virtual"><code>virtual</code></dt>
           <dd>
@@ -1637,7 +1637,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           </figure>
         </section>
         <section>
-          <h4>Derived Datatypes</h4>
+          <h3>Derived Datatypes</h3>
           <p>
             More specialised datatypes can be defined through a <dfn>datatype description</dfn>. A datatype description may have any of the following properties, all of which are optional.
           </p>
@@ -1711,6 +1711,21 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           </dl>
           <p>
             The <a>datatype description</a> MAY contain any <a title="common property">common properties</a> to provide extra metadata about the datatype, such as a title or description.
+          </p>
+          <p>
+            Applications MUST raise an error if both <code>length</code> and <code>minLength</code> are specified and they do not have the same value. Similarly, applications MUST raise an error if both <code>length</code> and <code>maxLength</code> are specified and they do not have the same value. Applications MUST raise an error if <code>length</code>, <code>maxLength</code>, or <code>minLength</code> are specified and the <a href="#datatype-base"><code>base</code></a> datatype is not <code>string</code> or one of its subtypes, or a binary type.
+          </p>
+          <p>
+            In all ways, including the errors described below, the <code>minimum</code> property is equivalent to the <code>minInclusive</code> property and the <code>maximum</code> property is equivalent to the <code>maxInclusive</code> property. Applications MUST raise an error if both <code>minimum</code> and <code>minInclusive</code> are specified and they do not have the same value. Similarly, applications MUST raise an error if both <code>maximum</code> and <code>maxInclusive</code> are specified and they do not have the same value.
+          </p>
+          <p>
+            Applications MUST raise an error if both <code>minInclusive</code> and <code>minExclusive</code> are specified, or if both <code>maxInclusive</code> and <code>maxExclusive</code> are specified. Applications MUST raise an error if both <code>minInclusive</code> and <code>maxInclusive</code> are specified and <code>maxInclusive</code> is less than <code>minInclusive</code>, or if both <code>minInclusive</code> and <code>maxExclusive</code> are specified and <code>maxExclusive</code> is less than or equal to <code>minInclusive</code>. Similarly, applications MUST raise an error if both <code>minExclusive</code> and <code>maxExclusive</code> are specified and <code>maxExclusive</code> is less than <code>minExclusive</code>, or if both <code>minExclusive</code> and <code>maxInclusive</code> are specified and <code>maxInclusive</code> is less than or equal to <code>minExclusive</code>.
+          </p>
+          <p>
+            Applications MUST raise an error if <code>minimum</code>, <code>minInclusive</code>, <code>maximum</code>, <code>maxInclusive</code>, <code>minExclusive</code>, or <code>maxExclusive</code> are specified and the <a href="#datatype-base"><code>base</code></a> datatype is not a numeric, date/time, or duration type.
+          </p>
+          <p>
+            Validation against these properties is as defined in [[!xmlschema11-2]].
           </p>
         </section>
       </section>
