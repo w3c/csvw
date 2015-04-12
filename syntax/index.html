@@ -606,7 +606,7 @@ Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
           <a title="column lang">lang</a>,
           <a title="column null">null</a>,
           <a title="column required">required</a>, and
-          <a title="column separator">separator</a> annotations provide the information needed to parse the <a title="cell string value">string value</a> of a cell into its (semantic) <a title="cell value">value</a>. This is used:
+          <a title="column separator">separator</a> annotations provide the information needed to parse the <a title="cell string value">string value</a> of a cell into its (semantic) <a title="cell value">value</a> annotation. This is used:
         </p>
         <ul>
           <li>by <strong>validators</strong> to check that the data in the table is in the expected format,</li>
@@ -636,11 +636,10 @@ Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
         <ol class="algorithm">
           <li>unless the <a>datatype base</a> is <code>string</code>, <code>json</code>, <code>xml</code>, <code>html</code> or <code>anyAtomicType</code>, replace all carriage return (<code>#xD</code>), line feed (<code>#xA</code>), and tab (<code>#x9</code>) characters with space characters.</li>
           <li>unless the <a>datatype base</a> is <code>string</code>, <code>json</code>, <code>xml</code>, <code>html</code>, <code>anyAtomicType</code>, or <code>normalizedString</code>, strip leading and trailing whitespace from the <a title="cell string value">string value</a> and replace all instances of two or more whitespace characters with a single space character.</li>
-          <li>if the resulting string is an empty string, apply the remaining steps to the string given by the <a>column default</a> annotation.</li>
-          <li>if the <a>column separator</a> annotation is not <code>null</code> and the resulting string is an empty string, the <a>cell value</a> is an empty list. If the <a>column required</a> annotation is <code>true</code>, add an error to the list of <a title="cell errors">errors</a> for the cell.</li>
+          <li>if the normalized string is an empty string, apply the remaining steps to the string given by the <a>column default</a> annotation.</li>
+          <li>if the <a>column separator</a> annotation is not <code>null</code> and the normalized string is an empty string, the <a>cell value</a> is an empty list. If the <a>column required</a> annotation is <code>true</code>, add an error to the list of <a title="cell errors">errors</a> for the cell.</li>
           <li>if the <a>column separator</a> annotation is not <code>null</code>, the <a>cell value</a> is a list of values; set the <a title="cell value list">list</a> annotation on the <a>cell</a> to <code>true</code>, and create the <a>cell value</a> created by:
             <ol class="algorithm">
-              <li>if the normalized string is an empty string, apply the remaining steps to the string given by the <a>column default</a> annotation.</li>
               <li>if the normalized string is the same as any one of the values of the <a>column null</a> annotation, then the resulting value is <code>null</code>.</li>
               <li>split the normalized string at the character specified by the <a>column separator</a> annotation.</li>
               <li>unless the <a>datatype base</a> is <code>string</code> or <code>anyAtomicType</code>, strip leading and trailing whitespace from these strings.</li>
@@ -649,8 +648,8 @@ Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
           </li>
           <li>if the string is an empty string, apply the remaining steps to the string given by the <a>column default</a> annotation.</li>
           <li>if the string is the same as any one of the values of the <a>column null</a> annotation, then the resulting value is <code>null</code>. If the <a>column separator</a> annotation is <code>null</code> and the <a>column required</a> annotation is <code>true</code>, add an error to the list of <a title="cell errors">errors</a> for the cell.</li>
-          <li>validate the string based on the datatype, using the <a>datatype format</a> annotation if one is specified, as described below, and then against the constraints described in <a href="#datatypes" class="sectionRef"></a>; if there are any errors, add them to the list of <a title="cell errors">errors</a> for the cell; the resulting value has a <a title="cell value datatype">datatype</a> annotation of <code>string</code> with the <a title="cell value language">language</a> annotation provided by the <a>column lang</a> annotation.</li>
-          <li>otherwise, if there are no errors, parse the string using the <a>datatype format</a> if one is specified, as described below; the resulting value sets a <a title="cell value datatype">datatype</a> annotation according to the <a>datatype base</a> and if the <a>datatype base</a> is <code>string</code>, or there is no <code>datatype</code>, it sets the <a title="cell value language">language</a> annotation from the <a>column lang</a> annotation.</li>
+          <li>parse the string using the <a>datatype format</a> if one is specified, as described below to give a value with an associated <a title="cell value datatype">datatype</a>. If the <a>datatype base</a> is <code>string</code>, or there is no <code>datatype</code>, the value has an associated <a title="cell value language">language</a> from the <a>column lang</a> annotation. If there are any errors, add them to the list of <a title="cell errors">errors</a> for the cell; in this case the value has a <a title="cell value datatype">datatype</a> of <code>string</code>; if the <a>datatype base</a> is <code>string</code>, or there is no <code>datatype</code>, the value has an associated <a title="cell value language">language</a> from the <a>column lang</a> annotation.</li>
+          <li>validate the value based on the length constraints described in <a href="#length-constraints" class="sectionRef"></a>, the value constraints described in <a href="#value-constraints" class="sectionRef"></a> and the <a>datatype format</a> annotation if one is specified, as described below. If there are any errors, add them to the list of <a title="cell errors">errors</a> for the cell.</li>
         </ol>
         <p>The final value (or values) become the <a title="cell value">value</a> annotation on the <a>cell</a>.</p>
         <p>If there is a <a title="column about URL">about URL</a> annotation on the <a>column</a>, it becomes the <a title="cell about URL">about URL</a> annotation on the <a>cell</a>, after being transformed into an absolute URL as described in <cite><a href="http://w3c.github.io/csvw/metadata/#uri-template-properties">URI Template Properties</a></cite> of [[!tabular-metadata]].</p>
@@ -668,7 +667,7 @@ Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
   "datatype": "integer"
           </pre>
           <p>
-            for the cell with the string value <code>"99"</code> then the value of that cell will be the integer <code>99</code>. A cell whose string value was not a valid integer (such as <code>"one"</code> or <code>"1.0"</code>) would be assigned that string value as its (semantic) value, but also have a validation error listed in its <a title="cell errors">errors</a> annotation.
+            for the cell with the string value <code>"99"</code> then the value of that cell will be the integer <code>99</code>. A cell whose string value was not a valid integer (such as <code>"one"</code> or <code>"1.0"</code>) would be assigned that string value as its (semantic) value annotation, but also have a validation error listed in its <a title="cell errors">errors</a> annotation.
           </p>
           <p>
             Sometimes data uses special codes to indicate unknown or null values. For example, a particular column might contain a number that is expected to be between <code>1</code> and <code>10</code>, with the string <code>99</code> used in the original tabular data file to indicate a null value. The metadata for such a column would include:
@@ -888,7 +887,7 @@ Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
             Authors are encouraged to be conservative in the regular expressions that they use, sticking to the basic features of regular expressions that are likely to be supported across implementations.
           </p>
           <p>
-            Values that are labelled as <code>html</code>, <code>xml</code>, or <code>json</code> are not validated against those formats.
+            Values that are labelled as <code>html</code>, <code>xml</code>, or <code>json</code> SHOULD NOT be validated against those formats.
           </p>
           <p class="note">
             Metadata creators who wish to check the syntax of HTML, XML, or JSON within tabular data should use the <a>datatype format</a> annotation to specify a regular expression against which such values will be tested.
