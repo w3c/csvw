@@ -208,12 +208,20 @@
         The metadata defined in this specification is used to provide annotations on an <a href="http://w3c.github.io/csvw/syntax/#dfn-annotated-table" class="externalDFN">annotated table</a> or <a href="http://w3c.github.io/csvw/syntax/#dfn-group-of-tables" class="externalDFN">group of tables</a>, as defined in [[!tabular-data-model]]. Annotated tables form the basis for all further processing, such as validating, converting, or displaying the tables.
       </p>
       <p>
-        All compliant applications MUST create <a href="http://w3c.github.io/csvw/syntax/#dfn-annotated-table" class="externalDFN">annotated tables</a> based on the algorithm defined here. All compliant applications MUST generate errors if a metadata document does not conform to this specification, such as:
+        All compliant applications MUST create <a href="http://w3c.github.io/csvw/syntax/#dfn-annotated-table" class="externalDFN">annotated tables</a> based on the algorithm defined here. All compliant applications MUST generate errors and stop processing if a metadata document:
       </p>
       <ul>
-        <li>not being compliant with JSON syntax</li>
-        <li>using any JSON outside of the restrictions defined in <a href="#json-ld-dialect" class="sectionRef"></a></li>
-        <li>not specifying a property that it is required to specify</li>
+        <li>does not use valid JSON syntax</li>
+        <li>uses any JSON outside of the restrictions defined in <a href="#json-ld-dialect" class="sectionRef"></a></li>
+        <li>does not specify a property that it is required to specify</li>
+      </ul>
+      <p>
+        Compliant applications MUST ignore properties (aside from <a title="common property">common properties</a>) which are not defined in this specification and MUST generate a warning when they are encoutered.
+      </p>      
+      <p>
+        If a property has a value that is not permitted by this specification, then if a default value is provided for that property, compliant applications MUST use that default value and MUST generate a warning. If no default value is provided for that property, compliant applications MUST generate a warning and behave as if the property had not been specified.
+      </p>      
+      <ul>
         <li>including properties (aside from <a title="common property">common properties</a>) which are not defined in this specification</li>
         <li>having invalid values for a given property</li>
       </ul>
@@ -296,11 +304,14 @@
           <p>
             in which case the <code>tables</code> property has a value that is an array of two <a>table description</a> objects.
           </p>
+          <p>
+            Any items within an array that are not valid objects of the type expected are ignored. If the supplied value of an array property is not an array (eg if it is an integer), compliant applications MUST issue a warning and proceed as if the property had been supplied with an empty array.
+          </p>
         </section>
         <section>
           <h4>Link Properties</h4>
           <p>
-            <dfn title="link property">Link properties</dfn> hold a single reference to another resource by URL. Their value is a <strong>string</strong> &mdash; resolved as a URL against the <a>base URL</a>.
+            <dfn title="link property">Link properties</dfn> hold a single reference to another resource by URL. Their value is a <strong>string</strong> &mdash; resolved as a URL against the <a>base URL</a>. If the supplied value of a link property is not a string (eg if it is an integer), compliant applications MUST issue a warning and proceed as if the property had been supplied with an empty string.
           </p>
           <p>
             For example, the <code>url</code> property is a link property. A <a>table description</a> might contain:
@@ -358,6 +369,9 @@
             <li>expanding any <a href="http://www.w3.org/TR/json-ld/#dfn-prefix" class="externalDFN">prefixes</a> as if the value were the name of a <a>common property</a>, as described in <a href="#common-properties" class="sectionRef"></a></li>
             <li>resolving the resulting URL against the base URL of the <a href="http://w3c.github.io/csvw/syntax/#dfn-table-url" class="externalDFN">table url</a> if not null</li>
           </ol>
+          <p>
+            If the supplied value of a URI template property is not a string (eg if it is an integer), compliant applications MUST issue a warning and proceed as if the property had been supplied with an empty string.
+          </p>
           <p>
             For example, the <a href="#cell-aboutUrl"><code>aboutUrl</code></a> property holds a URI template that is used to generate a URL identifier for each row, which might look like:
           </p>
@@ -445,6 +459,9 @@ CSVW,foaf:Project,table;data;conversion
             <li><strong>arrays</strong> &mdash; lists of strings as above</li>
           </ul>
           <p>
+            If the supplied value of a column reference property is not a string or array (eg if it is an integer), or if any of the values in the supplied array are not strings, or if any of the supplied strings do not reference one or more columns, compliant applications MUST issue a warning and proceed as if the property had been specified (which may mean that an error is issued, if the property was required).
+          </p>
+          <p>
             For example, the <code>primaryKey</code> property is a column reference property on the schema. It has to hold references to columns defined elsewhere in the schema, and the descriptions of those columns must have <code>name</code> properties. It can hold a single reference, like this:
           </p>
           <pre class="example highlight">
@@ -478,6 +495,9 @@ CSVW,foaf:Project,table;data;conversion
             <li><strong>strings</strong> &mdash; resolved as URLs against the <a>base URL</a></li>
             <li><strong>objects</strong> &mdash; interpreted as structured objects</li>
           </ul>
+          <p>
+            If the supplied value of an object property is not a string or object (eg if it is an integer), compliant applications MUST issue a warning and proceed as if the property had been specified as an object with no properties.
+          </p>
           <p>
             Object properties are often used when the values can be or should be values within controlled vocabularies, or structured information which may be held elsewhere. For example, the <code>dialect</code> of a table is an object property. It could be provided as a URL that indicates a commonly used dialect, like this:
           </p>
@@ -565,6 +585,9 @@ CSVW,foaf:Project,table;data;conversion
           <p class="note">
             When extracting a <a href="http://w3c.github.io/csvw/syntax/#dfn-annotation-value" class="externalDFN">annotation value</a> from a metadata that will have already been <a>merged</a>, a <a>natural language property</a> will already have this form.
           </p>
+          <p>
+            If the supplied value of a natural language property is not a string, array or object (eg if it is an integer), compliant applications MUST issue a warning and proceed as if the property had been specified as an empty array. If the supplied value is an array, any items in that array that are not strings MUST be ignored. If the supplied value is an object, any properties that are not valid language codes as defined by [[!BCP47]] MUST be ignored, as must any properties whose value is not a string or an array, and any items that are not strings within array values of these properties.
+          </p>
         </section>
         <section>
           <h4>Atomic Properties</h4>
@@ -579,7 +602,7 @@ CSVW,foaf:Project,table;data;conversion
             <li><strong>arrays</strong> &mdash; lists of numbers, booleans, strings, or objects</li>
           </ul>
           <p>
-            The <a href="http://w3c.github.io/csvw/syntax/#dfn-annotation-value" class="externalDFN">annotation value</a> of a boolean atomic property is <code>false</code> if unset; otherwise, the <a href="http://w3c.github.io/csvw/syntax/#dfn-annotation-value" class="externalDFN">annotation value</a> of an atomic property is <a title="normalization">normalized</a> value of that property, or the defined default value or <code>null</code>, if unset. Processors MUST raise an error if a property is set to an invalid value type, such as a boolean atomic property being set to the number <code>1</code> or a numeric atomic property being set to the string <code>"3.1415"</code>.
+            The <a href="http://w3c.github.io/csvw/syntax/#dfn-annotation-value" class="externalDFN">annotation value</a> of a boolean atomic property is <code>false</code> if unset; otherwise, the <a href="http://w3c.github.io/csvw/syntax/#dfn-annotation-value" class="externalDFN">annotation value</a> of an atomic property is <a title="normalization">normalized</a> value of that property, or the defined default value or <code>null</code>, if unset. Processors MUST issue a warning if a property is set to an invalid value type, such as a boolean atomic property being set to the number <code>1</code> or a numeric atomic property being set to the string <code>"3.1415"</code>, and act as if the property had not been specified (which may mean using the default value for the property, or may mean raising an error and halting processing if the property is a required property).
           </p>
         </section>
       </section>
@@ -594,7 +617,7 @@ CSVW,foaf:Project,table;data;conversion
               <dt id="context-base"><code>@base</code></dt>
               <dd>
                 <p>
-                  an <a>atomic property</a> that provides the base URL against which other URLs within the metadata file are resolved. If present, its value MUST be a URL which is resolved against the location of the metadata document to provide the <dfn>base URL</dfn> for other URLs in the metadata document; if unspecified, the base URL used for interpreting relative URLs within the metadata document is the location of the metadata document itself.
+                  an <a>atomic property</a> that provides the base URL against which other URLs within the metadata file are resolved. If present, its value MUST be a string that is interpreted as a URL which is resolved against the location of the metadata document to provide the <dfn>base URL</dfn> for other URLs in the metadata document; if unspecified, the base URL used for interpreting relative URLs within the metadata document is the location of the metadata document itself.
                 </p>
                 <p class="note">
                   Note that the <code>@base</code> property of the <code>@context</code> object provides the base URL used for URLs within the metadata document, not the URLs that appear as data within the group of tables or table it describes. <a title="URI template property">URI template properties</a> are not resolved against this base URL: they are resolved against the URL of the table.
@@ -603,7 +626,7 @@ CSVW,foaf:Project,table;data;conversion
               <dt id="context-language"><code>@language</code></dt>
               <dd>
                 <p>
-                  an <a>atomic property</a> that indicates the <dfn>default language</dfn> for the values of <a title="natural language property">natural language</a> or string-valued <a title="common property">common</a> properties in the metadata document; if present, its value MUST be a language code [[!BCP47]].
+                  an <a>atomic property</a> that indicates the <dfn>default language</dfn> for the values of <a title="natural language property">natural language</a> or string-valued <a title="common property">common</a> properties in the metadata document; if present, its value MUST be a language code [[!BCP47]]. The default is <code>und</code>.
                 </p>
                 <p class="note">
                   Note that the <code>@language</code> property of the <code>@context</code> object, which gives the default language used within the metadata file, is distinct from the <code>lang</code> property on a <a>description object</a>, which gives the language used in the data within a group of tables, table, or column.
@@ -623,7 +646,7 @@ CSVW,foaf:Project,table;data;conversion
           <dl>
             <dt id="table-group-tables"><code>tables</code></dt>
             <dd>
-              <p>An <a>array property</a> of <a title="table description">table descriptions</a> for the tables in the group, namely those listed in the <a href="http://w3c.github.io/csvw/syntax/#dfn-table-group-tables" class="externalDFN">tables</a> annotation on the <a href="http://w3c.github.io/csvw/syntax/#dfn-group-of-tables" class="externalDFN">group of tables</a> being described.</p>
+              <p>An <a>array property</a> of <a title="table description">table descriptions</a> for the tables in the group, namely those listed in the <a href="http://w3c.github.io/csvw/syntax/#dfn-table-group-tables" class="externalDFN">tables</a> annotation on the <a href="http://w3c.github.io/csvw/syntax/#dfn-group-of-tables" class="externalDFN">group of tables</a> being described. Compliant application MUST raise an error if this array does not contain one or more table descriptions.</p>
               <p>When an array of table descriptions <code>B</code> is <a>merged</a> into an original array of table descriptions <code>A</code>, each table description within <code>B</code> is combined into the original array <code>A</code> by:</p>
               <ul>
                 <li>if there is a table description with the same <code>url</code> in <code>A</code>, the table description from <code>B</code> is <a>merged</a> into the matching table description in <code>A</code>.</li>
@@ -654,7 +677,7 @@ CSVW,foaf:Project,table;data;conversion
             <dt id="table-group-direction"><code>tableDirection</code></dt>
             <dd>
               <p>
-                An <a>atomic property</a> that MUST have a single string value that is one of <code>"rtl"</code>, <code>"ltr"</code> or <code>"default"</code>. Indicates whether the tables in the group should be displayed with the first column on the right, on the left, or based on the first character in the table that has a specific direction. The value of this property becomes the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-table-direction" class="externalDFN">direction</a> annotation for all the tables in the table group. See <cite><a href="http://w3c.github.io/csvw/syntax/index.html#bidirectional-tables">Bidirectional Tables</a></cite> in [[!tabular-data-model]] for details.
+                An <a>atomic property</a> that MUST have a single string value that is one of <code>"rtl"</code>, <code>"ltr"</code> or <code>"default"</code>. Indicates whether the tables in the group should be displayed with the first column on the right, on the left, or based on the first character in the table that has a specific direction. The value of this property becomes the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-table-direction" class="externalDFN">direction</a> annotation for all the tables in the table group. See <cite><a href="http://w3c.github.io/csvw/syntax/index.html#bidirectional-tables">Bidirectional Tables</a></cite> in [[!tabular-data-model]] for details. The default value for this property is <code>"default"</code>.
               </p>
             </dd>
             <dt id="table-group-schema"><code>tableSchema</code></dt>
@@ -722,7 +745,7 @@ CSVW,foaf:Project,table;data;conversion
             </dd>
             <dt id="table-suppressOutput"><code>suppressOutput</code></dt>
             <dd>
-              <p>A boolean <a>atomic property</a>. If <code>true</code>, suppresses any output that would be generated when converting this table. The value of this property becomes the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-table-suppress-output" class="externalDFN">suppress output</a> annotation for this table.</p>
+              <p>A boolean <a>atomic property</a>. If <code>true</code>, suppresses any output that would be generated when converting this table. The value of this property becomes the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-table-suppress-output" class="externalDFN">suppress output</a> annotation for this table. The default is <code>false</code>.</p>
             </dd>
             <dt id="tableDirection"><code>tableDirection</code></dt>
             <dd><p>As defined for <a href="#table-group-direction">table groups</a>. The value of this property becomes the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-table-direction" class="externalDFN">direction</a> annotation for this table.</p></dd>
@@ -1050,7 +1073,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           <dt id="column-name"><code>name</code></dt>
           <dd>
             <p>
-              An <a>atomic property</a> that gives a single canonical name for the column. The value of this property becomes the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-name" class="externalDFN">name</a> annotation for the described <a href="http://w3c.github.io/csvw/syntax/#dfn-column" class="externalDFN">column</a>. This MUST be a string.
+              An <a>atomic property</a> that gives a single canonical name for the column. The value of this property becomes the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-name" class="externalDFN">name</a> annotation for the described <a href="http://w3c.github.io/csvw/syntax/#dfn-column" class="externalDFN">column</a>. This MUST be a string and this property has no default value, which means it MUST be ignored if the supplied value is not a string.
             </p>
             <p>
               For ease of reference within <a title="URI template property">URI template properties</a>, column names are restricted as defined in <cite><a href="https://tools.ietf.org/html/rfc6570#page-14">Variables</a></cite> in [[!URI-TEMPLATE]] with the additional provision that names beginning with <code>"_"</code> are reserved by this specification and MUST NOT be used within metadata documents.
@@ -1175,13 +1198,13 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           <dt id="cell-language"><code>lang</code></dt>
           <dd>
             <p>
-              An <a>atomic property</a> giving a single string language code as defined by [[!BCP47]]. Indicates the language of the value within the cell. See <cite><a href="http://w3c.github.io/csvw/syntax/#parsing-cells">Parsing Cells</a></cite> in [[!tabular-data-model]] for more details. The value of this property becomes the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-lang" class="externalDFN">lang</a> annotation for the described <a href="http://w3c.github.io/csvw/syntax/#dfn-column" class="externalDFN">column</a>.
+              An <a>atomic property</a> giving a single string language code as defined by [[!BCP47]]. Indicates the language of the value within the cell. See <cite><a href="http://w3c.github.io/csvw/syntax/#parsing-cells">Parsing Cells</a></cite> in [[!tabular-data-model]] for more details. The value of this property becomes the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-lang" class="externalDFN">lang</a> annotation for the described <a href="http://w3c.github.io/csvw/syntax/#dfn-column" class="externalDFN">column</a>. The default is <code>und</code>.
             </p>
           </dd>
           <dt id="cell-null"><code>null</code></dt>
           <dd>
             <p>
-              An <a>atomic property</a> giving the string or strings used for null values within the data. If the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-string-value" class="externalDFN">string value</a> of the cell is equal to any one of these values, the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">cell value</a> is <code>null</code>. See <cite><a href="http://w3c.github.io/csvw/syntax/#parsing-cells">Parsing Cells</a></cite> in [[!tabular-data-model]] for more details. If not specified, the default for the <code>null</code> property is the empty string. The value of this property becomes the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-null" class="externalDFN">null</a> annotation for the described <a href="http://w3c.github.io/csvw/syntax/#dfn-column" class="externalDFN">column</a>.
+              An <a>atomic property</a> giving the string or strings used for null values within the data. If the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-string-value" class="externalDFN">string value</a> of the cell is equal to any one of these values, the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">cell value</a> is <code>null</code>. See <cite><a href="http://w3c.github.io/csvw/syntax/#parsing-cells">Parsing Cells</a></cite> in [[!tabular-data-model]] for more details. If not specified, the default for the <code>null</code> property is the empty string <code>""</code>. The value of this property becomes the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-null" class="externalDFN">null</a> annotation for the described <a href="http://w3c.github.io/csvw/syntax/#dfn-column" class="externalDFN">column</a>.
             </p>
           </dd>
           <dt id="cell-ordered"><code>ordered</code></dt>
@@ -1200,7 +1223,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           <dt id="cell-separator"><code>separator</code></dt>
           <dd>
             <p>
-              An <a>atomic property</a> that MUST have a single string value that is the character used to separate items in the string value of the cell. If <code>null</code> or unspecified, the cell does not contain a list. Otherwise, application MUST split the string value of the cell on the specified separator character and parse each of the resulting strings separately. The cell's value will then be a list. See <cite><a href="http://w3c.github.io/csvw/syntax/#parsing-cells">Parsing Cells</a></cite> in [[!tabular-data-model]] for more details. The value of this property becomes the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-separator" class="externalDFN">separator</a> annotation for the described <a href="http://w3c.github.io/csvw/syntax/#dfn-column" class="externalDFN">column</a>.
+              An <a>atomic property</a> that MUST have a single string value that is the character used to separate items in the string value of the cell. If <code>null</code> (the default) or unspecified, the cell does not contain a list. Otherwise, application MUST split the string value of the cell on the specified separator character and parse each of the resulting strings separately. The cell's value will then be a list. See <cite><a href="http://w3c.github.io/csvw/syntax/#parsing-cells">Parsing Cells</a></cite> in [[!tabular-data-model]] for more details. The value of this property becomes the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-separator" class="externalDFN">separator</a> annotation for the described <a href="http://w3c.github.io/csvw/syntax/#dfn-column" class="externalDFN">column</a>.
             </p>
           </dd>
           <dt id="cell-textDirection"><code>textDirection</code></dt>
@@ -1405,55 +1428,55 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
         <dl>
           <dt id="dialect-commentPrefix"><code>commentPrefix</code></dt>
           <dd>
-            <p>An <a>atomic property</a> that sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-comment-prefix" class="externalDFN">comment prefix</a> flag to the single provided value, which MUST be a single character string.</p>
+            <p>An <a>atomic property</a> that sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-comment-prefix" class="externalDFN">comment prefix</a> flag to the single provided value, which MUST be a single character string. The default is <code>"#"</code>.</p>
           </dd>
           <dt id="dialect-delimiter"><code>delimiter</code></dt>
           <dd>
-            <p>An <a>atomic property</a> that sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-delimiter" class="externalDFN">delimiter</a> flag to the single provided value, which MUST be a single character string.</p>
+            <p>An <a>atomic property</a> that sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-delimiter" class="externalDFN">delimiter</a> flag to the single provided value, which MUST be a single character string. The default is <code>","</code>.</p>
           </dd>
           <dt id="dialect-doubleQuote"><code>doubleQuote</code></dt>
           <dd>
-            <p>A boolean <a>atomic property</a> that, if <code>true</code>, sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-escape-character" class="externalDFN">escape character</a> flag to <code>"</code>. If <code>false</code>, to <code>\</code>.</p>
+            <p>A boolean <a>atomic property</a> that, if <code>true</code>, sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-escape-character" class="externalDFN">escape character</a> flag to <code>"</code>. If <code>false</code>, to <code>\</code>. The default is <code>true</code>.</p>
           </dd>
           <dt id="dialect-encoding"><code>encoding</code></dt>
           <dd>
-            <p>An <a>atomic property</a> that sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-encoding" class="externalDFN">encoding</a> flag to the single provided string value, which MUST be a defined in [[!encoding]].</p>
+            <p>An <a>atomic property</a> that sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-encoding" class="externalDFN">encoding</a> flag to the single provided string value, which MUST be a defined in [[!encoding]]. The default is <code>"utf-8"</code>.</p>
           </dd>
           <dt id="dialect-header"><code>header</code></dt>
           <dd>
-            <p>A boolean <a>atomic property</a> that, if <code>true</code>, sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-header-row-count" class="externalDFN">header row count</a> flag to <code>1</code>, and if <code>false</code> to <code>0</code>, unless <a href="#dialect-headerRowCount"><code>headerRowCount</code></a> is provided, in which case the value provided for the <code>header</code> property is ignored.</p>
+            <p>A boolean <a>atomic property</a> that, if <code>true</code>, sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-header-row-count" class="externalDFN">header row count</a> flag to <code>1</code>, and if <code>false</code> to <code>0</code>, unless <a href="#dialect-headerRowCount"><code>headerRowCount</code></a> is provided, in which case the value provided for the <code>header</code> property is ignored. The default is <code>true</code>.</p>
           </dd>
           <dt id="dialect-headerRowCount"><code>headerRowCount</code></dt>
           <dd>
-            <p>An numeric <a>atomic property</a> that sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-header-row-count" class="externalDFN">header row count</a> flag to the single provided value, which MUST be a non-negative integer.</p>
+            <p>An numeric <a>atomic property</a> that sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-header-row-count" class="externalDFN">header row count</a> flag to the single provided value, which MUST be a non-negative integer. The default is <code>1</code>.</p>
           </dd>
           <dt id="dialect-lineTerminators"><code>lineTerminators</code></dt>
           <dd>
-            <p>An <a>atomic property</a> that sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-line-terminator" class="externalDFN">line terminators</a> flag to either an array containing the single provided string value, or the provided array.</p>
+            <p>An <a>atomic property</a> that sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-line-terminator" class="externalDFN">line terminators</a> flag to either an array containing the single provided string value, or the provided array. The default is <code>["\r\n", "\n"]</code>.</p>
           </dd>
           <dt id="dialect-quoteChar"><code>quoteChar</code></dt>
           <dd>
-            <p>An <a>atomic property</a> that sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-quote-character" class="externalDFN">quote character</a> flag to the single provided value, which MUST be a single character or <code>null</code>. If the value is <code>null</code>, the <a href="http://w3c.github.io/csvw/syntax/#dfn-escape-character" class="externalDFN">escape character</a> flag is also set to <code>null</code>.</p>
+            <p>An <a>atomic property</a> that sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-quote-character" class="externalDFN">quote character</a> flag to the single provided value, which MUST be a single character or <code>null</code>. If the value is <code>null</code>, the <a href="http://w3c.github.io/csvw/syntax/#dfn-escape-character" class="externalDFN">escape character</a> flag is also set to <code>null</code>. The default is <code>"</code>.</p>
           </dd>
           <dt id="dialect-skipBlankRows"><code>skipBlankRows</code></dt>
           <dd>
-            <p>An boolean <a>atomic property</a> that sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-skip-blank-rows" class="externalDFN">skip blank rows</a> flag to the single provided boolean value.</p>
+            <p>An boolean <a>atomic property</a> that sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-skip-blank-rows" class="externalDFN">skip blank rows</a> flag to the single provided boolean value. The default is <code>false</code>.</p>
           </dd>
           <dt id="dialect-skipColumns"><code>skipColumns</code></dt>
           <dd>
-            <p>An numeric <a>atomic property</a> that sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-skip-columns" class="externalDFN">skip columns</a> flag to the single provided numeric value, which MUST be a non-negative integer.</p>
+            <p>An numeric <a>atomic property</a> that sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-skip-columns" class="externalDFN">skip columns</a> flag to the single provided numeric value, which MUST be a non-negative integer. The default is <code>0</code>.</p>
           </dd>
           <dt id="dialect-skipInitialSpace"><code>skipInitialSpace</code></dt>
           <dd>
-            <p>A boolean <a>atomic property</a> that, if <code>true</code>, sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-trim" class="externalDFN">trim</a> flag to <code>"start"</code>. If <code>false</code>, to <code>false</code>. If the <a href="#dialect-trim"><code>trim</code></a> property is provided, the <code>skipInitialSpace</code> property is ignored.</p>
+            <p>A boolean <a>atomic property</a> that, if <code>true</code>, sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-trim" class="externalDFN">trim</a> flag to <code>"start"</code>. If <code>false</code>, to <code>false</code>. If the <a href="#dialect-trim"><code>trim</code></a> property is provided, the <code>skipInitialSpace</code> property is ignored. The default is <code>false</code>.</p>
           </dd>
           <dt id="dialect-skipRows"><code>skipRows</code></dt>
           <dd>
-            <p>An numeric <a>atomic property</a> that sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-skip-rows" class="externalDFN">skip rows</a> flag to the single provided numeric value, which MUST be a non-negative integer.</p>
+            <p>An numeric <a>atomic property</a> that sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-skip-rows" class="externalDFN">skip rows</a> flag to the single provided numeric value, which MUST be a non-negative integer. The default is <code>0</code>.</p>
           </dd>
           <dt id="dialect-trim"><code>trim</code></dt>
           <dd>
-            <p>An <a>atomic property</a> that, if the boolean <code>true</code>, sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-trim" class="externalDFN">trim</a> flag to <code>true</code> and if the boolean <code>false</code> to <code>false</code>. If the value provided is a string, sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-trim" class="externalDFN">trim</a> flag to the provided value, which MUST be one of <code>"true"</code>, <code>"false"</code>, <code>"start"</code>, or <code>"end"</code>.</p>
+            <p>An <a>atomic property</a> that, if the boolean <code>true</code>, sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-trim" class="externalDFN">trim</a> flag to <code>true</code> and if the boolean <code>false</code> to <code>false</code>. If the value provided is a string, sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-trim" class="externalDFN">trim</a> flag to the provided value, which MUST be one of <code>"true"</code>, <code>"false"</code>, <code>"start"</code>, or <code>"end"</code>. The default is <code>false</code>.</p>
           </dd>
           <dt id="dialect-ld-id"><code>@id</code></dt>
           <dd>
@@ -1553,7 +1576,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             <dt id="transformation-source"><code>source</code></dt>
             <dd>
               <p>
-                A single string <a>atomic property</a> that provides, if specified, the format to which the tabular data should be transformed prior to the transformation using the script or template. If the value is <code>json</code>, the tabular data MUST first be transformed to JSON as defined by [[!csv2json]] using <a href="http://w3c.github.io/csvw/csv2json/#dfn-standard-mode" class="externalDFN">standard mode</a>. If the value is <code>rdf</code>, the tabular data MUST first be transformed to an RDF graph as defined by [[!csv2rdf]] using <a href="http://w3c.github.io/csvw/csv2rdf/#dfn-standard-mode" class="externalDFN">standard mode</a>. If the <code>source</code> property is missing or <code>null</code> then the source of the transformation is the <a href="http://w3c.github.io/csvw/syntax/#dfn-annotated-tabular-data-model">annotated tabular data model</a>. No other values are valid.
+                A single string <a>atomic property</a> that provides, if specified, the format to which the tabular data should be transformed prior to the transformation using the script or template. If the value is <code>json</code>, the tabular data MUST first be transformed to JSON as defined by [[!csv2json]] using <a href="http://w3c.github.io/csvw/csv2json/#dfn-standard-mode" class="externalDFN">standard mode</a>. If the value is <code>rdf</code>, the tabular data MUST first be transformed to an RDF graph as defined by [[!csv2rdf]] using <a href="http://w3c.github.io/csvw/csv2rdf/#dfn-standard-mode" class="externalDFN">standard mode</a>. If the <code>source</code> property is missing or <code>null</code> (the default) then the source of the transformation is the <a href="http://w3c.github.io/csvw/syntax/#dfn-annotated-tabular-data-model">annotated tabular data model</a>. No other values are valid.
               </p>
             </dd>
             <dt id="transformation-title"><code>titles</code></dt>
@@ -1622,7 +1645,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             <dt id="datatype-base"><code>base</code></dt>
             <dd>
               <p>
-                An <a>atomic property</a> that contains a single string: a <a href="http://www.w3.org/TR/json-ld/#dfn-term" class="externalDFN">term</a> defined in the default context representing a built-in datatype URL, as listed above. If this property is missing, its default is <code>string</code>. All values of the datatype MUST be valid values of the base datatype. The value of this property becomes the <a href="http://w3c.github.io/csvw/syntax/#dfn-datatype-base" class="externalDFN">base</a> annotation for the described <a href="http://w3c.github.io/csvw/syntax/#dfn-datatype" class="externalDFN">datatype</a>.
+                An <a>atomic property</a> that contains a single string: a <a href="http://www.w3.org/TR/json-ld/#dfn-term" class="externalDFN">term</a> defined in the default context representing a built-in datatype URL, as listed above. Its default is <code>string</code>. All values of the datatype MUST be valid values of the base datatype. The value of this property becomes the <a href="http://w3c.github.io/csvw/syntax/#dfn-datatype-base" class="externalDFN">base</a> annotation for the described <a href="http://w3c.github.io/csvw/syntax/#dfn-datatype" class="externalDFN">datatype</a>.
               </p>
             </dd>
             <dt id="datatype-format"><code>format</code></dt>
