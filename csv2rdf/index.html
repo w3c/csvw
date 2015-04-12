@@ -108,8 +108,12 @@
       }
       ol.algorithm>li p {text-indent: 0em}
       ol.algorithm>li>p:first-child {position: relative; display: inline;}
-      dd a.externalDFN, p a.externalDFN {border-bottom:  1px solid #99c; font-style: italic;}
+      dd a.externalDFN, p a.externalDFN, code a.externalDFN {border-bottom:  1px solid #99c; font-style: italic;}
       pre {overflow: auto;}
+
+      dl.typography dt { font-weight: normal}
+      dl.typography dd { margin-bottom: 0.3em; margin-top: 0.2em;}
+      dl.typography a.externalDFN { border-bottom:  1px solid #99c; font-style: italic; }
     </style>
   </head>
   <body>
@@ -125,15 +129,15 @@
     <section id="intro">
       <h2>Introduction</h2>
 
-      <p>This document describes the processing of <a href="http://w3c.github.io/csvw/syntax/#dfn-tabular-data" class="externalDFN">tabular data</a> to create an RDF subject-predicate-object triples [[!rdf11-concepts]]. Since RDF is an <em>abstract syntax</em>, these triples MAY be serialized in a <em>concrete RDF syntax</em> such as N-Triples [[n-triples]], Turtle [[turtle]], RDFa [[rdfa-primer]], JSON-LD [[json-ld]], or TriG [[trig]]. The RDF serializations offered by a conversion application is implementation dependent.</p>
+      <p>This document describes the processing of <a href="http://w3c.github.io/csvw/syntax/#dfn-tabular-data" class="externalDFN">tabular data</a> to create an RDF subject-predicate-object triples [[!rdf11-concepts]]. Since RDF is an <em>abstract syntax</em>, these triples MAY be serialized in a <em>concrete RDF syntax</em> such as N-Triples [[n-triples]], Turtle [[turtle]], RDFa [[rdfa-primer]], JSON-LD [[json-ld]], or TriG [[trig]]. The RDF serializations offered by a conversion application is implementation defined.</p>
 
-      <p> The [[!tabular-data-model]] defines an <a href="http://w3c.github.io/csvw/syntax/#dfn-annotated-tabular-data-model" class="externalDFN">annotated tabular data model</a> consisting of <a href="http://w3c.github.io/csvw/syntax/#dfn-table" class="externalDFN">tables</a>, <a href="http://w3c.github.io/csvw/syntax/#dfn-column" class="externalDFN">columns</a>, <a href="http://w3c.github.io/csvw/syntax/#dfn-row" class="externalDFN">rows</a>, and <a href="http://w3c.github.io/csvw/syntax/#dfn-cell" class="externalDFN">cells</a>, enriched with <a href="http://w3c.github.io/csvw/syntax/#dfn-annotation" class="externalDFN">annotations</a> that describe the structure of the <a href="http://w3c.github.io/csvw/syntax/#dfn-tabular-data" class="externalDFN">tabular data</a> and the meaning of its content. A <a href="http://w3c.github.io/csvw/syntax/#dfn-group-of-tables" class="externalDFN">table group</a> is a collection of <a href="http://w3c.github.io/csvw/syntax/#dfn-table" class="externalDFN">tables</a> published as a single atomic unit.</p>
+      <p> The [[!tabular-data-model]] defines an <a href="http://w3c.github.io/csvw/syntax/#dfn-annotated-tabular-data-model" class="externalDFN">annotated tabular data model</a> consisting of <a href="http://w3c.github.io/csvw/syntax/#dfn-table" class="externalDFN">tables</a>, <a href="http://w3c.github.io/csvw/syntax/#dfn-column" class="externalDFN">columns</a>, <a href="http://w3c.github.io/csvw/syntax/#dfn-row" class="externalDFN">rows</a>, and <a href="http://w3c.github.io/csvw/syntax/#dfn-cell" class="externalDFN">cells</a>, enriched with <a href="http://w3c.github.io/csvw/syntax/#dfn-annotation" class="externalDFN">annotations</a> that describe the structure of the <a href="http://w3c.github.io/csvw/syntax/#dfn-tabular-data" class="externalDFN">tabular data</a> and the meaning of its content. A <a href="http://w3c.github.io/csvw/syntax/#dfn-group-of-tables" class="externalDFN">group of tables</a> is a collection of <a href="http://w3c.github.io/csvw/syntax/#dfn-table" class="externalDFN">tables</a> published as a single atomic unit.</p>
 
-      <p>The conversion procedure described in this specification operates on the <a href="http://w3c.github.io/csvw/syntax/#dfn-tabular-data" class="externalDFN">tabular data</a>. This specification does not specify the processes needed to convert CSV-encoded data into tabular data form. Please refer to [[!tabular-data-model]] for details of <a href="http://w3c.github.io/csvw/syntax/#parsing">parsing tabular data</a>.</p>
+      <p>The conversion procedure described in this specification operates on the <a href="http://w3c.github.io/csvw/syntax/#dfn-annotated-tabular-data-model" class="externalDFN">annotated tabular data model</a>. This specification does not specify the processes needed to convert CSV-encoded data into tabular data form. Please refer to [[!tabular-data-model]] for details of <a href="http://w3c.github.io/csvw/syntax/#parsing">parsing tabular data</a>.</p>
 
       <p>Conversion applications MUST provide at least two modes of operation: <a title="standard mode">standard</a> and <a title="minimal mode">minimal</a>.</p>
 
-      <p><dfn title="standard mode">Standard mode</dfn> conversion frames the information gleaned from the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell" class="externalDFN">cells</a> of the <a href="http://w3c.github.io/csvw/syntax/#dfn-tabular-data" class="externalDFN">tabular data</a> with details of the <a href="http://w3c.github.io/csvw/syntax/#dfn-row" class="externalDFN">rows</a>, <a href="http://w3c.github.io/csvw/syntax/#dfn-table" class="externalDFN">tables</a>, and a <a href="http://w3c.github.io/csvw/syntax/#dfn-group-of-tables" class="externalDFN">table group</a> within which that information is provided.</p>
+      <p><dfn title="standard mode">Standard mode</dfn> conversion frames the information gleaned from the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell" class="externalDFN">cells</a> of the <a href="http://w3c.github.io/csvw/syntax/#dfn-tabular-data" class="externalDFN">tabular data</a> with details of the <a href="http://w3c.github.io/csvw/syntax/#dfn-row" class="externalDFN">rows</a>, <a href="http://w3c.github.io/csvw/syntax/#dfn-table" class="externalDFN">tables</a>, and a <a href="http://w3c.github.io/csvw/syntax/#dfn-group-of-tables" class="externalDFN">group of tables</a> within which that information is provided.</p>
 
       <p><dfn title="minimal mode">Minimal mode</dfn> conversion includes <em>only</em> the information gleaned from the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell" class="externalDFN">cells</a> of the <a href="http://w3c.github.io/csvw/syntax/#dfn-tabular-data" class="externalDFN">tabular data</a>.</p>
 
@@ -141,13 +145,17 @@
 
       <p>Conversion applications MAY offer additional implementation specific conversion modes.</p>
 
-      <p><a href="http://w3c.github.io/csvw/metadata/#dfn-conversion-specification" class="externalDFN">Conversion specifications</a>, as defined in [[!tabular-metadata]] MAY be used to specify how <a href="http://w3c.github.io/csvw/syntax/#dfn-tabular-data" class="externalDFN">tabular data</a> can be transformed into another format using a script or template. Such a <a href="http://w3c.github.io/csvw/metadata/#dfn-conversion-specification" class="externalDFN">conversion specification</a> MAY use the RDF output described in this specification as input.</p>
+      <p><a href="http://w3c.github.io/csvw/metadata/#dfn-transformation-definition" class="externalDFN">Transformation definitions</a>, as defined in [[!tabular-metadata]] MAY be used to specify how <a href="http://w3c.github.io/csvw/syntax/#dfn-tabular-data" class="externalDFN">tabular data</a> can be transformed into another format using a script or template. Such a <a href="http://w3c.github.io/csvw/metadata/#dfn-transformation-definition" class="externalDFN">transformation definitions</a> MAY use the RDF output described in this specification as input.</p>
 
-      <p>The conversion procedure described in this specification is considered to be <em>entirely textual</em>. There is no requirement on conversion applications to check the semantic consistency of the data during the conversion, nor to validate the triples against RDF syntax rules. Downstream applications SHOULD be aware of the potential for syntax errors and take appropriate action.</p>
+      <p>There is no requirement on conversion applications to check the semantic consistency of the data during the conversion, nor to validate the triples against RDF schema. Downstream applications SHOULD be aware of the potential for inconsistencies and take appropriate action.</p>
     </section>
     
     <section id="conformance">
-      <p><a href="http://w3c.github.io/csvw/syntax/#dfn-tabular-data" class="externalDFN">Tabular data</a> MUST conform to the description from [[!tabular-data-model]]. In particular note that each <a href="http://w3c.github.io/csvw/syntax/#dfn-row" class="externalDFN">row</a> MUST contain the same number of <a href="http://w3c.github.io/csvw/syntax/#dfn-cell" class="externalDFN">cells</a> (although some of these <a href="http://w3c.github.io/csvw/syntax/#dfn-cell" class="externalDFN">cells</a> may be empty). Given this constraint, not all CSV-encoded data can be considered to be tabular data. As such, the conversion procedure described in this specification cannot be applied to all CSV files.</p>
+      <p><a href="http://w3c.github.io/csvw/syntax/#dfn-tabular-data" class="externalDFN">Tabular data</a> MUST conform to the description from [[!tabular-data-model]]. In particular note that each <a href="http://w3c.github.io/csvw/syntax/#dfn-row" class="externalDFN">row</a> MUST contain the same number of <a href="http://w3c.github.io/csvw/syntax/#dfn-cell" class="externalDFN">cells</a> (although some of these <a href="http://w3c.github.io/csvw/syntax/#dfn-cell" class="externalDFN">cells</a> may be empty).</p>
+
+      <p class="note">
+        Not all CSV-encoded data can be parsed into a tabular data model. An algorithm for parsing CSV-based files is described in [[!tabular-data-model]].
+      </p>
 
       <p>This specification makes use of the <dfn title="compact IRI">compact IRI Syntax</dfn>; please refer to the <a href="http://www.w3.org/TR/json-ld/#compact-iris">Compact IRIs</a> from [[json-ld]].</p>
      
@@ -163,6 +171,10 @@
 
     </section>
 
+    <section>
+      <h2>Typographical conventions</h2>
+      <div data-include="../typographical-conventions.html"></div>
+    </section>
 
     <section id="conversion">
       <h2>Converting Tabular Data to RDF</h2>
@@ -172,11 +184,11 @@
       <section id="algorithm-terms">
         <h3>Algorithm terms</h3>
         <dl>
-          <dt><dfn>aboutUrl</dfn></dt>
-          <dd><a>aboutUrl</a> is the evaluation of the <a href="http://w3c.github.io/csvw/metadata/#dfn-uri-template-property">URI template property</a> <a href="http://w3c.github.io/csvw/metadata/#cell-aboutUrl"><code>aboutUrl</code></a> for the current <a href="http://w3c.github.io/csvw/syntax/#dfn-cell" class="externalDFN">cell</a>.</dd>
+          <dt><dfn>about URL</dfn></dt>
+          <dd>The <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-about-url" class="externalDFN">about URL</a> annotation on the current <a href="http://w3c.github.io/csvw/syntax/#dfn-cell" class="externalDFN">cell</a>.</dd>
 
           <dt><dfn>annotated table</dfn></dt>
-          <dd>The <a href="http://w3c.github.io/csvw/syntax/#dfn-annotated-table" class="externalDFN">annotated table</a> is defined in [[!tabular-data-model]] as describing a particular <a href="http://w3c.github.io/csvw/syntax/#dfn-table" class="externalDFN">table</a> and its metadata.</dd>
+          <dd>The <a href="http://w3c.github.io/csvw/syntax/#dfn-annotated-table" class="externalDFN">annotated table</a> is defined in [[!tabular-data-model]] as describing a particular <a href="http://w3c.github.io/csvw/syntax/#dfn-table" class="externalDFN">table</a> and its annotations.</dd>
 
           <dt><dfn>blank node</dfn></dt>
           <dd>A <a href="http://www.w3.org/TR/rdf11-concepts/#dfn-blank-node" class="externalDFN">blank node</a> is defined in [[!rdf11-concepts]] as an <a href="http://www.w3.org/TR/rdf11-concepts/#section-triples" class="externalDFN">RDF Term</a> disjoint from IRIs or <a title="literal node">literals</a>.</dd>
@@ -188,16 +200,16 @@
           <dd><a href="http://w3c.github.io/csvw/syntax/#dfn-cell-errors" class="externalDFN">Cell errors</a> are defined in [[!tabular-data-model]] as a (possibly empty) list of validation errors generated while parsing the literal content of a <a>cell</a> to generate the <a title="cell value">semantic value</a>.</dd>
 
           <dt><dfn>cell value</dfn></dt>
-          <dd>A <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">cell value</a> is defined in [[!tabular-data-model]] as the semantic value of the <a>cell</a>; this MAY be <code>null</code> or, in the case that the <a>cell</a> specifies a <a href="http://w3c.github.io/csvw/metadata/#cell-separator"><code>separator</code></a> property, a sequence of values.</dd>
+          <dd>A <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value" class="externalDFN">cell value</a> is defined in [[!tabular-data-model]] as the semantic value of the <a>cell</a>; this MAY be <code>null</code> or a sequence of values.</dd>
 
           <dt><dfn>column</dfn></dt>
           <dd>A <a href="http://w3c.github.io/csvw/syntax/#dfn-column" class="externalDFN">column</a> is defined in [[!tabular-data-model]] as a vertical arrangement of <a title="cell">cells</a> within a <a title="annotated table">table</a>.</dd>
 
-          <dt><dfn>common properties</dfn></dt>
-          <dd>The <a>common properties</a> of a metadata resource are defined in <a href="http://w3c.github.io/csvw/metadata/#common-properties">Section 3.3 Common Properties</a> of [[!tabular-metadata]]). The RDF triples corresponding to these properties are the result of running the algorithm specified in <a href="#json-ld-to-rdf" class="sectionRef"></a> or equivalalent, over the <a>common properties</a> defined within the metadata description.</dd>
+          <dt><dfn>group of tables</dfn></dt>
+          <dd>The <a href="http://w3c.github.io/csvw/syntax/#dfn-group-of-tables" class="externalDFN">group of tables</a> is defined in [[!tabular-data-model]] as comprising a set of <a title="annotated table">annotated tables</a> and a set of annotations that relate to that group.</dd>
 
-          <dt><dfn>identifier</dfn></dt>
-          <dd>The identifier is the evaluation of the <code>@id</code> property for the current resource. As defined in [[!tabular-data-model]], the <a>identifier</a> is <code>null</code> if the <code>@id</code> property is undefined. The <a>identifier</a> MAY be applied to either a <a href="http://w3c.github.io/csvw/syntax/#dfn-group-of-tables" class="externalDFN">table group</a> or a <a href="http://w3c.github.io/csvw/syntax/#dfn-annotated-table" class="externalDFN">table</a>.</dd>
+          <dt><dfn>group of tables identifier</dfn></dt>
+          <dd>The group of tables identifier is the <a href="http://w3c.github.io/csvw/syntax/#dfn-group-of-tables-id" class="externalDFN">id</a> annotation on a <a>group of tables</a>. As defined in [[!tabular-data-model]].</dd>
 
           <dt><dfn>literal node</dfn></dt>
           <dd>A <a href="http://www.w3.org/TR/rdf11-concepts/#dfn-literal" class="externalDFN">literal node</a> is defined in [[!rdf11-concepts]] as a <a>node</a> within an RDF graph that provides values such as strings, numbers, and dates.</dd>
@@ -205,8 +217,11 @@
           <dt><dfn>node</dfn></dt>
           <dd>A <a href="http://www.w3.org/TR/rdf11-concepts/#dfn-node" class="externalDFN">node</a> is defined in [[!rdf11-concepts]] as a subject or an object of an RDF triple. When in subject position, it can be either a <a>blank node</a> or identified with a URL; when in object position, it can be a <a>blank node</a>, a <a title="literal node">literal</a>, or identified with a URL.</dd>
 
+          <dt><dfn>non-core annotations</dfn></dt>
+          <dd>Core annotations are listed in [[!tabular-data-model]]; <a title="group of tables">groups of tables</a> and <a title="annotated table">tables</a> may also have other annotations that are not defined in that specification; these are known as <a>non-core annotations</a>.</dd>
+
           <dt><dfn>notes</dfn></dt>
-          <dd>A list of <a href="http://w3c.github.io/csvw/syntax/#dfn-table-notes" class="externalDFN">notes</a>, as defined in [[!tabular-data-model]], attached to an <a title="annotated table">annotated table</a> or <a>table group</a> using the <code>notes</code> property. This may be an empty list.</dd>
+          <dd>A list of <a href="http://w3c.github.io/csvw/syntax/#dfn-table-notes" class="externalDFN">notes</a>, as defined in [[!tabular-data-model]], attached to an <a title="annotated table">annotated table</a> or <a>group of tables</a> using the <code>notes</code> property. This may be an empty list.</dd>
 
           <dt><dfn>predicate</dfn></dt>
           <dd>A <a href="http://www.w3.org/TR/rdf11-concepts/#dfn-predicate" class="externalDFN">predicate</a> is defined in [[!rdf11-concepts]] as an IRI that denotes the property used to relate <a title="node">nodes</a> within an RDF triple.</dd>
@@ -214,8 +229,8 @@
           <dt><dfn>prefixed name</dfn></dt>
           <dd>A <a href="http://www.w3.org/TR/json-ld/#dfn-compact-iri" class="externalDFN">prefixed name</a> is an abbreviation for a URI, in the syntax <code><var>prefix</var>:<var>name</var></code>. See <cite><a href="http://w3c.github.io/csvw/metadata/#names-of-common-properties">Names of Common Properties</a></cite> in [[!tabular-metadata]] for information on expansion.</dd>
 
-          <dt><dfn>propertyUrl</dfn></dt>
-          <dd>The <a>propertyUrl</a> is the evaluation of the <a href="http://w3c.github.io/csvw/metadata/#dfn-uri-template-property">URI template property</a> <a href="http://w3c.github.io/csvw/metadata/#cell-propertyUrl"><code>propertyUrl</code></a> for the current <a href="http://w3c.github.io/csvw/syntax/#dfn-cell" class="externalDFN">cell</a>.</dd>
+          <dt><dfn>property URL</dfn></dt>
+          <dd>The <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-property-url" class="externalDFN">property URL</a> annotation on the current <a href="http://w3c.github.io/csvw/syntax/#dfn-cell" class="externalDFN">cell</a>.</dd>
 
           <dt><dfn>row</dfn></dt>
           <dd>The <a href="http://w3c.github.io/csvw/syntax/#dfn-row" class="externalDFN">row</a> is defined in [[!tabular-data-model]] as a horizontal arrangement of <a title="cell">cells</a> within a <a title="annotated table">table</a>.</dd>
@@ -227,16 +242,13 @@
           <dd>A <a href="http://w3c.github.io/csvw/syntax/#dfn-row-source-number" class="externalDFN">row source number</a> is defined in [[!tabular-data-model]] as the position of the <a>row</a> within the source <a href="http://w3c.github.io/csvw/syntax/#dfn-tabular-data-file" class="externalDFN">tabular data file</a>. Provision of the <a>row source number</a> is dependent on parsing applications and may be reported as <code>null</code>.</dd>
 
           <dt><dfn>subject</dfn></dt>
-          <dd>Within this algorithm, a <a>subject</a> is the resource that the value of a given <a>cell</a> refers to. This may be specified using the <a>aboutUrl</a> property.</dd>
+          <dd>Within this algorithm, a <a>subject</a> is the resource that the value of a given <a>cell</a> refers to. This may be specified using <a>about URL</a>.</dd>
 
-          <dt><dfn>table group</dfn></dt>
-          <dd>The <a href="http://w3c.github.io/csvw/syntax/#dfn-group-of-tables" class="externalDFN">table group</a> is defined in [[!tabular-data-model]] as comprising a set of <a title="annotated table">annotated tables</a> and a set of annotations that relate to those tables.</dd>
-          
-          <dt><dfn>table group description</dfn></dt>
-          <dd>The <a href="http://w3c.github.io/csvw/metadata/#dfn-table-group-description" class="externalDFN">table group</a> <a href="http://w3c.github.io/csvw/metadata/#dfn-description-object" class="externalDFN">description object</a> as defined in [[!tabular-data-model]].</dd>
+          <dt><dfn>table identifier</dfn></dt>
+          <dd>The table identifier is the <a href="http://w3c.github.io/csvw/syntax/#dfn-table-id" class="externalDFN">id</a> annotation on an <a>annotated table</a>. As defined in [[!tabular-data-model]].</dd>
 
-          <dt><dfn>valueUrl</dfn></dt>
-          <dd>The <a>valueUrl</a> is the evaluation of the <a href="http://w3c.github.io/csvw/metadata/#dfn-uri-template-property">URI template property</a> <a href="http://w3c.github.io/csvw/metadata/#cell-valueUrl"><code>valueUrl</code></a> for the current <a href="http://w3c.github.io/csvw/syntax/#dfn-cell" class="externalDFN">cell</a>.</dd>
+          <dt><dfn>value URL</dfn></dt>
+          <dd>The <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value-url" class="externalDFN">value URL</a> annotation on the current <a href="http://w3c.github.io/csvw/syntax/#dfn-cell" class="externalDFN">cell</a>.</dd>
         </dl>
       </section>
 
@@ -247,12 +259,12 @@
 
         <p>Unless specified otherwise, the steps in the algorithm defined herein apply to both <a title="standard mode">standard</a> <em>and</em> <a title="minimal mode">minimal</a> modes.</p>
 
-        <p class="note">Where an <a>annotated table</a> is defined in isolation (e.g. in the absence of a <a>table group description</a>), a default <a>table group description</a> is provided with a single <a href="http://w3c.github.io/csvw/syntax/#dfn-table-group-resources" class="externalDFN"><code>resources</code></a> annotation that refers to that <a title="annotated table">table</a>.</p>
+        <p class="note">Where an <a>annotated table</a> is defined in isolation (e.g. in the absence of a <a>group of tables</a>), a default <a>group of tables</a> is provided with a single <a href="http://w3c.github.io/csvw/syntax/#dfn-table-group-tables" class="externalDFN">tables</a> annotation that refers to that <a title="annotated table">table</a>.</p>
 
         <ol class="algorithm">
           <li>
             In <strong><a>standard mode</a></strong> only, establish a new <a>node</a> <var>G</var>.
-            If the <a>table group</a> has an <a>identifier</a> then <a>node</a> <var>G</var> MUST be identified accordingly; else if <a>identifier</a> is <code>null</code>, then <a>node</a> <var>G</var> MUST be a new <a>blank node</a>.
+            If the <a>group of tables</a> has an <a title="group of tables identifier">identifier</a> then <a>node</a> <var>G</var> MUST be identified accordingly; else if <a title="group of tables identifier">identifier</a> is <code>null</code>, then <a>node</a> <var>G</var> MUST be a new <a>blank node</a>.
           </li>
           <li>
             <p>In <strong><a>standard mode</a></strong> only, specify the type of <a>node</a> <var>G</var> as <code>csvw:TableGroup</code>; emit the following triple:</p>
@@ -266,17 +278,17 @@
             </dl>
           </li>
           <li>
-            <p>In <strong><a>standard mode</a></strong> only, emit the triples generated by running the algorithm specified in <a href="#json-ld-to-rdf" class="sectionRef"></a> over any <a>notes</a> and <a>common properties</a> specified for the <a>table group</a>, with <a>node</a> <var>G</var> as an initial <var>subject</var>, the <a>notes</a> or <a title="common properties">common property</a> as <var>property</var>, and the value of the <a>notes</a> or <a title="common properties">common property</a> as <var>value</var>.</p>
+            <p>In <strong><a>standard mode</a></strong> only, emit the triples generated by running the algorithm specified in <a href="#json-ld-to-rdf" class="sectionRef"></a> over any <a>notes</a> and <a>non-core annotations</a> specified for the <a>group of tables</a>, with <a>node</a> <var>G</var> as an initial <var>subject</var>, the <a>notes</a> or <a title="non-core annotations">non-core annotation</a> as <var>property</var>, and the value of the <a>notes</a> or <a title="non-core annotations">non-core annotation</a> as <var>value</var>.</p>
           </li>
           <li>
-            <p>For each <a title="annotated table">table</a> where the value of property <a href="http://w3c.github.io/csvw/metadata/#table-suppressOutput"><code>suppressOutput</code></a> is <var>false</var>:</p>
+            <p>For each <a title="annotated table">table</a> where the <a href="http://w3c.github.io/csvw/syntax/#dfn-table-suppress-putput" class="externalDFN">suppress output</a> annotation is <code>false</code>:</p>
             <ol class="algorithm">
               <li>
                 <p>In <strong><a>standard mode</a></strong> only, establish a new <a>node</a> <var>T</var> which represents the current <a title="annotated table">table</a>.</p>
-                <p>If the <a title="annotated table">table</a> has an <a>identifier</a> then <a>node</a> <var>T</var> MUST be identified accordingly; else if <a>identifier</a> is <code>null</code>, then <a>node</a> <var>T</var> MUST be a new <a>blank node</a>.</p>
+                <p>If the <a title="annotated table">table</a> has an <a title="table identifier">identifier</a> then <a>node</a> <var>T</var> MUST be identified accordingly; else if <a title="table identifier">identifier</a> is <code>null</code>, then <a>node</a> <var>T</var> MUST be a new <a>blank node</a>.</p>
               </li>
               <li>
-                <p>In <strong><a>standard mode</a></strong> only, relate the <a title="annotated table">table</a> to the <a>table group</a>; emit the following triple:</p>
+                <p>In <strong><a>standard mode</a></strong> only, relate the <a title="annotated table">table</a> to the <a>group of tables</a>; emit the following triple:</p>
                 <dl class="triple">
                   <dt>subject</dt>
                   <dd><a>node</a> <var>G</var></dd>
@@ -298,7 +310,7 @@
                 </dl>
               </li>
               <li>
-                <p>In <strong><a>standard mode</a></strong> only, specify the source tabular data file <var>URL</var> for the current <a title="annotated table">table</a> based on the value of property <a href="http://w3c.github.io/csvw/metadata/#table-url"><code>url</code></a>; emit the following triple:</p>
+                <p>In <strong><a>standard mode</a></strong> only, specify the source tabular data file <var>URL</var> for the current <a title="annotated table">table</a> based on the <a href="http://w3c.github.io/csvw/syntax/#dfn-table-url" class="externalDFN">url</a> annotation; emit the following triple:</p>
                 <dl class="triple">
                   <dt>subject</dt>
                   <dd><a>node</a> <var>T</var></dd>
@@ -309,9 +321,9 @@
                 </dl>
               </li>
               <li>
-                <p>In <strong><a>standard mode</a></strong> only, emit the triples generated by running the algorithm specified in <a href="#json-ld-to-rdf" class="sectionRef"></a> over any <a>notes</a> and <a>common properties</a> specified for the <a title="annotated table">table</a>, with <a>node</a> <var>T</var> as an initial <var>subject</var>, the <a>notes</a> or <a title="common properties">common property</a> as <var>property</var>, and the value of the <a>notes</a> or <a title="common properties">common property</a> as <var>value</var>.</p>
+                <p>In <strong><a>standard mode</a></strong> only, emit the triples generated by running the algorithm specified in <a href="#json-ld-to-rdf" class="sectionRef"></a> over any <a>notes</a> and <a>non-core annotations</a> specified for the <a title="annotated table">table</a>, with <a>node</a> <var>T</var> as an initial <var>subject</var>, the <a>notes</a> or <a title="non-core annotations">non-core annotation</a> as <var>property</var>, and the value of the <a>notes</a> or <a title="non-core annotations">non-core annotation</a> as <var>value</var>.</p>
 
-                <p class="note">All other annotations for the <a title="annotated table">table</a> are ignored during the conversion; including information about <a href="http://w3c.github.io/csvw/metadata/#dfn-tableschema" class="externalDFN">table schemas</a> and <a href="http://w3c.github.io/csvw/metadata/#dfn-column-description" class="externalDFN">column descriptions</a> specified therein, <a href="http://w3c.github.io/csvw/metadata/#dfn-dialect-description" class="externalDFN">dialect descriptions</a>, <a href="http://w3c.github.io/csvw/metadata/#dfn-foreign-key-definition" class="externalDFN">foreign-key-definitions</a> etc.</p>
+                <p class="note">All other <a href="http://w3c.github.io/csvw/syntax/#dfn-core-annotations" class="externalDFN">core annotations</a> for the <a title="annotated table">table</a> are ignored during the conversion; including information about <a href="http://w3c.github.io/csvw/syntax/#dfn-table-direction" class="externalDFN">direction</a> and <a href="http://w3c.github.io/csvw/syntax/#dfn-table-foreign-keys" class="externalDFN">foreign keys</a> specified therein, <a href="http://w3c.github.io/csvw/syntax/#dfn-table-transformations" class="externalDFN">transformations</a> etc.</p>
               </li>
               <li>
                 <p>For each <a>row</a> in the current <a title="annotated table">table</a>:</p>
@@ -328,6 +340,17 @@
                       <dd><code>csvw:row</code></dd>
                       <dt>object</dt>
                       <dd><a>node</a> <var>R</var></dd>
+                    </dl>
+                  </li>
+                  <li>
+                    <p>In <strong><a>standard mode</a></strong> only, specify the type of <a>node</a> <var>R</var> as <code>csvw:Row</code>; emit the following triple:</p>
+                    <dl class="triple">
+                      <dt>subject</dt>
+                      <dd><a>node</a> <var>R</var></dd>
+                      <dt>predicate</dt>
+                      <dd><code>rdf:type</code></dd>
+                      <dt>object</dt>
+                      <dd><code>csvw:Row</code></dd>
                     </dl>
                   </li>
                   <li>
@@ -353,12 +376,12 @@
                     </dl>
                   </li>
                   <li>
-                    <p>Establish a new <a>blank node</a> <var>S<sub>def</sub></var> to be used as the default subject for <a title="cell">cells</a> where <a>aboutUrl</a> is undefined.</p>
-                    <p class="note">A <a>row</a> MAY describe multiple interrelated <a title="subject">subjects</a>; where the <a>valueUrl</a> property for one cell matches the <a>aboutUrl</a> property for another <a>cell</a> in the same <a>row</a>.</p>
-                    <p>For each <a>cell</a> in the current <a>row</a> where the value of property <a href="http://w3c.github.io/csvw/metadata/#column-suppressOutput"><code>suppressOutput</code></a> for the <a>column</a> associated with that <a>cell</a> is <var>false</var>:</p>
+                    <p>Establish a new <a>blank node</a> <var>S<sub>def</sub></var> to be used as the default subject for <a title="cell">cells</a> where <a>about URL</a> is undefined.</p>
+                    <p class="note">A <a>row</a> MAY describe multiple interrelated <a title="subject">subjects</a>; where the <a>value URL</a> annotation on one <a>cell</a> matches the <a>about URL</a> annotation on another <a>cell</a> in the same <a>row</a>.</p>
+                    <p>For each <a>cell</a> in the current <a>row</a> where the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-suppress-output" class="externalDFN">suppress output</a> annotation for the <a>column</a> associated with that <a>cell</a> is <code>false</code>:</p>
                     <ol class="algorithm">
                       <li>
-                        <p>Establish a <a>node</a> <var>S</var> from the <a>aboutUrl</a> property if set, or from <var>S<sub>def</sub></var> otherwise as the current <a>subject</a>.</p>
+                        <p>Establish a <a>node</a> <var>S</var> from <a>about URL</a> if set, or from <var>S<sub>def</sub></var> otherwise as the current <a>subject</a>.</p>
                       </li>
                       <li>
                         <p>In <strong><a>standard mode</a></strong> only, relate the current <a>subject</a> to the current <a>row</a>; emit the following triple:</p>
@@ -372,10 +395,10 @@
                         </dl>
                       </li>
                       <li>
-                        <p>If the value of <a>propertyUrl</a> for the <a>cell</a> is not <code>null</code>, then predicate <var>P</var> takes the value of <a>propertyUrl</a>.</p>
-                        <p>Else, <a>predicate</a> <var>P</var> is constructed by appending the value of the <a href="http://w3c.github.io/csvw/metadata/#column-name"><code>name</code></a> property for the column associated with the <a>cell</a> to the the tabular data file <var>URL</var> as a fragment identifier.</p>
+                        <p>If the value of <a>property URL</a> for the <a>cell</a> is not <code>null</code>, then predicate <var>P</var> takes the value of <a>property URL</a>.</p>
+                        <p>Else, <a>predicate</a> <var>P</var> is constructed by appending the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-name" class="externalDFN">name</a> annotation for the <a>column</a> associated with the <a>cell</a> to the the tabular data file <var>URL</var> as a fragment identifier.</p>
                       </li>  
-                      <li>If the <a>valueUrl</a> for the current <a>cell</a> is not <code>null</code>, then <a>valueUrl</a> identifies a <a>node</a> <var>V<sub>url</sub></var> that is related the current <a>subject</a> using the <a>predicate</a> <var>P</var>; emit the following triple:
+                      <li>If the <a>value URL</a> for the current <a>cell</a> is not <code>null</code>, then <a>value URL</a> identifies a <a>node</a> <var>V<sub>url</sub></var> that is related the current <a>subject</a> using the <a>predicate</a> <var>P</var>; emit the following triple:
                         <dl class="triple">
                           <dt>subject</dt>
                           <dd><a>node</a> <var>S</var></dd>
@@ -385,7 +408,7 @@
                           <dd><a>node</a> <var>V<sub>url</sub></var></dd>
                         </dl>
                       </li>
-                      <li>Else, if the <a>cell</a> specifies a <a href="http://w3c.github.io/csvw/metadata/#cell-separator"><code>separator</code></a> property and the <a>cell value</a> is not an empty sequence and the <a>cell</a> specifies that boolean property <a href="http://w3c.github.io/csvw/metadata/#cell-ordered"><code>ordered</code></a> is <var>true</var>, then the <a>cell value</a> provides an <em>ordered</em> sequence of <a title="literal node">literal nodes</a> for inclusion within the RDF output using an instance of <code>rdf:List</code> <var>V<sub>list</sub></var> as defined in [[rdf-schema]]. This instance is related to the <a>subject</a> using the <a>predicate</a> <var>P</var>; emit the triples defining list <var>V<sub>list</sub></var> plus the following triple:
+                      <li>Else, if the <a>cell value</a> is a <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value-list" class="externalDFN">list</a> and the <a>cell</a> <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-ordered" class="externalDFN">ordered</a> annotation is <code>true</code>, then the <a>cell value</a> provides an <em>ordered</em> sequence of <a title="literal node">literal nodes</a> for inclusion within the RDF output using an instance of <code>rdf:List</code> <var>V<sub>list</sub></var> as defined in [[rdf-schema]]. This instance is related to the <a>subject</a> using the <a>predicate</a> <var>P</var>; emit the triples defining list <var>V<sub>list</sub></var> plus the following triple:
                         <dl class="triple">
                           <dt>subject</dt>
                           <dd><a>node</a> <var>S</var></dd>
@@ -395,7 +418,7 @@
                           <dd><a>node</a> <var>V<sub>list</sub></var></dd>
                         </dl>
                       </li>
-                      <li>Else, if the <a>cell</a> specifies a <a href="http://w3c.github.io/csvw/metadata/#cell-separator"><code>separator</code></a> property and the <a>cell value</a> is not an empty sequence, then the <a>cell value</a> provides an <em>unordered</em> sequence of <a title="literal node">literal nodes</a> for inclusion within the RDF output, each of which is related to the <a>subject</a> using the <a>predicate</a> <var>P</var>. For each value provided in the sequence, add a <a>literal node</a> <var>V<sub>literal</sub></var>; emit the following triple:
+                      <li>Else, if the <a>cell value</a> is a <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value-list" class="externalDFN">list</a>, then the <a>cell value</a> provides an <em>unordered</em> sequence of <a title="literal node">literal nodes</a> for inclusion within the RDF output, each of which is related to the <a>subject</a> using the <a>predicate</a> <var>P</var>. For each value provided in the sequence, add a <a>literal node</a> <var>V<sub>literal</sub></var>; emit the following triple:
                         <dl class="triple">
                           <dt>subject</dt>
                           <dd><a>node</a> <var>S</var></dd>
@@ -405,7 +428,7 @@
                           <dd><a>literal node</a> <var>V<sub>literal</sub></var></dd>
                         </dl>
                       </li>
-                      <li>Else, if the <a>cell value</a> is not <code>null</code> and the <a>cell</a> does not specify a <a href="http://w3c.github.io/csvw/metadata/#cell-separator"><code>separator</code></a> property, then the <a>cell value</a> provides a single <a>literal node</a> <var>V<sub>literal</sub></var> for inclusion within the RDF output that is related the current <a>subject</a> using the <a>predicate</a> <var>P</var>; emit the following triple:
+                      <li>Else, if the <a>cell value</a> is not <code>null</code>, then the <a>cell value</a> provides a single <a>literal node</a> <var>V<sub>literal</sub></var> for inclusion within the RDF output that is related the current <a>subject</a> using the <a>predicate</a> <var>P</var>; emit the following triple:
                         <dl class="triple">
                           <dt>subject</dt>
                           <dd><a>node</a> <var>S</var></dd>
@@ -414,9 +437,9 @@
                           <dt>object</dt>
                           <dd><a>literal node</a> <var>V<sub>literal</sub></var></dd>
                         </dl>
-                        <p>The <a title="literal node">literal nodes</a> derived from the <a title="cell value">cell values</a> MUST be expressed according to the <a href="http://w3c.github.io/csvw/metadata/#cell-datatype"><code>datatype</code></a> property of the cell as defined below: <a href="#datatypes">Interpreting datatypes</a>.</p> 
-                        <p class="note">In the case when the <a href="http://w3c.github.io/csvw/metadata/#cell-datatype"><code>datatype</code></a> is not present, the conversion should default to <code>string</code>.</p> 
-                        <p class="note">In the case where a sequence of values is provided, the <code>datatype</code> applies to all members of the sequence.</p>
+                        <p>The <a title="literal node">literal nodes</a> derived from the <a title="cell value">cell values</a> MUST be expressed according to the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value-datatype" class="externalDFN">cell value's datatype</a> as defined below: <a href="#datatypes">Interpreting datatypes</a>.</p> 
+                        <p class="note">In the case when a <a>cell value</a> does not have a <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value-datatype" class="externalDFN">datatype</a>, the conversion should default to <code>string</code>.</p> 
+                        <p class="note">In the case where a sequence of values is provided, each value in the list has its own <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value-datatype" class="externalDFN">datatype</a>; the datatype may be different for different items in the sequence.</p>
                       </li>
                     </ol>
                   </li>
@@ -429,10 +452,10 @@
 
       <section id="datatypes">
         <h3>Interpreting datatypes</h3>
-        <p><a title="cell value">Cell values</a> are expressed in the RDF output according to the cell's <a href="http://w3c.github.io/csvw/metadata/#cell-datatype"><code>datatype</code></a> property. The relationship between the value of the <a href="http://w3c.github.io/csvw/metadata/#cell-datatype"><code>datatype</code></a> property and the <a href="http://www.w3.org/TR/rdf11-concepts/#dfn-datatype-iri" class="externalDFN">datatype IRI</a> used in the RDF is provided in the table below.</p>
+        <p><a title="cell value">Cell values</a> are expressed in the RDF output according to the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value-datatype" class="externalDFN">cell value's datatype</a>. The relationship between the value of the  <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value-datatype" class="externalDFN">cell value's datatype</a> and the <a href="http://www.w3.org/TR/rdf11-concepts/#dfn-datatype-iri" class="externalDFN">datatype IRI</a> used in the RDF is provided in the table below.</p>
         
         <div class="note">
-          <p>A cell's <a href="http://w3c.github.io/csvw/metadata/#datatype-format"><code>format</code></a> property is irrelevant to the conversion procedure defined in this specification; the <a>cell value</a> has already been parsed from the contents the <a>cell</a> according to the <a href="http://w3c.github.io/csvw/metadata/#datatype-format"><code>format</code></a> property.</p>
+          <p>A datatype's <a href="http://w3c.github.io/csvw/syntax/#dfn-datatype-format" class="externalDFN">format</a> annotation is irrelevant to the conversion procedure defined in this specification; the <a>cell value</a> has already been parsed from the contents the <a>cell</a> according to the <a href="http://w3c.github.io/csvw/syntax/#dfn-datatype-format" class="externalDFN">format</a> annotation.</p>
           <p>Where the contents of the <a>cell</a> cannot be parsed, or other validation errors occur, <a>cell errors</a> will be provided. It is an implementation decision to determine how conversion applications should proceed in the event that <a>cell errors</a> are encountered.</p>
         </div>
 
@@ -442,16 +465,12 @@
           </thead>
           <tbody>
 
-            <tr><td><code>anyAtomicType</code></td><td><code>xsd:anyAtomicType</code></td><td><code>any</code> is considered to be equivalent to <code>anyAtomicType</code></td></tr>
-            <tr><td><code>any</code></td><td><code>xsd:anyAtomicType</code></td><td></td></tr>
-            <tr><td><code>anyAtomicType</code></td><td><code>xsd:anyAtomicType</code></td><td></td></tr>
+            <tr><td><code>anyAtomicType</code></td><td><code>xsd:anyAtomicType</code></td></tr>
             <tr><td><code>anyURI</code></td><td><code>xsd:anyURI</code></td><td></td></tr>
             <tr><td><code>base64Binary</code></td><td><code>xsd:base64Binary</code></td><td></td></tr>
-            <tr><td><code>binary</code></td><td><code>xsd:base64Binary</code></td><td><code>binary</code> is considered to be equivalent to <code>base64Binary</code></td></tr>
             <tr><td><code>boolean</code></td><td><code>xsd:boolean</code></td><td></td></tr>
             <tr><td><code>date</code></td><td><code>xsd:date</code></td><td></td></tr>
             <tr><td><code>dateTime</code></td><td><code>xsd:dateTime</code></td><td></td></tr>
-            <tr><td><code>datetime</code></td><td><code>xsd:dateTime</code></td><td><code>datetime</code> is considered to be equivalent to <code>dateTime</code></td></tr>
             <tr><td><code>dateTimeStamp</code></td><td><code>xsd:dateTimeStamp</code></td><td></td></tr>
             <tr><td><code>decimal</code></td><td><code>xsd:decimal</code></td><td></td></tr>
             <tr><td><code>integer</code></td><td><code>xsd:integer</code></td><td></td></tr>
@@ -468,7 +487,6 @@
             <tr><td><code>nonPositiveInteger</code></td><td><code>xsd:nonPositiveInteger</code></td><td></td></tr>
             <tr><td><code>negativeInteger</code></td><td><code>xsd:negativeInteger</code></td><td></td></tr>
             <tr><td><code>double</code></td><td><code>xsd:double</code></td><td></td></tr>
-            <tr><td><code>number</code></td><td><code>xsd:double</code></td><td><code>number</code> is considered to be equivalent to <code>double</code></td></tr>
             <tr><td><code>duration</code></td><td><code>xsd:duration</code></td><td></td></tr>
             <tr><td><code>dayTimeDuration</code></td><td><code>xsd:dayTimeDuration</code></td><td></td></tr>
             <tr><td><code>yearMonthDuration</code></td><td><code>xsd:yearMonthDuration</code></td><td></td></tr>
@@ -480,7 +498,7 @@
             <tr><td><code>gYearMonth</code></td><td><code>xsd:gYearMonth</code></td><td></td></tr>
             <tr><td><code>hexBinary</code></td><td><code>xsd:hexBinary</code></td><td></td></tr>
             <tr><td><code>QName</code></td><td><code>xsd:QName</code></td><td></td></tr>
-            <tr><td><code>string</code></td><td><code>xsd:string</code> or <code>rdf:langString</code> depending on whether or not the <a href="http://w3c.github.io/csvw/metadata/#cell-language"><code>lang</code></a> property is defined for the cell.</td><td></td></tr>
+            <tr><td><code>string</code></td><td><code>xsd:string</code> or <code>rdf:langString</code> depending on whether or not the value has an associated language.</td><td></td></tr>
             <tr><td><code>normalizedString</code></td><td><code>xsd:normalizedString</code></td><td></td></tr>
             <tr><td><code>token</code></td><td><code>xsd:token</code></td><td></td></tr>
             <tr><td><code>language</code></td><td><code>xsd:language</code></td><td></td></tr>
@@ -493,7 +511,7 @@
           </tbody>
         </table>
 
-        <p>In the case of <code>rdf:langString</code>, the appropriate <a href="http://www.w3.org/TR/rdf11-concepts/#dfn-language-tag">language tag</a> (as defined in [[!rdf11-concepts]]) MUST be provided for the string, based on the value of <a href="http://w3c.github.io/csvw/metadata/#cell-language"><code>lang</code></a>.
+        <p>In the case of <code>rdf:langString</code>, the appropriate <a href="http://www.w3.org/TR/rdf11-concepts/#dfn-language-tag" class="externalDFN">language tag</a> (as defined in [[!rdf11-concepts]]) MUST be provided for the string, based on the value of <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value-language" class="externalDFN">cell value's language</a>.
         (See <a href="http://www.w3.org/TR/rdf11-concepts/#h3_section-Graph-Literal">section on Graph Literals</a> in [[!rdf11-concepts]] for further details on language tagged literals.)</p>
 
         <p class="note">According to [[rdf11-concepts]] language tags cannot be combined with any other <code>xsd</code> datatypes. If a cell has any other datatype than <code>string</code>, the value of <code>lang</code> MUST be ignored. Also, <em>all</em> literals have a datatype; however, specific serializations, like Turtle [[turtle]], MAY provide a special syntax for literals with datatype <code>xsd:string</code> or <code>rdf:langString</code>.</p>
@@ -537,8 +555,8 @@
 
     <section>
       <h3>JSON-LD to RDF</h3>
-      <p>This section defines a mechanism for transforming the [[json-ld]] <a href="http://w3c.github.io/csvw/metadata/#json-ld-dialect">dialect</a> used for <a>common properties</a> and <a><code>notes</code></a> into RDF in a manner consistent with the <cite><a href="http://www.w3.org/TR/json-ld-api/#deserialize-json-ld-to-rdf-algorithm">Deserialize JSON-LD to RDF Algorithm</a></cite> defined in [[!json-ld-api]]. Converters MAY use any algorithm which results in equivalent triples.</p>
-      <p>Given a <var>subject</var>, <var>property</var> and <var>value</var> in <a href="http://w3c.github.io/csvw/metadata/#dfn-normalization">normalized</a> form:</p>
+      <p>This section defines a mechanism for transforming the [[json-ld]] <a href="http://w3c.github.io/csvw/metadata/#json-ld-dialect">dialect</a> used for <a>non-core annotations</a> and <a><code>notes</code></a> into RDF in a manner consistent with the <cite><a href="http://www.w3.org/TR/json-ld-api/#deserialize-json-ld-to-rdf-algorithm">Deserialize JSON-LD to RDF Algorithm</a></cite> defined in [[!json-ld-api]]. Converters MAY use any algorithm which results in equivalent triples.</p>
+      <p>Given a <var>subject</var>, <var>property</var> and <var>value</var> in <a href="http://w3c.github.io/csvw/metadata/#dfn-normalization" class="externalDFN">normalized</a> form:</p>
       <ol class="algorithm">
         <li><var>Property</var> is a <a href="http://www.w3.org/TR/json-ld/#dfn-term" class="externalDFN">term</a> defined in the [[csvw-context]], a <a>prefixed name</a>, or an absolute URL; expand to an absolute URL by replacing a <a href="http://www.w3.org/TR/json-ld/#dfn-term" class="externalDFN">term</a> with the URI from the term definition in [[csvw-context]] or a <a>prefixed name</a> as described in <a href="#names-of-common-properties" class="sectionRef"></a>.</li>
         <li>If <var>value</var> is an array, generate RDF by running this algorithm using <var>subject</var>, <var>property</var> using each array member as <var>value</var>.</li>
@@ -609,6 +627,8 @@
         <dd><code>http://xmlns.com/foaf/0.1/</code></dd>
         <dt><code>oa</code>:</dt>
         <dd><code>http://www.w3.org/ns/oa#</code></dd>
+        <dt><code>org</code>:</dt>
+        <dd><code>http://www.w3.org/ns/org#</code></dd>
         <dt><code>schema</code>:</dt>
         <dd><code>http://schema.org/</code></dd>
       </dl>
@@ -620,7 +640,7 @@
       <section id="example-countries">
         <h3>Simple example</h3>
         <p>
-          This example comprises a single <a>annotated table</a> containing information attributes about countries; country code, position (latitude, longitude) and name. Whilst the input tabular data file, published at <code>http://example.org/countries.csv</code>, includes a <a href="http://w3c.github.io/csvw/syntax/#dfn-header-line" class="externalDFN">header line</a>, no further metadata annotations are given. The tabular data file is provided below:
+          This example comprises a single <a title="annotated table">table</a> containing information attributes about countries; country code, position (latitude, longitude) and name. Whilst the input tabular data file, published at <code>http://example.org/countries.csv</code>, includes a <a href="http://w3c.github.io/csvw/syntax/#dfn-header-line" class="externalDFN">header line</a>, no further metadata annotations are given. The tabular data file is provided below:
         </p>
         <pre class="example"
              id="example-countries-csv+"
@@ -638,8 +658,8 @@
 
           <table style="width: 100%; text-align: left">
             <thead>
-              <tr><th rowspan="2">id</th><th colspan="3">core annotations</th><th rowspan="2" colspan="2">annotations</th></tr>
-              <tr><th><code>url</code></th><th>columns</th><th>rows</th></tr>
+              <tr><th rowspan="2">id</th><th colspan="3">core annotations</th></tr>
+              <tr><th>url</th><th>columns</th><th>rows</th></tr>
             </thead>
             <tbody>
               <tr><td><var>T</var></td><td><code>http://example.org/countries.csv</code></td><td><var>C1</var>, <var>C2</var>, <var>C3</var>, <var>C4</var></td><td><var>R1</var>, <var>R2</var>, <var>R3</var></td><td></td><td></td></tr>
@@ -651,8 +671,8 @@
           <p><a title="column">Column</a> annotations:</p>
           <table style="width: 100%; text-align: left">
             <thead>
-              <tr><th rowspan="2">id</th><th colspan="4">core annotations</th><th colspan="2">annotations</th></tr>
-              <tr><th>table</th><th>number</th><th>source number</th><th>cells</th><th><code>name</code></th><th><code>title</code></th></tr>
+              <tr><th rowspan="2">id</th><th colspan="6">core annotations</th></tr>
+              <tr><th>table</th><th>number</th><th>source number</th><th>cells</th><th>name</th><th>titles</th></tr>
             </thead>
             <tbody>
               <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td>1</td><td><var>C1.1</var>, <var>C2.1</var>, <var>C3.1</var></td><td><code>countryCode</code></td><td><code>countryCode</code></td></tr>
@@ -678,29 +698,26 @@
           <p><a title="cell">Cell</a> annotations:</p>
           <table style="width: 100%; text-align: left">
             <thead>
-              <tr><th rowspan="2">id</th><th colspan="6">core annotations</th><th>annotations</th></tr>
-              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th><th>errors</th><th><code>propertyUrl</code></th></tr>
+              <tr><th rowspan="2">id</th><th colspan="6">core annotations</th></tr>
+              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th><th>property URL</th></tr>
             </thead>
             <tbody>
-              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"AD"</code></td><td><code>"AD"</code></td><td></td><td><code>&lt;http://example.org/countries.csv#countryCode&gt;</code></td></tr>
-              <tr><td><var>C1.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R1</var></td><td><code>"42.546245"</code></td><td><code>"42.546245"</code></td><td></td><td><code>&lt;http://example.org/countries.csv#latitude&gt;</code></td></tr>
-              <tr><td><var>C1.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R1</var></td><td><code>"1.601554"</code></td><td><code>"1.601554"</code></td><td></td><td><code>&lt;http://example.org/countries.csv#longitude&gt;</code></td></tr>
-              <tr><td><var>C1.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R1</var></td><td><code>"Andorra"</code></td><td><code>"Andorra"</code></td><td></td><td><code>&lt;http://example.org/countries.csv#name&gt;</code></td></tr>
+              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"AD"</code></td><td><code>"AD"</code></td><td><code>null</code></td></tr>
+              <tr><td><var>C1.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R1</var></td><td><code>"42.546245"</code></td><td><code>"42.546245"</code></td><td><code>null</code></td></tr>
+              <tr><td><var>C1.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R1</var></td><td><code>"1.601554"</code></td><td><code>"1.601554"</code></td><td><code>null</code></td></tr>
+              <tr><td><var>C1.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R1</var></td><td><code>"Andorra"</code></td><td><code>"Andorra"</code></td><td><code>null</code></td></tr>
 
-              <tr><td><var>C2.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R2</var></td><td><code>"AE"</code></td><td><code>"AE"</code></td><td></td><td><code>&lt;http://example.org/countries.csv#countryCode&gt;</code></td></tr>
-              <tr><td><var>C2.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R2</var></td><td><code>"23.424076"</code></td><td><code>"23.424076"</code></td><td></td><td><code>&lt;http://example.org/countries.csv#latitude&gt;</code></td></tr>
-              <tr><td><var>C2.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R2</var></td><td><code>"53.847818"</code></td><td><code>"53.847818"</code></td><td></td><td><code>&lt;http://example.org/countries.csv#longitude&gt;</code></td></tr>
-              <tr><td><var>C2.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R2</var></td><td><code>"United Arab Emirates"</code></td><td><code>"United Arab Emirates"</code></td><td></td><td><code>&lt;http://example.org/countries.csv#name&gt;</code></td></tr>
+              <tr><td><var>C2.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R2</var></td><td><code>"AE"</code></td><td><code>"AE"</code></td><td><code>null</code></td></tr>
+              <tr><td><var>C2.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R2</var></td><td><code>"23.424076"</code></td><td><code>"23.424076"</code></td><td><code>null</code></td></tr>
+              <tr><td><var>C2.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R2</var></td><td><code>"53.847818"</code></td><td><code>"53.847818"</code></td><td><code>null</code></td></tr>
+              <tr><td><var>C2.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R2</var></td><td><code>"United Arab Emirates"</code></td><td><code>"United Arab Emirates"</code></td><td><code>null</code></td></tr>
 
-              <tr><td><var>C3.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R3</var></td><td><code>"AF"</code></td><td><code>"AF"</code></td><td></td><td><code>&lt;http://example.org/countries.csv#countryCode&gt;</code></td></tr>
-              <tr><td><var>C3.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R3</var></td><td><code>"33.93911"</code></td><td><code>"33.93911"</code></td><td></td><td><code>&lt;http://example.org/countries.csv#latitude&gt;</code></td></tr>
-              <tr><td><var>C3.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R3</var></td><td><code>"67.709953"</code></td><td><code>"67.709953"</code></td><td></td><td><code>&lt;http://example.org/countries.csv#longitude&gt;</code></td></tr>
-              <tr><td><var>C3.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R3</var></td><td><code>"Afghanistan"</code></td><td><code>"Afghanistan"</code></td><td></td><td><code>&lt;http://example.org/countries.csv#name&gt;</code></td></tr>
+              <tr><td><var>C3.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R3</var></td><td><code>"AF"</code></td><td><code>"AF"</code></td><td><code>null</code></td></tr>
+              <tr><td><var>C3.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R3</var></td><td><code>"33.93911"</code></td><td><code>"33.93911"</code></td><td><code>null</code></td></tr>
+              <tr><td><var>C3.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R3</var></td><td><code>"67.709953"</code></td><td><code>"67.709953"</code></td><td><code>null</code></td></tr>
+              <tr><td><var>C3.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R3</var></td><td><code>"Afghanistan"</code></td><td><code>"Afghanistan"</code></td><td><code>null</code></td></tr>
             </tbody>
           </table>
-
-          <p class="note">As the value of <a href="http://w3c.github.io/csvw/metadata/#cell-propertyUrl"><code>propertyUrl</code></a> has not been set within the metadata description it defaults to the URI Template (see [[RFC6570]]) <code>#{<em>[column-name]</em>}</code>, where <code><em>[column-name]</em></code> is the value of the <a href="http://w3c.github.io/csvw/metadata/#column-name"><code>name</code></a> property for the column associated with the cell. For example, the value of <a href="http://w3c.github.io/csvw/metadata/#cell-propertyUrl"><code>propertyUrl</code></a> for all <a title="cell">cells</a> in <a>column</a> <var>C1</var> (<code>"name": "countryCode"</code>) is <code>http://example.org/countries.csv#countryCode</code>.</p>
-
       </div>
 
 
@@ -713,7 +730,10 @@
              data-oninclude="updateExample">
         </pre>
 
-        <p class="note">The <a href="http://w3c.github.io/csvw/metadata/#cell-aboutUrl"><code>aboutUrl</code></a> property has not been set for cells in table <var>T</var> (<code>{ "url": "http://example.org/countries.csv"}</code>) - <a title="cell">cells</a> in a given <a>row</a> where <a href="http://w3c.github.io/csvw/metadata/#cell-aboutUrl"><code>aboutUrl</code></a> has not been specified are assumed to refer to the same <a>subject</a>. This unspecified <a>subject</a> is treated as a <a>blank node</a>.</p>
+        <div class="note">
+          <p>The <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-about-URL" class="externalDFN">about URL</a> annotation has not been set for cells in table <var>T</var> (<code>{ "url": "http://example.org/countries.csv"}</code>) - <a title="cell">cells</a> in a given <a>row</a> where <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-about-URL" class="externalDFN">about URL</a> has not been specified are assumed to refer to the same <a>subject</a>. This unspecified <a>subject</a> is treated as a <a>blank node</a>.</p>
+          <p>Given that the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-property-url" class="externalDFN">property URL</a> is <code>null</code> for cells in table <var>T</var> (<code>{ "url": "http://example.org/countries.csv"}</code>), the property URL defaults to the URI Template (see [[RFC6570]]) <code>#{<em>[column-name]</em>}</code>, where <code><em>[column-name]</em></code> is the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-name" class="externalDFN">name</a> annotation of the column associated with the cell. For example, the value of the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-property-URL" class="externalDFN">property URL</a> annotation for all <a title="cell">cells</a> in <a>column</a> <var>C1</var> (<code>"name": "countryCode"</code>) is <code>http://example.org/countries.csv#countryCode</code>.</p>
+        </div>
 
         <p><strong><a title="standard mode">Standard mode</a></strong> output for this example is provided in Turtle [[turtle]] syntax below:</p>
 
@@ -725,8 +745,8 @@
         </pre>
 
         <div class="note">
-          <p>Even though the <a title="annotated table">table</a> was defined in isolation, the <a title="annotated table">table</a> is wrapped in a <a>table group</a>.</p>
-          <p>The type of both <a title="annotated table">table</a> and <a>table group</a> resources is explicitly stated; <code>csvw:TableGroup</code> and <code>csvw:Table</code> respectively.</p>
+          <p>Even though the <a title="annotated table">table</a> was defined in isolation, the <a>annotated table</a> is wrapped in a <a>group of tables</a>.</p>
+          <p>The type of both <a title="annotated table">table</a> and <a>group of tables</a> objects is explicitly stated; <code>csvw:TableGroup</code> and <code>csvw:Table</code> respectively.</p>
           <p>The <code>csvw:url</code> property provides reference to the original tabular data file and to specific <a title="row">rows</a> therein - noting the need to escape the Turtle-syntax reserved character <code>=</code> (<code>U+003D</code>) within the fragment identifier.</p>
           <p>The <a>row number</a> is provided for each <a>row</a> using <code>csvw:rownum</code> property.</p>
           <p>A <a>subject</a> and <a>row</a> are related using the <code>csvw:describes</code> property.</p>
@@ -736,7 +756,7 @@
       <section id="example-tree-ops-ext">
         <h3>Example with single table and rich annotations</h3>
         <p>
-          This example is based on <a href="http://w3c.github.io/csvw/use-cases-and-requirements/#UC-PaloAltoTreeData">Use Case #11 - City of Palo Alto Tree Data</a> and comprises a single <a>annotated table</a> describing an inventory of tree maintenance operations. The input tabular data file, published at <code>http://example.org/tree-ops-ext.csv</code>, and the associated metadata description <code>http://example.org/tree-ops-ext.csv-metadata.json</code> are provided below:
+          This example is based on <a href="http://w3c.github.io/csvw/use-cases-and-requirements/#UC-PaloAltoTreeData">Use Case #11 - City of Palo Alto Tree Data</a> and comprises a single <a title="annotated table">table</a> describing an inventory of tree maintenance operations. The input tabular data file, published at <code>http://example.org/tree-ops-ext.csv</code>, and the associated metadata description <code>http://example.org/tree-ops-ext.csv-metadata.json</code> are provided below:
         </p>
         <pre class="example"
              id="example-tree-ops-ext-csv+"
@@ -757,24 +777,32 @@
 
         <button class="toggle" data-toggle-target="ex-trees-annotation">empty</button>
         <div id="ex-trees-annotation" class="to-toggle">
-          <p>Annotations for the resulting <a title="annotated table">table</a> <var>T</var>, with 9 <a title="column">columns</a> and 3 <a title="row">rows</a>, are shown below:</p>
+          <p>Core annotations for the resulting <a title="annotated table">table</a> <var>T</var>, with 9 <a title="column">columns</a> and 3 <a title="row">rows</a>, are shown below:</p>
 
           <table style="width: 100%; text-align: left">
             <thead>
-              <tr><th rowspan="2">id</th><th colspan="3">core annotations</th><th rowspan="2" colspan="2">annotations</th></tr>
-              <tr><th><code>url</code></th><th>columns</th><th>rows</th></tr>
+              <tr><th rowspan="2">id</th><th colspan="3">core annotations</th></tr>
+              <tr><th>id</th><th>url</th><th>columns</th><th>rows</th><th>notes</th></tr>
             </thead>
             <tbody>
-              <tr><td><var>T</var></td><td><code>http://example.org/tree-ops-ext.csv</code></td><td><var>C1</var>, <var>C2</var>, <var>C3</var>, <var>C4</var>, <var>C5</var>, <var>C6</var>, <var>C7</var>, <var>C8</var>, <var>C9</var></td><td><var>R1</var>, <var>R2</var>, <var>R3</var></td><td><strong><code>@id</code></strong></td><td><code>&lt;http://example.org/tree-ops-ext&gt;</code></td></tr>
-              <tr><td></td><td></td><td></td><td></td><td><strong><code>dc:title</code></strong></td><td><code>"Tree Operations"</code></td></tr>
-              <tr><td></td><td></td><td></td><td></td><td><strong><code>dcat:keyword</code></strong></td><td><code>["tree", "street", "maintenance"]</code></td></tr>
-              <tr><td></td><td></td><td></td><td></td><td><strong><code>dc:publisher</code></strong></td><td><code>[{ "schema:name": "Example Municipality", "schema:url": { "@id": "http://example.org" } }]</code></td></tr>
-              <tr><td></td><td></td><td></td><td></td><td><strong><code>dc:license</code></strong></td><td><code>&lt;http://opendefinition.org/licenses/cc-by/&gt;</code></td></tr>
-              <tr><td></td><td></td><td></td><td></td><td><strong><code>dc:modified</code></strong></td><td><code>"2010-12-31"</code></td></tr>
-              <tr><td></td><td></td><td></td><td></td><td><strong><code>notes</code></strong></td><td><code>[{ "@type": "oa:Annotation", ... }]</code></td></tr>
-              <tr><td></td><td></td><td></td><td></td><td><strong><code>primaryKey</code></strong></td><td><var>C1</var></td></tr>
+              <tr><td><var>T</var></td><td>&lt;http://example.org/tree-ops-ext&gt;</td><td><code>http://example.org/tree-ops-ext.csv</code></td><td><var>C1</var>, <var>C2</var>, <var>C3</var>, <var>C4</var>, <var>C5</var>, <var>C6</var>, <var>C7</var>, <var>C8</var>, <var>C9</var></td><td><var>R1</var>, <var>R2</var>, <var>R3</var></td><td><code>[{ "@type": "oa:Annotation", ... }]</code></td></tr>
             </tbody>
           </table>
+
+          <p>Non-core annotations for the <a title="annotated table">table</a> <var>T</var> are:</p>
+
+          <dl>
+            <dt><code>dc:title</code></dt>
+            <dd><code>"Tree Operations"</code></dd>
+            <dt><code>dcat:keyword</code></dt>
+            <dd><code>["tree", "street", "maintenance"]</code></dd>
+            <dt><code>dc:publisher</code></dt>
+            <dd><code>[{ "schema:name": "Example Municipality", "schema:url": { "@id": "http://example.org" } }]</code></dd>
+            <dt><code>dc:license</code></dt>
+            <dd><code>{ "@id": "http://opendefinition.org/licenses/cc-by/" }</code></dd>
+            <dt><code>dc:modified</code></dt>
+            <dd><code>"2010-12-31"</code></dd>
+          </dl>
 
           <div class="note">
             <p>The value of the <code>notes</code> annotation has been shortened for clarity in the table above.
@@ -785,8 +813,8 @@
           <p><a title="column">Column</a> annotations:</p>
           <table style="width: 100%; text-align: left">
             <thead>
-              <tr><th rowspan="2">id</th><th colspan="4">core annotations</th><th colspan="5">annotations</th></tr>
-              <tr><th>table</th><th>number</th><th>source number</th><th>cells</th><th><code>name</code></th><th><code>title</code></th><th><code>suppressOutput</code></th><th><code>dc:description</code></th></tr>
+              <tr><th rowspan="2">id</th><th colspan="7">core annotations</th><th colspan="1">annotations</th></tr>
+              <tr><th>table</th><th>number</th><th>source number</th><th>cells</th><th>name</th><th>titles</th><th>suppress output</th><th><code>dc:description</code></th></tr>
             </thead>
             <tbody>
               <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td>1</td><td><var>C1.1</var>, <var>C2.1</var>, <var>C3.1</var></td><td><code>GID</code></td><td><code>GID</code>, <code>Generic Identifier</code></td><td><code>true</code></td><td><code>An identifier for the operation on a tree.</code></td></tr>
@@ -801,66 +829,63 @@
             </tbody>
           </table>
 
-          <p class="note">In this example, output for <a>column</a> <var>C1</var> (<code>GID</code>) is not required; note the <a href="http://w3c.github.io/csvw/metadata/#column-suppressOutput"><code>suppressOutput</code></a> annotation on this <a>column</a>.</p>
+          <p class="note">In this example, output for <a>column</a> <var>C1</var> (<code>GID</code>) is not required; note the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-suppress-output" class="externalDFN">suppress output</a> annotation on this <a>column</a>.</p>
 
           <p><a title="row">Row</a> annotations:</p>
           <table style="width: 100%; text-align: left">
             <thead>
-              <tr><th rowspan="2">id</th><th colspan="4">core annotations</th></tr>
-              <tr><th>table</th><th>number</th><th>source number</th><th>cells</th></tr>
+              <tr><th rowspan="2">id</th><th colspan="5">core annotations</th></tr>
+              <tr><th>table</th><th>number</th><th>source number</th><th>cells</th><th>primary key</th></tr>
             </thead>
             <tbody>
-              <tr><td><var>R1</var></td><td><var>T</var></td><td>1</td><td>2</td><td><var>C1.1</var>, <var>C1.2</var>, <var>C1.3</var>, <var>C1.4</var>, <var>C1.5</var>, <var>C1.6</var>, <var>C1.7</var>, <var>C1.8</var>, <var>C1.9</var></td></tr>
-              <tr><td><var>R2</var></td><td><var>T</var></td><td>2</td><td>3</td><td><var>C2.1</var>, <var>C2.2</var>, <var>C2.3</var>, <var>C2.4</var>, <var>C2.5</var>, <var>C2.6</var>, <var>C2.7</var>, <var>C2.8</var>, <var>C2.9</var></td></tr>
-              <tr><td><var>R3</var></td><td><var>T</var></td><td>3</td><td>4</td><td><var>C3.1</var>, <var>C3.2</var>, <var>C3.3</var>, <var>C3.4</var>, <var>C3.5</var>, <var>C3.6</var>, <var>C3.7</var>, <var>C3.8</var>, <var>C3.9</var></td></tr>
+              <tr><td><var>R1</var></td><td><var>T</var></td><td>1</td><td>2</td><td><var>C1.1</var>, <var>C1.2</var>, <var>C1.3</var>, <var>C1.4</var>, <var>C1.5</var>, <var>C1.6</var>, <var>C1.7</var>, <var>C1.8</var>, <var>C1.9</var></td><td><var>C1.1</var></td></tr>
+              <tr><td><var>R2</var></td><td><var>T</var></td><td>2</td><td>3</td><td><var>C2.1</var>, <var>C2.2</var>, <var>C2.3</var>, <var>C2.4</var>, <var>C2.5</var>, <var>C2.6</var>, <var>C2.7</var>, <var>C2.8</var>, <var>C2.9</var></td><td><var>C2.1</var></td></tr>
+              <tr><td><var>R3</var></td><td><var>T</var></td><td>3</td><td>4</td><td><var>C3.1</var>, <var>C3.2</var>, <var>C3.3</var>, <var>C3.4</var>, <var>C3.5</var>, <var>C3.6</var>, <var>C3.7</var>, <var>C3.8</var>, <var>C3.9</var></td><td><var>C3.1</var></td></tr>
             </tbody>
           </table>
 
           <p><a title="cell">Cell</a> annotations:</p>
           <table style="width: 100%; text-align: left">
             <thead>
-              <tr><th rowspan="2">id</th><th colspan="6">core annotations</th><th colspan="5">annotations</th></tr>
-              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th><th>errors</th><th><code>lang</code></th><th><code>datatype</code></th><th><code>format</code></th><th><code>default</code></th><th><code>aboutUrl</code></th></tr>
+              <tr><th rowspan="2">id</th><th colspan="6">core annotations</th></tr>
+              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th><th>about URL</th></tr>
             </thead>
             <tbody>
-              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"1"</code></td><td><code>"1"</code></td><td></td><td></td><td><code>string</code></td><td></td><td></td><td><code>http://example.org/tree-ops-ext#gid-1</code></td></tr>
-              <tr><td><var>C1.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R1</var></td><td><code>"ADDISON AV"</code></td><td><code>"ADDISON AV"</code></td><td></td><td></td><td><code>string</code></td><td></td><td></td><td><code>&lt;http://example.org/tree-ops-ext#gid-1&gt;</code></td></tr>
-              <tr><td><var>C1.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R1</var></td><td><code>"Celtis australis"</code></td><td><code>"Celtis australis"</code></td><td></td><td></td><td><code>string</code></td><td></td><td></td><td><code>&lt;http://example.org/tree-ops-ext#gid-1&gt;</code></td></tr>
-              <tr><td><var>C1.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R1</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td><td></td><td><code>en</code></td><td><code>string</code></td><td></td><td></td><td><code>&lt;http://example.org/tree-ops-ext#gid-1&gt;</code></td></tr>
-              <tr><td><var>C1.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R1</var></td><td><code>"11"</code></td><td><code>11</code></td><td></td><td></td><td><code>integer</code></td><td></td><td></td><td><code>&lt;http://example.org/tree-ops-ext#gid-1&gt;</code></td></tr>
-              <tr><td><var>C1.6</var></td><td><var>T</var></td><td><var>C6</var></td><td><var>R1</var></td><td><code>"10/18/2010"</code></td><td><code>2010-10-18</code></td><td></td><td></td><td><code>date</code></td><td><code>M/d/yyyy</code></td><td></td><td><code>&lt;http://example.org/tree-ops-ext#gid-1&gt;</code></td></tr>
-              <tr><td><var>C1.7</var></td><td><var>T</var></td><td><var>C7</var></td><td><var>R1</var></td><td><code>""</code></td><td><code>null</code></td><td></td><td></td><td><code>string</code></td><td></td><td></td><td><code>&lt;http://example.org/tree-ops-ext#gid-1&gt;</code></td></tr>
-              <tr><td><var>C1.8</var></td><td><var>T</var></td><td><var>C8</var></td><td><var>R1</var></td><td><code>""</code></td><td><code>false</code></td><td></td><td></td><td><code>boolean</code></td><td><code>YES|NO</code></td><td><code>"NO"</code></td><td><code>&lt;http://example.org/tree-ops-ext#gid-1&gt;</code></td></tr>
-              <tr><td><var>C1.9</var></td><td><var>T</var></td><td><var>C9</var></td><td><var>R1</var></td><td><code>"&lt;Point&gt;&lt;coordinates&gt;-122.156485,37.440963&lt;/coordinates&gt;&lt;/Point&gt;"</code></td><td><code>"&lt;Point&gt;&lt;coordinates&gt;-122.156485,37.440963&lt;/coordinates&gt;&lt;/Point&gt;"</code></td><td></td><td></td><td><code>xml</code></td><td></td><td></td><td><code>&lt;http://example.org/tree-ops-ext#gid-1&gt;</code></td></tr>
+              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"1"</code></td><td><code>"1"</code></td><td><code>http://example.org/tree-ops-ext#gid-1</code></td></tr>
+              <tr><td><var>C1.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R1</var></td><td><code>"ADDISON AV"</code></td><td><code>"ADDISON AV"</code></td><td><code>&lt;http://example.org/tree-ops-ext#gid-1&gt;</code></td></tr>
+              <tr><td><var>C1.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R1</var></td><td><code>"Celtis australis"</code></td><td><code>"Celtis australis"</code></td><td><code>&lt;http://example.org/tree-ops-ext#gid-1&gt;</code></td></tr>
+              <tr><td><var>C1.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R1</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code> (English)</td><td><code>&lt;http://example.org/tree-ops-ext#gid-1&gt;</code></td></tr>
+              <tr><td><var>C1.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R1</var></td><td><code>"11"</code></td><td><code>11</code></td><td><code>&lt;http://example.org/tree-ops-ext#gid-1&gt;</code></td></tr>
+              <tr><td><var>C1.6</var></td><td><var>T</var></td><td><var>C6</var></td><td><var>R1</var></td><td><code>"10/18/2010"</code></td><td><code>2010-10-18</code></td><td><code>&lt;http://example.org/tree-ops-ext#gid-1&gt;</code></td></tr>
+              <tr><td><var>C1.7</var></td><td><var>T</var></td><td><var>C7</var></td><td><var>R1</var></td><td><code>""</code></td><td><code>null</code></td><td><code>&lt;http://example.org/tree-ops-ext#gid-1&gt;</code></td></tr>
+              <tr><td><var>C1.8</var></td><td><var>T</var></td><td><var>C8</var></td><td><var>R1</var></td><td><code>""</code></td><td><code>false</code></td><td><code>&lt;http://example.org/tree-ops-ext#gid-1&gt;</code></td></tr>
+              <tr><td><var>C1.9</var></td><td><var>T</var></td><td><var>C9</var></td><td><var>R1</var></td><td><code>"&lt;Point&gt;&lt;coordinates&gt;-122.156485,37.440963&lt;/coordinates&gt;&lt;/Point&gt;"</code></td><td><code>"&lt;Point&gt;&lt;coordinates&gt;-122.156485,37.440963&lt;/coordinates&gt;&lt;/Point&gt;"</code> (XML)</td><td><code>&lt;http://example.org/tree-ops-ext#gid-1&gt;</code></td></tr>
 
-              <tr><td><var>C2.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R2</var></td><td><code>"2"</code></td><td><code>"2"</code></td><td></td><td></td><td><code>string</code></td><td></td><td></td><td><code>&lt;http://example.org/tree-ops-ext#gid-2&gt;</code></td></tr>
-              <tr><td><var>C2.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R2</var></td><td><code>"EMERSON ST"</code></td><td><code>"EMERSON ST"</code></td><td></td><td></td><td><code>string</code></td><td></td><td></td><td><code>&lt;http://example.org/tree-ops-ext#gid-2&gt;</code></td></tr>
-              <tr><td><var>C2.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R2</var></td><td><code>"Liquidambar styraciflua"</code></td><td><code>"Liquidambar styraciflua"</code></td><td></td><td></td><td><code>string</code></td><td></td><td></td><td><code>&lt;http://example.org/tree-ops-ext#gid-2&gt;</code></td></tr>
-              <tr><td><var>C2.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R2</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td><td></td><td><code>en</code></td><td><code>string</code></td><td></td><td></td><td><code>&lt;http://example.org/tree-ops-ext#gid-2&gt;</code></td></tr>
-              <tr><td><var>C2.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R2</var></td><td><code>"11"</code></td><td><code>11</code></td><td></td><td></td><td><code>integer</code></td><td></td><td></td><td><code>&lt;http://example.org/tree-ops-ext#gid-2&gt;</code></td></tr>
-              <tr><td><var>C2.6</var></td><td><var>T</var></td><td><var>C6</var></td><td><var>R2</var></td><td><code>"6/2/2010"</code></td><td><code>2010-06-02</code></td><td></td><td></td><td><code>date</code></td><td><code>M/d/yyyy</code></td><td></td><td><code>&lt;http://example.org/tree-ops-ext#gid-2&gt;</code></td></tr>
-              <tr><td><var>C2.7</var></td><td><var>T</var></td><td><var>C7</var></td><td><var>R2</var></td><td><code>""</code></td><td><code>null</code></td><td></td><td></td><td><code>string</code></td><td></td><td></td><td><code>&lt;http://example.org/tree-ops-ext#gid-2&gt;</code></td></tr>
-              <tr><td><var>C2.8</var></td><td><var>T</var></td><td><var>C8</var></td><td><var>R2</var></td><td><code>""</code></td><td><code>false</code></td><td></td><td></td><td><code>boolean</code></td><td><code>YES|NO</code></td><td><code>"NO"</code></td><td><code>&lt;http://example.org/tree-ops-ext#gid-2&gt;</code></td></tr>
-              <tr><td><var>C2.9</var></td><td><var>T</var></td><td><var>C9</var></td><td><var>R2</var></td><td><code>"&lt;Point&gt;&lt;coordinates&gt;-122.156749,37.440958&lt;/coordinates&gt;&lt;/Point&gt;"</code></td><td><code>"&lt;Point&gt;&lt;coordinates&gt;-122.156749,37.440958&lt;/coordinates&gt;&lt;/Point&gt;"</code></td><td></td><td></td><td><code>xml</code></td><td></td><td></td><td><code>&lt;http://example.org/tree-ops-ext#gid-2&gt;</code></td></tr>
+              <tr><td><var>C2.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R2</var></td><td><code>"2"</code></td><td><code>"2"</code></td><td><code>&lt;http://example.org/tree-ops-ext#gid-2&gt;</code></td></tr>
+              <tr><td><var>C2.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R2</var></td><td><code>"EMERSON ST"</code></td><td><code>"EMERSON ST"</code></td><td><code>&lt;http://example.org/tree-ops-ext#gid-2&gt;</code></td></tr>
+              <tr><td><var>C2.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R2</var></td><td><code>"Liquidambar styraciflua"</code></td><td><code>"Liquidambar styraciflua"</code></td><td><code>&lt;http://example.org/tree-ops-ext#gid-2&gt;</code></td></tr>
+              <tr><td><var>C2.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R2</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code> (English)</td><td><code>&lt;http://example.org/tree-ops-ext#gid-2&gt;</code></td></tr>
+              <tr><td><var>C2.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R2</var></td><td><code>"11"</code></td><td><code>11</code></td><td><code>&lt;http://example.org/tree-ops-ext#gid-2&gt;</code></td></tr>
+              <tr><td><var>C2.6</var></td><td><var>T</var></td><td><var>C6</var></td><td><var>R2</var></td><td><code>"6/2/2010"</code></td><td><code>2010-06-02</code></td><td><code>&lt;http://example.org/tree-ops-ext#gid-2&gt;</code></td></tr>
+              <tr><td><var>C2.7</var></td><td><var>T</var></td><td><var>C7</var></td><td><var>R2</var></td><td><code>""</code></td><td><code>null</code></td><td><code>&lt;http://example.org/tree-ops-ext#gid-2&gt;</code></td></tr>
+              <tr><td><var>C2.8</var></td><td><var>T</var></td><td><var>C8</var></td><td><var>R2</var></td><td><code>""</code></td><td><code>false</code></td><td><code>&lt;http://example.org/tree-ops-ext#gid-2&gt;</code></td></tr>
+              <tr><td><var>C2.9</var></td><td><var>T</var></td><td><var>C9</var></td><td><var>R2</var></td><td><code>"&lt;Point&gt;&lt;coordinates&gt;-122.156749,37.440958&lt;/coordinates&gt;&lt;/Point&gt;"</code></td><td><code>"&lt;Point&gt;&lt;coordinates&gt;-122.156749,37.440958&lt;/coordinates&gt;&lt;/Point&gt;"</code> (XML)</td><td><code>&lt;http://example.org/tree-ops-ext#gid-2&gt;</code></td></tr>
 
-              <tr><td><var>C3.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R3</var></td><td><code>"6"</code></td><td><code>"6"</code></td><td></td><td></td><td><code>string</code></td><td></td><td></td><td><code>&lt;http://example.org/tree-ops-ext#gid-6&gt;</code></td></tr>
-              <tr><td><var>C3.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R3</var></td><td><code>"ADDISON AV"</code></td><td><code>"ADDISON AV"</code></td><td></td><td></td><td><code>string</code></td><td></td><td></td><td><code>&lt;http://example.org/tree-ops-ext#gid-6&gt;</code></td></tr>
-              <tr><td><var>C3.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R3</var></td><td><code>"Robinia pseudoacacia"</code></td><td><code>"Robinia pseudoacacia"</code></td><td></td><td></td><td><code>string</code></td><td></td><td></td><td><code>&lt;http://example.org/tree-ops-ext#gid-6&gt;</code></td></tr>
-              <tr><td><var>C3.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R3</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code></td><td></td><td><code>en</code></td><td><code>string</code></td><td></td><td></td><td><code>&lt;http://example.org/tree-ops-ext#gid-6&gt;</code></td></tr>
-              <tr><td><var>C3.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R3</var></td><td><code>"29"</code></td><td><code>29</code></td><td></td><td></td><td><code>integer</code></td><td></td><td></td><td><code>&lt;http://example.org/tree-ops-ext#gid-6&gt;</code></td></tr>
-              <tr><td><var>C3.6</var></td><td><var>T</var></td><td><var>C6</var></td><td><var>R3</var></td><td><code>"6/1/2010"</code></td><td><code>2010-06-01</code></td><td></td><td></td><td><code>date</code></td><td><code>M/d/yyyy</code></td><td></td><td><code>&lt;http://example.org/tree-ops-ext#gid-6&gt;</code></td></tr>
-              <tr><td><var>C3.7</var></td><td><var>T</var></td><td><var>C7</var></td><td><var>R3</var></td><td><code>"cavity or decay; trunk decay; codominant leaders; included bark; large leader or limb decay; previous failure root damage; root decay;  beware of BEES"</code></td><td><code>"cavity or decay"</code>, <code>"trunk decay"</code>, <code>"codominant leaders"</code>, <code>"included bark"</code>, <code>"large leader or limb decay"</code>, <code>"previous failure root damage"</code>, <code>"root decay"</code>, <code>"beware of BEES"</code></td><td></td><td></td><td><code>string</code></td><td></td><td></td><td><code>&lt;http://example.org/tree-ops-ext#gid-6&gt;</code></td></tr>
-              <tr><td><var>C3.8</var></td><td><var>T</var></td><td><var>C8</var></td><td><var>R3</var></td><td><code>"YES"</code></td><td><code>true</code></td><td></td><td></td><td><code>boolean</code></td><td><code>YES|NO</code></td><td><code>"NO"</code></td><td><code>&lt;http://example.org/tree-ops-ext#gid-6&gt;</code></td></tr>
-              <tr><td><var>C3.9</var></td><td><var>T</var></td><td><var>C9</var></td><td><var>R3</var></td><td><code>"&lt;Point&gt;&lt;coordinates&gt;-122.156299,37.441151&lt;/coordinates&gt;&lt;/Point&gt;"</code></td><td><code>"&lt;Point&gt;&lt;coordinates&gt;-122.156299,37.441151&lt;/coordinates&gt;&lt;/Point&gt;"</code></td><td></td><td></td><td><code>xml</code></td><td></td><td></td><td><code>&lt;http://example.org/tree-ops-ext#gid-6&gt;</code></td></tr>
+              <tr><td><var>C3.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R3</var></td><td><code>"6"</code></td><td><code>"6"</code></td><td><code>&lt;http://example.org/tree-ops-ext#gid-6&gt;</code></td></tr>
+              <tr><td><var>C3.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R3</var></td><td><code>"ADDISON AV"</code></td><td><code>"ADDISON AV"</code></td><td><code>&lt;http://example.org/tree-ops-ext#gid-6&gt;</code></td></tr>
+              <tr><td><var>C3.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R3</var></td><td><code>"Robinia pseudoacacia"</code></td><td><code>"Robinia pseudoacacia"</code></td><td><code>&lt;http://example.org/tree-ops-ext#gid-6&gt;</code></td></tr>
+              <tr><td><var>C3.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R3</var></td><td><code>"Large Tree Routine Prune"</code></td><td><code>"Large Tree Routine Prune"</code> (English)</td><td><code>&lt;http://example.org/tree-ops-ext#gid-6&gt;</code></td></tr>
+              <tr><td><var>C3.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R3</var></td><td><code>"29"</code></td><td><code>29</code></td><td><code>&lt;http://example.org/tree-ops-ext#gid-6&gt;</code></td></tr>
+              <tr><td><var>C3.6</var></td><td><var>T</var></td><td><var>C6</var></td><td><var>R3</var></td><td><code>"6/1/2010"</code></td><td><code>2010-06-01</code></td><td><code>&lt;http://example.org/tree-ops-ext#gid-6&gt;</code></td></tr>
+              <tr><td><var>C3.7</var></td><td><var>T</var></td><td><var>C7</var></td><td><var>R3</var></td><td><code>"cavity or decay; trunk decay; codominant leaders; included bark; large leader or limb decay; previous failure root damage; root decay;  beware of BEES"</code></td><td><code>"cavity or decay"</code>, <code>"trunk decay"</code>, <code>"codominant leaders"</code>, <code>"included bark"</code>, <code>"large leader or limb decay"</code>, <code>"previous failure root damage"</code>, <code>"root decay"</code>, <code>"beware of BEES"</code></td><td><code>&lt;http://example.org/tree-ops-ext#gid-6&gt;</code></td></tr>
+              <tr><td><var>C3.8</var></td><td><var>T</var></td><td><var>C8</var></td><td><var>R3</var></td><td><code>"YES"</code></td><td><code>true</code></td><td><code>&lt;http://example.org/tree-ops-ext#gid-6&gt;</code></td></tr>
+              <tr><td><var>C3.9</var></td><td><var>T</var></td><td><var>C9</var></td><td><var>R3</var></td><td><code>"&lt;Point&gt;&lt;coordinates&gt;-122.156299,37.441151&lt;/coordinates&gt;&lt;/Point&gt;"</code></td><td><code>"&lt;Point&gt;&lt;coordinates&gt;-122.156299,37.441151&lt;/coordinates&gt;&lt;/Point&gt;"</code> (XML)</td><td><code>&lt;http://example.org/tree-ops-ext#gid-6&gt;</code></td></tr>
             </tbody>
           </table>
 
-          <p class="note">For brevity, the <a href="http://w3c.github.io/csvw/metadata/#cell-propertyUrl"><code>propertyUrl</code></a> is not shown in the table of <a>cell</a> annotations. Where not explicitly set, the value of <a href="http://w3c.github.io/csvw/metadata/#cell-propertyUrl"><code>propertyUrl</code></a> defaults to the URI Template (see [[RFC6570]]) <code>#{<em>[column-name]</em>}</code>, where <code><em>[column-name]</em></code> is the value of the <a href="http://w3c.github.io/csvw/metadata/#column-name"><code>name</code></a> property for the <a>column</a> associated with the <a>cell</a>. For example, the value of <a href="http://w3c.github.io/csvw/metadata/#cell-propertyUrl"><code>propertyUrl</code></a> for all <a title="cell">cells</a> in <a>column</a> <var>C2</var> (<code>"name": "on_street"</code>) is <code>http://example.org/tree-ops-ext.csv#on_street</code>.</p>
-
-          <p class="note">The lists of values from <a title="cell">cells</a> in <a>column</a> <var>C7</var> (<code>"name": "comments"</code>) are assumed to be <em>unordered</em> as the boolean property <a href="http://w3c.github.io/csvw/metadata/#cell-ordered"><code>ordered</code></a>, with default value <var>true</var>, has not be set within the metadata description.</p>
+          <p class="note">The lists of values from <a title="cell">cells</a> in <a>column</a> <var>C7</var> (<code>"name": "comments"</code>) are assumed to be <em>unordered</em> as the boolean <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-ordered" class="externalDFN">ordered</a> annotation, which defaults to <code>false</code>, has not be set within the metadata description.</p>
 
         </div>
-
 
         <p><strong><a title="minimal mode">Minimal mode</a></strong> output for this example is provided in Turtle [[turtle]] syntax below:</p>
 
@@ -872,12 +897,12 @@
         </pre>
 
         <div class="note">
-          <p>The <a>subject</a> described by each <a>row</a> is explcitly defined using the <a href="http://w3c.github.io/csvw/metadata/#cell-aboutUrl"><code>aboutUrl</code></a> property; e.g. the <a>subject</a> of <a>row</a> <var>R1</var> is <code>http://example.org/tree-ops-ext#gid-1</code>.</p>
-          <p>Output for <a>column</a> <var>C1</var> (<code>{ "name": "GID" }</code>) is not included as <a>column</a> property <a href="http://w3c.github.io/csvw/metadata/#column-suppressOutput"><code>suppressOutput</code></a> has value <var>true</var>.</p>
-          <p>A <a href="http://www.w3.org/TR/rdf11-concepts/#dfn-language-tag" class="externalDFN">language tag</a> is specified for <a title="cell value">values</a> of <a>column</a> <var>C4</var> (<code>{ "name": "trim_cycle" }</code>) as <a>cell</a> property <a href="http://w3c.github.io/csvw/metadata/#cell-language"><code>lang</code></a> is specified with value <code>en</code>.</p>
-          <p>The <a href="http://w3c.github.io/csvw/metadata/#cell-datatype"><code>datatype</code></a> property is set on <a title="column">columns</a> <var>C5</var>, <var>C6</var>, <var>C8</var> and <var>C9</var> (<code>{ "name": "dbh"}</code>, <code>{ "name": "inventory_date" }</code>, <code>{ "name": "protected" }</code> and <code>{ "name": "kml" }</code>); <code>integer</code>, <code>date</code>, <code>boolean</code> and <code>xml</code> respectively. The <a href="http://w3c.github.io/csvw/metadata/#cell-datatype"><code>datatype</code></a> property is inherited by all <a title="cell">cells</a> in each of those <a title="column">columns</a>, therefore the RDF output for those <a title="cell">cells</a> includes the appropriate <a href="http://www.w3.org/TR/rdf11-concepts/#dfn-datatype-iri" class="externalDFN">datatype IRI</a>.</p>
+          <p>The <a>subject</a> described by each <a>row</a> is explicitly defined using the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-about-url" class="externalDFN">about URL</a> annotation; e.g. the <a>subject</a> of <a>row</a> <var>R1</var> is <code>http://example.org/tree-ops-ext#gid-1</code>.</p>
+          <p>Output for <a>column</a> <var>C1</var> (<code>{ "name": "GID" }</code>) is not included as the <a>column</a> <a href="http://w3c.github.io/csvw/syntax/#dfn-column-suppress-output" class="externalDFN">suppress output</a> annotation is <code>true</code>.</p>
+          <p>A <a href="http://www.w3.org/TR/rdf11-concepts/#dfn-language-tag" class="externalDFN">language tag</a> is specified for <a title="cell value">values</a> of <a>column</a> <var>C4</var> (<code>{ "name": "trim_cycle" }</code>) as <a>cell</a> <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-lang" class="externalDFN">lang</a> annotation is <code>en</code>.</p>
+          <p>The <a href="http://w3c.github.io/csvw/syntax/#dfn-column-datatype"><code>datatype</code></a> property is set on <a title="column">columns</a> <var>C5</var>, <var>C6</var>, <var>C8</var> and <var>C9</var> (<code>{ "name": "dbh"}</code>, <code>{ "name": "inventory_date" }</code>, <code>{ "name": "protected" }</code> and <code>{ "name": "kml" }</code>); <code>integer</code>, <code>date</code>, <code>boolean</code> and <code>xml</code> respectively. The <a href="http://w3c.github.io/csvw/metadata/#cell-datatype"><code>datatype</code></a> property is inherited by all <a title="cell">cells</a> in each of those <a title="column">columns</a>, therefore the RDF output for those <a title="cell">cells</a> includes the appropriate <a href="http://www.w3.org/TR/rdf11-concepts/#dfn-datatype-iri" class="externalDFN">datatype IRI</a>.</p>
           <p><a Title="cell">Cells</a> <var>C1.7</var> and <var>C2.7</var> (<a title="row">rows</a> <var>R1</var> and <var>R2</var>; <a>column</a>, <code>{ "name": "comments" }</code>) have <code>null</code> <a title="cell value">values</a> - no output is included for these <a title="cell">cells</a>.</p>
-          <p><a Title="cell">Cell</a> <var>C3.7</var> (<a>row</a> <var>R3</var>; <a>column</a>, <code>{ "name": "comments" }</code>) contains an unordered sequence of values; the set of values are included as a simple set of triples as opposed to an instance of <code>rdf:List</code> as the <a href="http://w3c.github.io/csvw/metadata/#cell-ordered"><code>ordered</code></a> property has not been specified (default is <em>unorderd</em>).</p>
+          <p><a Title="cell">Cell</a> <var>C3.7</var> (<a>row</a> <var>R3</var>; <a>column</a>, <code>{ "name": "comments" }</code>) contains an unordered sequence of values; the set of values are included as a simple set of triples as opposed to an instance of <code>rdf:List</code> as the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-ordered" class="externalDFN">ordered</a> annotation has defaulted to <code>false</code>.</p>
         </div>
 
         <p><strong><a title="standard mode">Standard mode</a></strong> output for this example is provided in Turtle [[turtle]] syntax below:</p>
@@ -891,8 +916,8 @@
 
         <div class="note">
           <p><a title="annotated table">Table</a> <var>T</var> (<code>{ "url": "http://example.org/tree-ops-ext.csv"}</code>) has been explicitly identified: <code>{ "@id": "&lt;http://exmple.org/tree-ops-ext&gt;"}</code>.</p>
-          <p><a title="common properties">Common properties</a> and <a>notes</a> specified for <a title="annotated table">table</a> <var>T</var> (<code>{ "url": "http://example.org/tree-ops-ext.csv"}</code>) are included in the output.</p>
-          <p>As the metadata description file <code>http://example.org/tree-ops-ext.csv-metadata.json</code> defines a default language within the context (<code>"@context": ["http://www.w3.org/ns/csvw", {"@language": "en"}]</code>), all <a>common properties</a> of type <code>string</code> (e.g. <code>dc:title</code>, <code>dcat:keyword</code>, <code>dc:publisher</code>, <code>dc:license</code> and <code>dc:modified</code>) are expressed in the RDF output using the the appropriate <a href="http://www.w3.org/TR/rdf11-concepts/#dfn-language-tag" class="externalDFN">language tag</a>.</p>
+          <p><a title="non-core annotations">Non-core annotations</a> and <a>notes</a> specified for <a title="annotated table">table</a> <var>T</var> (<code>{ "url": "http://example.org/tree-ops-ext.csv"}</code>) are included in the output.</p>
+          <p>As the metadata description file <code>http://example.org/tree-ops-ext.csv-metadata.json</code> defines a default language within the context (<code>"@context": ["http://www.w3.org/ns/csvw", {"@language": "en"}]</code>), all <a>non-core annotations</a> of type <code>string</code> (e.g. <code>dc:title</code>, <code>dcat:keyword</code>, <code>dc:publisher</code>, <code>dc:license</code> and <code>dc:modified</code>) are expressed in the RDF output using the the appropriate <a href="http://www.w3.org/TR/rdf11-concepts/#dfn-language-tag" class="externalDFN">language tag</a>.</p>
         </div>
 
       </section>
@@ -900,7 +925,7 @@
       <section id="example-events-listing">
         <h3>Example with single table and using <em>virtual columns</em> to produce multiple subjects per row</h3>
         <p>
-          This example uses a single <a>annotated table</a> describing a listing of music events. Each <a>row</a> from the tabular data file corresponds to three resources; the music event itself, the location where that event occurs and the offer to sell tickets for that event. The goal is to convert the CSV content into <a href="http://schema.org">schema.org</a> markup that a search engine such as <a href="http://www.google.com">Google</a>can use to index music events. Details of how Google expects this information to be structured can be found <a href="https://support.google.com/webmasters/answer/4620133?hl=en">here</a>.
+          This example uses a single <a title="annotated table">table</a> describing a listing of music events. Each <a>row</a> from the tabular data file corresponds to three resources; the music event itself, the location where that event occurs and the offer to sell tickets for that event. The goal is to convert the CSV content into <a href="http://schema.org">schema.org</a> markup that a search engine such as <a href="http://www.google.com">Google</a>can use to index music events. Details of how Google expects this information to be structured can be found <a href="https://support.google.com/webmasters/answer/4620133?hl=en">here</a>.
         </p>
         <p> 
           The input tabular data file, published at <code>http://example.org/events-listing.csv</code>, and the associated metadata description <code>http://example.org/events-listing.csv-metadata.json</code> are provided below:
@@ -920,7 +945,7 @@
 
         <div class="note">
           <p>
-            The CSV to RDF translation is limited to providing one statement, or triple, per <a>column</a> in the <a title="annotated table">table</a>. The target <code>schema.org</code> markup requires 10 statements to describe each event. As the base tabular data file contains 5 columns, an additional 5 <em>virtual <a title="column">columns</a></em> have been added in order to provide for the full complement of statements—including the relationships between the 3 resources (event, location, and offer) described by each <a>row</a> of the <a title="annotated table">table</a>. Note that the <a href="http://w3c.github.io/csvw/metadata/#column-virtual"><code>virtual</code></a> property is set to <var>true</var> for these <em>virtual <a title="column">columns</a></em>.
+            The CSV to RDF translation is limited to providing one statement, or triple, per <a>column</a> in the <a title="annotated table">table</a>. The target <a href="http://schema.org">schema.org</a> markup requires 10 statements to describe each event. As the base tabular data file contains 5 columns, an additional 5 <em>virtual <a title="column">columns</a></em> have been added in order to provide for the full complement of statements—including the relationships between the 3 resources (event, location, and offer) described by each <a>row</a> of the <a title="annotated table">table</a>. Note that the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-virtual" class="externalDFN">virtual</a> annotation is set to <var>true</var> for these <em>virtual <a title="column">columns</a></em>.
           </p>
           <p>
             Furthermore, note that no attempt is made to reconcile between locations or offers that may be associated with more than one event; every <a>row</a> in the <a title="annotated table">table</a> will create both a new location resource and offer resource in addition to the event resource. If considered necessary, applications such as <a href="http://openrefine.org">OpenRefine</a> may be used to identify and reconcile duplicate location resources once the RDF output has been generated.
@@ -948,10 +973,6 @@
 
           <p><a title="column">Column</a> annotations:</p>
           <table style="width: 100%; text-align: left">
-            <thead>
-              <tr><th rowspan="2">id</th><th colspan="4">core annotations</th><th colspan="3">annotations</th></tr>
-              <tr><th>table</th><th>number</th><th>source number</th><th>cells</th><th><code>name</code></th><th><code>title</code></th><th><code>virtual</code></th></tr>
-            </thead>
             <tbody>
               <tr><td><var>C1</var></td><td><var>T</var></td><td>1</td><td>1</td><td><var>C1.1</var>, <var>C2.1</var></td><td><code>name</code></td><td><code>Name</code></td><td></td></tr>
               <tr><td><var>C2</var></td><td><var>T</var></td><td>2</td><td>2</td><td><var>C1.2</var>, <var>C2.2</var></td><td><code>start_date</code></td><td><code>Start Date</code></td><td></td></tr>
@@ -981,31 +1002,31 @@
           <p><a title="cell">Cell</a> annotations:</p>
           <table style="width: 100%; text-align: left">
             <thead>
-              <tr><th rowspan="2">id</th><th colspan="6">core annotations</th><th colspan="5">annotations</th></tr>
-              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th><th>errors</th><th><code>datatype</code></th><th><code>format</code></th><th><code>aboutUrl</code></th><th><code>propertyUrl</code></th><th><code>valueUrl</code></th></tr>
+              <tr><th rowspan="2">id</th><th colspan="8">core annotations</th></tr>
+              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th><th>about URL</th><th>property URL</th><th>value URL</th></tr>
             </thead>
             <tbody>
-              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"B.B. King"</code></td><td><code>"B.B. King"</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/events-listing.csv#event-1&gt;</code></td><td><code>schema:name</code></td><td></td></tr>
-              <tr><td><var>C1.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R1</var></td><td><code>"2014-04-12T19:30"</code></td><td><code>2014-04-12T19:30:00</code></td><td></td><td><code>datetime</code></td><td><code>yyyy-MM-ddTHH:mm:ss</code></td><td><code>&lt;http://example.org/events-listing.csv#event-1&gt;</code></td><td><code>schema:startDate</code></td><td></td></tr>
-              <tr><td><var>C1.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R1</var></td><td><code>"Lupo’s Heartbreak Hotel"</code></td><td><code>"Lupo’s Heartbreak Hotel"</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/events-listing.csv#place-1&gt;</code></td><td><code>schema:name</code></td><td></td></tr>
-              <tr><td><var>C1.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R1</var></td><td><code>"79 Washington St., Providence, RI"</code></td><td><code>"79 Washington St., Providence, RI"</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/events-listing.csv#place-1&gt;</code></td><td><code>schema:address</code></td><td></td></tr>
-              <tr><td><var>C1.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R1</var></td><td><code>"https://www.etix.com/ticket/1771656"</code></td><td><code>&lt;https://www.etix.com/ticket/1771656&gt;</code></td><td></td><td><code>anyURI</code></td><td></td><td><code>&lt;http://example.org/events-listing.csv#offer-1&gt;</code></td><td><code>schema:url</code></td><td></td></tr>
-              <tr><td><var>C1.6</var></td><td><var>T</var></td><td><var>C6</var></td><td><var>R1</var></td><td><code>""</code></td><td><code>null</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/events-listing.csv#event-1&gt;</code></td><td><code>rdf:type</code></td><td><code>schema:MusicEvent</code></td></tr>
-              <tr><td><var>C1.7</var></td><td><var>T</var></td><td><var>C7</var></td><td><var>R1</var></td><td><code>""</code></td><td><code>null</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/events-listing.csv#place-1&gt;</code></td><td><code>rdf:type</code></td><td><code>schema:Place</code></td></tr>
-              <tr><td><var>C1.8</var></td><td><var>T</var></td><td><var>C8</var></td><td><var>R1</var></td><td><code>""</code></td><td><code>null</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/events-listing.csv#offer-1&gt;</code></td><td><code>rdf:type</code></td><td><code>schema:Offer</code></td></tr>
-              <tr><td><var>C1.9</var></td><td><var>T</var></td><td><var>C9</var></td><td><var>R1</var></td><td><code>""</code></td><td><code>null</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/events-listing.csv#event-1&gt;</code></td><td><code>schema:location</code></td><td><code>&lt;http://example.org/events-listing.csv#place-1&gt;</code></td></tr>
-              <tr><td><var>C1.10</var></td><td><var>T</var></td><td><var>C10</var></td><td><var>R1</var></td><td><code>""</code></td><td><code>null</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/events-listing.csv#event-1&gt;</code></td><td><code>schema:offers</code></td><td><code>&lt;http://example.org/events-listing.csv#offer-1&gt;</code></td></tr>
+              <tr><td><var>C1.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R1</var></td><td><code>"B.B. King"</code></td><td><code>"B.B. King"</code></td><td><code>&lt;http://example.org/events-listing.csv#event-1&gt;</code></td><td><code>schema:name</code></td><td></td></tr>
+              <tr><td><var>C1.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R1</var></td><td><code>"2014-04-12T19:30"</code></td><td><code>2014-04-12T19:30:00</code></td><td><code>&lt;http://example.org/events-listing.csv#event-1&gt;</code></td><td><code>schema:startDate</code></td><td></td></tr>
+              <tr><td><var>C1.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R1</var></td><td><code>"Lupo’s Heartbreak Hotel"</code></td><td><code>"Lupo’s Heartbreak Hotel"</code></td><td><code>&lt;http://example.org/events-listing.csv#place-1&gt;</code></td><td><code>schema:name</code></td><td></td></tr>
+              <tr><td><var>C1.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R1</var></td><td><code>"79 Washington St., Providence, RI"</code></td><td><code>"79 Washington St., Providence, RI"</code></td><td><code>&lt;http://example.org/events-listing.csv#place-1&gt;</code></td><td><code>schema:address</code></td><td></td></tr>
+              <tr><td><var>C1.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R1</var></td><td><code>"https://www.etix.com/ticket/1771656"</code></td><td><code>&lt;https://www.etix.com/ticket/1771656&gt;</code></td><td><code>&lt;http://example.org/events-listing.csv#offer-1&gt;</code></td><td><code>schema:url</code></td><td></td></tr>
+              <tr><td><var>C1.6</var></td><td><var>T</var></td><td><var>C6</var></td><td><var>R1</var></td><td><code>""</code></td><td><code>null</code></td><td><code>&lt;http://example.org/events-listing.csv#event-1&gt;</code></td><td><code>rdf:type</code></td><td><code>schema:MusicEvent</code></td></tr>
+              <tr><td><var>C1.7</var></td><td><var>T</var></td><td><var>C7</var></td><td><var>R1</var></td><td><code>""</code></td><td><code>null</code></td><td><code>&lt;http://example.org/events-listing.csv#place-1&gt;</code></td><td><code>rdf:type</code></td><td><code>schema:Place</code></td></tr>
+              <tr><td><var>C1.8</var></td><td><var>T</var></td><td><var>C8</var></td><td><var>R1</var></td><td><code>""</code></td><td><code>null</code></td><td><code>&lt;http://example.org/events-listing.csv#offer-1&gt;</code></td><td><code>rdf:type</code></td><td><code>schema:Offer</code></td></tr>
+              <tr><td><var>C1.9</var></td><td><var>T</var></td><td><var>C9</var></td><td><var>R1</var></td><td><code>""</code></td><td><code>null</code></td><td><code>&lt;http://example.org/events-listing.csv#event-1&gt;</code></td><td><code>schema:location</code></td><td><code>&lt;http://example.org/events-listing.csv#place-1&gt;</code></td></tr>
+              <tr><td><var>C1.10</var></td><td><var>T</var></td><td><var>C10</var></td><td><var>R1</var></td><td><code>""</code></td><td><code>null</code></td><td><code>&lt;http://example.org/events-listing.csv#event-1&gt;</code></td><td><code>schema:offers</code></td><td><code>&lt;http://example.org/events-listing.csv#offer-1&gt;</code></td></tr>
 
-              <tr><td><var>C2.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R2</var></td><td><code>"B.B. King"</code></td><td><code>"B.B. King"</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/events-listing.csv#event-2&gt;</code></td><td><code>schema:name</code></td><td></td></tr>
-              <tr><td><var>C2.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R2</var></td><td><code>"2014-04-13T20:00"</code></td><td><code>2014-04-13T20:00:00</code></td><td></td><td><code>datetime</code></td><td><code>yyyy-MM-ddTHH:mm:ss</code></td><td><code>&lt;http://example.org/events-listing.csv#event-2&gt;</code></td><td><code>schema:startDate</code></td><td></td></tr>
-              <tr><td><var>C2.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R2</var></td><td><code>"Lynn Auditorium"</code></td><td><code>"Lynn Auditorium"</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/events-listing.csv#place-2&gt;</code></td><td><code>schema:name</code></td><td></td></tr>
-              <tr><td><var>C2.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R2</var></td><td><code>"Lynn, MA, 01901"</code></td><td><code>"Lynn, MA, 01901"</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/events-listing.csv#place-2&gt;</code></td><td><code>schema:address</code></td><td></td></tr>
-              <tr><td><var>C2.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R2</var></td><td><code>"http://frontgatetickets.com/venue.php?id=11766"</code></td><td><code>&lt;http://frontgatetickets.com/venue.php?id=11766&gt;</code></td><td></td><td><code>anyURI</code></td><td></td><td><code>&lt;http://example.org/events-listing.csv#offer-2&gt;</code></td><td><code>schema:url</code></td><td></td></tr>
-              <tr><td><var>C2.6</var></td><td><var>T</var></td><td><var>C6</var></td><td><var>R2</var></td><td><code>""</code></td><td><code>null</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/events-listing.csv#event-2&gt;</code></td><td><code>rdf:type</code></td><td><code>schema:MusicEvent</code></td></tr>
-              <tr><td><var>C2.7</var></td><td><var>T</var></td><td><var>C7</var></td><td><var>R2</var></td><td><code>""</code></td><td><code>null</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/events-listing.csv#place-2&gt;</code></td><td><code>rdf:type</code></td><td><code>schema:Place</code></td></tr>
-              <tr><td><var>C2.8</var></td><td><var>T</var></td><td><var>C8</var></td><td><var>R2</var></td><td><code>""</code></td><td><code>null</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/events-listing.csv#offer-2&gt;</code></td><td><code>rdf:type</code></td><td><code>schema:Offer</code></td></tr>
-              <tr><td><var>C2.9</var></td><td><var>T</var></td><td><var>C9</var></td><td><var>R2</var></td><td><code>""</code></td><td><code>null</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/events-listing.csv#event-2&gt;</code></td><td><code>schema:location</code></td><td><code>&lt;http://example.org/events-listing.csv#place-2&gt;</code></td></tr>
-              <tr><td><var>C2.10</var></td><td><var>T</var></td><td><var>C10</var></td><td><var>R2</var></td><td><code>""</code></td><td><code>null</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/events-listing.csv#event-2&gt;</code></td><td><code>schema:offers</code></td><td><code>&lt;http://example.org/events-listing.csv#offer-2&gt;</code></td></tr>
+              <tr><td><var>C2.1</var></td><td><var>T</var></td><td><var>C1</var></td><td><var>R2</var></td><td><code>"B.B. King"</code></td><td><code>"B.B. King"</code></td><td><code>&lt;http://example.org/events-listing.csv#event-2&gt;</code></td><td><code>schema:name</code></td><td></td></tr>
+              <tr><td><var>C2.2</var></td><td><var>T</var></td><td><var>C2</var></td><td><var>R2</var></td><td><code>"2014-04-13T20:00"</code></td><td><code>2014-04-13T20:00:00</code></td><td><code>&lt;http://example.org/events-listing.csv#event-2&gt;</code></td><td><code>schema:startDate</code></td><td></td></tr>
+              <tr><td><var>C2.3</var></td><td><var>T</var></td><td><var>C3</var></td><td><var>R2</var></td><td><code>"Lynn Auditorium"</code></td><td><code>"Lynn Auditorium"</code></td><td><code>&lt;http://example.org/events-listing.csv#place-2&gt;</code></td><td><code>schema:name</code></td><td></td></tr>
+              <tr><td><var>C2.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R2</var></td><td><code>"Lynn, MA, 01901"</code></td><td><code>"Lynn, MA, 01901"</code></td><td><code>&lt;http://example.org/events-listing.csv#place-2&gt;</code></td><td><code>schema:address</code></td><td></td></tr>
+              <tr><td><var>C2.5</var></td><td><var>T</var></td><td><var>C5</var></td><td><var>R2</var></td><td><code>"http://frontgatetickets.com/venue.php?id=11766"</code></td><td><code>&lt;http://frontgatetickets.com/venue.php?id=11766&gt;</code></td><td><code>&lt;http://example.org/events-listing.csv#offer-2&gt;</code></td><td><code>schema:url</code></td><td></td></tr>
+              <tr><td><var>C2.6</var></td><td><var>T</var></td><td><var>C6</var></td><td><var>R2</var></td><td><code>""</code></td><td><code>null</code></td><td><code>&lt;http://example.org/events-listing.csv#event-2&gt;</code></td><td><code>rdf:type</code></td><td><code>schema:MusicEvent</code></td></tr>
+              <tr><td><var>C2.7</var></td><td><var>T</var></td><td><var>C7</var></td><td><var>R2</var></td><td><code>""</code></td><td><code>null</code></td><td><code>&lt;http://example.org/events-listing.csv#place-2&gt;</code></td><td><code>rdf:type</code></td><td><code>schema:Place</code></td></tr>
+              <tr><td><var>C2.8</var></td><td><var>T</var></td><td><var>C8</var></td><td><var>R2</var></td><td><code>""</code></td><td><code>null</code></td><td><code>&lt;http://example.org/events-listing.csv#offer-2&gt;</code></td><td><code>rdf:type</code></td><td><code>schema:Offer</code></td></tr>
+              <tr><td><var>C2.9</var></td><td><var>T</var></td><td><var>C9</var></td><td><var>R2</var></td><td><code>""</code></td><td><code>null</code></td><td><code>&lt;http://example.org/events-listing.csv#event-2&gt;</code></td><td><code>schema:location</code></td><td><code>&lt;http://example.org/events-listing.csv#place-2&gt;</code></td></tr>
+              <tr><td><var>C2.10</var></td><td><var>T</var></td><td><var>C10</var></td><td><var>R2</var></td><td><code>""</code></td><td><code>null</code></td><td><code>&lt;http://example.org/events-listing.csv#event-2&gt;</code></td><td><code>schema:offers</code></td><td><code>&lt;http://example.org/events-listing.csv#offer-2&gt;</code></td></tr>
             </tbody>
           </table>
 
@@ -1022,7 +1043,7 @@
 
         <div class="note">
           <p>Three resources are defined for each row within the table; event, location, and offer.</p>
-          <p>Each <a>column</a> explicitly defines both <a href="http://w3c.github.io/csvw/metadata/#cell-aboutUrl"><code>aboutUrl</code></a> and <a href="http://w3c.github.io/csvw/metadata/#cell-propertyUrl"><code>propertyUrl</code></a> properties which are inherited by the column's <a title="cell">cells</a>.</p>
+          <p>Each <a>column</a> description in the metadata explicitly defines both <a href="http://w3c.github.io/csvw/metadata/#cell-aboutUrl"><code>aboutUrl</code></a> and <a href="http://w3c.github.io/csvw/metadata/#cell-propertyUrl"><code>propertyUrl</code></a> properties which are used to create the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-about-url" class="externalDFN">about URL</a>  and <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-property-url" class="externalDFN">property URL</a> annotations on the column's <a title="cell">cells</a>.</p>
           <p><a title="column">Columns</a> <var>C6</var>, <var>C7</var> and <var>C8</var> (<code>{ "name": "type_event"}</code>, <code>{ "name": "type_place"}</code> and <code>{ "name": "type_offer"}</code>) define the semantic types of the resources described by each <a>row</a>: <code>schema:MusicEvent</code>, <code>schema:Place</code> and <code>schema:Offer</code> respectively.</p>
           <p><a title="column">Column</a> <var>C9</var> (<code>{ "name": "location"}</code>) uses the <a href="http://w3c.github.io/csvw/metadata/#cell-aboutUrl"><code>aboutUrl</code></a> and <a href="http://w3c.github.io/csvw/metadata/#cell-valueUrl"><code>valueUrl</code></a> to assert the relationship between the event and location resources.</p>
           <p><a title="column">Column</a> <var>C10</var> (<code>{ "name": "offer"}</code>) uses the <a href="http://w3c.github.io/csvw/metadata/#cell-aboutUrl"><code>aboutUrl</code></a> and <a href="http://w3c.github.io/csvw/metadata/#cell-valueUrl"><code>valueUrl</code></a> to assert the relationship between the event and offer resources.</p>
@@ -1038,25 +1059,39 @@
         </pre>
 
         <div class="note">
-          <p>The resources described by each <a>row</a> are explcitly defined using the <a href="http://w3c.github.io/csvw/metadata/#cell-aboutUrl"><code>aboutUrl</code></a> property—in this case three resources per <a>row</a> (event, location, and offer); the relationship between the <a>row</a> and each <a>subject</a> resource is asserted using the <code>csvw:describes</code> property; e.g. for <a>row</a> <var>R1</var> we state <code>[] csvw:describes t1:event-1, t1:place-1, t1:offer-1 .</code></p>
+          <p>The resources described by each <a>row</a> are explcitly defined using the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-about-url" class="externalDFN">about URL</a> annotation this case three resources per <a>row</a> (event, location, and offer); the relationship between the <a>row</a> and each <a>subject</a> resource is asserted using the <code>csvw:describes</code> property; e.g. for <a>row</a> <var>R1</var> we state <code>[] csvw:describes t1:event-1, t1:place-1, t1:offer-1 .</code></p>
         </div>
         
       </section>
 
       <section id="example-public-sector-roles-and-salaries">
-        <h3>Example with table group comprising three interrelated tables</h3>
+        <h3>Example with <a>group of tables</a> comprising four interrelated tables</h3>
         <p>
-          This example is based on <a href="http://w3c.github.io/csvw/use-cases-and-requirements/#UC-OrganogramData">Use Case #4 - Publication of public sector roles and salaries</a> and uses three <a title="annotated table">annotated tables</a> published within a <a>table group</a>. Information about senior roles and junior roles within a government department are published in CSV format by each department. These are validated against a centrally published <a href="http://w3c.github.io/csvw/metadata/#dfn-tableschema" class="externalDFN">schema</a> to ensure that all the data published by departments is consistent. Additionally, a list of professions is also published centrally, providing a <em>controlled vocabulary</em> against which departmental submissions are validated.
+          This example is based on <a href="http://w3c.github.io/csvw/use-cases-and-requirements/#UC-OrganogramData">Use Case #4 - Publication of public sector roles and salaries</a> and uses four <a title="annotated table">tables</a> published within a <a>group of tables</a>. Information about senior roles and junior roles within a government department or organization are published in CSV format by each department. These are validated against a centrally published <a href="http://w3c.github.io/csvw/metadata/#dfn-tableschema" class="externalDFN">schema</a> to ensure that all the data published by departments is consistent. Additionally, lists of organizations and professions are also published centrally, providing <em>controlled vocabularies</em> against which departmental submissions are validated.
+        </p>
+
+        <p>
+          Information published about junior and senior roles provides summary information for each post within the government department or organization. Whilst the junior role information is anonymous, providing only an indication of the number of full-time-equivalent (FTE) staff occupying a given post, the senior role information specifies the named individual occupying each post. As such, each <a>row</a> from the tabular data file describing senior roles corresponds to two resources; the <em>post</em> and the <em>person</em> occupying that post.
+        </p>
+
+        <p>
+          This example is concerned only with converting the information provided each government department or organization not the centrally published information listing organizations and professions.
         </p>
 
         <p> 
           The input tabular data files and associated metadata descriptions are provided below:
         </p>
         <pre class="example"
-             id="example-public-sector-roles-and-salaries-csv+-professions"
-             data-include="../examples/gov.uk/professions.csv"
+             id="example-public-sector-roles-and-salaries-csv+-organizations"
+             data-include="../examples/gov.uk/data/organizations.csv"
              data-oninclude="updateExample"
-             title="http://example.org/gov.uk/professions.csv">
+             title="http://example.org/gov.uk/data/organizations.csv">
+        </pre>
+        <pre class="example"
+             id="example-public-sector-roles-and-salaries-csv+-professions"
+             data-include="../examples/gov.uk/data/professions.csv"
+             data-oninclude="updateExample"
+             title="http://example.org/gov.uk/data/professions.csv">
         </pre>
         <pre class="example"
              id="example-public-sector-roles-and-salaries-csv+-senior-roles"
@@ -1077,85 +1112,125 @@
              title="http://example.org/metadata.json">
         </pre>
         <pre class="example highlight"
-             id="example-public-sector-roles-and-salaries-metadata-senior"
-             data-include="../examples/senior-roles.json"
+             id="example-public-sector-roles-and-salaries-metadata-organizations"
+             data-include="../examples/gov.uk/schema/organizations.json"
              data-oninclude="updateExample"
-             title="http://example.org/senior-roles.json">
+             title="http://example.org/gov.uk/schema/organizations.json">
+        </pre>
+        <pre class="example highlight"
+             id="example-public-sector-roles-and-salaries-metadata-professions"
+             data-include="../examples/gov.uk/schema/professions.json"
+             data-oninclude="updateExample"
+             title="http://example.org/gov.uk/schema/professions.json">
+        </pre>
+        <pre class="example highlight"
+             id="example-public-sector-roles-and-salaries-metadata-senior"
+             data-include="../examples/gov.uk/schema/senior-roles.json"
+             data-oninclude="updateExample"
+             title="http://example.org/gov.uk/schema/senior-roles.json">
         </pre>
         <pre class="example highlight"
              id="example-public-sector-roles-and-salaries-metadata-junior"
-             data-include="../examples/junior-roles.json"
+             data-include="../examples/gov.uk/schema/junior-roles.json"
              data-oninclude="updateExample"
-             title="http://example.org/junior-roles.json">
+             title="http://example.org/gov.uk/schema/junior-roles.json">
         </pre>
 
-        <p class="note">In this example, the resource <code>gov.uk/professions.csv</code> is identified using a relative URL to host <code>http://example.org</code>. In reality this resource would be published centrally by government and served from some remote host. Similarly, the metadata description resource <code>metadata.json</code> would be also be centrally published. Government departments seeking to validate their role and salary data would download a copy of this metadata description and place it, without modification, in the same directory as their tabular data files whose names MUST match those specified in the metadata description; <code>senior-roles.csv</code> and <code>junior-roles.csv</code>.</p>
+        <div class="note">
+          <p>This example makes extensive use of the <code>example.org</code> domain. As described in [[RFC6761]], this domain is used for illustrative examples within documentation. In reality, the resources described here with the URL path <code>/gov.uk</code> would be centrally published by the UK Government at, say, the domain <code>data.gov.uk</code>.</p>
+          <p>Given that these resources are centrally published with an aspiration for reuse, the <a href="http://w3c.github.io/csvw/metadata/#dfn-tableschema" class="externalDFN">table schema</a> descriptions have been factored out into separate resources. As such, the top-level metadata description resource <code>metadata.json</code> simply provides the list of <a href="http://w3c.github.io/csvw/syntax/#dfn-table" class="externalDFN">tables</a> and binds each of them to the appropriate <a href="http://w3c.github.io/csvw/metadata/#dfn-tableschema" class="externalDFN">table schema</a> that is defined elsewhere.</p>
+          <p>Finally, note that because the centrally published metadata descriptions are intended to be reused across many government departments and organizations, extra consideration has been given to defining URIs for the <em>person</em> and <em>post</em> resources defined in each row of the senior roles tabular data and subsequently referenced from the junior roles tabular data. To ensure that naming clashes are avoided, the unique reference for the organization to which the <em>person</em> or <em>post</em> belongs has been included in a path segment of the identifier. For example, the <a href="http://w3c.github.io/csvw/metadata/#dfn-uri-template-property">URI template property</a> <a href="http://w3c.github.io/csvw/metadata/#cell-aboutUrl"><code>aboutUrl</code></a> used to identify the senior <em>post</em> is specified as <code>http://example.org/organization/{organizationRef}/post/{ref}</code>, thus yielding the URI <code>http://example.org/organization/hefce.ac.uk/post/90115</code> for the <em>post</em> described in the first <a>row</a> of the senior roles tabular data.</p>
+        </div>
 
-        <p>The <a>table group</a> generated from parsing the tabular data files and associated metadata is shown below and provides the basis for the conversion to RDF.</p>
+        <p>The <a>group of tables</a> generated from parsing the tabular data files and associated metadata is shown below and provides the basis for the conversion to RDF.</p>
 
         <button class="toggle" data-toggle-target="ex-groups-annotation">empty</button>
         <div id="ex-groups-annotation" class="to-toggle">
 
-          <p>Annotations for the <a>table group</a> <var>G</var> and the three <a title="annotated table">tables</a> <var>Ta</var>, <var>Tb</var>, and <var>Tc</var> are shown below.</p>
+          <p>Annotations for the <a>group of tables</a> <var>G</var> and the four <a title="annotated table">tables</a> <var>Ta</var>, <var>Tb</var>, <var>Tc</var>, and <var>Td</var> are shown below.</p>
 
-          <p><a title="table group">Table Group</a> annotations:</p>
+          <p><a>Group of Tables</a> annotations:</p>
           <table>
             <thead>
-              <tr><th rowspan="2">id</th><th>core annotations</th><th rowspan="2" colspan="2">annotations</th></tr>
-              <tr><th><code>resources</code></th>
+              <tr><th rowspan="2">id</th><th>core annotations</th></tr>
+              <tr><th>tables</th>
             </thead>
             <tbody>
-              <tr><td><var>G</var></td><td><var>Ta</var>, <var>Tb</var>, <var>Tc</var></td><td><strong><code>@type</code></strong></td><td><code>TableGroup</code></td></tr>
+              <tr><td><var>G</var></td><td><var>Ta</var>, <var>Tb</var>, <var>Tc</var>, <var>Td</var></td></tr>
             </tbody>
           </table>
 
           <p><a title="annotated table">Table</a> annotations:</p>
           <table style="width: 100%; text-align: left">
             <thead>
-              <tr><th rowspan="3">id</th><th colspan="3">core annotations</th><th colspan="4">annotations</th></tr>
-              <tr><th rowspan="2"><code>url</code></th><th rowspan="2">columns</th><th rowspan="2">rows</th><th rowspan="2"><code>primaryKey</code></th><th rowspan="2"><code>suppressOutput</code></th><th colspan="2"><code>foreignKeys</code></th></tr>
-              <tr><th><code>columns</code></th><th><code>reference</code></th></tr>
+              <tr><th rowspan="2">id</th><th colspan="5">core annotations</th></tr>
+              <tr><th><code>url</code></th><th>columns</th><th>rows</th><th>suppress output</th><th>foreign keys</th></tr>
             </thead>
             <tbody>
-              <tr><td><var>Ta</var></td><td><code>http://example.org/gov.uk/professions.csv</code></td><td><var>Ca1</var></td><td><var>Ra1</var>, <var>Ra2</var>, <var>Ra3</var>, <var>Ra4</var></td><td><var>Ca1</var></td><td><code>true</code></td><td></td><td></td></tr>
+              <tr><td><var>Ta</var></td><td><code>http://example.org/gov.uk/data/organizations.csv</code></td><td><var>Ca1</var>, <var>Ca2</var>, <var>Ca3</var></td><td><var>Ra1</var>, <var>Ra2</var></td><td><code>true</code></td><td><var>Fa1</var></td></tr>
 
-              <tr><td><var>Tb</var></td><td><code>http://example.org/senior-roles.csv</code></td><td><var>Cb1</var>, <var>Cb2</var>, <var>Cb3</var>, <var>Cb4</var>, <var>Cb5</var>, <var>Cb6</var></td><td><var>Rb1</var>, <var>Rb2</var></td><td><var>Cb1</var></td><td></td><td><var>Cb5</var></td><td><var>Cb1</var></td></tr>
-              <tr><td></td><td></td><td></td><td></td><td></td><td></td><td><var>Cb6</var></td><td><var>Ca1</var></td></tr>
+              <tr><td><var>Tb</var></td><td><code>http://example.org/gov.uk/professions.csv</code></td><td><var>Cb1</var></td><td><var>Rb1</var>, <var>Rb2</var>, <var>Rb3</var>, <var>Rb4</var></td><td><code>true</code></td><td></td></tr>
+
+              <tr><td><var>Tc</var></td><td><code>http://example.org/senior-roles.csv</code></td><td><var>Cc1</var>, <var>Cc2</var>, <var>Cc3</var>, <var>Cc4</var>, <var>Cc5</var>, <var>Cc6</var></td><td><var>Rc1</var>, <var>Rc2</var></td><td><code>false</code></td><td><var>Fc1</var>, <var>Fc2</var>, <var>Fc3</var></td></tr>
               
-              <tr><td><var>Tc</var></td><td><code>http://example.org/junior-roles.csv</code></td><td><var>Cc1</var>, <var>Cc2</var>, <var>Cc3</var>, <var>Cc4</var>, <var>Cc5</var>, <var>Cc6</var>, <var>Cc7</var></td><td><var>Rc1</var>, <var>Rc2</var></td><td></td><td></td><td><var>Cc1</var></td><td><var>Cb1</var></td></tr>
-              <tr><td></td><td></td><td></td><td></td><td></td><td></td><td><var>Cc7</var></td><td><var>Ca1</var></td></tr>
+              <tr><td><var>Td</var></td><td><code>http://example.org/junior-roles.csv</code></td><td><var>Cd1</var>, <var>Cd2</var>, <var>Cd3</var>, <var>Cd4</var>, <var>Cd5</var>, <var>Cd6</var>, <var>Cd7</var></td><td><var>Rd1</var>, <var>Rd2</var></td><td><code>false</code></td><td><var>Fd1</var>, <var>Fd2</var>, <var>Fd3</var></td></tr>
             </tbody>
           </table>
 
-          <p class="note">In this example, output for the centrally published list of professions, table <var>Ta</var> (<code>http://example.org/gov.uk/professions.csv</code>), is not required; only information from the departmental submissions is to be translated to RDF. Note the <a href="http://w3c.github.io/csvw/metadata/#table-suppressOutput"><code>suppressOutput</code></a> annotation on this <a title="annotated table">table</a>.</p>
+          <p class="note">In this example, output for the centrally published lists of organizations and professions, tables <var>Ta</var> and <var>Tb</var> (<code>http://example.org/gov.uk/data/organizations.csv</code> and <code>http://example.org/gov.uk/data/professions.csv</code> respectively), are not required; only information from the departmental submissions is to be translated to RDF. Note the <a href="http://w3c.github.io/csvw/syntax/#dfn-table-suppress-output" class="externalDFN">suppress output</a> annotation on this <a title="annotated table">table</a>.</p>
+
+          <p>The following foreign keys are defined:</p>
+          <table style="width: 100%; text-align: left">
+            <thead>
+              <tr><th>id</th><th>columns in table</th><th>columns in referenced table</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><var>Fa1</var></td><td><var>Ca3</var></td><td><var>Ca1</var></td></tr>
+              <tr><td><var>Fc1</var></td><td><var>Cc5</var></td><td><var>Cc1</var></td></tr>
+              <tr><td><var>Fc2</var></td><td><var>Cc6</var></td><td><var>Cb1</var></td></tr>
+              <tr><td><var>Fc3</var></td><td><var>Cc7</var></td><td><var>Ca1</var></td></tr>
+              <tr><td><var>Fd1</var></td><td><var>Cd1</var></td><td><var>Cc1</var></td></tr>
+              <tr><td><var>Fd2</var></td><td><var>Cd7</var></td><td><var>Cb1</var></td></tr>
+              <tr><td><var>Fd3</var></td><td><var>Cd8</var></td><td><var>Ca1</var></td></tr>
+            </tbody>
+          </table>
 
           <p>Annotations for the <a title="column">columns</a>, <a title="row">rows</a> and <a title="cell">cells</a> in <a title="annotated table">table</a> <var>T</var> are shown in the tables below.</p>
 
           <p><a title="column">Column</a> annotations:</p>
           <table style="width: 100%; text-align: left">
             <thead>
-              <tr><th rowspan="2">id</th><th colspan="4">core annotations</th><th colspan="3">annotations</th></tr>
-              <tr><th>table</th><th>number</th><th>source number</th><th>cells</th><th><code>name</code></th><th><code>title</code></th></tr>
+              <tr><th rowspan="2">id</th><th colspan="8">core annotations</th></tr>
+              <tr><th>table</th><th>number</th><th>source number</th><th>cells</th><th>name</th><th>titles</th><th>required</th><th>virtual</th></tr>
             </thead>
             <tbody>
-              <tr><td><var>Ca1</var></td><td><var>Ta</var></td><td>1</td><td>1</td><td><var>Ca1.1</var>, <var>Ca2.1</var>, <var>Ca3.1</var>, <var>Ca4.1</var></td><td><code>name</code></td><td><code>Profession</code></td></tr>
+              <tr><td><var>Ca1</var></td><td><var>Ta</var></td><td>1</td><td>1</td><td><var>Ca1.1</var>, <var>Ca2.1</var></td><td><code>ref</code></td><td><code>Organization Unique Reference</code></td><td><code>true</code></td><td></td></tr>
+              <tr><td><var>Ca2</var></td><td><var>Ta</var></td><td>1</td><td>1</td><td><var>Ca1.2</var>, <var>Ca2.2</var></td><td><code>name</code></td><td><code>Organization Name</code></td><td></td><td></td></tr>
+              <tr><td><var>Ca3</var></td><td><var>Ta</var></td><td>1</td><td>1</td><td><var>Ca1.3</var>, <var>Ca2.3</var></td><td><code>department</code></td><td><code>Department Reference</code></td><td></td><td></td></tr>
 
-              <tr><td><var>Cb1</var></td><td><var>Tb</var></td><td>1</td><td>1</td><td><var>Cb1.1</var>, <var>Cb2.1</var></td><td><code>ref</code></td><td><code>Post Unique Reference</code></td></tr>
-              <tr><td><var>Cb2</var></td><td><var>Tb</var></td><td>2</td><td>2</td><td><var>Cb1.2</var>, <var>Cb2.2</var></td><td><code>name</code></td><td><code>Name</code></td></tr>
-              <tr><td><var>Cb3</var></td><td><var>Tb</var></td><td>3</td><td>3</td><td><var>Cb1.3</var>, <var>Cb2.3</var></td><td><code>grade</code></td><td><code>Grade</code></td></tr>
-              <tr><td><var>Cb4</var></td><td><var>Tb</var></td><td>4</td><td>4</td><td><var>Cb1.4</var>, <var>Cb2.4</var></td><td><code>job</code></td><td><code>Job Title</code></td></tr>
-              <tr><td><var>Cb5</var></td><td><var>Tb</var></td><td>5</td><td>5</td><td><var>Cb1.5</var>, <var>Cb2.5</var></td><td><code>reportsTo</code></td><td><code>Reports to Senior Post</code></td></tr>
-              <tr><td><var>Cb6</var></td><td><var>Tb</var></td><td>6</td><td>6</td><td><var>Cb1.6</var>, <var>Cb2.6</var></td><td><code>profession</code></td><td><code>Profession</code></td></tr>
+              <tr><td><var>Cb1</var></td><td><var>Tb</var></td><td>1</td><td>1</td><td><var>Cb1.1</var>, <var>Cb2.1</var>, <var>Cb3.1</var>, <var>Cb4.1</var></td><td><code>name</code></td><td><code>Profession</code></td><td><code>true</code></td><td></td></tr>
 
-              <tr><td><var>Cc1</var></td><td><var>Tc</var></td><td>1</td><td>1</td><td><var>Cc1.1</var>, <var>Cc2.1</var></td><td><code>reportsToSenior</code></td><td><code>Reporting Senior Post</code></td></tr>
-              <tr><td><var>Cc2</var></td><td><var>Tc</var></td><td>2</td><td>2</td><td><var>Cc1.2</var>, <var>Cc2.2</var></td><td><code>grade</code></td><td><code>Grade</code></td></tr>
-              <tr><td><var>Cc3</var></td><td><var>Tc</var></td><td>3</td><td>3</td><td><var>Cc1.3</var>, <var>Cc2.3</var></td><td><code>min_pay</code></td><td><code>Payscale Minimum (£)</code></td></tr>
-              <tr><td><var>Cc4</var></td><td><var>Tc</var></td><td>4</td><td>4</td><td><var>Cc1.4</var>, <var>Cc2.4</var></td><td><code>max_pay</code></td><td><code>Payscale Maximum (£)</code></td></tr>
-              <tr><td><var>Cc5</var></td><td><var>Tc</var></td><td>5</td><td>5</td><td><var>Cc1.5</var>, <var>Cc2.5</var></td><td><code>job</code></td><td><code>Generic Job Title</code></td></tr>
-              <tr><td><var>Cc6</var></td><td><var>Tc</var></td><td>6</td><td>6</td><td><var>Cc1.6</var>, <var>Cc2.6</var></td><td><code>number</code></td><td><code>Number of Posts (FTE)</code></td></tr>
-              <tr><td><var>Cc7</var></td><td><var>Tc</var></td><td>7</td><td>7</td><td><var>Cc1.7</var>, <var>Cc2.7</var></td><td><code>profession</code></td><td><code>Profession</code></td></tr>
+              <tr><td><var>Cc1</var></td><td><var>Tc</var></td><td>1</td><td>1</td><td><var>Cc1.1</var>, <var>Cc2.1</var></td><td><code>ref</code></td><td><code>Post Unique Reference</code></td><td><code>true</code></td><td></td></tr>
+              <tr><td><var>Cc2</var></td><td><var>Tc</var></td><td>2</td><td>2</td><td><var>Cc1.2</var>, <var>Cc2.2</var></td><td><code>name</code></td><td><code>Name</code></td><td></td><td></td></tr>
+              <tr><td><var>Cc3</var></td><td><var>Tc</var></td><td>3</td><td>3</td><td><var>Cc1.3</var>, <var>Cc2.3</var></td><td><code>grade</code></td><td><code>Grade</code></td><td></td><td></td></tr>
+              <tr><td><var>Cc4</var></td><td><var>Tc</var></td><td>4</td><td>4</td><td><var>Cc1.4</var>, <var>Cc2.4</var></td><td><code>job</code></td><td><code>Job Title</code></td><td></td><td></td></tr>
+              <tr><td><var>Cc5</var></td><td><var>Tc</var></td><td>5</td><td>5</td><td><var>Cc1.5</var>, <var>Cc2.5</var></td><td><code>reportsTo</code></td><td><code>Reports to Senior Post</code></td><td></td><td></td></tr>
+              <tr><td><var>Cc6</var></td><td><var>Tc</var></td><td>6</td><td>6</td><td><var>Cc1.6</var>, <var>Cc2.6</var></td><td><code>profession</code></td><td><code>Profession</code></td><td></td><td></td></tr>
+              <tr><td><var>Cc7</var></td><td><var>Tc</var></td><td>7</td><td>7</td><td><var>Cc1.7</var>, <var>Cc2.7</var></td><td><code>organizationRef</code></td><td><code>Organization Reference</code></td><td><code>true</code></td><td></td></tr>
+              <tr><td><var>Cc8</var></td><td><var>Tc</var></td><td>8</td><td>8</td><td><var>Cc1.8</var>, <var>Cc2.8</var></td><td><code>post_holder</code></td><td></td><td></td><td><code>true</code></td></tr>
+
+              <tr><td><var>Cd1</var></td><td><var>Td</var></td><td>1</td><td>1</td><td><var>Cd1.1</var>, <var>Cd2.1</var></td><td><code>reportsToSenior</code></td><td><code>Reporting Senior Post</code></td><td><code>true</code></td><td></td></tr>
+              <tr><td><var>Cd2</var></td><td><var>Td</var></td><td>2</td><td>2</td><td><var>Cd1.2</var>, <var>Cd2.2</var></td><td><code>grade</code></td><td><code>Grade</code></td><td></td><td></td></tr>
+              <tr><td><var>Cd3</var></td><td><var>Td</var></td><td>3</td><td>3</td><td><var>Cd1.3</var>, <var>Cd2.3</var></td><td><code>min_pay</code></td><td><code>Payscale Minimum (£)</code></td><td></td><td></td></tr>
+              <tr><td><var>Cd4</var></td><td><var>Td</var></td><td>4</td><td>4</td><td><var>Cd1.4</var>, <var>Cd2.4</var></td><td><code>max_pay</code></td><td><code>Payscale Maximum (£)</code></td><td></td><td></td></tr>
+              <tr><td><var>Cd5</var></td><td><var>Td</var></td><td>5</td><td>5</td><td><var>Cd1.5</var>, <var>Cd2.5</var></td><td><code>job</code></td><td><code>Generic Job Title</code></td><td></td><td></td></tr>
+              <tr><td><var>Cd6</var></td><td><var>Td</var></td><td>6</td><td>6</td><td><var>Cd1.6</var>, <var>Cd2.6</var></td><td><code>number</code></td><td><code>Number of Posts (FTE)</code></td><td></td><td></td></tr>
+              <tr><td><var>Cd7</var></td><td><var>Td</var></td><td>7</td><td>7</td><td><var>Cd1.7</var>, <var>Cd2.7</var></td><td><code>profession</code></td><td><code>Profession</code></td><td></td><td></td></tr>
+              <tr><td><var>Cd8</var></td><td><var>Td</var></td><td>8</td><td>8</td><td><var>Cd1.8</var>, <var>Cd2.8</var></td><td><code>organizationRef</code></td><td><code>Organization Reference</code></td><td><code>true</code></td><td></td></tr>
             </tbody>
           </table>
+
+          <p class="note"><a title="column">Column</a> <var>Cc8</var>, with the <a href="http://w3c.github.io/csvw/metadata/#column-virtual"><code>virtual</code></a> annotation specified as <var>true</var>, is used to relate the <em>person</em> resource, whose name is provided in <a>column</a> <var>Cc2</var>, to the associated <em>post</em> resource within the current <a>row</a> of <a title="annotated table">table</a> <var>Tc</var> (<code>{ "url": "http://example.org/senior-roles.csv" }</code>).</p>
 
           <p><a title="row">Row</a> annotations:</p>
           <table style="width: 100%; text-align: left">
@@ -1164,69 +1239,86 @@
               <tr><th>table</th><th>number</th><th>source number</th><th>cells</th></tr>
             </thead>
             <tbody>
-              <tr><td><var>Ra1</var></td><td><var>Ta</var></td><td>1</td><td>2</td><td><var>Ca1.1</var></td></tr>
-              <tr><td><var>Ra2</var></td><td><var>Ta</var></td><td>2</td><td>3</td><td><var>Ca2.1</var></td></tr>
-              <tr><td><var>Ra3</var></td><td><var>Ta</var></td><td>3</td><td>4</td><td><var>Ca3.1</var></td></tr>
-              <tr><td><var>Ra4</var></td><td><var>Ta</var></td><td>4</td><td>5</td><td><var>Ca4.1</var></td></tr>
+              <tr><td><var>Ra1</var></td><td><var>Ta</var></td><td>1</td><td>2</td><td><var>Ca1.1</var>, <var>Ca1.2</var>, <var>Ca1.3</var></td></tr>
+              <tr><td><var>Ra2</var></td><td><var>Ta</var></td><td>2</td><td>3</td><td><var>Ca2.1</var>, <var>Ca2.2</var>, <var>Ca2.3</var></td></tr>
 
-              <tr><td><var>Rb1</var></td><td><var>Tb</var></td><td>1</td><td>2</td><td><var>Cb1.1</var>, <var>Cb1.2</var>, <var>Cb1.3</var>, <var>Cb1.4</var>, <var>Cb1.5</var>, <var>Cb1.6</var></td></tr>
-              <tr><td><var>Rb2</var></td><td><var>Tb</var></td><td>2</td><td>3</td><td><var>Cb2.1</var>, <var>Cb2.2</var>, <var>Cb2.3</var>, <var>Cb2.4</var>, <var>Cb2.5</var>, <var>Cb2.6</var></td></tr>
+              <tr><td><var>Rb1</var></td><td><var>Tb</var></td><td>1</td><td>2</td><td><var>Cb1.1</var></td></tr>
+              <tr><td><var>Rb2</var></td><td><var>Tb</var></td><td>2</td><td>3</td><td><var>Cb2.1</var></td></tr>
+              <tr><td><var>Rb3</var></td><td><var>Tb</var></td><td>3</td><td>4</td><td><var>Cb3.1</var></td></tr>
+              <tr><td><var>Rb4</var></td><td><var>Tb</var></td><td>4</td><td>5</td><td><var>Cb4.1</var></td></tr>
 
-              <tr><td><var>Rc1</var></td><td><var>Tc</var></td><td>1</td><td>2</td><td><var>Cc1.1</var>, <var>Cc1.2</var>, <var>Cc1.3</var>, <var>Cc1.4</var>, <var>Cc1.5</var>, <var>Cc1.6</var>, <var>Cc1.7</var></td></tr>
-              <tr><td><var>Rc2</var></td><td><var>Tc</var></td><td>2</td><td>3</td><td><var>Cc2.1</var>, <var>Cc2.2</var>, <var>Cc2.3</var>, <var>Cc2.4</var>, <var>Cc2.5</var>, <var>Cc2.6</var>, <var>Cc2.7</var></td></tr>
+              <tr><td><var>Rc1</var></td><td><var>Tc</var></td><td>1</td><td>2</td><td><var>Cc1.1</var>, <var>Cc1.2</var>, <var>Cc1.3</var>, <var>Cc1.4</var>, <var>Cc1.5</var>, <var>Cc1.6</var>, <var>Cc1.7</var>, <var>Cc1.8</var></td></tr>
+              <tr><td><var>Rc2</var></td><td><var>Tc</var></td><td>2</td><td>3</td><td><var>Cc2.1</var>, <var>Cc2.2</var>, <var>Cc2.3</var>, <var>Cc2.4</var>, <var>Cc2.5</var>, <var>Cc2.6</var>, <var>Cc2.7</var>, <var>Cc2.8</var></td></tr>
+
+              <tr><td><var>Rd1</var></td><td><var>Td</var></td><td>1</td><td>2</td><td><var>Cd1.1</var>, <var>Cd1.2</var>, <var>Cd1.3</var>, <var>Cd1.4</var>, <var>Cd1.5</var>, <var>Cd1.6</var>, <var>Cd1.7</var>, <var>Cd1.8</var></td></tr>
+              <tr><td><var>Rd2</var></td><td><var>Td</var></td><td>2</td><td>3</td><td><var>Cd2.1</var>, <var>Cd2.2</var>, <var>Cd2.3</var>, <var>Cd2.4</var>, <var>Cd2.5</var>, <var>Cd2.6</var>, <var>Cd2.7</var>, <var>Cd2.8</var></td></tr>
             </tbody>
           </table>
 
           <p><a title="cell">Cell</a> annotations:</p>
           <table style="width: 100%; text-align: left">
             <thead>
-              <tr><th rowspan="2">id</th><th colspan="6">core annotations</th><th colspan="4">annotations</th></tr>
-              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th><th>errors</th><th><code>datatype</code></th><th><code>aboutUrl</code></th><th><code>propertyUrl</code></th><th><code>valueUrl</code></th></tr>
+              <tr><th rowspan="2">id</th><th colspan="8">core annotations</th></tr>
+              <tr><th>table</th><th>column</th><th>row</th><th>string value</th><th>value</th><th>about URL</th><th>property URL</th><th>value URL</th></tr>
             </thead>
             <tbody>
-              <tr><td><var>Ca1.1</var></td><td><var>Ta</var></td><td><var>Ca1</var></td><td><var>Ra1</var></td><td><code>"Finance"</code></td><td><code>"Finance"</code></td><td></td><td><code>string</code></td><td></td><td></td><td></td></tr>
+              <tr><td><var>Ca1.1</var></td><td><var>Ta</var></td><td><var>Ca1</var></td><td><var>Ra1</var></td><td><code>"hefce.ac.uk"</code></td><td><code>"hefce.ac.uk"</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk&gt;</code></td><td><code>dc:identifier</code></td><td></td></tr>
+              <tr><td><var>Ca1.2</var></td><td><var>Ta</var></td><td><var>Ca2</var></td><td><var>Ra1</var></td><td><code>"Higher Education Funding Council for England"</code></td><td><code>"Higher Education Funding Council for England"</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk&gt;</code></td><td><code>foaf:name</code></td><td></td></tr>
+              <tr><td><var>Ca1.3</var></td><td><var>Ta</var></td><td><var>Ca3</var></td><td><var>Ra1</var></td><td><code>"bis.gov.uk"</code></td><td><code>"bis.gov.uk"</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk&gt;</code></td><td><code>org:subOrganizationOf</code></td><td><code>&lt;http://example.org/organization/bis.gov.uk&gt;</code></td></tr>
 
-              <tr><td><var>Ca2.1</var></td><td><var>Ta</var></td><td><var>Ca1</var></td><td><var>Ra2</var></td><td><code>"Information Technology"</code></td><td><code>"Information Techology"</code></td><td></td><td><code>string</code></td><td></td><td></td><td></td></tr>
+              <tr><td><var>Ca2.1</var></td><td><var>Ta</var></td><td><var>Ca1</var></td><td><var>Ra2</var></td><td><code>"bis.gov.uk"</code></td><td><code>"bis.gov.uk"</code></td><td><code>&lt;http://example.org/organization/bis.gov.uk&gt;</code></td><td><code>dc:identifier</code></td><td></td></tr>
+              <tr><td><var>Ca2.2</var></td><td><var>Ta</var></td><td><var>Ca2</var></td><td><var>Ra2</var></td><td><code>"Department for Business, Innovation and Skills"</code></td><td><code>"Department for Business, Innovation and Skills"</code></td><td><code>&lt;http://example.org/organization/bis.gov.uk&gt;</code></td><td><code>foaf:name</code></td><td></td></tr>
+              <tr><td><var>Ca2.3</var></td><td><var>Ta</var></td><td><var>Ca3</var></td><td><var>Ra2</var></td><td><code>"xx"</code></td><td><code>null</code></td><td><code>&lt;http://example.org/organization/bis.gov.uk&gt;</code></td><td><code>org:subOrganizationOf</code></td><td></td></tr>
 
-              <tr><td><var>Ca3.1</var></td><td><var>Ta</var></td><td><var>Ca1</var></td><td><var>Ra3</var></td><td><code>"Operational Delivery"</code></td><td><code>"Operational Delivery"</code></td><td></td><td><code>string</code></td><td></td><td></td><td></td></tr>
+              <tr><td><var>Cb1.1</var></td><td><var>Tb</var></td><td><var>Cb1</var></td><td><var>Rb1</var></td><td><code>"Finance"</code></td><td><code>"Finance"</code></td><td></td><td></td><td></td></tr>
 
-              <tr><td><var>Ca4.1</var></td><td><var>Ta</var></td><td><var>Ca1</var></td><td><var>Ra4</var></td><td><code>"Policy"</code></td><td><code>"Policy"</code></td><td></td><td><code>string</code></td><td></td><td></td><td></td></tr>
+              <tr><td><var>Cb2.1</var></td><td><var>Tb</var></td><td><var>Cb1</var></td><td><var>Rb2</var></td><td><code>"Information Technology"</code></td><td><code>"Information Techology"</code></td><td></td><td></td><td></td></tr>
 
+              <tr><td><var>Cb3.1</var></td><td><var>Tb</var></td><td><var>Cb1</var></td><td><var>Rb3</var></td><td><code>"Operational Delivery"</code></td><td><code>"Operational Delivery"</code></td><td></td><td></td><td></td></tr>
 
-              <tr><td><var>Cb1.1</var></td><td><var>Tb</var></td><td><var>Cb1</var></td><td><var>Rb1</var></td><td><code>"90115"</code></td><td><code>"90115"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/senior-roles.csv#post-90115&gt;</code></td><td><code>dc:identifier</code></td><td></td></tr>
-              <tr><td><var>Cb1.2</var></td><td><var>Tb</var></td><td><var>Cb2</var></td><td><var>Rb1</var></td><td><code>"Steve Egan"</code></td><td><code>"Steve Egan"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/senior-roles.csv#post-90115&gt;</code></td><td><code>foaf:name</code></td><td></td></tr>
-              <tr><td><var>Cb1.3</var></td><td><var>Tb</var></td><td><var>Cb3</var></td><td><var>Rb1</var></td><td><code>"SCS1A"</code></td><td><code>"SCS1A"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/senior-roles.csv#post-90115&gt;</code></td><td><code>&lt;http://example.org/def/grade&gt;</code></td><td></td></tr>
-              <tr><td><var>Cb1.4</var></td><td><var>Tb</var></td><td><var>Cb4</var></td><td><var>Rb1</var></td><td><code>"Deputy Chief Executive"</code></td><td><code>"Deputy Chief Executive"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/senior-roles.csv#post-90115&gt;</code></td><td><code>&lt;http://example.org/def/job&gt;</code></td><td></td></tr>
-              <tr><td><var>Cb1.5</var></td><td><var>Tb</var></td><td><var>Cb5</var></td><td><var>Rb1</var></td><td><code>"90334"</code></td><td><code>"90334"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/senior-roles.csv#post-90115&gt;</code></td><td><code>&lt;http://example.org/def/reportsTo&gt;</code></td><td><code>&lt;http://example.org/senior-roles.csv#post-90334&gt;</code></td></tr>
-              <tr><td><var>Cb1.6</var></td><td><var>Tb</var></td><td><var>Cb6</var></td><td><var>Rb1</var></td><td><code>"Finance"</code></td><td><code>"Finance"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/senior-roles.csv#post-90115&gt;</code></td><td><code>&lt;http://example.org/def/profession&gt;</code></td><td></td></tr>  
-
-              <tr><td><var>Cb2.1</var></td><td><var>Tb</var></td><td><var>Cb1</var></td><td><var>Rb2</var></td><td><code>"90334"</code></td><td><code>"90334"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/senior-roles.csv#post-90334&gt;</code></td><td><code>dc:identifier</code></td><td></td></tr>
-              <tr><td><var>Cb2.2</var></td><td><var>Tb</var></td><td><var>Cb2</var></td><td><var>Rb2</var></td><td><code>"Sir Alan Langlands"</code></td><td><code>"Sir Alan Langlands"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/senior-roles.csv#post-90334&gt;</code></td><td><code>foaf:name</code></td><td></td></tr>
-              <tr><td><var>Cb2.3</var></td><td><var>Tb</var></td><td><var>Cb3</var></td><td><var>Rb2</var></td><td><code>"SCS4"</code></td><td><code>"SCS4"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/senior-roles.csv#post-90334&gt;</code></td><td><code>&lt;http://example.org/def/grade&gt;</code></td><td></td></tr>
-              <tr><td><var>Cb2.4</var></td><td><var>Tb</var></td><td><var>Cb4</var></td><td><var>Rb2</var></td><td><code>"Chief Executive"</code></td><td><code>"Chief Executive"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/senior-roles.csv#post-90334&gt;</code></td><td><code>&lt;http://example.org/def/job&gt;</code></td><td></td></tr>
-              <tr><td><var>Cb2.5</var></td><td><var>Tb</var></td><td><var>Cb5</var></td><td><var>Rb2</var></td><td><code>"xx"</code></td><td><code>null</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/senior-roles.csv#post-90334&gt;</code></td><td><code>&lt;http://example.org/def/reportsTo&gt;</code></td><td></td></tr>
-              <tr><td><var>Cb2.6</var></td><td><var>Tb</var></td><td><var>Cb6</var></td><td><var>Rb2</var></td><td><code>"Policy"</code></td><td><code>"Policy"</code></td><td></td><td><code>string</code></td><td><code>&lt;http://example.org/senior-roles.csv#post-90334&gt;</code></td><td><code>&lt;http://example.org/def/profession&gt;</code></td><td></td></tr>
+              <tr><td><var>Cb4.1</var></td><td><var>Tb</var></td><td><var>Cb1</var></td><td><var>Rb4</var></td><td><code>"Policy"</code></td><td><code>"Policy"</code></td><td></td><td></td><td></td></tr>
 
 
-              <tr><td><var>Cc1.1</var></td><td><var>Tc</var></td><td><var>Cc1</var></td><td><var>Rc1</var></td><td><code>"90115"</code></td><td><code>"90115"</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/def/reportsTo&gt;</code></td><td><code>&lt;http://example.org/senior-roles.csv#post-90115&gt;</code></td></tr>
-              <tr><td><var>Cc1.2</var></td><td><var>Tc</var></td><td><var>Cc2</var></td><td><var>Rc1</var></td><td><code>"4"</code></td><td><code>"4"</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/def/grade&gt;</code></td><td></td></tr>
-              <tr><td><var>Cc1.3</var></td><td><var>Tc</var></td><td><var>Cc3</var></td><td><var>Rc1</var></td><td><code>"17426"</code></td><td><code>17426</code></td><td></td><td><code>integer</code></td><td></td><td><code>&lt;http://example.org/def/min_pay&gt;</code></td><td></td></tr>
-              <tr><td><var>Cc1.4</var></td><td><var>Tc</var></td><td><var>Cc4</var></td><td><var>Rc1</var></td><td><code>"20002"</code></td><td><code>20002</code></td><td></td><td><code>integer</code></td><td></td><td><code>&lt;http://example.org/def/max_pay&gt;</code></td><td></td></tr>
-              <tr><td><var>Cc1.5</var></td><td><var>Tc</var></td><td><var>Cc5</var></td><td><var>Rc1</var></td><td><code>"Administrator"</code></td><td><code>"Administrator"</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/def/job&gt;</code></td><td></td></tr>
-              <tr><td><var>Cc1.6</var></td><td><var>Tc</var></td><td><var>Cc6</var></td><td><var>Rc1</var></td><td><code>"8.67"</code></td><td><code>8.67</code></td><td></td><td><code>number</code></td><td></td><td><code>&lt;http://example.org/def/number-of-posts&gt;</code></td><td></td></tr>
-              <tr><td><var>Cc1.7</var></td><td><var>Tc</var></td><td><var>Cc7</var></td><td><var>Rc1</var></td><td><code>"Operational Delivery"</code></td><td><code>"Operational Delivery"</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/def/profession&gt;</code></td><td></td></tr>
+              <tr><td><var>Cc1.1</var></td><td><var>Tc</var></td><td><var>Cc1</var></td><td><var>Rc1</var></td><td><code>"90115"</code></td><td><code>"90115"</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/post/90115&gt;</code></td><td><code>dc:identifier</code></td><td></td></tr>
+              <tr><td><var>Cc1.2</var></td><td><var>Tc</var></td><td><var>Cc2</var></td><td><var>Rc1</var></td><td><code>"Steve Egan"</code></td><td><code>"Steve Egan"</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/person/1&gt;</code></td><td><code>foaf:name</code></td><td></td></tr>
+              <tr><td><var>Cc1.3</var></td><td><var>Tc</var></td><td><var>Cc3</var></td><td><var>Rc1</var></td><td><code>"SCS1A"</code></td><td><code>"SCS1A"</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/post/90115&gt;</code></td><td><code>&lt;http://example.org/gov.uk/def/grade&gt;</code></td><td></td></tr>
+              <tr><td><var>Cc1.4</var></td><td><var>Tc</var></td><td><var>Cc4</var></td><td><var>Rc1</var></td><td><code>"Deputy Chief Executive"</code></td><td><code>"Deputy Chief Executive"</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/post/90115&gt;</code></td><td><code>&lt;http://example.org/gov.uk/def/job&gt;</code></td><td></td></tr>
+              <tr><td><var>Cc1.5</var></td><td><var>Tc</var></td><td><var>Cc5</var></td><td><var>Rc1</var></td><td><code>"90334"</code></td><td><code>"90334"</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/post/90115&gt;</code></td><td><code>org:reportsTo</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/post/90334&gt;</code></td></tr>
+              <tr><td><var>Cc1.6</var></td><td><var>Tc</var></td><td><var>Cc6</var></td><td><var>Rc1</var></td><td><code>"Finance"</code></td><td><code>"Finance"</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/post/90115&gt;</code></td><td><code>&lt;http://example.org/gov.uk/def/profession&gt;</code></td><td></td></tr>
+              <tr><td><var>Cc1.7</var></td><td><var>Tc</var></td><td><var>Cc7</var></td><td><var>Rc1</var></td><td><code>"hefce.ac.uk"</code></td><td><code>"hefce.ac.uk"</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/post/90115&gt;</code></td><td><code>org:postIn</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk&gt;</code></td></tr>
+              <tr><td><var>Cc1.8</var></td><td><var>Tc</var></td><td><var>Cc8</var></td><td><var>Rc1</var></td><td><code>""</code></td><td><code>null</code></td><td></td><td></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/post/90115&gt;</code></td><td><code>org:heldBy</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/person/1&gt;</code></td></tr>
 
-              <tr><td><var>Cc2.1</var></td><td><var>Tc</var></td><td><var>Cc1</var></td><td><var>Rc2</var></td><td><code>"90115"</code></td><td><code>"90115"</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/def/reportsTo&gt;</code></td><td><code>&lt;http://example.org/senior-roles.csv#post-90115&gt;</code></td></tr>
-              <tr><td><var>Cc2.2</var></td><td><var>Tc</var></td><td><var>Cc2</var></td><td><var>Rc2</var></td><td><code>"5"</code></td><td><code>"5"</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/def/grade&gt;</code></td><td></td></tr>
-              <tr><td><var>Cc2.3</var></td><td><var>Tc</var></td><td><var>Cc3</var></td><td><var>Rc2</var></td><td><code>"19546"</code></td><td><code>19546</code></td><td></td><td><code>integer</code></td><td></td><td><code>&lt;http://example.org/def/min_pay&gt;</code></td><td></td></tr>
-              <tr><td><var>Cc2.4</var></td><td><var>Tc</var></td><td><var>Cc4</var></td><td><var>Rc2</var></td><td><code>"22478"</code></td><td><code>22478</code></td><td></td><td><code>integer</code></td><td></td><td><code>&lt;http://example.org/def/max_pay&gt;</code></td><td></td></tr>
-              <tr><td><var>Cc2.5</var></td><td><var>Tc</var></td><td><var>Cc5</var></td><td><var>Rc2</var></td><td><code>"Administrator"</code></td><td><code>"Administrator"</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/def/job&gt;</code></td><td></td></tr>
-              <tr><td><var>Cc2.6</var></td><td><var>Tc</var></td><td><var>Cc6</var></td><td><var>Rc2</var></td><td><code>"0.5"</code></td><td><code>0.5</code></td><td></td><td><code>number</code></td><td></td><td><code>&lt;http://example.org/def/number-of-posts&gt;</code></td><td></td></tr>
-              <tr><td><var>Cc2.7</var></td><td><var>Tc</var></td><td><var>Cc7</var></td><td><var>Rc2</var></td><td><code>"Operational Delivery"</code></td><td><code>"Operational Delivery"</code></td><td></td><td><code>string</code></td><td></td><td><code>&lt;http://example.org/def/profession&gt;</code></td><td></td></tr>
+              <tr><td><var>Cc2.1</var></td><td><var>Tc</var></td><td><var>Cc1</var></td><td><var>Rc2</var></td><td><code>"90334"</code></td><td><code>"90334"</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/post/90334&gt;</code></td><td><code>dc:identifier</code></td><td></td></tr>
+              <tr><td><var>Cc2.2</var></td><td><var>Tc</var></td><td><var>Cc2</var></td><td><var>Rc2</var></td><td><code>"Sir Alan Langlands"</code></td><td><code>"Sir Alan Langlands"</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/person/2&gt;</code></td><td><code>foaf:name</code></td><td></td></tr>
+              <tr><td><var>Cc2.3</var></td><td><var>Tc</var></td><td><var>Cc3</var></td><td><var>Rc2</var></td><td><code>"SCS4"</code></td><td><code>"SCS4"</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/post/90334&gt;</code></td><td><code>&lt;http://example.org/gov.uk/def/grade&gt;</code></td><td></td></tr>
+              <tr><td><var>Cc2.4</var></td><td><var>Tc</var></td><td><var>Cc4</var></td><td><var>Rc2</var></td><td><code>"Chief Executive"</code></td><td><code>"Chief Executive"</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/post/90334&gt;</code></td><td><code>&lt;http://example.org/gov.uk/def/job&gt;</code></td><td></td></tr>
+              <tr><td><var>Cc2.5</var></td><td><var>Tc</var></td><td><var>Cc5</var></td><td><var>Rc2</var></td><td><code>"xx"</code></td><td><code>null</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/post/90334&gt;</code></td><td><code>org:reportsTo</code></td><td></td></tr>
+              <tr><td><var>Cc2.6</var></td><td><var>Tc</var></td><td><var>Cc6</var></td><td><var>Rc2</var></td><td><code>"Policy"</code></td><td><code>"Policy"</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/post/90334&gt;</code></td><td><code>&lt;http://example.org/gov.uk/def/profession&gt;</code></td><td></td></tr>
+              <tr><td><var>Cc2.7</var></td><td><var>Tc</var></td><td><var>Cc7</var></td><td><var>Rc2</var></td><td><code>"hefce.ac.uk"</code></td><td><code>"hefce.ac.uk"</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/post/90334&gt;</code></td><td><code>org:postIn</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk&gt;</code></td></tr>
+              <tr><td><var>Cc2.8</var></td><td><var>Tc</var></td><td><var>Cc8</var></td><td><var>Rc2</var></td><td><code>""</code></td><td><code>null</code></td><td></td><td></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/post/90334&gt;</code></td><td><code>org:heldBy</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/person/2&gt;</code></td></tr>
+
+
+              <tr><td><var>Cd1.1</var></td><td><var>Td</var></td><td><var>Cd1</var></td><td><var>Rd1</var></td><td><code>"90115"</code></td><td><code>"90115"</code></td><td></td><td><code>org:reportsTo</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/post/90115&gt;</code></td></tr>
+              <tr><td><var>Cd1.2</var></td><td><var>Td</var></td><td><var>Cd2</var></td><td><var>Rd1</var></td><td><code>"4"</code></td><td><code>"4"</code></td><td></td><td><code>&lt;http://example.org/gov.uk/def/grade&gt;</code></td><td></td></tr>
+              <tr><td><var>Cd1.3</var></td><td><var>Td</var></td><td><var>Cd3</var></td><td><var>Rd1</var></td><td><code>"17426"</code></td><td><code>17426</code></td><td></td><td><code>&lt;http://example.org/gov.uk/def/min_pay&gt;</code></td><td></td></tr>
+              <tr><td><var>Cd1.4</var></td><td><var>Td</var></td><td><var>Cd4</var></td><td><var>Rd1</var></td><td><code>"20002"</code></td><td><code>20002</code></td><td></td><td><code>&lt;http://example.org/gov.uk/def/max_pay&gt;</code></td><td></td></tr>
+              <tr><td><var>Cd1.5</var></td><td><var>Td</var></td><td><var>Cd5</var></td><td><var>Rd1</var></td><td><code>"Administrator"</code></td><td><code>"Administrator"</code></td><td></td><td><code>&lt;http://example.org/gov.uk/def/job&gt;</code></td><td></td></tr>
+              <tr><td><var>Cd1.6</var></td><td><var>Td</var></td><td><var>Cd6</var></td><td><var>Rd1</var></td><td><code>"8.67"</code></td><td><code>8.67</code></td><td></td><td><code>number</code></td><td></td><td><code>&lt;http://example.org/gov.uk/def/number_of_posts&gt;</code></td><td></td></tr>
+              <tr><td><var>Cd1.7</var></td><td><var>Td</var></td><td><var>Cd7</var></td><td><var>Rd1</var></td><td><code>"Operational Delivery"</code></td><td><code>"Operational Delivery"</code></td><td></td><td><code>&lt;http://example.org/gov.uk/def/profession&gt;</code></td><td></td></tr>
+              <tr><td><var>Cd1.8</var></td><td><var>Td</var></td><td><var>Cd8</var></td><td><var>Rd1</var></td><td><code>"hefce.ac.uk"</code></td><td><code>"hefce.ac.uk"</code></td><td></td><td><code>org:postIn</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk&gt;</code></td></tr>
+
+              <tr><td><var>Cd2.1</var></td><td><var>Td</var></td><td><var>Cd1</var></td><td><var>Rd2</var></td><td><code>"90115"</code></td><td><code>"90115"</code></td><td></td><td><code>org:reportsTo</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk/post/90115&gt;</code></td></tr>
+              <tr><td><var>Cd2.2</var></td><td><var>Td</var></td><td><var>Cd2</var></td><td><var>Rd2</var></td><td><code>"5"</code></td><td><code>"5"</code></td><td></td><td><code>&lt;http://example.org/gov.uk/def/grade&gt;</code></td><td></td></tr>
+              <tr><td><var>Cd2.3</var></td><td><var>Td</var></td><td><var>Cd3</var></td><td><var>Rd2</var></td><td><code>"19546"</code></td><td><code>19546</code></td><td></td><td><code>&lt;http://example.org/gov.uk/def/min_pay&gt;</code></td><td></td></tr>
+              <tr><td><var>Cd2.4</var></td><td><var>Td</var></td><td><var>Cd4</var></td><td><var>Rd2</var></td><td><code>"22478"</code></td><td><code>22478</code></td><td></td><td><code>&lt;http://example.org/gov.uk/def/max_pay&gt;</code></td><td></td></tr>
+              <tr><td><var>Cd2.5</var></td><td><var>Td</var></td><td><var>Cd5</var></td><td><var>Rd2</var></td><td><code>"Administrator"</code></td><td><code>"Administrator"</code></td><td></td><td><code>&lt;http://example.org/gov.uk/def/job&gt;</code></td><td></td></tr>
+              <tr><td><var>Cd2.6</var></td><td><var>Td</var></td><td><var>Cd6</var></td><td><var>Rd2</var></td><td><code>"0.5"</code></td><td><code>0.5</code></td><td></td><td><code>number</code></td><td></td><td><code>&lt;http://example.org/gov.uk/def/number_of_posts&gt;</code></td><td></td></tr>
+              <tr><td><var>Cd2.7</var></td><td><var>Td</var></td><td><var>Cd7</var></td><td><var>Rd2</var></td><td><code>"Operational Delivery"</code></td><td><code>"Operational Delivery"</code></td><td></td><td><code>&lt;http://example.org/gov.uk/def/profession&gt;</code></td><td></td></tr>
+              <tr><td><var>Cd2.8</var></td><td><var>Td</var></td><td><var>Cd8</var></td><td><var>Rd2</var></td><td><code>"hefce.ac.uk"</code></td><td><code>"hefce.ac.uk"</code></td><td></td><td><code>org:postIn</code></td><td><code>&lt;http://example.org/organization/hefce.ac.uk&gt;</code></td></tr>
             </tbody>
           </table>
 
-          <p class="note">Notice that <a>valueUrl</a> is not specified for <a>cell</a> <var>Cb2.5</var> because the <a>cell value</a> is <code>null</code> and the <a href="http://w3c.github.io/csvw/metadata/#column-virtual"><code>virtual</code></a> property of <a>column</a> <var>Cb5</var> is <em>not</em> specified.</p>
+          <p class="note">Notice that <a>value URL</a> is not specified for <a title="cell">cells</a> <var>Ca2.3</var> and <var>Cc2.5</var> because in each case the <a>cell value</a> is <code>null</code> and the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-virtual" class="externalDFN">virtual</a> annotation of <a>column</a> <var>Cb5</var> is <em>not</em> defined.</p>
 
         </div>
 
@@ -1240,9 +1332,11 @@
         </pre>
 
         <div class="note">
-          <p>Output for <a title="annotated table">table</a> <var>Ta</var> (<code>{ "url": "http://example.org/gov.uk/professions.csv" }</code>) is not included as property <a href="http://w3c.github.io/csvw/metadata/#table-suppressOutput"><code>suppressOutput</code></a> has value <var>true</var>.</p>
-          <p>The <a href="http://w3c.github.io/csvw/metadata/#cell-propertyUrl"><code>propertyUrl</code></a> is specified for all <a title="cell">cells</a> in <a title="annotated table">tables</a> <var>Tb</var> and <var>Tc</var>.</p>
-          <p><a title="column">Columns</a> <var>Cb5</var> and <var>Cc1</var> (<code>{ "name": "reportsTo" }</code> and <code>{ "name": "reportsToSenior" }</code>) use the <a href="http://w3c.github.io/csvw/metadata/#cell-aboutUrl"><code>aboutUrl</code></a>, <a href="http://w3c.github.io/csvw/metadata/#cell-propertyUrl"><code>propertyUrl</code></a> and <a href="http://w3c.github.io/csvw/metadata/#cell-valueUrl"><code>valueUrl</code></a> properties to assert the relationship between the given post and the senior post it reports to for the <a title="cell">cells</a> therein.</p>
+          <p>Output for <a title="annotated table">tables</a> <var>Ta</var> and <var>Tb</var> (<code>{ "url": "http://example.org/gov.uk/data/organizations.csv" }</code> and <code>{ "url": "http://example.org/gov.uk/data/professions.csv" }</code>) are not included as the <a href="http://w3c.github.io/csvw/syntax/#dfn-table-suppress-output" class="externalDFN">suppress output</a> annotation is <code>true</code>.</p>
+          <p>The <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-property-url" class="externalDFN">property URL</a> is specified for all <a title="cell">cells</a> in <a title="annotated table">tables</a> <var>Tc</var> and <var>Td</var>.</p>
+          <p><a title="column">Columns</a> <var>Cc5</var> and <var>Cd1</var> (<code>{ "name": "reportsTo" }</code> and <code>{ "name": "reportsToSenior" }</code>) use the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-about-url" class="externalDFN">about URL</a>, <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-property-url" class="externalDFN">property URL</a> and <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value-url" class="externalDFN">value URL</a> annotations to assert the relationship between the given post and the senior post it reports to for the <a title="cell">cells</a> therein.</p>
+          <p>Similarly, <a title="column">columns</a> <var>Cc7</var> and <var>Cd8</var> (both with <code>{ "name": "organizationRef" }</code>) use the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-about-url" class="externalDFN">about URL</a>, <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-property-url" class="externalDFN">property URL</a> and <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value-url" class="externalDFN">value URL</a> annotations to assert the relationship between the given post and the organization to which it belongs for the <a title="cell">cells</a> those <a title="column">columns</a>.</p>
+          <p>Finally, note that two resources are created for each <a>row</a> within <a title="annotated table">table</a> <var>Tc</var> (<code>{ "url": "http://example.org/senior-roles.csv" }</code>): the <em>person</em> and the <em>post</em> they occupy. The relationship between these resources is specified via <em>virtual</em> <a>column</a> <var>Cc8</var> (<code>{ "name": "post_holder" }</code>) using the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-about-url" class="externalDFN">about URL</a>, <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-property-url" class="externalDFN">property URL</a> and <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value-url" class="externalDFN">value URL</a> annotations.</p>
         </div>
 
         <p><strong><a title="standard mode">Standard mode</a></strong> output for this example is provided in Turtle [[turtle]] syntax below:</p>
@@ -1255,15 +1349,15 @@
         </pre>
 
         <div class="note">
-          <p><a title="table group">Table group</a> <var>G</var> was explicitly defined, but has not been explicitly identified; the table resource is treated as a <a>blank node</a>.</p>
-          <p>The resources described by each <a>row</a> of <a title="annotated table">table</a> <var>Tb</var> (<code>{ "url": "http://example.org/senior-roles.csv"}</code>) are explcitly defined using the <a href="http://w3c.github.io/csvw/metadata/#cell-aboutUrl"><code>aboutUrl</code></a> property; therefore, say, for <a>row</a> <var>Rb1</var> we state <code>[] csvw:describes t2:post-90115 .</code>; whilst the <a href="http://w3c.github.io/csvw/metadata/#cell-aboutUrl"><code>aboutUrl</code></a> property has not been defined for resources described by each <a>row</a> of <a title="annotated table">table</a> <var>Tc</var> (<code>{ "url": "http://example.org/junior-roles.csv"}</code>); therefore <a title="blank node">blank nodes</a> are used, e.g. for <a>row</a> <var>Rc1</var> we state <code>[] csvw:describes _:d8b8e40c-8c74-458b-99f7-64d1cf5c65f2 .</code>.</p>
+          <p><a title="group of tables">Table group</a> <var>G</var> was explicitly defined, but has not been explicitly identified; the table group and table resources are treated as <a title="blank node">blank nodes</a>.</p>
+          <p>The <em>person</em> and <em>post</em> resources described by each <a>row</a> of <a title="annotated table">table</a> <var>Tc</var> (<code>{ "url": "http://example.org/senior-roles.csv"}</code>) are explcitly defined using the <a href="http://w3c.github.io/csvw/metadata/#cell-aboutUrl"><code>aboutUrl</code></a> property; therefore, say, for <a>row</a> <var>Rc1</var> we state <code>[] csvw:describes &lt;http://example.org/organization/hefce.ac.uk/post/90115&gt;, &lt;http://example.org/organization/hefce.ac.uk/person/1&gt; .</code>; whilst the <a href="http://w3c.github.io/csvw/metadata/#cell-aboutUrl"><code>aboutUrl</code></a> property has not been defined for resources described by each <a>row</a> of <a title="annotated table">table</a> <var>Td</var> (<code>{ "url": "http://example.org/junior-roles.csv"}</code>); therefore <a title="blank node">blank nodes</a> are used, e.g. for <a>row</a> <var>Rd1</var> we state <code>[] csvw:describes _:d8b8e40c-8c74-458b-99f7-64d1cf5c65f2 .</code>.</p>
         </div>
       </section>
 
     </section>
     <section class="appendix">
       <h2>Acknowledgements</h2>
-      <span data-include="../acknowledgements.html"></span>
+      <div data-include="../acknowledgements.html"></div>
     </section>
     <script type="text/javascript">
       (function(){
