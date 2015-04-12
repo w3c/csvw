@@ -368,7 +368,7 @@
             If the value of the <code>on_street</code> or <code>GID</code> column were <code>null</code>, the URL would still be generated with the null value generating an empty string in the URL. For example if <code>on_street</code> were <code>null</code> and <code>GID</code> were <code>3</code>, the generated URL would be <code>http://example.org/tree//3</code>.
           </p>
           <p>
-            Once the URI has been generated, it is resolved against the location of the resource (eg the CSV file) to create an absolute URI. For example, given a <a href="#cell-aboutUrl"><code>aboutUrl</code></a> within a schema such as:
+            Once the URI has been generated, it is resolved against the url of the table (eg the CSV file) to create an absolute URI. For example, given a <a href="#cell-aboutUrl"><code>aboutUrl</code></a> within a schema such as:
           </p>
           <pre class="example highlight" title="definition of aboutUrl as a relative URL">
 "aboutUrl": "#row.{_row}"
@@ -733,7 +733,7 @@ CSVW,foaf:Project,table;data;conversion
               When an array of column descriptions <code>B</code> is <a>merged</a> into an original array of column descriptions <code>A</code>, each column description within <code>B</code> is combined into the original array <code>A</code>, based on the index of each column description, as follows:
             </p>
             <ol class="algorithm">
-              <li>if there is a non-empty case-insensitive intersection between the percent-decoded <a href="#column-name"><code>name</code></a> and <a href="#column-titles"><code>titless</code></a> values for the column description at the same index within <code>A</code> and <code>B</code>, the column description from <code>B</code> is <a>merged</a> into the matching column description in <code>A</code>.</li>
+              <li>if there is a non-empty case-insensitive intersection between the percent-decoded <a href="#column-name"><code>name</code></a> and <a href="#column-titles"><code>titles</code></a> values for the column description at the same index within <code>A</code> and <code>B</code>, the column description from <code>B</code> is <a>merged</a> into the matching column description in <code>A</code>.</li>
               <li>otherwise, if there are column descriptions at the same index within <code>A</code> and <code>B</code>, <a>validators</a> and <a>converters</a> MUST generate an error.</li>
               <li>otherwise, if at a given index there is no column description within A, but there is a column description within <code>B</code>, then:
                 <ol class="algorithm">
@@ -787,7 +787,7 @@ CSVW,foaf:Project,table;data;conversion
               </dd>
             </dl>
             <p class="note">
-              It is not required for the resource or schema referenced from a <code>foreignKeys</code> property to have a similarly defined <code>primaryKey</code>, though frequently it will.
+              It is not required for the table or schema referenced from a <code>foreignKeys</code> property to have a similarly defined <code>primaryKey</code>, though frequently it will.
             </p>
             <p>
               When an array of foreign key definitions <code>B</code> is <a>merged</a> into an original array of foreign key definitions <code>A</code>, each foreign key definition within <code>B</code> which does not appear within <code>A</code> is appended to the original array <code>A</code>.
@@ -1630,7 +1630,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
       </p>
       <p>Implementations MUST merge metadata documents in a manner consistent with these rules. <a>Validators</a> MUST check and issue warnings where merge issues are found as noted below and in the relevant property definitions.</p>
       <p>
-        Merging of metadata happens in order from highest priority to lowest priority by merging the first two metadata files (<code>A</code> and <code>B</code>) together to create new merged metadata AB'. This is then used to merge in the next metadata file until all metadata have been processed to create a <a>table group description</a>. If the top-level object of either of the metadata files are <a title="table description">table descriptions</a>, these are turned into <a title="table group description">table group descriptions</a> containing a single table description (i.e., having a single <code>resource</code> property whose value is the same as the original table description). Ensure that <code>@context</code> definitions are moved from the <a>table description</a> to the <a>table group description</a>.
+        Merging of metadata happens in order from highest priority to lowest priority by merging the first two metadata files (<code>A</code> and <code>B</code>) together to create new merged metadata AB'. This is then used to merge in the next metadata file until all metadata have been processed to create a <a>table group description</a>. If the top-level object of either of the metadata files are <a title="table description">table descriptions</a>, these are turned into <a title="table group description">table group descriptions</a> containing a single table description (i.e., having a <code>tables</code> property whose value is an array containing the original table description). Ensure that <code>@context</code> definitions are moved from the <a>table description</a> to the <a>table group description</a>.
       </p>
       <p>
         Merging has two stages: the <a>normalization</a> of metadata documents, described in <a href="#normalization" class="sectionRef"></a> and the <a title="merged">merging</a> of those normalized documents, described in <a href="#merging" class="sectionRef"></a>.
