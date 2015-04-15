@@ -1,0 +1,87 @@
+{
+  "@context": "http://www.w3.org/ns/csvw",
+  "null": "",
+  "tables" : [{
+    "url": "dm-example-2/people.csv",
+    "aboutUrl" : "http://foo.example/DB/People/ID={ID}",
+    "propertyUrl" : "http://foo.example/DB/People#{_name}",
+    "tableSchema": {
+      "columns": [
+        {"name": "ID", "required": true, "datatype": "integer"},
+        {"name": "fname"},
+        {"name": "addr", "datatype": "integer"},
+        {"name": "deptName"},
+        {"name": "deptCity"},
+        {
+          "name": "type",
+          "virtual": true,
+          "propertyUrl": "rdf:type",
+          "valueUrl" : "http://foo.example/DB/People"
+        },
+        {
+          "name": "ref",
+          "virtual": true,
+          "propertyUrl": "http://foo.example/DB/People#ref-deptName;deptCity",
+          "valueUrl" : "http://foo.example/DB/People/ID=XX"
+        }
+      ],
+      "primaryKey": "ID",
+      "foreignKeys" : [{
+        "columnReference" : "addr",
+        "reference" : {
+            "resource" : "dm-example-2/addresses.csv",
+            "columnReference" : "ID"
+        }
+      }, {
+        "columnReference" : ["deptName", "deptCity"],
+        "reference" : {
+            "resource" : "dm-example-2/department.csv",
+            "columnReference" : ["name", "city"]
+        }
+      }]
+    }
+  }, {
+    "url": "dm-example-2/addresses.csv",
+    "aboutUrl" : "http://foo.example/DB/Addresses/ID={ID}",
+    "propertyUrl" : "http://foo.example/DB/Addresses#{_name}",
+    "tableSchema": {
+      "columns": [
+        {"name": "ID", "required": true, "datatype": "integer"},
+        {"name": "city"},
+        {"name": "state"},
+        {
+          "name": "type",
+          "virtual": true,
+          "propertyUrl": "rdf:type",
+          "valueUrl" : "http://foo.example/DB/Addresses"
+        }
+      ],
+      "primaryKey": "ID"
+    }
+  }, {
+    "url": "dm-example-2/department.csv",
+    "aboutUrl" : "http://foo.example/DB/Departent/ID={ID}",
+    "propertyUrl" : "http://foo.example/DB/Departent#{_name}",
+    "tableSchema": {
+      "columns": [
+        {"name": "ID", "required": true, "datatype": "integer"},
+        {"name": "name"},
+        {"name": "city"},
+        {"name": "manager", "datatype": "integer"},
+        {
+          "name": "ref",
+          "virtual": true,
+          "propertyUrl": "http://foo.example/DB/Departent#ref-manager",
+          "valueUrl" : "http://foo.example/DB/People/ID={manager}"
+        },
+        {
+          "name": "type",
+          "virtual": true,
+          "propertyUrl": "rdf:type",
+          "valueUrl" : "http://foo.example/DB/Department"
+        }
+      ],
+      "primaryKey": "ID"
+    }
+  }]
+}
