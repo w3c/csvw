@@ -27,6 +27,14 @@
       footer {text-align: center;}
     %title
       = man['label']
+    :css
+      em.rfc2119 { 
+          text-transform:     lowercase;
+          font-variant:       small-caps;
+          font-style:         normal;
+          color:              #900;
+      }
+
   %body{resource: man['id'], typeof: man['type']}
     %p
       %a{href: "http://www.w3.org/"}
@@ -54,9 +62,10 @@
         - manifests.each do |id, man|
           %li
             %a{href: "##{id}"}<=man['label']
+            = "– #{man['entries'].count} entries"
     - manifests.each do |id, man|
       %section{id: id, property: "mf:entry", inlist: true, resource: id, typeof: man['type']}
-        %h2<=man['label']
+        %h2<= "#{man['label']} (#{man['entries'].count} entries)"
         %p{property: "rdfs:comment"}<= man['comment']
         %p
           - if id =~/json/
@@ -71,10 +80,11 @@
               = "#{test['id']}:"
               %span{about: test['id'], property: "mf:name"}<~test['name']
             %dd{property: "mf:entry", inlist: true, resource: test['id'], typeof: test['type']}
-              %p
-                %span{property: "rdfs:comment"}<~test['comment']
+              %div{property: "rdfs:comment"}
+                :markdown
+                  #{test['comment'].gsub(/(MUST|SHOULD|MAY)/, '<em class="rfc2119">\\1</em>')}
                 - if test['type'] =~ /Negative/
-                  (negative test)
+                  Negative Test
               %dl.test-detail
                 %dt="approval"
                 %dd{property: "mf:approval", resource: test['approval']}<~test['approval']
