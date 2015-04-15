@@ -27,6 +27,14 @@
       footer {text-align: center;}
     %title
       = man['label']
+    :css
+      em.rfc2119 { 
+          text-transform:     lowercase;
+          font-variant:       small-caps;
+          font-style:         normal;
+          color:              #900;
+      }
+
   %body{resource: man['id'], typeof: man['type']}
     %p
       %a{href: "http://www.w3.org/"}
@@ -48,15 +56,23 @@
       ## Contributing Tests
       The test manifests and entries are built automatically from [manifest.csv](manifest.csv) using [mk_manifest.rb](mk_manifest.rb), where each row defines a combination of RDF, JSON and Validation tests for the same _action_ and implicit files. Tests may be contributed via pull request to [https://github.com/w3c/csvw](https://github.com/w3c/csvw) with suitable changes to the [manifest.csv](manifest.csv) and necessary _action_, _result_ and _implicit_ files. Tests will also be considered if a contribution is sent to [public-csv-wg-comments@w3.org](mailto:public-csv-wg-comments@w3.org).
 
+      ## Distribution
+        Distributed under both the [W3C Test Suite License](http://www.w3.org/Consortium/Legal/2008/04-testsuite-license) and the [W3C 3-clause BSD License](http://www.w3.org/Consortium/Legal/2008/03-bsd-license). To contribute to a W3C Test Suite, see the [policies and contribution forms](http://www.w3.org/2004/10/27-testcases).
+
+      ## Disclaimer
+        UNDER BOTH MUTUALLY EXCLUSIVE LICENSES, THIS DOCUMENT AND ALL DOCUMENTS, TESTS AND SOFTWARE THAT LINK THIS STATEMENT ARE PROVIDED "AS IS," AND COPYRIGHT HOLDERS MAKE NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE DOCUMENT ARE SUITABLE FOR ANY PURPOSE; NOR THAT THE IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ANY THIRD PARTY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+        COPYRIGHT HOLDERS WILL NOT BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF ANY USE OF THE DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+
     %section.contents
       %h2="Contents"
       %ol
         - manifests.each do |id, man|
           %li
             %a{href: "##{id}"}<=man['label']
+            = "– #{man['entries'].count} entries"
     - manifests.each do |id, man|
       %section{id: id, property: "mf:entry", inlist: true, resource: id, typeof: man['type']}
-        %h2<=man['label']
+        %h2<= "#{man['label']} (#{man['entries'].count} entries)"
         %p{property: "rdfs:comment"}<= man['comment']
         %p
           - if id =~/json/
@@ -71,10 +87,11 @@
               = "#{test['id']}:"
               %span{about: test['id'], property: "mf:name"}<~test['name']
             %dd{property: "mf:entry", inlist: true, resource: test['id'], typeof: test['type']}
-              %p
-                %span{property: "rdfs:comment"}<~test['comment']
+              %div{property: "rdfs:comment"}
+                :markdown
+                  #{test['comment'].gsub(/(MUST|SHOULD|MAY)/, '<em class="rfc2119">\\1</em>')}
                 - if test['type'] =~ /Negative/
-                  (negative test)
+                  Negative Test
               %dl.test-detail
                 %dt="approval"
                 %dd{property: "mf:approval", resource: test['approval']}<~test['approval']
@@ -118,6 +135,7 @@
                     - if test['option']['metadata']
                       user metadata:
                       %a{property: "csvt:metadata", href: test['option']['metadata']}<~test['option']['metadata']
+
     %footer
-      %span{property: "dc:publisher"}
-        W3C CSV on the Web Working Group
+      :markdown
+        [Copyright ©](http://www.w3.org/Consortium/Legal/ipr-notice#Copyright) 2015 [W3C](http://www.w3.org/)® ([MIT](http://www.csail.mit.edu/), [ERCIM](http://www.ercim.org/), [Keio](http://www.keio.ac.jp/), [Beihang](http://ev.buaa.edu.cn/)). W3C® [liability](http://www.w3.org/Consortium/Legal/ipr-notice#Legal_Disclaimer), [trademark](http://www.w3.org/Consortium/Legal/ipr-notice#W3C_Trademarks) and [document use](http://www.w3.org/Consortium/Legal/copyright-documents) rules apply.
