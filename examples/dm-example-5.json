@@ -1,0 +1,65 @@
+{
+  "@context": "http://www.w3.org/ns/csvw",
+  "null": "",
+  "tables" : [{
+    "url": "dm-example-5/projects.csv",
+    "propertyUrl" : "http://foo.example/DB/Projects#{_name}",
+    "tableSchema": {
+      "columns": [
+        {"name": "lead", "valueUrl": "http://foo.example/DB/People/ID={lead}"},
+        {"name": "name"},
+        {"name": "deptName"},
+        {"name": "deptCity"},
+        {
+          "name": "type",
+          "virtual": true,
+          "propertyUrl": "rdf:type",
+          "valueUrl" : "http://foo.example/DB/Projects"
+        },
+        {
+          "name": "refNameCity",
+          "virtual": true,
+          "propertyUrl": "http://foo.example/DB/Projects#ref-deptName;deptCity",
+          "valueUrl" : "http://foo.example/DB/Department/ID=XX"
+        }
+      ]
+    }
+  }, {
+    "url": "dm-example-5/task_assignments.csv",
+    "aboutUrl" : "http://foo.example/DB/TaskAssignments/worker={worker}.project={project}",
+    "propertyUrl" : "http://foo.example/DB/TaskAssignments#{_name}",
+    "tableSchema": {
+      "columns": [
+        {"name": "worker", "required": true, "datatype": "integer"},
+        {"name": "project", "required": true},
+        {"name": "deptName"},
+        {"name": "deptCity"},
+        {
+          "name": "type",
+          "virtual": true,
+          "propertyUrl": "rdf:type",
+          "valueUrl" : "http://foo.example/DB/TaskAssignments"
+        },
+        {
+          "name": "refWorker",
+          "virtual": true,
+          "propertyUrl": "http://foo.example/DB/TaskAssignments#ref-worker",
+          "valueUrl" : "http://foo.example/DB/People/ID={worker}"
+        },
+        {
+          "name": "refNameCity",
+          "virtual": true,
+          "propertyUrl": "http://foo.example/DB/TaskAssignments#ref-deptName;deptCity",
+          "valueUrl" : "http://foo.example/DB/People/ID=XX"
+        },
+        {
+          "name": "refProjectNameCity",
+          "virtual": true,
+          "propertyUrl": "http://foo.example/DB/TaskAssignments#ref-project;deptName;deptCity",
+          "valueUrl" : "http://foo.example/DB/Projects/ID=XX"
+        }
+      ],
+      "primaryKey": ["worker", "project"]
+    }
+  }]
+}

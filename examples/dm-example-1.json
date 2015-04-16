@@ -1,0 +1,48 @@
+{
+  "@context": "http://www.w3.org/ns/csvw",
+  "null": "",
+  "tables" : [{
+    "url": "dm-example-1/people.csv",
+    "aboutUrl" : "http://foo.example/DB/People/ID={ID}",
+    "propertyUrl" : "http://foo.example/DB/People#{_name}",
+    "tableSchema": {
+      "columns": [
+        {"name": "ID", "required": true, "datatype": "integer"},
+        {"name": "fname"},
+        {"name": "addr", "datatype": "integer"},
+        {
+          "name": "type",
+          "virtual": true,
+          "propertyUrl": "rdf:type",
+          "valueUrl" : "http://foo.example/DB/People"
+        }
+      ],
+      "primaryKey": "ID",
+      "foreignKeys" : [{
+        "columnReference" : "addr",
+        "reference" : {
+            "resource" : "dm-example-1/addresses.csv",
+            "columnReference" : "ID"
+        }
+      }]
+    }
+  }, {
+    "url": "dm-example-1/addresses.csv",
+    "aboutUrl" : "http://foo.example/DB/Addresses/ID={ID}",
+    "propertyUrl" : "http://foo.example/DB/Addresses#{_name}",
+    "tableSchema": {
+      "columns": [
+        {"name": "ID", "required": true, "datatype": "integer"},
+        {"name": "city"},
+        {"name": "state"},
+        {
+          "name": "type",
+          "virtual": true,
+          "propertyUrl": "rdf:type",
+          "valueUrl" : "http://foo.example/DB/Addresses"
+        }
+      ],
+      "primaryKey": "ID"
+    }
+  }]
+}
