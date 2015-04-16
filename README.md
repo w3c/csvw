@@ -1,6 +1,8 @@
 CSVW
 ====
 
+[![Join the chat at https://gitter.im/w3c/csvw](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/w3c/csvw?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Deliverables of W3C’s [CSV on the Web Working Group](http://www.w3.org/2013/csvw). Please consult that page for further details on the goals and deliverables of the that group.
 
 The group is chaired by [Jeni Tennison](http://theodi.org/team/jeni-tennison) and [Dan Brickley](http://danbri.org/). The W3C staff contact is [Ivan Herman](http://www.w3.org/People/Ivan/). If you are member of the Working Group, and you want to gain a “push” right to this repository, please contact <ivan@w3.org>, providing your github ID.
