@@ -17,11 +17,17 @@ class Vocab
 
   TITLE = "CSVW Namespace Vocabulary Terms".freeze
   DESCRIPTION = %(This document describes the RDFS vocabulary description used in the Metadata Vocabulary for Tabular Data [[tabular-metadata]] along with the default JSON-LD Context.).freeze
-  attr_accessor :prefixes, :terms, :properties, :classes, :instances, :datatypes
+  attr_accessor :prefixes, :terms, :properties, :classes, :instances, :datatypes,
+                :imports, :date, :commit, :seeAlso
 
   def initialize
-    csv = CSV.new(File.open(File.expand_path("../_vocab.csv", __FILE__)))
+    path = File.expand_path("../_vocab.csv", __FILE__)
+    csv = CSV.new(File.open(path))
     @prefixes, @terms, @properties, @classes, @datatypes, @instances = {}, {}, {}, {}, {}, {}
+    @imports, @seeAlso = [], []
+    git_info = %x{git log -1 #{path}}.split("\n")
+    @commit = "https://github.com/w3c/csvw/commit/" + git_info[0].split.last
+    @date = Date.parse(git_info[2].split(":",2).last).strftime("%Y-%m-%d")
 
     columns = []
     csv.shift.each_with_index {|c, i| columns[i] = c.to_sym if c}
@@ -37,9 +43,12 @@ class Vocab
       when 'rdf:Property'   then @properties[entry[:id]] = entry
       when 'rdfs:Class'     then @classes[entry[:id]] = entry
       when 'rdfs:Datatype'  then @datatypes[entry[:id]] = entry
+      when 'owl:imports'    then @imports << entry[:subClassOf]
+      when 'rdfs:seeAlso'   then @seeAlso << entry[:subClassOf]
       else                       @instances[entry[:id]] = entry
       end
     end
+
   end
 
   def namespaced(term)
@@ -53,17 +62,19 @@ class Vocab
       "type": "@type",
       "dc:title": {"@container": "@language"},
       "dc:description": {"@container": "@language"},
+      "dc:date": {"@type": "xsd:date"},
       "rdfs:comment": {"@container": "@language"},
       "rdfs:domain": {"@type": "@id"},
       "rdfs:label": {"@container": "@language"},
       "rdfs:range": {"@type": "@id"},
+      "rdfs:seeAlso": {"@type": "@id"},
       "rdfs:subClassOf": {"@type": "@id"},
       "rdfs:subPropertyOf": {"@type": "@id"},
       "owl:equivalentClass": {"@type": "@vocab"},
       "owl:equivalentProperty": {"@type": "@vocab"},
       "owl:oneOf": {"@container": "@list", "@type": "@vocab"},
       "owl:imports": {"@type": "@id"},
-      "owl:versionInfo": {"@type": "xsd:string", "@language": null},
+      "owl:versionInfo": {"@type": "@id"},
       "owl:inverseOf": {"@type": "@vocab"},
       "owl:unionOf": {"@type": "@vocab", "@container": "@list"},
       "rdfs_classes": {"@reverse": "rdfs:isDefinedBy", "@type": "@id"},
@@ -162,19 +173,25 @@ class Vocab
     end
 
     # Use separate rdfs context so as not to polute the CSVW context.
+    ontology = {
+      "@context" => rdfs_context,
+      "@id" => prefixes["csvw"][:subClassOf],
+      "@type" => "owl:Ontology",
+      "dc:title" => {"en" => TITLE},
+      "dc:description" => {"en" => DESCRIPTION},
+      "dc:date" => date,
+      "owl:imports" => imports,
+      "owl:versionInfo" => commit,
+      "rdfs:seeAlso" => seeAlso,
+      "rdfs_classes" => rdfs_classes,
+      "rdfs_properties" => rdfs_properties,
+      "rdfs_datatypes" => rdfs_datatypes,
+      "rdfs_instances" => rdfs_instances
+    }.delete_if {|k,v| Array(v).empty?}
+
     {
       "@context" => context,
-      "@graph" => {
-        "@context" => rdfs_context,
-        "@id" => prefixes["csvw"][:subClassOf],
-        "@type" => "owl:Ontology",
-        "dc:title" => {"en" => TITLE},
-        "dc:description" => {"en" => DESCRIPTION},
-        "rdfs_classes" => rdfs_classes,
-        "rdfs_properties" => rdfs_properties,
-        "rdfs_datatypes" => rdfs_datatypes,
-        "rdfs_instances" => rdfs_instances
-      }
+      "@graph" => ontology
     }.to_json(JSON_STATE)
   end
 
@@ -193,6 +210,10 @@ class Vocab
     output << "csvw: a owl:Ontology;"
     output << %(  dc:title "#{TITLE}"@en;)
     output << %(  dc:description """#{DESCRIPTION}"""@en;)
+    output << %(  dc:date "#{date}"^^xsd:date;)
+    output << %(  dc:imports #{imports.map {|i| '<' + i + '>'}.join(", ")};)
+    output << %(  owl:versionInfo <#{commit}>;)
+    output << %(  rdfs:seeAlso #{seeAlso.map {|i| '<' + i + '>'}.join(", ")};)
     output << "  .\n"
 
     output << "\n# Class definitions"#{
