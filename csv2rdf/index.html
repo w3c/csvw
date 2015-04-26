@@ -125,6 +125,7 @@
       table.rdb thead tr td { 
         font-style: italic;
         text-align: center;
+        background: #f0f8ff !important;
       }
  
     </style>
@@ -259,6 +260,9 @@
 
           <dt><dfn>table identifier</dfn></dt>
           <dd>The table identifier is the <a href="http://w3c.github.io/csvw/syntax/#dfn-table-id" class="externalDFN">id</a> annotation on an <a>annotated table</a>. As defined in [[!tabular-data-model]].</dd>
+
+          <dt><dfn>tabular data mapping</dfn></dt>
+          <dd>The mapping from tabular data to RDF, as defined by this Recommendation.</dd>
 
           <dt><dfn>value URL</dfn></dt>
           <dd>The <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-value-url" class="externalDFN">value URL</a> annotation on the current <a href="http://w3c.github.io/csvw/syntax/#dfn-cell" class="externalDFN">cell</a>. As defined in [[!tabular-data-model]].</dd>
@@ -737,7 +741,7 @@
               <tr><td><var>C3.4</var></td><td><var>T</var></td><td><var>C4</var></td><td><var>R3</var></td><td><code>"Afghanistan"</code></td><td><code>"Afghanistan"</code></td><td><code>null</code></td></tr>
             </tbody>
           </table>
-      </div>
+        </div>
 
 
         <p><strong><a title="minimal mode">Minimal mode</a></strong> output for this example is provided in Turtle [[turtle]] syntax below:</p>
@@ -1377,14 +1381,15 @@
     <section class="appendix informative">
       <h2 id="rel-rdb">Relationship to RDB Direct Mapping</h2>
 
-      <p>The "Direct Mapping of Relational Data to RDF" W3C Recommendation [[rdb-direct-mapping]] defines a simple transformation (referred to as <dfn>direct mapping</dfn>) from a relational representation of data to RDF. The direct mapping takes as input a relational database (data and schema), and generates an RDF graph that is called the <dfn>direct graph</dfn>. Tables in a relational databases bear a strong resemblence to tabular data as defined in [[tabular-data-model]]; this section highlights the similarities and differences between the <a>direct mapping</a> and the <dfn>tabular data mapping</dfn>, as defined in the current document. The following statements summarize the relationships:</p>
+      <p>The "Direct Mapping of Relational Data to RDF" W3C Recommendation [[rdb-direct-mapping]] defines a simple transformation (referred to as <dfn>direct mapping</dfn>) from a relational representation of data to RDF. The direct mapping takes as input a relational database (data and schema), and generates an RDF graph called the <dfn>direct graph</dfn>. Tables in a relational databases bear a strong resemblence to tabular data as defined in [[tabular-data-model]]; this section highlights the similarities and differences between the <a>direct mapping</a> and the <a>tabular data mapping</a> defined by this document. The following statements summarize the relationships:</p>
 
       <ul>
-        <li>It is possible, for a single tabular data, to provide an annotation such that the output of the (<a title="minimal mode">minimal</a>) <a>tabular data mapping</a> is semantically equivalent to the output of the <a>direct mapping</a> in case the tabular data is  equivalent to the table in the relational database. See the <a href="#rdb-single">example with a single table</a>.</li>
-        <li>If the tabular data consists of several interrelated tables it is not always possible to provide an annotation to achieve the same level of semantic equivalence betwen the <a>tabular data mapping</a> and the <a>direct mapping</a>. See the <a href="#rdb-three">example with three tables</a>.</li>
+        <li>It is possible, for a single table in a relational database, to provide an annotation to the corresponding tabular data (i.e., the CSV export of the table from the database) such that the output of the <a>direct mapping</a> is semantically equivalent to the output of the (<a title="minimal mode">minimal</a>) <a>tabular data mapping</a>. See the <a href="#rdb-single">example with a single table</a>.</li>
+        <li>If the database consists of several interrelated tables it is not always possible to provide an annotation to the corresponding tabular data to achieve the same level of semantic equivalence. See the <a href="#rdb-three">example with three tables</a>.</li>
       </ul>
 
       <p>The rest of this section will provide some examples. These are somewhat simplified forms of the examples as used in the [[rdb-direct-mapping]] document.</p>
+
       <section>
         <h2 id="rdb-single">Single table case</h2>
         <p>Consider a simple table in a relational database, called <code>People</code>:</p>
@@ -1411,49 +1416,49 @@
   </tbody>
 </table></pre>
 
-        <p>A relational table always has a schema, that the RDF Direct Mapping makes use of. In this example, the schema may define that:</p>
+        <p>A relational table always has a schema that the <a>direct mapping</a> makes use of. In this example, the schema defines that:</p>
 
-        <ul>
-          <li><code>ID</code> is a primary key in the table, and the cells are integers.</li>
-          <li>The <code>name</code> column contains strings.</li>
-          <li>The <code>addr</code> column contains integers.</li>
+        <ul id="rdb-schema-people">
+          <li>The table has three columns named <code>ID</code>, <code>fname</code>, and <code>addr</code>.</li>
+          <li>Values in <code>ID</code> are the primary keys in the table, and the corresponding cells contain integers.</li>
+          <li>Cells in the <code>fname</code> column contain strings.</li>
+          <li>Cells in the <code>addr</code> column contain integers.</li>
         </ul>
 
         <p>Using the schema information, the <a>direct graph</a> is as follows (see [[rdb-direct-mapping]] for further details):</p>
 
-        <pre class="example">&lt;http://foo.example/DB/People/ID=7&gt; rdf:type &lt;http://foo.example/DB/People&gt;.
-  &lt;http://foo.example/DB/People/#ID&gt; 7;
-  &lt;http://foo.example/DB/People/#fname&gt; "Bob";
-  &lt;http://foo.example/DB/People/#addr&gt; 18
-  .</pre>
+        <pre class="example">&lt;http://foo.example.org/DB/People/ID=7&gt; rdf:type &lt;http://foo.example.org/DB/People&gt;;
+  &lt;http://foo.example.org/DB/People/#ID&gt; 7;
+  &lt;http://foo.example.org/DB/People/#fname&gt; "Bob";
+  &lt;http://foo.example.org/DB/People/#addr&gt; 18.</pre>
 
-        <p>where <code>http://foo.example/DB/</code> is the URL for the database that contains the <code>People</code> table.</p>
+        <p>where <code>http://foo.example.org/DB/</code> is the URL for the database containing the <code>People</code> table.</p>
 
-        <p>If the table is mapped on a tabular data, the headers would naturally be mapped on the titles of the respective columns. The (<a title="minimal mode">minimal</a>) <a>tabular data mapping</a> yields:</p>
+        <p>When exporting the table into CSV the column names would naturally be mapped on the titles of the respective columns. The (<a title="minimal mode">minimal</a>) <a>tabular data mapping</a> yields:</p>
 
-        <pre class="example">[]
-  &lt;http://foo.example/DB/People/#ID&gt; "7";
-  &lt;http://foo.example/DB/People/#fname&gt; "Bob";
-  &lt;http://foo.example/DB/People/#addr&gt; "18"
-  .</pre>
+        <pre class="example">[
+  &lt;http://foo.example.org/CSV/People/#ID&gt; "7";
+  &lt;http://foo.example.org/CSV/People/#fname&gt; "Bob";
+  &lt;http://foo.example.org/CSV/People/#addr&gt; "18";
+]</pre>
 
-        <p>where, for the sake of comparison, <code>http://foo.example/DB/People</code> is considered to be the URL of the CSV file, as exported from the relational database.</p>
+        <p>where <code>http://foo.example.org/CSV/People</code> is the URL of the CSV file exported from the relational database.</p>
 
         <p>Comparing the two conversion results:</p>
 
         <ul>
           <li>The <a>tabular data mapping</a> does not have the information that the first column provides unique identifiers for the rows (i.e., that it is a primary key); consequently, a blank node must be used for the common row subject.</li>
           <li>The <a>tabular data mapping</a> does not have information on the data types and, therefore, cannot presume that the first and the third columns contain integers.</li>
-          <li>There is no reason to use the URL for the table as a class for typing. That could lead to semantically incorrect situations.</li>
+          <li>There is no reason to use the URL for the table as a class for typing ny default, without any further information. That could lead to semantically incorrect situations.</li>
         </ul>
 
-        <p>It is, however, possible to add annotation to the tabular data so that the two graphs would coincide. Indeed, consider the following metadata using the definitions of the [[tabular-metadata]] specification:</p>
+        <p>It is, however, possible to add annotation to the tabular data so that the two graphs would be semantically equivalent. Indeed, consider the following metadata using the definitions of the [[tabular-metadata]] specification:</p>
 
         <pre class="example highlight">{
   "@context": "http://www.w3.org/ns/csvw",
   "tableSchema": {
-     "url" : "http://foo.example/DB/People",
-     "aboutUrl" : "http://foo.example/DB/People/ID={_row}",
+     "url" : "http://foo.example.org/CSV/People",
+     "aboutUrl" : "http://foo.example.org/CSV/People/ID={_row}",
      "columns": [{
         "name": "ID",
         "datatype" : "integer"
@@ -1464,22 +1469,26 @@
         "datatype" : "integer"
       }, {
         "name": "type",
-        "virtual": "true",
+        "virtual": true,
         "propertyUrl": "rdf:type",
-        "valueUrl" : "http://foo.example/DB/People"
+        "valueUrl" : "http://foo.example.org/CSV/People"
     }],
   }
 }</pre>
 
         <p>The metadata adds annotations on datatypes, adds the RDF typing triple explicitly (using a <a href="http://w3c.github.io/csvw/syntax/#dfn-virtual-column" class="externalDFN">virtual column</a>), and uses the <a href="http://w3c.github.io/csvw/metadata/#cell-aboutUrl" class="externalDFN"><code>aboutUrl</code></a> URL template property to provide the common subject. Essentially, the metadata provides the information that the <a>direct mapping</a> retrieves from the table schema.</p>
 
-        <p class="note">The [[tabular-metadata]] specification includes an annotation for <a href="http://w3c.github.io/csvw/syntax/#dfn-row-primary-key" class="externalDFN">primary keys</a>. However, that annotation is used for validation and does not influence the <a>tabular data mapping</a>, hence it is not included in the metadata of the example.</p>
+        <p class="note">The [[tabular-metadata]] specification includes an annotation for <a href="http://w3c.github.io/csvw/syntax/#dfn-row-primary-key" class="externalDFN">primary keys</a>. However, that annotation is used for validation and does not influence the <a>tabular data mapping</a>, hence it is not included in the example metadata.</p>
+
+        <p class="note">A processor exporting the table into a CSV file could also generate such a metadata automatically.</p>
+
+
       </section>
 
       <section>
         <h3 id="rdb-two">Simple, two table case</h3>
 
-        <p>Consider a case with two, interrelated simple tables in a relational database, called <code>People</code> and <code>Addresses</code>, respectively:</p>
+        <p>Consider a two interrelated simple tables in a relational database, called <code>People</code> and <code>Addresses</code>, respectively:</p>
         <pre class="example">
 <table class="rdb">
   <thead>
@@ -1525,47 +1534,34 @@
     </tr>
   </tbody>
 </table></pre>
-        <p>The corresponding relational schema specifies that:</p>
-        <ul>
-          <li>For the <code>People</code> table
-            <ul>
-              <li><code>ID</code> is a primary key in the table, and the cells are integers</li>
-              <li>The <code>name</code> column contains strings</li>
-              <li>The <code>addr</code> column contains integers</li>
-            </ul>
-          </li>
-          <li>For the <code>Addresses</code> table
-            <ul>
-              <li><code>ID</code> is  primary key in the table, and the cells are integers</li>
-              <li>both the <code>city</code> and <code>state</code> columns contain strings</li>
-            </ul>
-          </li>
-          <li>The <code>addr</code> column in the <code>People</code> table contains foreign keys that reference the <code>ID</code> field of the <code>Addresses</code> table.</li>
+        <p>Beyond what is <a href="#rdb-schema-people">already specified</a> for the <code>People</code> table the corresponding relational schema also specifies that:</p>
+        <ul id="rdb-schema-addresses">
+          <li>The <code>Addresses</code> table has three columns named <code>ID</code>, <code>city</code>, and <code>state</code>.</li>
+          <li>Values of <code>ID</code> are primary keys in the <code>Addresses</code> table, and the corresponding cells contain integers.</li>
+          <li>Cells in both the <code>city</code> and <code>state</code> columns in the <code>Addresses</code> table contain strings</li>
+          <li>Cells in the <code>addr</code> column of the <code>People</code> table are foreign keys that reference the <code>ID</code> field of the <code>Addresses</code> table.</li>
         </ul>
 
         <p>Using the schema information, the <a>direct graph</a> is as follows (see [[rdb-direct-mapping]] for further details):</p>
-        <pre class="example">&lt;http://foo.example/DB/People/ID=7&gt; rdf:type &lt;http://foo.example/DB/People&gt;;
-  &lt;http://foo.example/DB/People#ID&gt; 7;
-  &lt;http://foo.example/DB/People#fname&gt; "Bob";
-  &lt;http://foo.example/DB/People#addr&gt; 18;
-  &lt;http://foo.example/DB/People#ref-addr&gt; &lt;http://foo.example/DB/Addresses/ID=18&gt;
-  .
+        <pre class="example">&lt;http://foo.example.org/DB/People/ID=7&gt; rdf:type &lt;http://foo.example.org/DB/People&gt;;
+  &lt;http://foo.example.org/DB/People#ID&gt; 7;
+  &lt;http://foo.example.org/DB/People#fname&gt; "Bob";
+  &lt;http://foo.example.org/DB/People#addr&gt; 18;
+  <span style="color:red">&lt;http://foo.example.org/DB/People#ref-addr&gt; &lt;http://foo.example.org/DB/Addresses/ID=18&gt;</span>.
 
-&lt;http://foo.example/DB/Addresses/ID=18&gt; rdf:type &lt;http://foo.example/DB/Addresses&gt;.
-  &lt;http://foo.example/DB/Addresses#ID&gt; 18.
-  &lt;http://foo.example/DB/Addresses#city&gt; "Cambridge".
-  &lt;http://foo.example/DB/Addresses#addr&gt; "MA"
-  .
-</pre>
-        <p>Note the extra RDF triple in the first block, with predicate <code>#ref-addr</code>, linking to the subject corresponding to the relevant row of the <code>Addresses</code> table.</p>
+&lt;http://foo.example.org/DB/Addresses/ID=18&gt; rdf:type &lt;http://foo.example.org/DB/Addresses&gt;;
+  &lt;http://foo.example.org/DB/Addresses#ID&gt; 18;
+  &lt;http://foo.example.org/DB/Addresses#city&gt; "Cambridge";
+  &lt;http://foo.example.org/DB/Addresses#addr&gt; "MA".</pre>
+        <p>Note the highlighted RDF triple linking to the relevant row of the <code>Addresses</code> table; this corresponds to the foreign key in the schema.</p>
 
-        <p>Using the following metadata specification, the <a>tabular data mapping</a> yields the same result:</p>
+        <p>Using the following metadata the <a>tabular data mapping</a> yields a semantically equivalent result:</p>
 
         <pre class="example highlight">{
     "@context": "http://www.w3.org/ns/csvw",
     "resources" : [{
-      "url": "http://foo.example/DB/People",
-      "aboutUrl" : "http://foo.example/DB/People/ID={_row}",
+      "url": "http://foo.example.org/CSV/People",
+      "aboutUrl" : "http://foo.example.org/CSV/People/ID={_row}",
       "tableSchema": {
         "columns": [{
           "name": "ID",
@@ -1578,18 +1574,18 @@
         }, {
           "name": "ref",
           "virtual": true,
-          "propertyUrl": "http://foo.example/DB/People#ref-addr",
-          "valueUrl" : "http://foo.example/DB/Addresses/ID={addr}"
+          "propertyUrl": "http://foo.example.org/CSV/People#ref-addr",
+          "valueUrl" : "http://foo.example.org/CSV/Addresses/ID={addr}"
         }, {
           "name": "type",
-          "virtual": "true",
+          "virtual": true,
           "propertyUrl": "rdf:type",
-          "valueUrl" : "http://foo.example/DB/People"
+          "valueUrl" : "http://foo.example.org/CSV/People"
         }],
       }
     }, {
-      "url": "http://foo.example/DB/Addresses",
-      "aboutUrl" : "http://foo.example/DB/Addresses/ID={_row}",
+      "url": "http://foo.example.org/CSV/Addresses",
+      "aboutUrl" : "http://foo.example.org/CSV/Addresses/ID={_row}",
       "tableSchema": [{
         "columns": [{
           "name": "ID",
@@ -1602,7 +1598,7 @@
           "name": "type",
           "virtual": true,
           "propertyUrl": "rdf:type",
-          "valueUrl" : "http://foo.example/DB/Addresses"
+          "valueUrl" : "http://foo.example.org/CSV/Addresses"
         }],
     }]
 }</pre>
@@ -1684,68 +1680,64 @@
   </tbody>
 </table></pre>
 
-        <p>The corresponding relational schema specifies that:</p>
+        <p>The corresponding relational schema specifies that</p>
         <ul>
           <li>For the <code>People</code> table
 
             <ul>
-              <li><code>ID</code> is a primary key in the table, and the cells are integers</li>
-              <li>The <code>name</code> column contains strings</li>
-              <li>The <code>addr</code> column contains integers</li>
+              <li>The table has five columns, named <code>ID</code>, <code>name</code>, <code>addr</code>, <code>deptName</code>, and <code>deptCity</code>.</li>
+              <li>Values in <code>ID</code> are the primary keys in the table, and the corresponding cells contain integers.</li>
+              <li>Cells in the <code>name</code>, <code>deptName</code>, and <code>deptCity</code> columns contain strings.</li>
+              <li>Cells in the <code>addr</code> columns contains integers.</li>
             </ul>
           </li>
           <li>For the <code>Addresses</code> table
             <ul>
-              <li><code>ID</code> is  primary key in the table, and the cells are integers</li>
-              <li>both the <code>city</code> and <code>state</code> columns contain strings</li>
+              <li>The table has three columns, named <code>ID</code>, <code>city</code>, and <code>state</code>.</li>
+              <li>Values in <code>ID</code> are the primary keys in the table, and the corresponding cells contain integers.</li>
+              <li>Cells in both the <code>city</code> and <code>state</code> columns contain strings.</li>
             </ul>
           </li>
           <li>For the <code>Departments</code> table
             <ul>
-              <li><code>ID</code> is  primary key in the table, and the cells are integers</li>
-              <li>both the <code>name</code> and <code>city</code> columns contain strings</li>
-              <li>the combination of <code>name</code> and <code>city</code> are unique keys</li>
+              <li>The table has three columns, named <code>ID</code>, <code>name</code>, and <code>city</code>.</li>
+              <li>Values in <code>ID</code> are the primary keys in the table, and the corresponding cells contain integers.</li>
+              <li>Cells in both the <code>name</code> and <code>city</code> columns contain strings.</li>
+              <li>The <em>combination</em> of <code>name</code> and <code>city</code> are unique keys.</li>
             </ul>
           </li>
-          <li>The <code>addr</code> column in the <code>People</code> table contains foreign keys that reference the <code>ID</code> field of the <code>Addresses</code> table.</li>
-          <li>The <code>deptName</code> and <code>deptCity</code> in the <code>People</code> table contain <em>joint</em> foreign keys referencing <em>candidate keys</em> for the <code>name</code> and <code>city</code> pair of the <code>Department</code> table.</li>
+          <li>The cells in the <code>addr</code> column of the <code>People</code> table are foreign keys that reference the <code>ID</code> field of the <code>Addresses</code> table.</li>
+          <li>The cells in the <code>deptName</code> and <code>deptCity</code> columns in the <code>People</code> table are <em>combined</em> foreign keys referencing <em>candidate keys</em> for the <code>name</code> and <code>city</code> pairs of the <code>Departments</code> table.</li>
         </ul>
         <p>Using the schema information, the <a>direct graph</a> is as follows (see [[rdb-direct-mapping]] for further details):</p>
 
-        <pre class="example">&lt;http://foo.example/DB/People/ID=7&gt; rdf:type &lt;http://foo.example/DB/People&gt;;
-  &lt;http://foo.example/DB/People/#ID&gt; 7;
-  &lt;http://foo.example/DB/People/#fname&gt; "Bob";
-  &lt;http://foo.example/DB/People/#addr&gt; 18;
-  &lt;http://foo.example/DB/People/#ref-addr&gt; &lt;http://foo.example/DB/Addresses/ID=18&gt;;
-  &lt;http://foo.example/DB/People/#deptName&gt; "accounting";
-  &lt;http://foo.example/DB/People/#deptCity&gt; "Cambridge";
-  <span style="color:red">&lt;http://foo.example/DB/People/#ref-deptName;deptCity&gt; &lt;http://foo.example/DB/Department/ID=23&gt;;</span>
-  .
+        <pre class="example">&lt;http://foo.example.org/DB/People/ID=7&gt; rdf:type &lt;http://foo.example.org/DB/People&gt;;
+  &lt;http://foo.example.org/DB/People/#ID&gt; 7;
+  &lt;http://foo.example.org/DB/People/#fname&gt; "Bob";
+  &lt;http://foo.example.org/DB/People/#addr&gt; 18;
+  &lt;http://foo.example.org/DB/People/#ref-addr&gt; &lt;http://foo.example.org/DB/Addresses/ID=18&gt;;
+  &lt;http://foo.example.org/DB/People/#deptName&gt; "accounting";
+  &lt;http://foo.example.org/DB/People/#deptCity&gt; "Cambridge";
+  <span style="color:red">&lt;http://foo.example.org/DB/People/#ref-deptName;deptCity&gt; &lt;http://foo.example.org/DB/Department/ID=23&gt;.</span>
 
-&lt;http://foo.example/DB/Addresses/ID=18&gt; rdf:type &lt;http://foo.example/DB/Addresses&gt;.
-  &lt;http://foo.example/DB/Addresses/#ID&gt; 18;
-  &lt;http://foo.example/DB/Addresses/#city&gt; "Cambridge";
-  &lt;http://foo.example/DB/Addresses/#addr&gt; "MA"
-  .
+&lt;http://foo.example.org/DB/Addresses/ID=18&gt; rdf:type &lt;http://foo.example.org/DB/Addresses&gt;;
+  &lt;http://foo.example.org/DB/Addresses/#ID&gt; 18;
+  &lt;http://foo.example.org/DB/Addresses/#city&gt; "Cambridge";
+  &lt;http://foo.example.org/DB/Addresses/#addr&gt; "MA".
 
-&lt;http://foo.example/DB/Departments/ID=23&gt; rdf:type &lt;http://foo.example/DB/Addresses&gt;.
-  &lt;http://foo.example/DB/Departments/#ID&gt; 23;
-  &lt;http://foo.example/DB/Departments/#name&gt; "accounting";
-  &lt;http://foo.example/DB/Departments/#city&gt; "Cambridge"
-  .</pre>
+&lt;http://foo.example.org/DB/Departments/ID=23&gt; rdf:type &lt;http://foo.example.org/DB/Addresses&gt;;
+  &lt;http://foo.example.org/DB/Departments/#ID&gt; 23;
+  &lt;http://foo.example.org/DB/Departments/#name&gt; "accounting";
+  &lt;http://foo.example.org/DB/Departments/#city&gt; "Cambridge".</pre>
 
-        <p>The major difference, compared to the <a href="#rdb-two">simpler example with foreign keys</a> is the usage of unique keys. To generate the right object URI in highlighted statement of the RDF graph the <a>direct mapping</a> processor has to find that unique key combination in the target table (i.e., <code>Departments</code>) and, using that combination, has to establish the subject for that specific row that can then be used as an object URI. This can be done because the <a>direct mapping</a> processor has access to several tables within the same relational database. It is therefore straightforward to access all the tables in parallel and establish the relationships to generate the triples.</p>
+        <p>The major difference, compared to the <a href="#rdb-two">simpler example with foreign keys</a> is the usage of unique keys. To generate the right object URI in the highlighted statement of the <a>direct graph</a> the processor has to find that unique key combination in the <code>Departments</code> table and, using that combination, has to establish the subject for that specific row that can is to be used as an object URI in the highlighted statement. This can be done because the <a>direct mapping</a> processor has simultaneous access to several tables within the same relational database. It is therefore straightforward to access all the tables in parallel and establish the necessary relationships to generate the triples.</p>
 
-        <p>However, this combination <em>cannot</em> be handled by the <a>tabular data mapping</a>. The situation for tabular data is indeed different: tables are typically produced from single and, potentially, very large CSV files, meaning that a <a>tabular data mapping</a> processor cannot be expected to handle several tables in parallel. That is the reason why the [[tabular-data-model]] does not include features that would force such parallel access. However, as a consequence, the output of the <a>direct mapping</a> for such tables cannot be reproduced by the <a>tabular data mapping</a>.</p>
+        <p>However, this combination <em>cannot</em> be handled by the <a>tabular data mapping</a>. The situation for tabular data is indeed different: tables are typically generated from single and, potentially, very large CSV files, meaning that a <a>tabular data mapping</a> processor cannot be expected to handle several tables in parallel. That is the reason why the [[tabular-data-model]] does not include features that would require such parallel access. However, as a consequence, the output of the <a>direct mapping</a> for such tables cannot be reproduced by the <a>tabular data mapping</a>.</p>
 
-        <p class="note">Note that the [[tabular-data-model]] includes an annotation for <a href='http://w3c.github.io/csvw/metadata/#transformation-definitions'>transformations</a>; implementations may include scripts or templates to transform the output of the <a>tabular data mapping</a> and generate the required RDF graph.</p
+        <p class="note">Note that the [[tabular-data-model]] includes an annotation for <a href='http://w3c.github.io/csvw/metadata/#transformation-definitions'>transformations</a>; implementations may include scripts or templates to transform the output of the <a>tabular data mapping</a> and generate the required RDF graph.</p>
 
       </section>
-
-
-
     </section>
-
 
     <section class="appendix">
       <h2>Acknowledgements</h2>
