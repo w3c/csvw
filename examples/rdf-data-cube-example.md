@@ -71,7 +71,7 @@ When parsing the CSV and associated metadata description, column titles from the
 
 Finally, note that later in the conversion process we want to combine the values from the `yyyy` and `mm` columns to create a date-time string compliant with ISO 8601 _Representations of dates and times_. To do this, the values in the `mm` (month) column must consistently have two digits (e.g. include a trailing zero for months 1 to 9, January to September). The values of `mm` column have been formated accordingly during the translation from fixed-format text to CSV.
 
-A snippet of the resulting CSV (see `[http://example.org/cambornedata.csv](cambornedata.csv)`) is provided below:
+A snippet of the resulting CSV (see [http://example.org/cambornedata.csv](cambornedata.csv)) is provided below:
 
 
 ```
@@ -110,7 +110,7 @@ yyyy,mm,tmax, ,tmin, ,af, ,rain, ,sun, ,
 
 ### Characteristics of the observation dataset for Camborne and its CSV encoding ###
 
-A significant amount of contextual information is known about the observation dataset for Camborne and its CSV encoding. Details of this information and RDF encodings are provided in [JSON-LD](http://www.w3.org/TR/json-ld/). This information can be included in the metadata description that complements the CSV file.
+A significant amount of contextual information is known about the observation dataset for Camborne and its CSV encoding. Details of this information and RDF encodings are provided in [JSON-LD](http://www.w3.org/TR/json-ld/) below.
 
 The observation dataset for Camborne is published by the [Met Office](http://www.metoffice.gov.uk).
 
@@ -121,7 +121,7 @@ The observation dataset for Camborne is published by the [Met Office](http://www
   }]
 ```
 
-Both the fixed-format text- and CSV-formatted files (`[http://www.metoffice.gov.uk/pub/data/weather/uk/climate/stationdata/cambornedata.txt](cambornedata.txt)` and `[http://example.org/cambornedata.csv](cambornedata.csv)`) can be considered as _distributions_ of a _dataset_ - as specified in the [W3C Data Catalog vocabulary DCAT](http://www.w3.org/TR/vocab-dcat/). Furthermore, the CSV-formatted file is derived from the fixed-format text formatted file. This relationship can be specified using the [W3C PROV-O](http://www.w3.org/TR/prov-o/) term `prov:wasDerivedFrom`.
+Both the fixed-format text- and CSV-formatted files ([http://www.metoffice.gov.uk/pub/data/weather/uk/climate/stationdata/cambornedata.txt](cambornedata.txt) and [http://example.org/cambornedata.csv](cambornedata.csv)) can be considered as _distributions_ of a _dataset_ - as specified in the [W3C Data Catalog vocabulary DCAT](http://www.w3.org/TR/vocab-dcat/). Furthermore, the CSV-formatted file is derived from the fixed-format text formatted file. This relationship can be specified using the [W3C PROV-O](http://www.w3.org/TR/prov-o/) term `prov:wasDerivedFrom`.
 
 ```
   "dcat:distribution": [{
@@ -139,7 +139,7 @@ Both the fixed-format text- and CSV-formatted files (`[http://www.metoffice.gov.
   }]
 ```
 
-Camborne is a geographic location - with lat-lon-alt coordinates specified in the "metadata" header-rows: `Location 1627E 407N 87m amsl`. We can precisely relate the dataset to a geographical location - using both coordinates and an [Ordnance Survey](http://www.ordnancesurvey.co.uk/) [NamedPlace](http://data.ordnancesurvey.co.uk/ontology/50kGazetteer/NamedPlace).
+Camborne is a geographic location - with OSGB Northing and Easting plus Altitude coordinates specified in the "metadata" header-rows: `Location 1627E 407N 87m amsl`. We can precisely relate the dataset to a geographical location - using both coordinates and an [Ordnance Survey](http://www.ordnancesurvey.co.uk/) [NamedPlace](http://data.ordnancesurvey.co.uk/ontology/50kGazetteer/NamedPlace).
 
 ```
   "dc:spatial": [{
@@ -153,7 +153,7 @@ Camborne is a geographic location - with lat-lon-alt coordinates specified in th
   }]
 ```
 
-The header-rows of the CSV file contain some contextual information. We can capture this information using the [`notes` annotation](http://www.w3.org/TR/2015/WD-tabular-data-model-20150416/#dfn-table-notes) specified in the [tabular data model](http://www.w3.org/TR/tabular-data-model/) and the [Open Annotation data model](http://www.openannotation.org/spec/core/) currently under development within the [Web Annotations Working Group](http://www.w3.org/annotation/).
+The header-rows of the CSV file contain some contextual information. We can capture this information using the [notes annotation](http://www.w3.org/TR/tabular-data-model/#dfn-table-notes) specified in the [tabular data model](http://www.w3.org/TR/tabular-data-model/) and the [Open Annotation data model](http://www.openannotation.org/spec/core/) currently under development within the [Web Annotations Working Group](http://www.w3.org/annotation/).
 
 ```
   "notes": [{
@@ -208,7 +208,7 @@ Combinations of `yyyy` (year) and `mm` (month) values should be unique for each 
     "primaryKey": [ "year", "month" ]
 ```
 
-Furthermore, each row is describing a single entity that can be uniquely identified using the year and month. Using a URI Template, as defined in [RFC 6570](https://tools.ietf.org/html/rfc6570) we can set the [about URL](http://www.w3.org/TR/tabular-data-model/#dfn-cell-about-url) annotation that is used as the subject of each triple arising from the cell values.
+Furthermore, each row is describing a single entity that can be uniquely identified using the year and month. Using a URI Template, as defined in [RFC 6570](https://tools.ietf.org/html/rfc6570), we can set the [about URL](http://www.w3.org/TR/tabular-data-model/#dfn-cell-about-url) annotation that is used as the subject of each triple arising from the cell values.
 
 ```
     "aboutUrl": "http://example.org/cambornedata#record-{year}-{month}"
@@ -296,7 +296,7 @@ The data value for sunshine hours may be qualified with a "#" character to indic
     }
 ```
 
-The column indicating _provisional_ status for the entire observation record is similar to the observation status value for each data value. However, in this case, a URI Template is specified from which the [value URL](http://www.w3.org/TR/tabular-data-model/#dfn-cell-value-url) annotation is created. Here, the URI Template `{obsStatus:1}` uses only the first character from the cell value - in this case "P" for `Provisional`, thus the object of the RDF triple would be the code-list term `http://purl.org/linked-data/sdmx/2009/code#obsStatus-P` for "Provisional value".
+The column indicating _provisional_ status for the entire observation record is similar to the observation status for each data value. However, in this case, a URI Template is specified from which the [value URL](http://www.w3.org/TR/tabular-data-model/#dfn-cell-value-url) annotation is created. Here, the URI Template `{obsStatus:1}` uses only the first character from the cell value - in this case "P" for `Provisional`, thus the object of the RDF triple would be the code-list term `http://purl.org/linked-data/sdmx/2009/code#obsStatus-P` for "Provisional value".
 
 ```
     {
@@ -345,7 +345,7 @@ To express the tabular data as an RDF Data Cube we need to provide a [data struc
 
 Each of the [property URLs](http://www.w3.org/TR/tabular-data-model/#dfn-cell-property-url) defined in the table schema (one for each column in the tabular data where output is not suppressed) is mapped to a [ComponentProperty](http://www.w3.org/TR/vocab-data-cube/#ref_qb_ComponentProperty).
 
-The _year_ and _month_ values - which are combined to specify the _reference period_ (`[http://purl.org/linked-data/sdmx/2009/dimension#refPeriod](http://purl.org/linked-data/sdmx/2009/dimension#refPeriod)`) - are mapped to a [DimensionProperty](http://www.w3.org/TR/vocab-data-cube/#ref_qb_DimensionProperty).
+The _year_ and _month_ values - which are combined to specify the _reference period_ ([http://purl.org/linked-data/sdmx/2009/dimension#refPeriod](http://purl.org/linked-data/sdmx/2009/dimension#refPeriod)) - are mapped to a [DimensionProperty](http://www.w3.org/TR/vocab-data-cube/#ref_qb_DimensionProperty).
 
 ```
         "qb:dimension": {
@@ -386,7 +386,7 @@ The properties relating _data_ values to the [Observation](http://www.w3.org/TR/
         }
 ```
 
-Of particular interest, note that the unit of measurement - as specified in row 7 of the CSV file - is provided in the property description. As shown below, the unit of measurement (`[http://def.seegrid.csiro.au/ontology/om/om-lite#uom](http://def.seegrid.csiro.au/ontology/om/om-lite#uom)`) is declared as an [AttributeProperty](http://www.w3.org/TR/vocab-data-cube/#ref_qb_AttributeProperty) that is attached directly to the [MeasureProperty](http://www.w3.org/TR/vocab-data-cube/#ref_qb_MeasureProperty).
+Of particular interest, note that the unit of measurement - as specified in row 7 of the CSV file - is provided in the property description. As shown below, the unit of measurement ([http://def.seegrid.csiro.au/ontology/om/om-lite#uom](http://def.seegrid.csiro.au/ontology/om/om-lite#uom)) is declared as an [AttributeProperty](http://www.w3.org/TR/vocab-data-cube/#ref_qb_AttributeProperty) that is attached directly to the [MeasureProperty](http://www.w3.org/TR/vocab-data-cube/#ref_qb_MeasureProperty).
 
 ```
         "qb:attribute": {
@@ -446,16 +446,16 @@ Finally, the location information for the dataset `dc:spatial` is specified mapp
 
 ### Metadata description ###
 
-All the information described above is contextual information - metadata - about the CSV file and can all be included in the metadata description of the CSV file: [cambornedata.csv-metadata.json](cambornedata.csv-metadata.json) - which must be provided in [JSON-LD](http://www.w3.org/TR/json-ld/) format. For conveience in this self-contained example, descriptions of all the resources, including properties and data structure definition, are included in a single file. In real implementations, it is likely that these resources would be published in separate documents and referenced from the metadata description. 
+All the information described above is contextual information - metadata - about the CSV file and can all be included in the metadata description of the CSV file: [cambornedata.csv-metadata.json](cambornedata.csv-metadata.json) - which must be provided in [JSON-LD](http://www.w3.org/TR/json-ld/) format. For convenience in this self-contained example, descriptions of all the resources, including properties and data structure definition, are included in a single file. In real implementations, it is likely that these resources would be published in separate documents and referenced from the metadata description. 
 
 ### Standard-mode output from conversion ###
 
-Example output from the [standard mode conversion to RDF](http://www.w3.org/TR/csv2rdf/#dfn-standard-mode) is provided below. Only in [standard mode](http://www.w3.org/TR/csv2rdf/#dfn-standard-mode) is the ancilliary information included in the output; [minimal mode](http://www.w3.org/TR/csv2rdf/#dfn-standard-mode) conversion includes only the information gleaned from the cells of the tabular data.
+Example output from the [standard mode conversion to RDF](http://www.w3.org/TR/csv2rdf/#dfn-standard-mode) is provided below. Only in [standard mode](http://www.w3.org/TR/csv2rdf/#dfn-standard-mode) is the ancilliary information from the metadata description included in the output; [minimal mode](http://www.w3.org/TR/csv2rdf/#dfn-minimal-mode) conversion includes only the information gleaned from the cells of the tabular data.
 
 The RDF output from the conversion is in the [abbreviated](http://www.w3.org/TR/vocab-data-cube/#dfn-abbreviated) data cube form - as defined in the [W3C RDF Data Cube Recommendation](http://www.w3.org/TR/vocab-data-cube/#normalize).
 
-* [Turtle](http://www.w3.org/TR/turtle/): [cambornedata-standard.ttl](cambornedata-standard.ttl)
-* [JSON-LD](http://www.w3.org/TR/json-ld/): [cambornedata-standard.json](cambornedata-standard.json)
+* [Turtle](http://www.w3.org/TR/turtle/) format: [cambornedata-standard.ttl](cambornedata-standard.ttl)
+* [JSON-LD](http://www.w3.org/TR/json-ld/) format: [cambornedata-standard.json](cambornedata-standard.json)
 
 ### Cut-down example (only 4 rows of data) ###
 
@@ -479,8 +479,8 @@ The metadata description is amended to refer to the differently named file: [cam
 
 The [standard mode](http://www.w3.org/TR/csv2rdf/#dfn-standard-mode) output is below:
 
-* [Turtle](http://www.w3.org/TR/turtle/): [cambornedata-snippet-standard.ttl](cambornedata-snippet-standard.ttl)
-* [JSON-LD](http://www.w3.org/TR/json-ld/): [cambornedata-snippet-standard.json](cambornedata-snippet-standard.json)
+* [Turtle](http://www.w3.org/TR/turtle/) format: [cambornedata-snippet-standard.ttl](cambornedata-snippet-standard.ttl)
+* [JSON-LD](http://www.w3.org/TR/json-ld/) format: [cambornedata-snippet-standard.json](cambornedata-snippet-standard.json)
 
 ### RDF Data Cube Normalisation ###
 
