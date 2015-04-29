@@ -459,8 +459,14 @@ CSVW,foaf:Project,table;data;conversion
             <li><strong>arrays</strong> &mdash; lists of strings as above</li>
           </ul>
           <p>
-            If the supplied value of a column reference property is not a string or array (eg if it is an integer), or if any of the values in the supplied array are not strings, or if any of the supplied strings do not reference one or more columns, compliant applications MUST issue a warning and proceed as if the property had been specified (which may mean that an error is issued, if the property was required).
+            Compliant applications MUST issue a warning and proceed as if the column reference property had not been specified if:
           </p>
+          <ul>
+            <li>the supplied value is not a string or array (eg if it is an integer)</li>
+            <li>the supplied value is an empty array</li>
+            <li>any of the values in the supplied array are not strings</li>
+            <li>any of the supplied strings do not reference one or more columns</li>
+          </ul>
           <p>
             For example, the <code>primaryKey</code> property is a column reference property on the schema. It has to hold references to columns defined elsewhere in the schema, and the descriptions of those columns must have <code>name</code> properties. It can hold a single reference, like this:
           </p>
@@ -485,6 +491,12 @@ CSVW,foaf:Project,table;data;conversion
   "primaryKey": [ "givenName", "familyName" ]
 }
           </pre>
+          <p>
+            If the <code>primaryKey</code> property were given an invalid value, such as <code>1</code>, or a column name were misspelled, the processor will issue a warning and ignore the value.
+          </p>
+          <p>
+            On the other hand, the <a href="#foreignKey-columnReference"><code>columnReference</code></a> property is a required property; if it has an invalid value, such as an empty array, then the processor will issue an error as if the property were not specified at all.
+          </p>
         </section>
         <section>
           <h4>Object Properties</h4>
