@@ -13,9 +13,9 @@
         specStatus: "ED",
         shortName: "tabular-data-model",
         //publishDate:  "2014-03-27",
-        previousPublishDate: "2015-01-08",
+        previousPublishDate: "2015-04-16",
         previousMaturity: "WD",
-        previousURI: "http://www.w3.org/TR/2015/WD-tabular-data-model-20150108/",
+        previousURI: "http://www.w3.org/TR/2015/WD-tabular-data-model-20150416/",
         edDraftURI: "http://w3c.github.io/csvw/syntax/",
         // lcEnd: "3000-01-01",
         // crEnd: "3000-01-01",
@@ -66,7 +66,7 @@
           key: "Changes",
             data: [{
               value: "Diff to previous version",
-              href: "diff-20150108.html"
+              href: "diff-20150416.html"
             }, {
               value: "Commit history",
               href: "https://github.com/w3c/csvw/commits/gh-pages"
@@ -105,7 +105,7 @@
       ol.algorithm>li p, ol.algorithm>li ul {text-indent: 0em}
       ol.algorithm>li>p:first-child {position: relative; display: inline;}
       pre {overflow: auto;}
-      dd a.externalDFN, p a.externalDFN {border-bottom:  1px solid #99c; font-style: italic;}
+      dd a.externalDFN, p a.externalDFN, li a.externalDFN {border-bottom:  1px solid #99c; font-style: italic;}
 
       dl.typography dt { font-weight: normal}
       dl.typography dd { margin-bottom: 0.3em; margin-top: 0.2em;}
@@ -200,7 +200,7 @@
           <li>links to other groups of tables (eg to those that provide similar data from a different time period).</li>
         </ul>
 
-        <p>When originating from [[!tabular-metadata]], these annotations arise from <a href="http://w3c.github.io/csvw/metadata/#dfn-common-property" class="externalDFN">common properties</a> defined on table group descriptions within metadata documents.</p>
+        <p>When originating from [[!tabular-metadata]], these annotations arise from <a href="http://w3c.github.io/csvw/metadata/#dfn-common-property" class="externalDFN">common properties</a> defined on <a href="http://w3c.github.io/csvw/metadata/#dfn-table-group-description" class="externalDFN">table group descriptions</a> within metadata documents.</p>
 
       </section>
       <section>
@@ -228,7 +228,7 @@
           <li>information about the source or provenance of the data in the table, or</li>
           <li>links to other tables (eg to indicate tables that include related information).</li>
         </ul>
-        <p>When originating from [[!tabular-metadata]], these annotations arise from <a href="http://w3c.github.io/csvw/metadata/#dfn-common-property" class="externalDFN">common properties</a> defined on table group descriptions within metadata documents.</p>
+        <p>When originating from [[!tabular-metadata]], these annotations arise from <a href="http://w3c.github.io/csvw/metadata/#dfn-common-property" class="externalDFN">common properties</a> defined on <a href="http://w3c.github.io/csvw/metadata/#dfn-table-group-description" class="externalDFN">table group descriptions</a> within metadata documents.</p>
       </section>
       <section>
         <h3>Columns</h3>
@@ -257,7 +257,7 @@
           <li><dfn title="column virtual">virtual</dfn> &mdash; a boolean that indicates whether the column is a <a>virtual column</a>. <dfn title="virtual column">Virtual columns</dfn> are used to extend the source data with additional empty columns to support more advanced conversions; when this annotation is <code>false</code>, the column is a <dfn>real column</dfn>, which exists in the source data for the table.</li>
         </ul>
         <p>
-          Columns MAY in addition have any number of other <a title="annotation">annotations</a>, such as a description. When originating from [[!tabular-metadata]], these annotations arise from <a href="http://w3c.github.io/csvw/metadata/#dfn-common-property" class="externalDFN">common properties</a> defined on table group descriptions within metadata documents.</p>
+          Columns MAY in addition have any number of other <a title="annotation">annotations</a>, such as a description. When originating from [[!tabular-metadata]], these annotations arise from <a href="http://w3c.github.io/csvw/metadata/#dfn-common-property" class="externalDFN">common properties</a> defined on <a href="http://w3c.github.io/csvw/metadata/#dfn-table-group-description" class="externalDFN">table group descriptions</a> within metadata documents.</p>
       </section>
       <section>
         <h3>Rows</h3>
@@ -379,28 +379,18 @@
         As described in <a href="#model" class="sectionRef"></a>, tabular data may have a number of annotations associated with it. Here we describe the different methods that can be used to locate metadata that provides those annotations.
       </p>
       <p>
-        In most methods of locating metadata described here, metadata is provided within separate documents. The syntax of these documents is defined in [[!tabular-metadata]].
-      </p>
-      <p>
-        When creating a set of annotations from metadata, if the same property is specified in two locations then information "closer" to the end user or interpreter of the document overrides other information, and information "closer" to the document itself overrides information "further" from the document. Explicitly, the order of precedence is:
+        In the methods of locating metadata described here, metadata is provided within a single document. The syntax of such documents is defined in [[!tabular-metadata]]. Metadata is located using a specific orer of precedence:
       </p>
       <ol>
         <li>metadata supplied by the user of the implementation that is processing the tabular data, see <a href="#overriding-metadata" class="sectionRef"></a></li>
-        <li>metadata embedded within the <a>tabular data file</a> itself, see <a href="#embedded-metadata" class="sectionRef"></a></li>
         <li>metadata in a document linked to using a <code>Link</code> header associated with the <a>tabular data file</a>, see <a href="#link-header" class="sectionRef"></a></li>
         <li>file-specific metadata in a document located based on the location of the <a>tabular data file</a>, see <a href="#standard-file-metadata" class="sectionRef"></a></li>
         <li>directory-specific metadata in a document located based on the location of the <a>tabular data file</a>, see <a href="#standard-directory-metadata" class="sectionRef"></a></li>
+        <li>metadata embedded within the <a>tabular data file</a> itself, see <a href="#embedded-metadata" class="sectionRef"></a></li>
       </ol>
       <p>
-        Processors MUST always use overriding metadata and embedded metadata. If the overriding metadata does not originate from a complete metadata file itself (for example, if it is generated from command-line options when invoking the implementation), processors MUST attempt to locate the first metadata document from the <code>Link</code> header, the file-specific metadata, or the directory-specific metadata. The located metadata from these locations MUST be merged as defined in [[!tabular-metadata]].
+        Processors MUST use the first metadata found for processing a <a>tabular data file</a> by using overriding metadata, if provided. Otherwise processors MUST attempt to locate the first metadata document from the <code>Link</code> header, the file-specific metadata, or the directory-specific metadata. If no metadata is supplied or found, processors MUST use <a>embedded metadata</a>. If the metadata does not originate from the embedded metadata, <a>validators</a> MUST verify that the <a href="http://w3c.github.io/csvw/metadata/#dfn-table-group-description" class="externalDFN">table group description</a> within that metadata is <a href="http://w3c.github.io/csvw/metadata/#dfn-table-group-description-compatibility" class="externalDFN">compatible</a> with that in the <a>embedded metadata</a>, as defined in [[!tabular-metadata]].
       </p>
-      <p>If no metadata is supplied or found, then the following Metadata is used as the <dfn>default metadata</dfn>:</p>
-      <pre>
-{
-  "@type": "TableGroup",
-  "tables": []
-}
-      </pre>
       <section>
         <h3>Overriding Metadata</h3>
         <p>
@@ -428,32 +418,6 @@ $ csvlint data.csv --schema:schema.json
         </p>
         <p>
           Metadata supplied in this way is called overriding, or user-supplied, metadata. Implementations SHOULD define how any options they define are mapped into the vocabulary defined in [[!tabular-metadata]]. If the user selects existing metadata files, implementations MUST NOT use metadata located through the link header (as described in <a href="#link-header" class="sectionRef"></a>), file-specific metadata (as described in <a href="#standard-file-metadata" class="sectionRef"></a>) or directory-specific metadata (as described in <a href="#standard-directory-metadata" class="sectionRef"></a>).
-        </p>
-      </section>
-      <section>
-        <h3>Embedded Metadata</h3>
-        <p>
-          Most syntaxes for tabular data provide a facility for <dfn title="embedded metadata">embedding metadata</dfn> within the <a>tabular data file</a> itself. The definition of a syntax for tabular data SHOULD include a description of how the syntax maps to an annotated data model, and in particular how any embedded metadata is mapped into the vocabulary defined in [[!tabular-metadata]]. Parsing based on the default dialect for CSV, as described in <a href="#parsing" class="secitonRef"></a>, will extract <a>column titles</a> from the first row of a CSV file.
-        </p>
-        <pre class="example"
-             title="http://example.org/tree-ops.csv"
-             data-include="../examples/tree-ops.csv"
-             data-oninclude="updateExample">
-        </pre>
-        <p>The results of this can be found in <a href="#simple-example" class="sectionRef"></a>.</p>
-        <p>For another example, the following tab-delimited file contains embedded metadata where it is assumed that comments may be added using a <code>#</code>, and that the column types may be indicated using a <code>#datatype</code> annotation:
-        </p>
-        <pre class="example" title="Tab-separated file containing embedded metadata">
-# publisher City of Palo Alto
-# updated 12/31/2010
-#name GID on_street species trim_cycle  inventory_date
-#datatype string  string  string  string  date:M/D/YYYY
-  GID On Street Species Trim Cycle  Inventory Date
-  1 ADDISON AV  Celtis australis  Large Tree Routine Prune  10/18/2010
-  2 EMERSON ST  Liquidambar styraciflua Large Tree Routine Prune  6/2/2010
-        </pre>
-        <p>
-          A processor that recognises this format may be able to extract and make sense of this embedded metadata.
         </p>
       </section>
       <section>
@@ -517,6 +481,32 @@ Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
           If the metadata file found at this location does not explicitly include a reference to the relevant <a>tabular data file</a> then it MUST be ignored.
         </p>
       </section>
+      <section>
+        <h3>Embedded Metadata</h3>
+        <p>
+          Most syntaxes for tabular data provide a facility for <dfn title="embedded metadata">embedding metadata</dfn> within the <a>tabular data file</a> itself. The definition of a syntax for tabular data SHOULD include a description of how the syntax maps to an annotated data model, and in particular how any embedded metadata is mapped into the vocabulary defined in [[!tabular-metadata]]. Parsing based on the default dialect for CSV, as described in <a href="#parsing" class="secitonRef"></a>, will extract <a>column titles</a> from the first row of a CSV file.
+        </p>
+        <pre class="example"
+             title="http://example.org/tree-ops.csv"
+             data-include="../examples/tree-ops.csv"
+             data-oninclude="updateExample">
+        </pre>
+        <p>The results of this can be found in <a href="#simple-example" class="sectionRef"></a>.</p>
+        <p>For another example, the following tab-delimited file contains embedded metadata where it is assumed that comments may be added using a <code>#</code>, and that the column types may be indicated using a <code>#datatype</code> annotation:
+        </p>
+        <pre class="example" title="Tab-separated file containing embedded metadata">
+# publisher City of Palo Alto
+# updated 12/31/2010
+#name GID on_street species trim_cycle  inventory_date
+#datatype string  string  string  string  date:M/D/YYYY
+  GID On Street Species Trim Cycle  Inventory Date
+  1 ADDISON AV  Celtis australis  Large Tree Routine Prune  10/18/2010
+  2 EMERSON ST  Liquidambar styraciflua Large Tree Routine Prune  6/2/2010
+        </pre>
+        <p>
+          A processor that recognises this format may be able to extract and make sense of this embedded metadata.
+        </p>
+      </section>
     </section>
     <section>
       <h2>Processing Tables</h2>
@@ -544,7 +534,7 @@ Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
 }
       </pre>
       <p>
-        the validator would validate all the listed tables, using the locally defined schema at <code>government-spending.csv</code>. It would also use the metadata embedded in the referenced CSV files; for example, when processing <code>http://example.org/east-sussex-2015-03.csv</code>, it would use <a>embedded metadata</a> within that file.
+        the validator would validate all the listed tables, using the locally defined schema at <code>government-spending.csv</code>. It would also use the metadata embedded in the referenced CSV files; for example, when processing <code>http://example.org/east-sussex-2015-03.csv</code>, it would use <a>embedded metadata</a> within that file to verify that the CSV is compatible with the metadata.
       </p>
       <p>
         If a validator is passed a <a>tabular data file</a> <code>http://example.org/east-sussex-2015-03.csv</code>,
@@ -553,28 +543,29 @@ Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
       <p class="note">Starting with a metadata file can remove the need to perform additional requests to locate linked, file-specific, or directory-specific metadata</p> 
       <section>
         <h2>Creating Annotated Tables</h2>
-        <p>After locating metadata, metadata is <a href="http://w3c.github.io/csvw/metadata/#dfn-merged" class="externalDFN">merged</a> into a single <a href="http://w3c.github.io/csvw/metadata/#dfn-table-group-description" class="externalDFN">table group description</a>. When starting with a metadata file, this involves merging the provided metadata file with the <a>embedded metadata</a> for each <a>tabular data file</a> referenced by that file. When starting with a tabular data file, this involves locating the first metadata file as described in <a href="#locating-metadata" class="sectionRef"></a> and merging all relevant metadata into a single descriptor.
+        <p>After locating metadata, metadata is <a href="http://w3c.github.io/csvw/metadata/#dfn-normalization" class="externalDFN">normalized</a> and coerced into a single <a href="http://w3c.github.io/csvw/metadata/#dfn-table-group-description" class="externalDFN">table group description</a>. When starting with a metadata file, this involves normalizing the provided metadata file and, if <a title="validators">validating</a>, verifying that the <a>embedded metadata</a> for each <a>tabular data file</a> referenced from the metadata is compatible with the metadata. When starting with a tabular data file, this involves locating the first metadata file as described in <a href="#locating-metadata" class="sectionRef"></a> and normalizing into a single descriptor.
         </p>
         <p>If processing starts with a <a>tabular data file</a>, implementations:</p>
         <ol class="algorithm">
           <li>Retrieve the tabular data file.</li>
-          <li>Retrieve any metadata supplied by the user (<code>UM<sub>T</sub></code>) (see <a href="#overriding-metadata" class="sectionRef"></a>).</li>
-          <li>If <code>UM<sub>T</sub></code> does not describe a <a>table</a> or <a>group of tables</a> describing the tabular data file, retrieve the first metadata file (<code>FM</code>) as described in <a href="#locating-metadata" class="sectionRef"></a>:
+          <li>Retrieve the first metadata file (<code>FM</code>) as described in <a href="#locating-metadata" class="sectionRef"></a>:
             <ol class="algorithm">
+              <li>metadata supplied by the user (see <a href="#overriding-metadata" class="sectionRef"></a>).</li>
               <li>metadata referenced from a <em>Link Header</em> that may be returned when retrieving the tabular data file (see <a href="#link-header" class="sectionRef"></a>).</li>
               <li>file-specific metadata in a document located based on the location of the tabular data file (see <a href="#standard-file-metadata" class="sectionRef"></a>).</li>
               <li>directory-specific metadata in a document located based on the location of the tabular data file (see <a href="#standard-directory-metadata" class="sectionRef"></a>).</li>
-              <li><a>default metadata</a> as defined in <a href="#locating-metadata" class="sectionRef"></a> with a single <code>tables</code> entry where the <code>url</code> property is set from that of the <a>tabular data file</a>.</li>
+              <li><a>embedded metadata</a> as defined in <a href="#embedded-metadata" class="sectionRef"></a> with a single <code>tables</code> entry where the <code>url</code> property is set from that of the <a>tabular data file</a>.</li>
             </ol>
           </li>
-          <li>Proceed as if the process starts with a metadata file using the merged metadata <code>UM<sub>M</sub> = merge(UM<sub>T</sub>, FM)</code> or <code>UM<sub>T</sub></code> if no <code>FM</code> is loaded.</li>
+          <li>Proceed as if the process starts with <code>FM</code>.</li>
         </ol>
         <p>If the process starts with a metadata file:</p>
         <ol class="algorithm">
-          <li>Retrieve the metadata file yielding the metadata <code>UM<sub>M</sub></code> (which is treated as overriding metadata, see <a href="#overriding-metadata" class="sectionRef"></a>).</li>
-          <li>For each <a>table</a> in <code>UM<sub>M</sub></code> in order, create one or more <a title="annotated table">annotated tables</a>:
+          <li>Retrieve the metadata file yielding the metadata <code>UM</code> (which is treated as overriding metadata, see <a href="#overriding-metadata" class="sectionRef"></a>).</li>
+          <li>Normalize <code>UM</code> using the process defined in <cite><a href="http://w3c.github.io/csvw/metadata/#normalization">Normalization</a></cite> in [[!tabular-metadata]], coercing <code>UM</code> into a <a href="http://w3c.github.io/csvw/metadata/#dfn-table-group-description" class="externalDFN">table group description</a>, if necessary.</li>
+          <li>For each <a>table</a> (<code>TM</code>) in <code>UM</code> in order, create one or more <a title="annotated table">annotated tables</a>:
             <ol class="algorithm">
-              <li>Extract the <a href="http://w3c.github.io/csvw/metadata/#dialect-descriptions">dialect description</a> (<code>DD</code>) from <code>UM<sub>M</sub></code> for the <a>table</a> associated with the tabular data file. If there is no such dialect description, extract the first available dialect description from a <a>group of tables</a> in which the tabular data file is described. Otherwise use the default dialect description.</li>
+              <li>Extract the <a href="http://w3c.github.io/csvw/metadata/#dialect-descriptions">dialect description</a> (<code>DD</code>) from <code>UM</code> for the <a>table</a> associated with the tabular data file. If there is no such dialect description, extract the first available dialect description from a <a>group of tables</a> in which the tabular data file is described. Otherwise use the default dialect description.</li>
               <li>If using the default <a href="http://w3c.github.io/csvw/metadata/#dialect-descriptions">dialect description</a>, override default values in <code>DD</code> based on HTTP headers found when retrieving the tabular data file:
                 <ul>
                   <li>If the media type from the <code>Content-Type</code> header is <code>text/tsv</code>, set <a href="http://w3c.github.io/csvw/metadata/#dialect-delimiter" class="externalDFN">delimiter</a> to <code>TAB</code> in <code>DD</code>.</li>
@@ -586,15 +577,16 @@ Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
                 <p>Parse the tabular data file, using <code>DD</code> as a guide, to create a basic tabular data model (<code>T</code>) and extract <a>embedded metadata</a> (<code>EM</code>), for example from the <a>header line</a>.</p>
                 <p class="note">This specification provides a non-normative definition for parsing CSV-based files, including the extraction of <a>embedded metadata</a>, in <a href="#parsing" class="sectionRef"></a>. This specification does not define any syntax for embedded metadata beyond this; whatever syntax is used, it's assumed that metadata can be mapped to the vocabulary defined in [[!tabular-metadata]].</p>
               </li>
-              <li>If a <code>Content-Language</code> HTTP header was found when retrieving the tabular data file, and the value provides a single language, set the <a href="http://w3c.github.io/csvw/metadata/#cell-language" class="externalDFN">lang</a> inherited property to this value in <code>EM</code>.</li>
-              <li>Create the merged metadata <code>M = merge(UM<sub>M</sub>, EM)</code> using the <a href="http://w3c.github.io/csvw/metadata/#dfn-merged" class="externalDFN">merge algorithm</a> defined in [[!tabular-metadata]].</li>
-              <li>Use the metadata <code>M</code> to add annotations to the tabular data model <code>T</code> as described in <a href="http://w3c.github.io/csvw/metadata/#annotating-tables">Section 2 Annotating Tables</a> in [[!tabular-metadata]].</li>
+              <li>If a <code>Content-Language</code> HTTP header was found when retrieving the tabular data file, and the value provides a single language, set the <a href="http://w3c.github.io/csvw/metadata/#cell-language" class="externalDFN">lang</a> inherited property to this value in <code>TM</code>, unless <code>TM</code> already has a <a href="http://w3c.github.io/csvw/metadata/#cell-language" class="externalDFN">lang</a> inherited property.</li>
+              <li>If <a title="validator">validating</a>, verify that <code>TM</code> is compatible with <code>EM</code> using the procedure defined in <cite><a href="http://w3c.github.io/csvw/metadata/#table-description-compatibility">Table Description Compatibility</a> </cite> in [[!tabular-metadata]]; if <code>TM</code> is not compatible with <code>EM</code> validators MUST raise an error.</li>
+              <li>Use the metadata <code>TM</code> to add annotations to the tabular data model <code>T</code> as described in <a href="http://w3c.github.io/csvw/metadata/#annotating-tables">Section 2 Annotating Tables</a> in [[!tabular-metadata]].</li>
             </ol>
           </li>
         </ol>
-        <p class="note">
-          In the case of starting with a metadata file, <code>UM<sub>M</sub></code> will describe a <a>table</a> or <a>group of tables</a>, and no other metadata files will be retrieved. Thus the metadata file must provide all applicable metadata aside from that embedded within the tabular data files themselves.
-        </p>
+      </section>
+      <section>
+        <h2>Metadata Compatibility</h2>
+        <p>When processing a <a>tabular data file</a> using metadata as discovered using <a href="#locating-metadata" class="sectionRef"></a>, processors MUST ensure that the metadata and <a>tabular data file</a> are compatible, this is typically done by extracting <a>embedded metadata</a> from the <a>tabular data file</a> and determining that the provided or discovered metadata is compatible with the <a>embedded metadata</a> using the procedure defined in <cite><a href="http://w3c.github.io/csvw/metadata/#table-compatibility">Table Compatibility</a></cite> in [[!tabular-metadata]].</p>
       </section>
       <section>
         <h2>Parsing Cells</h2>
@@ -933,9 +925,10 @@ Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
       <section>
         <h3>Validating Tables</h3>
         <p>
-          <a href="http://w3c.github.io/csvw/metadata/#dfn-validators" class="externalDFN">Validators</a> test whether given <a title="tabular data file">tabular data files</a> adhere to the structure defined within a <a href="http://w3c.github.io/csvw/metadata/#dfn-schema" class="externalDFN">schema</a>. Validators MUST raise errors as defined in [[!tabular-metadata]] and in the following situations:
+          <dfn>Validators</dfn> test whether given <a title="tabular data file">tabular data files</a> adhere to the structure defined within a <a href="http://w3c.github.io/csvw/metadata/#dfn-schema" class="externalDFN">schema</a>. Validators MUST raise errors as defined in [[!tabular-metadata]] and in the following situations:
         </p>
         <ul>
+          <li>if the <a href="http://w3c.github.io/csvw/metadata/#dfn-table-description" class="externalDFN">table description</a> is not compatible with the <a>embedded metadata</a> extracted from the <a>tabular data file</a>, as defined in <cite><a href="http://w3c.github.io/csvw/metadata/#table-compatibility">Table Compatibility</a> </cite> in [[!tabular-metadata]].</li>
           <li>if there is more than one <a>row</a> with the same <a title="row primary key">primary key</a>, that is where the <a title="cell">cells</a> listed for the primary key for the row have the same <a title="cell value">values</a> as the cells listed for the primary key for another row,</li>
           <li>for each <a>row</a> that does not have a <a title="row referenced rows">referenced row</a> for each of the <a title="table foreign keys">foreign keys</a> on the <a>table</a> in which the row appears, or</li>
           <li>for each <a title="cell errors">error</a> on each <a>cell</a>.</li>
@@ -1129,6 +1122,9 @@ Content-Type: text/csv;header=absent
             </li>
             <li>Add <code>1</code> to the <a>source row number</a>.</li>
           </ol>
+        </li>
+        <li>
+          If <a>header row count</a> is zero, create an empty column description object in <code><em>M</em>.tableSchema.columns</code> for each column in the current row after <a>skip columns</a>.
         </li>
         <li>Set <dfn title="model row number">row number</dfn> to <code>1</code>.</li>
         <li>
@@ -2248,14 +2244,24 @@ TEXTDATA =  %x20-21 / %x23-2B / %x2D-7E
       <div data-include="../acknowledgements.html"></div>
     </section>
     <section class="appendix" id="changes">
-      <h2>Changes since the working draft of 08 January 2015</h2>
-      <p>The document has undergone substantial changes since the last working draft. Below are some of the changes made:</p>
-      <ul>
-        <li>Describe all core annotations on a <a>group of tables</a>, <a title="table">tables</a>, <a title="column">columns</a>, <a title="row">rows</a>, and <a title="datatype">datatypes</a>.</li>
-        <li>Removed the <em>Core Tabular Data Model</em>, as this can be derived from the <a>Annotated Tabular Data Model</a> with an appropriate <a href="http://w3c.github.io/csvw/metadata/#dfn-dialect-description" class="externalDFN">dialect description</a><a href="http://w3c.github.io/csvw/metadata/#dfn-dialect-description" class="externalDFN">dialect description</a>.</li>
-        <li>Describe the process of <a href="#locating-metadata">locating metadata</a>, using this to create <a>embedded metadata</a>, <a href="#processing-tables">processing</a> <a title="tabular data file">tabular data files</a>, and <a href="#creating-annotated-tables">creating annotated tables</a>.</li>
-        <li>Move details on <a href="#datatypes">datatypes</a> and <a href="#cells">parsing cells</a>. Datatypes include detailed formats for different datatypes.</li>
-      </ul>
+      <h2>Changes from previous drafts</h2>
+      <section>
+        <h2>Changes since the working draft of 16 April 2015</h2>
+        <ul>
+          <li>Merging of metadata files has been removed as it was determined not to be necessary.</li>
+          <li>Embedded metadata now used for compatibility check only, or as metadata if no other is found.</li>
+        </ul>
+      </section>
+      <section>
+        <h2>Changes since the working draft of 08 January 2015</h2>
+        <p>The document has undergone substantial changes since the last working draft. Below are some of the changes made:</p>
+        <ul>
+          <li>Describe all core annotations on a <a>group of tables</a>, <a title="table">tables</a>, <a title="column">columns</a>, <a title="row">rows</a>, and <a title="datatype">datatypes</a>.</li>
+          <li>Removed the <em>Core Tabular Data Model</em>, as this can be derived from the <a>Annotated Tabular Data Model</a> with an appropriate <a href="http://w3c.github.io/csvw/metadata/#dfn-dialect-description" class="externalDFN">dialect description</a><a href="http://w3c.github.io/csvw/metadata/#dfn-dialect-description" class="externalDFN">dialect description</a>.</li>
+          <li>Describe the process of <a href="#locating-metadata">locating metadata</a>, using this to create <a>embedded metadata</a>, <a href="#processing-tables">processing</a> <a title="tabular data file">tabular data files</a>, and <a href="#creating-annotated-tables">creating annotated tables</a>.</li>
+          <li>Move details on <a href="#datatypes">datatypes</a> and <a href="#cells">parsing cells</a>. Datatypes include detailed formats for different datatypes.</li>
+        </ul>
+      </section>
     </section>
   </body>
 </html>
