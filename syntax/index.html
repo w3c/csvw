@@ -389,7 +389,7 @@
         <li>metadata embedded within the <a>tabular data file</a> itself, see <a href="#embedded-metadata" class="sectionRef"></a></li>
       </ol>
       <p>
-        Processors MUST use the first metadata found for processing a <a>tabular data file</a> by using overriding metadata, if provided. Otherwise processors MUST attempt to locate the first metadata document from the <code>Link</code> header, the file-specific metadata, or the directory-specific metadata. If no metadata is supplied or found, processors MUST use <a>embedded metadata</a>. Processors MUST verify that the metadata is <a href="http://w3c.github.io/csvw/metadata/#dfn-table-compatibility" class="externalDFN">compatible</a> with <a>embedded metadata</a> as defined in [[!tabular-metadata]].
+        Processors MUST use the first metadata found for processing a <a>tabular data file</a> by using overriding metadata, if provided. Otherwise processors MUST attempt to locate the first metadata document from the <code>Link</code> header, the file-specific metadata, or the directory-specific metadata. If no metadata is supplied or found, processors MUST use <a>embedded metadata</a>. If the metadata does not originate from the embedded metadata, <a>validators</a> MUST verify that the <a href="http://w3c.github.io/csvw/metadata/#dfn-table-group-description" class="externalDFN">table group description</a> within that metadata is <a href="http://w3c.github.io/csvw/metadata/#dfn-table-group-description-compatibility" class="externalDFN">compatible</a> with that in the <a>embedded metadata</a>, as defined in [[!tabular-metadata]].
       </p>
       <section>
         <h3>Overriding Metadata</h3>
@@ -418,32 +418,6 @@ $ csvlint data.csv --schema:schema.json
         </p>
         <p>
           Metadata supplied in this way is called overriding, or user-supplied, metadata. Implementations SHOULD define how any options they define are mapped into the vocabulary defined in [[!tabular-metadata]]. If the user selects existing metadata files, implementations MUST NOT use metadata located through the link header (as described in <a href="#link-header" class="sectionRef"></a>), file-specific metadata (as described in <a href="#standard-file-metadata" class="sectionRef"></a>) or directory-specific metadata (as described in <a href="#standard-directory-metadata" class="sectionRef"></a>).
-        </p>
-      </section>
-      <section>
-        <h3>Embedded Metadata</h3>
-        <p>
-          Most syntaxes for tabular data provide a facility for <dfn title="embedded metadata">embedding metadata</dfn> within the <a>tabular data file</a> itself. The definition of a syntax for tabular data SHOULD include a description of how the syntax maps to an annotated data model, and in particular how any embedded metadata is mapped into the vocabulary defined in [[!tabular-metadata]]. Parsing based on the default dialect for CSV, as described in <a href="#parsing" class="secitonRef"></a>, will extract <a>column titles</a> from the first row of a CSV file.
-        </p>
-        <pre class="example"
-             title="http://example.org/tree-ops.csv"
-             data-include="../examples/tree-ops.csv"
-             data-oninclude="updateExample">
-        </pre>
-        <p>The results of this can be found in <a href="#simple-example" class="sectionRef"></a>.</p>
-        <p>For another example, the following tab-delimited file contains embedded metadata where it is assumed that comments may be added using a <code>#</code>, and that the column types may be indicated using a <code>#datatype</code> annotation:
-        </p>
-        <pre class="example" title="Tab-separated file containing embedded metadata">
-# publisher City of Palo Alto
-# updated 12/31/2010
-#name GID on_street species trim_cycle  inventory_date
-#datatype string  string  string  string  date:M/D/YYYY
-  GID On Street Species Trim Cycle  Inventory Date
-  1 ADDISON AV  Celtis australis  Large Tree Routine Prune  10/18/2010
-  2 EMERSON ST  Liquidambar styraciflua Large Tree Routine Prune  6/2/2010
-        </pre>
-        <p>
-          A processor that recognises this format may be able to extract and make sense of this embedded metadata.
         </p>
       </section>
       <section>
@@ -508,6 +482,32 @@ Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
           If the metadata file found at this location does not explicitly include a reference to the relevant <a>tabular data file</a> then it MUST be ignored.
         </p>
       </section>
+      <section>
+        <h3>Embedded Metadata</h3>
+        <p>
+          Most syntaxes for tabular data provide a facility for <dfn title="embedded metadata">embedding metadata</dfn> within the <a>tabular data file</a> itself. The definition of a syntax for tabular data SHOULD include a description of how the syntax maps to an annotated data model, and in particular how any embedded metadata is mapped into the vocabulary defined in [[!tabular-metadata]]. Parsing based on the default dialect for CSV, as described in <a href="#parsing" class="secitonRef"></a>, will extract <a>column titles</a> from the first row of a CSV file.
+        </p>
+        <pre class="example"
+             title="http://example.org/tree-ops.csv"
+             data-include="../examples/tree-ops.csv"
+             data-oninclude="updateExample">
+        </pre>
+        <p>The results of this can be found in <a href="#simple-example" class="sectionRef"></a>.</p>
+        <p>For another example, the following tab-delimited file contains embedded metadata where it is assumed that comments may be added using a <code>#</code>, and that the column types may be indicated using a <code>#datatype</code> annotation:
+        </p>
+        <pre class="example" title="Tab-separated file containing embedded metadata">
+# publisher City of Palo Alto
+# updated 12/31/2010
+#name GID on_street species trim_cycle  inventory_date
+#datatype string  string  string  string  date:M/D/YYYY
+  GID On Street Species Trim Cycle  Inventory Date
+  1 ADDISON AV  Celtis australis  Large Tree Routine Prune  10/18/2010
+  2 EMERSON ST  Liquidambar styraciflua Large Tree Routine Prune  6/2/2010
+        </pre>
+        <p>
+          A processor that recognises this format may be able to extract and make sense of this embedded metadata.
+        </p>
+      </section>
     </section>
     <section>
       <h2>Processing Tables</h2>
@@ -544,7 +544,7 @@ Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
       <p class="note">Starting with a metadata file can remove the need to perform additional requests to locate linked, file-specific, or directory-specific metadata</p> 
       <section>
         <h2>Creating Annotated Tables</h2>
-        <p>After locating metadata, metadata is <a href="http://w3c.github.io/csvw/metadata/#dfn-normalization" class="externalDFN">normalized</a> and coerced into a single <a href="http://w3c.github.io/csvw/metadata/#dfn-table-group-description" class="externalDFN">table group description</a>. When starting with a metadata file, this involves normalizing the provided metadata file and verifying that the <a>embedded metadata</a> for each <a>tabular data file</a> referenced from the metadata is compatible with the metadata. When starting with a tabular data file, this involves locating the first metadata file as described in <a href="#locating-metadata" class="sectionRef"></a> and normalizing into a single descriptor.
+        <p>After locating metadata, metadata is <a href="http://w3c.github.io/csvw/metadata/#dfn-normalization" class="externalDFN">normalized</a> and coerced into a single <a href="http://w3c.github.io/csvw/metadata/#dfn-table-group-description" class="externalDFN">table group description</a>. When starting with a metadata file, this involves normalizing the provided metadata file and, if <a title="validators">validating</a>, verifying that the <a>embedded metadata</a> for each <a>tabular data file</a> referenced from the metadata is compatible with the metadata. When starting with a tabular data file, this involves locating the first metadata file as described in <a href="#locating-metadata" class="sectionRef"></a> and normalizing into a single descriptor.
         </p>
         <p>If processing starts with a <a>tabular data file</a>, implementations:</p>
         <ol class="algorithm">
@@ -579,7 +579,7 @@ Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
                 <p class="note">This specification provides a non-normative definition for parsing CSV-based files, including the extraction of <a>embedded metadata</a>, in <a href="#parsing" class="sectionRef"></a>. This specification does not define any syntax for embedded metadata beyond this; whatever syntax is used, it's assumed that metadata can be mapped to the vocabulary defined in [[!tabular-metadata]].</p>
               </li>
               <li>If a <code>Content-Language</code> HTTP header was found when retrieving the tabular data file, and the value provides a single language, set the <a href="http://w3c.github.io/csvw/metadata/#cell-language" class="externalDFN">lang</a> inherited property to this value in <code>TM</code>, unless <code>TM</code> already has a <a href="http://w3c.github.io/csvw/metadata/#cell-language" class="externalDFN">lang</a> inherited property.</li>
-              <li>Verify that <code>TM</code> is compatible with <code>EM</code> using the procedure defined in <cite><a href="http://w3c.github.io/csvw/metadata/#table-compatibility">Table Compatibility</a> </cite> in [[!tabular-metadata]]; if <code>TM</code> is not compatible with <code>EM</code> processors MUST raise an error.</li>
+              <li>If <a title="validator">validating</a>, verify that <code>TM</code> is compatible with <code>EM</code> using the procedure defined in <cite><a href="http://w3c.github.io/csvw/metadata/#table-description-compatibility">Table Description Compatibility</a> </cite> in [[!tabular-metadata]]; if <code>TM</code> is not compatible with <code>EM</code> validators MUST raise an error.</li>
               <li>Use the metadata <code>TM</code> to add annotations to the tabular data model <code>T</code> as described in <a href="http://w3c.github.io/csvw/metadata/#annotating-tables">Section 2 Annotating Tables</a> in [[!tabular-metadata]].</li>
             </ol>
           </li>
@@ -926,7 +926,7 @@ Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
       <section>
         <h3>Validating Tables</h3>
         <p>
-          <a href="http://w3c.github.io/csvw/metadata/#dfn-validators" class="externalDFN">Validators</a> test whether given <a title="tabular data file">tabular data files</a> adhere to the structure defined within a <a href="http://w3c.github.io/csvw/metadata/#dfn-schema" class="externalDFN">schema</a>. Validators MUST raise errors as defined in [[!tabular-metadata]] and in the following situations:
+          <dfn>Validators</dfn> test whether given <a title="tabular data file">tabular data files</a> adhere to the structure defined within a <a href="http://w3c.github.io/csvw/metadata/#dfn-schema" class="externalDFN">schema</a>. Validators MUST raise errors as defined in [[!tabular-metadata]] and in the following situations:
         </p>
         <ul>
           <li>if the <a href="http://w3c.github.io/csvw/metadata/#dfn-table-description" class="externalDFN">table description</a> is not compatible with the <a>embedded metadata</a> extracted from the <a>tabular data file</a>, as defined in <cite><a href="http://w3c.github.io/csvw/metadata/#table-compatibility">Table Compatibility</a> </cite> in [[!tabular-metadata]].</li>
