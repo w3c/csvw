@@ -127,13 +127,13 @@ Both the fixed-format text- and CSV-formatted files ([http://www.metoffice.gov.u
   "dcat:distribution": [{
     "@id": "http://example.org/cambornedata#distribution-txt",
     "dc:title": "Camborne data (fixed-width text format)",
-    "dc:format": "text/plain",
+    "dc:format": {"@value": "text/plain"},
     "dcat:license": {"@id": "http://www.nationalarchives.gov.uk/doc/open-government-licence/version/2/"},
     "dcat:downloadURL": {"@id": "http://www.metoffice.gov.uk/pub/data/weather/uk/climate/stationdata/cambornedata.txt"}
-  },{
+  }, {
     "@id": "http://example.org/cambornedata#distribution-csv",
     "dc:title": "Camborne data (CSV format)",
-    "dc:format": "text/csv",
+    "dc:format": {"@value": "text/csv"},
     "dcat:downloadURL": {"@id": "cambornedata.csv"},
     "prov:wasDerivedFrom": {"@id": "http://example.org/cambornedata#distribution-txt"}
   }]
@@ -147,9 +147,9 @@ Camborne is a geographic location - with OSGB Northing and Easting plus Altitude
   }, { 
     "@id": "http://example.org/cambornedata#point-location",
     "@type": "http://www.w3.org/2003/01/geo/wgs84_pos#Point",
-    "http://www.w3.org/2003/01/geo/wgs84_pos#alt": {"@type": "xsd:double" , "@value": "87"},
-    "http://www.w3.org/2003/01/geo/wgs84_pos#lat": {"@type": "xsd:double" , "@value": "49.770856"},
-    "http://www.w3.org/2003/01/geo/wgs84_pos#lon": {"@type": "xsd:double" , "@value": "7.533833"}
+    "http://www.w3.org/2003/01/geo/wgs84_pos#alt": 87.0,
+    "http://www.w3.org/2003/01/geo/wgs84_pos#lat": 49.770856,
+    "http://www.w3.org/2003/01/geo/wgs84_pos#lon": 7.533833
   }]
 ```
 
@@ -164,7 +164,7 @@ The header-rows of the CSV file contain some contextual information. We can capt
       "rdf:value": "The first five rows of the CSV file contain the following descriptive metadata:\r\f\r\fCamborne\r\fLocation 1627E 407N 87m amsl\r\fEstimated data is marked with a * after the  value.\r\fMissing data (more than 2 days missing in month) is  marked by  ---.\r\fSunshine data taken from an automatic Kipp & Zonen sensor marked with a #, otherwise sunshine data taken from a Campbell Stokes recorder.",
       "dc:format": {"@value": "text/plain"}
     }
-  },{
+  }, {
     "@type": "oa:Annotation",
     "oa:hasTarget": {"@id": "cambornedata.csv#row=7"},
     "oa:hasBody": {
@@ -268,7 +268,7 @@ Note the `titles` value for `tmax_obsStatus` is specified as " " in order to mat
       "dc:description": "Mean daily maximum temperature",
       "datatype": "decimal",
       "propertyUrl": "http://example.org/cambornedata#tmax"
-    },{
+    }, {
       "name": "tmax_obsStatus",
       "titles": " ",
       "dc:description": "status of the observed value of mean daily maximum temperature",
@@ -335,10 +335,7 @@ To express the tabular data as an RDF Data Cube we need to provide a [data struc
   "qb:structure": {
     "@id": "http://example.org/cambornedata#dsd",
     "@type": "qb:DataStructureDefinition",
-    "rdfs:comment": {
-      "@value": "RDF Data Cube data structure definition for historical monthly observations (multi-measure approach)",
-      "@language": "en"
-    },
+    "rdfs:comment": "RDF Data Cube data structure definition for historical monthly observations (multi-measure approach)",
     "qb:component": [ ... ]
   }
 ```
@@ -351,10 +348,7 @@ The _year_ and _month_ values - which are combined to specify the _reference per
         "qb:dimension": {
           "@id": "http://purl.org/linked-data/sdmx/2009/dimension#refPeriod",
           "@type": "qb:DimensionProperty",
-          "rdfs:label": {
-            "@value": "reference period for observation value",
-            "@language": "en"
-          },
+          "rdfs:label": "reference period for observation value",
           "rdfs:range": {
             "@id": "http://www.w3.org/2006/time#Interval"
           }
@@ -375,10 +369,7 @@ The properties relating _data_ values to the [Observation](http://www.w3.org/TR/
           "http://def.seegrid.csiro.au/ontology/om/om-lite#uom": {
             "@id": "http://qudt.org/vocab/unit#DegreeCelsius"
           },
-          "rdfs:label": {
-            "@value": "mean daily maximum temperature",
-            "@language": "en"
-          },
+          "rdfs:label": "mean daily maximum temperature",
           "rdfs:range": {
             "@id": "xsd:decimal"
           },
@@ -392,18 +383,12 @@ Of particular interest, note that the unit of measurement - as specified in row 
         "qb:attribute": {
           "@id": "http://def.seegrid.csiro.au/ontology/om/om-lite#uom",
           "@type": "qb:AttributeProperty",
-          "rdfs:label": {
-            "@value": "unit of measurement",
-            "@language": "en"
-          }
+          "rdfs:label": "unit of measurement"
         },
         "qb:componentAttachment": {
           "@id": "qb:MeasureProperty"
         },
-        "qb:componentRequired": {
-          "@value": "true",
-          "@type": "xsd:boolean"
-        }
+        "qb:componentRequired": true
 ```
 
 The properties relating the complementary _observation status_ values to the [Observation](http://www.w3.org/TR/vocab-data-cube/#ref_qb_Observation) are mapped to [AttributeProperty](http://www.w3.org/TR/vocab-data-cube/#ref_qb_AttributeProperty) instances; for example `tmax-obsStatus`. Here we can see how values from the column are related to a specific controlled vocabulary: `"qb:codeList": { "@id": "http://purl.org/linked-data/sdmx/2009/code#obsStatus" }`.
@@ -419,10 +404,7 @@ The properties relating the complementary _observation status_ values to the [Ob
           "qb:codeList": {
             "@id": "http://purl.org/linked-data/sdmx/2009/code#obsStatus"
           },
-          "rdfs:label": {
-            "@value": "status of the observed value of mean daily maximum temperature",
-            "@language": "en"
-          },
+          "rdfs:label": "status of the observed value of mean daily maximum temperature",
           "rdfs:range": {
               "@id": "http://purl.org/linked-data/sdmx/2009/code#ObsStatus"
           }
@@ -438,10 +420,7 @@ Finally, the location information for the dataset `dc:spatial` is specified mapp
         "qb:componentAttachment": {
           "@id": "qb:DataSet"
         },
-        "qb:componentRequired": {
-          "@value": "true",
-          "@type": "xsd:boolean"
-        }
+        "qb:componentRequired": true
 ```
 
 ### Metadata description ###
