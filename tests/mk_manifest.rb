@@ -59,6 +59,7 @@ class Manifest
       extras[:validation] = entry[:validate] == "TRUE"
       extras[:negative] = entry[:"test-type"] == "negative"
       extras[:warning] = entry[:"test-type"] == "warning"
+      extras[:invalid] = entry[:"test-type"] == "invalid"
       test = Test.new(entry[:test], entry[:name], entry[:comment], entry[:approval], extras)
 
       if entry[:"directory-metadata"] == "TRUE" || test.option[:dir]
@@ -118,6 +119,12 @@ class Manifest
       case variant
       #when :rdf         then "csvt:ToRdfTest"
       #when :json        then "csvt:ToJsonTest"
+      when :validation  then "csvt:NegativeValidationTest"
+      end
+    when test.option[:invalid]
+      case variant
+      when :rdf         then "csvt:ToRdfTest"
+      when :json        then "csvt:ToJsonTest"
       when :validation  then "csvt:NegativeValidationTest"
       end
     when test.option[:warning]
