@@ -64,6 +64,7 @@ class Manifest
 
       if entry[:"directory-metadata"] == "TRUE" || test.option[:dir]
         test.action = extras.fetch(:action) do
+          # action-metadata indicates that processing starts with metadata, not CSV
           if entry[:"action-metadata"] == "TRUE"
             test.option[:implicit] ||= "#{test.id}/action.csv"
             "#{test.id}/metadata.json"
@@ -80,7 +81,7 @@ class Manifest
         test.directory_metadata = "#{test.id}/metadata.json" if entry[:"directory-metadata"] == "TRUE"
       else
         test.action = extras.fetch(:action) do
-          entry[:"action-metadata"] == "TRUE" ? "#{test.id}-metadata.json" : "#{test.id}.csv"
+          # action-metadata indicates that processing starts with metadata, not CSV
           if entry[:"action-metadata"] == "TRUE"
             test.option[:implicit] ||= "#{test.id}.csv"
             "#{test.id}-metadata.json"
@@ -104,7 +105,9 @@ class Manifest
   def create_files
     tests.each do |test|
       FileUtils.mkdir(test.id.to_s) unless Dir.exist?(test.id.to_s) if test.directory_metadata || test.option[:dir]
-      files = [test.action] + test.option[:implicit]
+      files = []
+      files << test.action.split('?').first
+      files += test.option[:implicit]
       files << "#{test.result}ttl"  if test.result && test.option[:rdf]
       files << "#{test.result}json" if test.result && test.option[:json]
       files.compact.select {|f| !File.exist?(f)}.each do |f|
