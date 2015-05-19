@@ -31,7 +31,8 @@
     :test052 :test054 :test055 :test056 :test057 :test058 :test059 :test060 :test061 :test062
     :test063 :test065 :test066 :test067 :test068 :test069 :test070 :test071 :test072 :test073
     :test075 :test076 :test093 :test095 :test097 :test098 :test099 :test101 :test102 :test106
-    :test109 :test110 :test111 :test112 :test113 :test114 :test115
+    :test109 :test110 :test111 :test112 :test113 :test114 :test115 :test116 :test117 :test118
+    :test119
   ) .
 
 :test001 a csvt:ToRdfTest;
@@ -1106,4 +1107,54 @@
   mf:action <test115-metadata.json>;
   mf:result <test115.ttl>;
   csvt:implicit <tree-ops.csv>;
+  .
+
+:test116 a csvt:ToRdfTest;
+  mf:name "file-metadata with query component";
+  rdfs:comment "processors MUST attempt to locate a file-specific metadata document. This method MUST NOT be used if the URL of the tabular data file contains a query component.";
+  csvt:approval csvt:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test116.csv?query>;
+  mf:result <test116.ttl>;
+  csvt:implicit <test116.csv-metadata.json>;
+  .
+
+:test117 a csvt:ToRdfTest;
+  mf:name "file-metadata not referencing file";
+  rdfs:comment "Tabular data files are determined from located metadata, not URL it starts with.";
+  csvt:approval csvt:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test117.csv>;
+  mf:result <test117.ttl>;
+  csvt:implicit <test117-ref.csv>,
+    <test117.csv-metadata.json>;
+  .
+
+:test118 a csvt:ToRdfTest;
+  mf:name "directory-metadata with query component";
+  rdfs:comment "processors MUST attempt to locate a directory-level metadata document. This method MUST NOT be used if the URL of the tabular data file contains a query component.";
+  csvt:approval csvt:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test118/action.csv?query>;
+  mf:result <test118/result.ttl>;
+  csvt:implicit <test118/metadata.json>;
+  .
+
+:test119 a csvt:ToRdfTest;
+  mf:name "directory-metadata not referencing file";
+  rdfs:comment "Tabular data files are determined from located metadata, not URL it starts with.";
+  csvt:approval csvt:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test119/action.csv>;
+  mf:result <test119/result.ttl>;
+  csvt:implicit <test119/ref.csv>,
+    <test119/metadata.json>;
   .
