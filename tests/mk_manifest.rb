@@ -221,7 +221,7 @@ class Manifest
 
   def to_ttl(variant)
     output = []
-    output << %(# CSV+ tests
+    output << %(## CSV+ tests
 ## Distributed under both the W3C Test Suite License[1] and the W3C 3-
 ## clause BSD License[2]. To contribute to a W3C Test Suite, see the
 ## policies and contribution forms [3]

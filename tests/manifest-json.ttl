@@ -1,4 +1,4 @@
-# CSV+ tests
+## CSV+ tests
 ## Distributed under both the W3C Test Suite License[1] and the W3C 3-
 ## clause BSD License[2]. To contribute to a W3C Test Suite, see the
 ## policies and contribution forms [3]
@@ -32,7 +32,7 @@
     :test063 :test065 :test066 :test067 :test068 :test069 :test070 :test071 :test072 :test073
     :test075 :test076 :test093 :test095 :test097 :test098 :test099 :test101 :test102 :test106
     :test109 :test110 :test111 :test112 :test113 :test114 :test115 :test116 :test117 :test118
-    :test119
+    :test119 :test120 :test121 :test122 :test123
   ) .
 
 :test001 a csvt:ToJsonTest;
@@ -1123,15 +1123,14 @@
 
 :test117 a csvt:ToJsonTest;
   mf:name "file-metadata not referencing file";
-  rdfs:comment "Tabular data files are determined from located metadata, not URL it starts with.";
+  rdfs:comment "If the metadata file found at this location does not explicitly include a reference to the requested tabular data file then it must be ignored.";
   csvt:approval csvt:Proposed;
   csvt:option [
     csvt:noProv true;
   ];
   mf:action <test117.csv>;
   mf:result <test117.json>;
-  csvt:implicit <test117-ref.csv>,
-    <test117.csv-metadata.json>;
+  csvt:implicit <test117.csv-metadata.json>;
   .
 
 :test118 a csvt:ToJsonTest;
@@ -1148,13 +1147,66 @@
 
 :test119 a csvt:ToJsonTest;
   mf:name "directory-metadata not referencing file";
-  rdfs:comment "Tabular data files are determined from located metadata, not URL it starts with.";
+  rdfs:comment "If the metadata file found at this location does not explicitly include a reference to the requested tabular data file then it must be ignored.";
   csvt:approval csvt:Proposed;
   csvt:option [
     csvt:noProv true;
   ];
   mf:action <test119/action.csv>;
   mf:result <test119/result.json>;
-  csvt:implicit <test119/ref.csv>,
-    <test119/metadata.json>;
+  csvt:implicit <test119/metadata.json>;
+  .
+
+:test120 a csvt:ToJsonTest;
+  mf:name "link-metadata not referencing file";
+  rdfs:comment "If the metadata file found at this location does not explicitly include a reference to the requested tabular data file then it MUST be ignored.";
+  csvt:approval csvt:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  csvt:httpLink "<test120-linked-metadata.json>; rel=\"describedby\"";
+  mf:action <test120.csv>;
+  mf:result <test120.json>;
+  csvt:implicit <test120-linked-metadata.json>;
+  .
+
+:test121 a csvt:ToJsonTest;
+  mf:name "user-metadata not referencing file";
+  rdfs:comment "User-specified metadata does not need to reference the starting CSV";
+  csvt:approval csvt:Proposed;
+  csvt:option [
+    csvt:noProv true;
+    csvt:metadata <test121-user-metadata.json>;
+  ];
+  mf:action <test121.csv>;
+  mf:result <test121.json>;
+  csvt:implicit <test121-ref.csv>,
+    <test121-user-metadata.json>;
+  .
+
+:test122 a csvt:ToJsonTest;
+  mf:name "link-metadata not describing file uses file-metadata";
+  rdfs:comment "If the metadata file found at this location does not explicitly include a reference to the requested tabular data file then it MUST be ignored.";
+  csvt:approval csvt:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  csvt:httpLink "<test122-linked-metadata.json>; rel=\"describedby\"";
+  mf:action <test122.csv>;
+  mf:result <test122.json>;
+  csvt:implicit <test122-linked-metadata.json>,
+    <test122.csv-metadata.json>;
+  .
+
+:test123 a csvt:ToJsonTest;
+  mf:name "file-metadata not describing file uses directory-metadata";
+  rdfs:comment "If the metadata file found at this location does not explicitly include a reference to the requested tabular data file then it MUST be ignored.";
+  csvt:approval csvt:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test123/action.csv>;
+  mf:result <test123/result.json>;
+  csvt:implicit <test123/action.csv-metadata.json>,
+    <test123/metadata.json>;
   .
