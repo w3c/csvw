@@ -267,7 +267,8 @@
         <ul>
           <li><dfn title="row cells">cells</dfn> &mdash; the list of <a title="cell">cells</a> in the row. A row MUST contain one cell from each <a>column</a> in the table. The order of the cells in the list MUST match the order of the columns in which they appear within the <a>table columns</a> for the row's table.</li>
           <li><dfn title="row number">number</dfn> &mdash; the position of the row amongst the <a title="table rows">rows</a> for the <a title="row table">table</a>, starting from 1.</li>
-          <li><dfn title="row primary key">primary key</dfn> &mdash; a possibly empty list of <a title="cell">cells</a> whose values together provide a unique identifier for this row.</li>
+          <li><dfn title="row primary key">primary key</dfn> &mdash; a possibly empty list of <a title="cell">cells</a> whose values together provide a unique identifier for this row. This is similar to the <a title="column name">name</a> of a <a>column</a>.</li>
+          <li><dfn title="row titles">titles</dfn> &mdash; any number of human-readable titles for the row, each of which MAY have an associated language code as defined by [[!BCP47]].</li>
           <li><dfn title="row referenced rows">referenced rows</dfn> &mdash; a possibly empty list of pairs of a <a title="table foreign keys">foreign key</a> and a row in a table within the same <a>group of tables</a> (which may be another row in the table in which this row appears).</li>
           <li><dfn title="row source number">source number</dfn> &mdash; the position of the row in the original <a title="table url">url</a> of the table, starting from 1, or <code>null</code>.</li>
           <li><dfn title="row table">table</dfn> &mdash; the <a>table</a> in which the row appears.</li>
@@ -898,16 +899,16 @@ Link: &lt;http://example.org/country_slice.csv&gt;; rel="describes"; type="text/
         </section>
       </section>
       <section class="informative">
-        <h3>Displaying Tables</h3>
+        <h3>Presenting Tables</h3>
         <p>
-          When displaying tables, implementations should:
+          When presenting tables, implementations should:
         </p>
         <ul>
           <li>use the <a title="table direction">direction</a> annotation on each <a>table</a>, and the <a title="cell text direction">text direction</a> annotation on each cell, to determine the ordering of columns and characters within cells, as described in <a href="#bidirectional-tables" class="sectionRef"></a></li>
-          <li>use the <a title="column titles">titles</a> annotation on each <a>column</a> to provide a header for the column, selecting the first title in a language based on the user's locale and preferences</li>
+          <li>use the <a title="column titles">titles</a> annotation on each <a>column</a> to provide a header for the column, selecting the first title in a language based on the user's locale and preferences, as described in <a href="#row-and-column-labelling" class="sectionRef"></a></li>
           <li>add links to headers based on the <a title="cell property URL">property URLs</a> of the cells in the first row of the table</li>
-          <li>display <a title="cell value">cell values</a>, particularly boolean, numeric and date/time values, in a lexical form based on the user's locale and preferences</li>
-          <li>add links to the display of rows and cells based on the <a title="cell about URL">about URL</a> and <a title="cell value URL">value URL</a> annotations on cells</li>
+          <li>present <a title="cell value">cell values</a>, particularly boolean, numeric and date/time values, in a lexical form based on the user's locale and preferences</li>
+          <li>add links to the presentation of rows and cells based on the <a title="cell about URL">about URL</a> and <a title="cell value URL">value URL</a> annotations on cells</li>
           <li>highlight or otherwise indicate cells with <a title="cell errors">errors</a></li>
           <li>provide a way of viewing non-core <a title="annotation">annotations</a> on table groups, tables, columns, rows and cells</li>
           <li>provide links to download the raw <a>tabular data file</a> that is being displayed</li>
@@ -932,6 +933,32 @@ Link: &lt;http://example.org/country_slice.csv&gt;; rel="describes"; type="text/
           <p>
             Thus, as defined by the <abbr title="Unicode Bidirectional Algorithm">UBA</abbr>, if a cell contains no characters with a strong type (if it's a number or date for example) then the way the cell is displayed should be determined by the <a title="cell text direction">text direction</a> annotation of the cell. However, when the cell contains characters with a strong type (such as letters) then they should be displayed according to the Unicode Bidirectional Algorithm as described in [[!BIDI]].
           </p>
+        </section>
+        <section>
+          <h4>Column and row labelling</h4>
+          <p>
+            The labelling of columns and rows helps those who are attempting to understand the content of a table to grasp what a particular cell means. Implementations should present appropriate titles for columns, and ensure that the most important information in a row is kept apparent to the user, to aid their understanding. For example:
+          </p>
+          <ul>
+            <li>a table presented on the screen might retain certain columns in view so that readers can easily glance at the identifying information in each row</li>
+            <li>as the user moves focus into a cell, screen readers announce a label for the new column if the user has changed column, or for the new row if the user has changed row</li>
+          </ul>
+          <p>
+            When labelling a column, either on the screen or aurally, implementations should use the first available of:
+          </p>
+          <ol>
+            <li>the column's <a title="column titles">titles</a> in the preferred language of the user, or with an undefined language if there is no title available in a preferred language; there may be multiple such titles in which case all should be announced</li>
+            <li>the column's <a title="column name">name</a></li>
+            <li>the column's <a title="column name">number</a></li>
+          </ol>
+          <p>
+            When labelling a row, either on the screen or aurally, implementations should use the first available of:
+          </p>
+          <ol>
+            <li>the row's <a title="row titles">titles</a> in the preferred language of the user, or with an undefined language if there is no title available in a preferred language; there may be multiple such titles in which case all should be announced</li>
+            <li>the <a title="cell value">values</a> of the cells in the row's <a title="row primary key">primary key</a></li>
+            <li>the row's <a title="row name">number</a></li>
+          </ol>
         </section>
       </section>
       <section>
@@ -2262,6 +2289,7 @@ TEXTDATA =  %x20-21 / %x23-2B / %x2D-7E
         <ul>
           <li>Merging of metadata files has been removed as it was determined not to be necessary.</li>
           <li>Embedded metadata now used for compatibility check only, or as metadata if no other is found.</li>
+          <li>The <a title="row titles">titles</a> annotation has been added to rows, and a section added describing the way in which screen readers should announce rows and columns to users</li>
         </ul>
       </section>
       <section>
