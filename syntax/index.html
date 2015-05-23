@@ -216,7 +216,7 @@
           <li><dfn title="table notes">notes</dfn> &mdash; any number of additional annotations on the table. This annotation may be empty.</li>
           <li><dfn title="table rows">rows</dfn> &mdash; the list of <a title="row">rows</a> in the table. A table MUST have one or more rows and the order of the rows within the list is significant and MUST be preserved by applications.</li>
           <li><dfn title="table schema">schema</dfn> &mdash; a URL referencing a schema applied to this table, or <code>null</code>.</li>
-          <li><dfn title="table suppress output">suppress output</dfn> &mdash; a boolean that indicates whether or not this table should be suppressed in any output generated from the converting the <a>group of tables</a> that this table belongs to into another format, as described in <a href="#converting-tables" class="sectionRef"></a>.</li>
+          <li><dfn title="table suppress output">suppress output</dfn> &mdash; a boolean that indicates whether or not this table should be suppressed in any output generated from converting the <a>group of tables</a>, that this table belongs to, into another format, as described in <a href="#converting-tables" class="sectionRef"></a>.</li>
           <li><dfn title="table transformations">transformations</dfn> &mdash; a (possibly empty) list of specifications for converting this table into other formats, as defined in [[!tabular-metadata]].</li>
           <li><dfn title="table url">url</dfn> &mdash; the URL of the source of the data in the table, or <code>null</code> if this is undefined.</li>
         </ul>
@@ -330,13 +330,14 @@
           <li>the datatype <code>json</code>, a sub-type of <code>string</code>, which indicates the value is serialized JSON</li>
         </ul>
         <figure id="fig-datatypes" style="text-align:center">
-          <img src="datatypes.svg" style="width: 50%" alt="Built-in Datatype Hierarchy diagram"/>
+          <img src="datatypes.svg" style="width: 50%" alt="Built-in Datatype Hierarchy diagram" longdesc="datatypes.html#imageDescription"/>
           <figcaption>Diagram showing the built-in datatypes, based on [[!xmlschema11-2]]; names in paranthesis denote aliases to the [[!xmlschema11-2]] terms (see the diagram in <a href="datatypes.svg">SVG</a> or <a href="datatypes.png">PNG</a> formats)</figcaption>
         </figure>
         <p>The <a>core annotations</a> of a datatype are:</p>
         <ul>
           <li><dfn title="datatype base">base</dfn> &mdash; a string representing the datatype identifier from the set defined above. All <a title="cell value">values</a> of the datatype MUST be valid values of the base datatype.</li>
           <li><dfn title="datatype format">format</dfn> &mdash; a string or object that defines the format of a value of this type, used when parsing a <a>cell string value</a> as described in <a href="#parsing-cells"></a>.</li>
+          <li><dfn title="datatype id">id</dfn> &mdash; the absolute URL for an external definition describing further restrictions on the <a>datatype base</a>, or <code>null</code> if undefined; <strong>converters</strong> SHOULD use this URL when serializing values of this datatype. Processors MAY use this annotation to perform additional validation on column values using this datatype.</li>
           <li><dfn title="datatype length">length</dfn> &mdash; a number that the exact length of a <a>cell string value</a> as described in <a href="#length-constraints" class="sectionRef"></a>.</li>
           <li><dfn title="datatype minimum length">minimum length</dfn> &mdash; a number that the minimum length of a <a>cell string value</a> as described in <a href="#length-constraints" class="sectionRef"></a>.</li>
           <li><dfn title="datatype maximum length">maximum length</dfn> &mdash; a number that the maximum length of a <a>cell string value</a> as described in <a href="#length-constraints" class="sectionRef"></a>.</li>
@@ -347,6 +348,9 @@
         </ul>
         <p>
           Datatypes MAY have any number of additional <a title="annotation">annotations</a>. The annotations on a datatype provide metadata about the datatype such as title or description. These arise from <a href="http://w3c.github.io/csvw/metadata/#dfn-common-property" class="externalDFN">common properties</a> defined on datatype descriptions within metadata documents, as defined in [[!tabular-metadata]].
+        </p>
+        <p class="note">
+          The <a title="datatype id">id</a> annotation may reference an XSD, OWL or other datatype definition, which is not used by this specification for validating column values, but may be useful for processor implementations.
         </p>
         <section>
           <h3>Length Constraints</h3>
@@ -450,6 +454,14 @@ Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
         <p>
           If the metadata file found at this location does not explicitly include a reference to the requested <a>tabular data file</a> then it MUST be ignored.
         </p>
+
+        <div class="note">
+          <p>The <code>Link</code> header of the <em>metadata file</em> MAY include references to the CSV files it describes, using the <code>describes</code> relationship. For example, in the <a href="https://raw.githubusercontent.com/w3c/csvw/gh-pages/examples/countries.json">countries' metadata example</a>, the server might return the following headers:</p>
+          <pre>Link: &lt;http://example.org/countries.csv&gt;; rel="describes"; type="text/csv"
+Link: &lt;http://example.org/country_slice.csv&gt;; rel="describes"; type="text/csv"</pre>
+
+          <p>However, locating the metadata SHOULD NOT depend on this mechanism.</p>
+        </div>
       </section>
       <section>
         <h3>Standard File Metadata</h3>

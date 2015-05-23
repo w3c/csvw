@@ -875,7 +875,7 @@ CSVW,foaf:Project,table;data;conversion
             <li>If either <a>column description</a> has neither <a href="#column-name"><code>name</code></a> nor <a href="#column-titles"><code>titles</code></a> properties.</li>
             <li>If there is a case-sensitive match between the <a href="#column-name"><code>name</code></a> properties of the columns.</li>
             <li>If there is a non-empty case-sensitive intersection between the <a href="#column-titles"><code>titles</code></a> values, where matches must have a matching language; <code>und</code> matches any language, and languages match if they are equal when <a href="https://tools.ietf.org/html/bcp47#section-4.4.2">truncated</a>, as defined in [[!BCP47]], to the length of the shortest language tag.</li>
-            <li>If not validating, and there is a non-empty case-insensitive intersection between the percent-decoded <a href="#column-name"><code>name</code></a> and <a href="#column-titles"><code>titles</code></a> values where language is ignored.</li>
+            <li>If not validating, and one schema has a <a href="#column-name"><code>name</code></a> property but not a <a href="#column-titles"><code>titles</code></a> property, and the other has a <a href="#column-titles"><code>titles</code></a> property but not a <a href="#column-name"><code>name</code></a> property.</li>
           </ul>
           <p class="note">A <a>column description</a> within embedded metadata where the <a href="#dialect-header"><code>header</code></a> dialect property is <code>false</code> will have neither <a href="#column-name"><code>name</code></a> nor <a href="#column-titles"><code>titles</code></a> properties.</p>
         </section>
@@ -1631,7 +1631,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             <li>the datatype <code>json</code>, a sub-type of <code>string</code>, which indicates the value is serialized JSON</li>
           </ul>
           <figure id="fig-datatypes" style="text-align:center">
-            <img src="datatypes.svg" style="width: 50%" alt="Built-in Datatype Hierarchy diagram"/>
+            <img src="datatypes.svg" style="width: 50%" alt="Built-in Datatype Hierarchy diagram" longdesc="datatypes.html#imageDescription" />
             <figcaption>Diagram showing the built-in datatypes, based on [[!xmlschema11-2]]; names in paranthesis denote aliases to the [[!xmlschema11-2]] terms (see the diagram in <a href="datatypes.svg">SVG</a> or <a href="datatypes.png">PNG</a> formats)</figcaption>
           </figure>
         </section>
@@ -1706,6 +1706,14 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
               <p>
                 An <a>atomic property</a> that contains a single number or string that is the maximum valid value (exclusive). The value of this property becomes the <a href="http://w3c.github.io/csvw/syntax/#dfn-datatype-maximum-exclusive" class="externalDFN">maximum exclusive</a> annotation for the described <a href="http://w3c.github.io/csvw/syntax/#dfn-datatype" class="externalDFN">datatype</a>. See <cite><a href="http://w3c.github.io/csvw/syntax/#value-constraints" class="sectionRef">Value Constraints</a></cite> in [[!tabular-data-model]] for details.
               </p>
+            </dd>
+            <dt id="datatype-id"><code>@id</code></dt>
+            <dd>
+              <p>If included, <code>@id</code> is a <a>link property</a> that references an external definition further restricting values of this datatype. The value of this property becomes the <a href="http://w3c.github.io/csvw/syntax/#dfn-datatype-id" class="externalDFN">id</a> annotation for the described <a href="http://w3c.github.io/csvw/syntax/#dfn-datatype" class="externalDFN">datatype</a>. It MUST NOT start with <code>_:</code>.</p>
+            </dd>
+            <dt id="datatype-type"><code>@type</code></dt>
+            <dd>
+              <p>If included, <code>@type</code> is an <a>atomic property</a> that MUST be set to <code>"Datatype"</code>. Publishers MAY include this to provide additional information to JSON-LD based toolchains.</p>
             </dd>
           </dl>
           <p>
@@ -1960,6 +1968,9 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
         The JSON-LD context, located at <code><a href="http://www.w3.org/ns/csvw.jsonld">http://www.w3.org/ns/csvw.jsonld</a></code> is used with metadata documents. When used within a metadata document,
         the context can be referenced as <code>http://www.w3.org/ns/csvw</code>.
         See [[csvw-context]] for a full description of defined <a href="http://www.w3.org/TR/json-ld/#dfn-term" class="externalDFN">terms</a> and <a href="http://www.w3.org/TR/json-ld/#dfn-prefix" class="externalDFN">prefixes</a>. This context may be updated from time-to-time to define new terms and prefixes.
+      </p>
+      <p class="note">
+        A JSON-LD processor retrieving the context will use <cite><a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec12.html">content negotiation</a></cite> to request the resource at <code>http://www.w3.org/ns/csvw</code> with an <code>Accept: application/ld+json</code> HTTP header as defined in <cite><a href="http://www.w3.org/TR/json-ld-api/#remote-document-and-context-retrieval">Remote Document and Context Retrieval</a></cite> in [[!JSON-LD-API]]. Without this header, this resource will return an HTML representation of the <code>csvw</code> namespace. All serializations of this resource also define the metadata vocabulary using <cite><a href="http://www.w3.org/TR/rdf-schema/">RDFS</a></cite>.
       </p>
     </section>
     <section class="appendix" id="changes">
