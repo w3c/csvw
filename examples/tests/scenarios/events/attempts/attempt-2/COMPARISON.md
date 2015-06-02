@@ -1,4 +1,8 @@
 
+Comparison of RML and W3C CSVW w.r.t. the Event CSV mapping example.
+
+Dan Brickley <danbri@google.com>
+
 1. RML version (Turtle notation)
 
 This is what (R2)RML looks like for this mapping:
