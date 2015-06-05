@@ -1,5 +1,27 @@
 #! /usr/bin/env ruby
 # Parse test manifest to create driver and area-specific test manifests
+#
+# Manifest has the following columns:
+#
+#  * test - test number, used for naming test files, in the form "testnnn" the test manifest
+#  * name - name of the test, used for mf:name on the test entry
+#  * comment
+#    description of the test, used for rdfs:comment on the test entry
+#  * approval - Approval status of the test, one of rdft:Approved, rdft:Proposed, or rdft:Rejected.
+#  * rdf - TRUE or FALSE indicating if an RDF Evaluation Test is generated
+#  * json - TRUE or FALSE indicating if a JSON Evaluation Test is generated
+#  * validate - TRUE or FALSE indicating if a Validation Test is generated
+#  * test-type - if negative, all tests are Negative tests. If warning, the validation test is a WarningValidationTest, if invalid, RDF and JSON tests are positive, but the validation test is a NegativeValidationTest
+#  * action-metadata - indicates that the `action` is a metadata file
+#  * user-metadata - Generates a user metadata file
+#  * link-metadata - Generates a Link metadata file, and uses the HttpLink property
+#  * file-metadata - Generates file metadata
+#  * directory-metadata - Generates directory-metadata, and places the tests in a separate directory
+#  * extra - other options
+#   * implicit - adds additional implicit files to the teset
+#   * action - overrides the action file used
+#   * dir - if "true" uses expects test files to be in a directory
+#   * minimal - if "true" expects minimal output
 
 require 'getoptlong'
 require 'csv'
@@ -43,7 +65,7 @@ class Manifest
     columns = []
     csv.shift.each_with_index {|c, i| columns[i] = c.to_sym if c}
 
-    @tests = csv.map do |line|
+    @tests = csv.select {|l| l[0]}.map do |line|
       entry = {}
       # Create entry as object indexed by symbolized column name
       line.each_with_index {|v, i| entry[columns[i]] = v ? v.gsub("\r", "\n").gsub("\\", "\\\\") : nil}
@@ -73,7 +95,7 @@ class Manifest
           end
         end
         
-        test.result = extras.fetch(:result, "#{test.id}/result.") if extras[:rdf] || extras[:json]
+        test.result = extras.fetch(:result, "#{test.id}/result.") if (extras[:rdf] || extras[:json]) && !extras[:negative]
 
         test.user_metadata = "#{test.id}/user-metadata.json" if entry[:"user-metadata"] == "TRUE"
         test.link_metadata = "#{test.id}/linked-metadata.json" if entry[:"link-metadata"] == "TRUE"
@@ -89,7 +111,7 @@ class Manifest
             "#{test.id}.csv"
           end
         end
-        test.result = extras.fetch(:result, "#{test.id}.") if extras[:rdf] || extras[:json]
+        test.result = extras.fetch(:result, "#{test.id}.") if (extras[:rdf] || extras[:json]) && !extras[:negative]
         
         test.user_metadata = "#{test.id}-user-metadata.json" if entry[:"user-metadata"] == "TRUE"
         test.link_metadata = "#{test.id}-linked-metadata.json" if entry[:"link-metadata"] == "TRUE"
@@ -120,8 +142,8 @@ class Manifest
     case
     when test.option[:negative]
       case variant
-      #when :rdf         then "csvt:ToRdfTest"
-      #when :json        then "csvt:ToJsonTest"
+      when :rdf         then "csvt:NegativeRdfTest"
+      when :json        then "csvt:NegativeJsonTest"
       when :validation  then "csvt:NegativeValidationTest"
       end
     when test.option[:invalid]
@@ -155,7 +177,7 @@ class Manifest
       "id": "@id",
       "type": "@type",
       "action": {"@id": "mf:action",  "@type": "@id"},
-      "approval": {"@id": "csvt:approval", "@type": "@id"},
+      "approval": {"@id": "rdft:approval", "@type": "@id"},
       "comment": "rdfs:comment",
       "contentType": "csvt:contentType",
       "entries": {"@id": "mf:entries", "@type": "@id", "@container": "@list"},
@@ -257,7 +279,7 @@ class Manifest
       output << ":#{test.id} a #{test_class(test, variant)};"
       output << %(  mf:name "#{test.name}";)
       output << %(  rdfs:comment "#{test.comment}";)
-      output << %(  csvt:approval #{(test.approval ? "csvt:#{test.approval}" : "csvt:Proposed")};)
+      output << %(  rdft:approval #{(test.approval ? "rdft:#{test.approval}" : "rdft:Proposed")};)
       output << %(  csvt:option [\n    csvt:noProv true;)
       output << %(    csvt:metadata <#{test.user_metadata}>;) if test.user_metadata
       output << %(    csvt:minimal true;) if test.option[:minimal]
