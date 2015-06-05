@@ -65,7 +65,7 @@ class Manifest
     columns = []
     csv.shift.each_with_index {|c, i| columns[i] = c.to_sym if c}
 
-    @tests = csv.map do |line|
+    @tests = csv.select {|l| l[0]}.map do |line|
       entry = {}
       # Create entry as object indexed by symbolized column name
       line.each_with_index {|v, i| entry[columns[i]] = v ? v.gsub("\r", "\n").gsub("\\", "\\\\") : nil}
@@ -95,7 +95,7 @@ class Manifest
           end
         end
         
-        test.result = extras.fetch(:result, "#{test.id}/result.") if extras[:rdf] || extras[:json]
+        test.result = extras.fetch(:result, "#{test.id}/result.") if (extras[:rdf] || extras[:json]) && !extras[:negative]
 
         test.user_metadata = "#{test.id}/user-metadata.json" if entry[:"user-metadata"] == "TRUE"
         test.link_metadata = "#{test.id}/linked-metadata.json" if entry[:"link-metadata"] == "TRUE"
@@ -111,7 +111,7 @@ class Manifest
             "#{test.id}.csv"
           end
         end
-        test.result = extras.fetch(:result, "#{test.id}.") if extras[:rdf] || extras[:json]
+        test.result = extras.fetch(:result, "#{test.id}.") if (extras[:rdf] || extras[:json]) && !extras[:negative]
         
         test.user_metadata = "#{test.id}-user-metadata.json" if entry[:"user-metadata"] == "TRUE"
         test.link_metadata = "#{test.id}-linked-metadata.json" if entry[:"link-metadata"] == "TRUE"
