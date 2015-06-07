@@ -41,9 +41,9 @@
 csvw: a owl:Ontology;
   dc:title "CSVW Namespace Vocabulary Terms"@en;
   dc:description """This document describes the RDFS vocabulary description used in the Metadata Vocabulary for Tabular Data [[tabular-metadata]] along with the default JSON-LD Context."""@en;
-  dc:date "2015-05-21"^^xsd:date;
+  dc:date "2015-06-04"^^xsd:date;
   dc:imports <http://www.w3.org/ns/prov>;
-  owl:versionInfo <https://github.com/w3c/csvw/commit/a77c956b09c46908afa3de00fb1f3d1d10425758>;
+  owl:versionInfo <https://github.com/w3c/csvw/commit/051f46f5b9cce6f654db937114b53b1a193cb442>;
   rdfs:seeAlso <http://www.w3.org/TR/tabular-metadata>;
   .
 
@@ -182,8 +182,10 @@ csvw:encoding a rdf:Property;
   rdfs:isDefinedBy csvw: .
 csvw:foreignKey a rdf:Property;
   rdfs:label "foreign key"@en;
-  rdfs:comment """An array property of foreign key definitions that define how the values from specified columns within this table link to rows within this table or other tables."""@en;
-  rdfs:domain csvw:Schema;
+  rdfs:comment """For a Table: a list of foreign keys on the table.
+
+For a Schema: an array property of foreign key definitions that define how the values from specified columns within this table link to rows within this table or other tables."""@en;
+  rdfs:domain [ owl:unionOf (csvw:Table csvw:Schema)];
   rdfs:range csvw:ForeignKey;
   rdfs:isDefinedBy csvw: .
 csvw:format a rdf:Property;
@@ -295,8 +297,10 @@ csvw:pattern a rdf:Property;
   rdfs:isDefinedBy csvw: .
 csvw:primaryKey a rdf:Property;
   rdfs:label "primary key"@en;
-  rdfs:comment """A column reference property that holds either a single reference to a column description object or an array of references."""@en;
-  rdfs:domain csvw:Schema;
+  rdfs:comment """For Schema: A column reference property that holds either a single reference to a column description object or an array of references.
+
+For Row: a possibly empty list of cells whose values together provide a unique identifier for this row. This is similar to the name of a column."""@en;
+  rdfs:domain [ owl:unionOf (csvw:Schema csvw:Row)];
   rdfs:range xsd:string;
   rdfs:isDefinedBy csvw: .
 csvw:propertyUrl a rdf:Property;
@@ -316,6 +320,11 @@ csvw:reference a rdf:Property;
   rdfs:comment """An object property that identifies a referenced table and a set of referenced columns within that table."""@en;
   rdfs:domain csvw:ForeignKey;
   rdfs:range csvw:TableReference;
+  rdfs:isDefinedBy csvw: .
+csvw:referencedRow a rdf:Property;
+  rdfs:label "referenced rows"@en;
+  rdfs:comment """A possibly empty list of pairs of a foreign key and a row in a table within the same group of tables."""@en;
+  rdfs:domain csvw:Row;
   rdfs:isDefinedBy csvw: .
 csvw:required a rdf:Property;
   rdfs:label "required"@en;

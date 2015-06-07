@@ -247,6 +247,9 @@
       "@id": "csvw:reference",
       "@type": "@id"
     },
+    "referencedRow": {
+      "@id": "csvw:referencedRow"
+    },
     "required": {
       "@id": "csvw:required",
       "@type": "xsd:boolean"
@@ -430,11 +433,11 @@
     "dc:description": {
       "en": "This document describes the RDFS vocabulary description used in the Metadata Vocabulary for Tabular Data [[tabular-metadata]] along with the default JSON-LD Context."
     },
-    "dc:date": "2015-05-21",
+    "dc:date": "2015-06-04",
     "owl:imports": [
       "http://www.w3.org/ns/prov"
     ],
-    "owl:versionInfo": "https://github.com/w3c/csvw/commit/a77c956b09c46908afa3de00fb1f3d1d10425758",
+    "owl:versionInfo": "https://github.com/w3c/csvw/commit/051f46f5b9cce6f654db937114b53b1a193cb442",
     "rdfs:seeAlso": [
       "http://www.w3.org/TR/tabular-metadata"
     ],
@@ -769,9 +772,14 @@
           "en": "foreign key"
         },
         "rdfs:comment": {
-          "en": "An array property of foreign key definitions that define how the values from specified columns within this table link to rows within this table or other tables."
+          "en": "For a Table: a list of foreign keys on the table.\n\nFor a Schema: an array property of foreign key definitions that define how the values from specified columns within this table link to rows within this table or other tables."
         },
-        "rdfs:domain": "csvw:Schema",
+        "rdfs:domain": {
+          "owl:unionOf": [
+            "csvw:Table",
+            "csvw:Schema"
+          ]
+        },
         "rdfs:range": "csvw:ForeignKey"
       },
       {
@@ -1027,9 +1035,14 @@
           "en": "primary key"
         },
         "rdfs:comment": {
-          "en": "A column reference property that holds either a single reference to a column description object or an array of references."
+          "en": "For Schema: A column reference property that holds either a single reference to a column description object or an array of references.\n\nFor Row: a possibly empty list of cells whose values together provide a unique identifier for this row. This is similar to the name of a column."
         },
-        "rdfs:domain": "csvw:Schema",
+        "rdfs:domain": {
+          "owl:unionOf": [
+            "csvw:Schema",
+            "csvw:Row"
+          ]
+        },
         "rdfs:range": "xsd:string"
       },
       {
@@ -1074,6 +1087,17 @@
         },
         "rdfs:domain": "csvw:ForeignKey",
         "rdfs:range": "csvw:TableReference"
+      },
+      {
+        "@id": "csvw:referencedRow",
+        "@type": "rdf:Property",
+        "rdfs:label": {
+          "en": "referenced rows"
+        },
+        "rdfs:comment": {
+          "en": "A possibly empty list of pairs of a foreign key and a row in a table within the same group of tables."
+        },
+        "rdfs:domain": "csvw:Row"
       },
       {
         "@id": "csvw:required",

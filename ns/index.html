@@ -9,7 +9,7 @@ var respecConfig = {
     localBiblio: localBibliography,
     specStatus: "base",
     shortName: "csvwns",
-    publishDate:  "2015-05-21",
+    publishDate:  "2015-06-04",
     edDraftURI: "http://w3c.github.io/csvw/ns/",
     // lcEnd: "3000-01-01",
     // crEnd: "3000-01-01",
@@ -84,11 +84,11 @@ var respecConfig = {
         These versions may also be retrieved from <code>http://www.w3.org/ns/csvw</code> using an appropiate HTTP <em>Accept</em> header.
       </p>
       <dl>
-        <dt>Published:</dt><dd><time property="dc:date">2015-05-21</time></dd>
+        <dt>Published:</dt><dd><time property="dc:date">2015-06-04</time></dd>
         <dt>Imports:</dt>
           <dd><a href="http://www.w3.org/ns/prov" property="owl:imports">http://www.w3.org/ns/prov</a></dd>
         <dt>Version Info:</dt>
-        <dd><a href="https://github.com/w3c/csvw/commit/a77c956b09c46908afa3de00fb1f3d1d10425758" property="owl:versionInfo">https://github.com/w3c/csvw/commit/a77c956b09c46908afa3de00fb1f3d1d10425758</a></dd>
+        <dd><a href="https://github.com/w3c/csvw/commit/051f46f5b9cce6f654db937114b53b1a193cb442" property="owl:versionInfo">https://github.com/w3c/csvw/commit/051f46f5b9cce6f654db937114b53b1a193cb442</a></dd>
         <dt>See Also:</dt>
           <dd><a href="http://www.w3.org/TR/tabular-metadata" property="rdfs:seeAlso">http://www.w3.org/TR/tabular-metadata</a></dd>
       </dl>
@@ -423,13 +423,19 @@ var respecConfig = {
         <tr><td class="bold">foreignKey</td>
           <td resource="csvw:foreignKey" typeof="rdf:Property">
             <em property="rdfs:label">foreign key</em>
-            <p property="rdfs:comment">An array property of foreign key definitions that define how the values from specified columns within this table link to rows within this table or other tables.</p>
+            <p property="rdfs:comment">For a Table: a list of foreign keys on the table.
+
+For a Schema: an array property of foreign key definitions that define how the values from specified columns within this table link to rows within this table or other tables.</p>
             <span property="rdfs:isDefinedBy" resource="csvw:"></span>
               <dl class="terms">
                   <dt>rdfs:range</dt>
                       <dd property="rdfs:range" resource="csvw:ForeignKey">csvw:ForeignKey</dd>
                   <dt>rdfs:domain</dt>
-                      <dd property="rdfs:domain" resource="csvw:Schema">csvw:Schema</dd>
+                      <dd property="rdfs:domain" resource="_:">
+                        Union of
+                        <span property="owl:unionOf" inlist=true resource="csvw:Table">csvw:Table</span>
+                        <span property="owl:unionOf" inlist=true resource="csvw:Schema">csvw:Schema</span>
+                      </dd>
               </dl>
           </td>
         </tr>
@@ -694,13 +700,19 @@ var respecConfig = {
         <tr><td class="bold">primaryKey</td>
           <td resource="csvw:primaryKey" typeof="rdf:Property">
             <em property="rdfs:label">primary key</em>
-            <p property="rdfs:comment">A column reference property that holds either a single reference to a column description object or an array of references.</p>
+            <p property="rdfs:comment">For Schema: A column reference property that holds either a single reference to a column description object or an array of references.
+
+For Row: a possibly empty list of cells whose values together provide a unique identifier for this row. This is similar to the name of a column.</p>
             <span property="rdfs:isDefinedBy" resource="csvw:"></span>
               <dl class="terms">
                   <dt>rdfs:range</dt>
                       <dd property="rdfs:range" resource="xsd:string">xsd:string</dd>
                   <dt>rdfs:domain</dt>
-                      <dd property="rdfs:domain" resource="csvw:Schema">csvw:Schema</dd>
+                      <dd property="rdfs:domain" resource="_:">
+                        Union of
+                        <span property="owl:unionOf" inlist=true resource="csvw:Schema">csvw:Schema</span>
+                        <span property="owl:unionOf" inlist=true resource="csvw:Row">csvw:Row</span>
+                      </dd>
               </dl>
           </td>
         </tr>
@@ -746,6 +758,17 @@ var respecConfig = {
                       <dd property="rdfs:range" resource="csvw:TableReference">csvw:TableReference</dd>
                   <dt>rdfs:domain</dt>
                       <dd property="rdfs:domain" resource="csvw:ForeignKey">csvw:ForeignKey</dd>
+              </dl>
+          </td>
+        </tr>
+        <tr><td class="bold">referencedRow</td>
+          <td resource="csvw:referencedRow" typeof="rdf:Property">
+            <em property="rdfs:label">referenced rows</em>
+            <p property="rdfs:comment">A possibly empty list of pairs of a foreign key and a row in a table within the same group of tables.</p>
+            <span property="rdfs:isDefinedBy" resource="csvw:"></span>
+              <dl class="terms">
+                  <dt>rdfs:domain</dt>
+                      <dd property="rdfs:domain" resource="csvw:Row">csvw:Row</dd>
               </dl>
           </td>
         </tr>
@@ -1652,6 +1675,10 @@ For a Transformation: A link property giving the single URL of the file that the
         <dd>
             csvw:reference
             with string values interpreted as @id
+        </dd>
+        <dt>referencedRow</dt>
+        <dd>
+            csvw:referencedRow
         </dd>
         <dt>required</dt>
         <dd>
