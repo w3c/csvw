@@ -486,14 +486,14 @@ Link: &lt;http://example.org/country_slice.csv&gt;; rel="describes"; type="text/
           In this case, processors MUST retrieve the file from the well-known URI <code>/.well-known/csvm</code>. (Well-known URIs are defined by [[!RFC5785]].) If no such file is located, processors MUST proceed as if this file were found with the content:
         </p>
         <pre>
-{+base}-metadata.json
+{+url}-metadata.json
 metadata.json
         </pre>
         <p>
           This file MUST contain a URI template, as defined by [[!URI-TEMPLATE]], on each line. Starting with the first such URI template, processors MUST:
         </p>
         <ol>
-          <li>Expand the URI template, with the variable <code>base</code> being set to the URL of the requested <a>tabular data file</a> (with any fragment component of that URL removed).</li>
+          <li>Expand the URI template, with the variable <code>url</code> being set to the URL of the requested <a>tabular data file</a> (with any fragment component of that URL removed).</li>
           <li>Resolve the resulting URL against the URL of the requested <a>tabular data file</a>.</li>
           <li>Attempt to retrieve a metadata document at that URL.</li>
           <li>If no metadata document is found at that location, or if the metadata file found at the location does not explicitly include a reference to the relevant <a>tabular data file</a>, perform these same steps on the next URI template, otherwise use that metadata document.</li>
@@ -502,9 +502,9 @@ metadata.json
           For example, if the <a>tabular data file</a> is at <code>http://example.org/south-west/devon.csv</code> then processors must attempt to locate a well-known file at <code>http://example.org/.well-known/csvm</code>. If that file contains:
         </p>
         <pre class="example">
-{+base}.json
+{+url}.json
 csvm.json
-/csvm?file={base}
+/csvm?file={url}
         </pre>
         <p>
           the processor will first look for <code>http://example.org/south-west/devon.csv.json</code>. If there is no metadata file in that location, it will then look for <code>http://example.org/south-west/csvm.json</code>. Finally, if that also fails, it will look for <code>http://example.org/csvm?file=http://example.org/south-west/devon.csv.json</code>.
