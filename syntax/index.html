@@ -400,12 +400,11 @@
       <ol>
         <li>metadata supplied by the user of the implementation that is processing the tabular data, see <a href="#overriding-metadata" class="sectionRef"></a></li>
         <li>metadata in a document linked to using a <code>Link</code> header associated with the <a>tabular data file</a>, see <a href="#link-header" class="sectionRef"></a></li>
-        <li>file-specific metadata in a document located based on the location of the <a>tabular data file</a>, see <a href="#standard-file-metadata" class="sectionRef"></a></li>
-        <li>directory-specific metadata in a document located based on the location of the <a>tabular data file</a>, see <a href="#standard-directory-metadata" class="sectionRef"></a></li>
+        <li>metadata located through a site-wide location configuration, see <a href="#site-wide-location-configuration" class="sectionRef"></a></li>
         <li>metadata embedded within the <a>tabular data file</a> itself, see <a href="#embedded-metadata" class="sectionRef"></a></li>
       </ol>
       <p>
-        Processors MUST use the first metadata found for processing a <a>tabular data file</a> by using overriding metadata, if provided. Otherwise processors MUST attempt to locate the first metadata document from the <code>Link</code> header, the file-specific metadata, or the directory-specific metadata. If no metadata is supplied or found, processors MUST use <a>embedded metadata</a>. If the metadata does not originate from the embedded metadata, <a>validators</a> MUST verify that the <a href="http://w3c.github.io/csvw/metadata/#dfn-table-group-description" class="externalDFN">table group description</a> within that metadata is <a href="http://w3c.github.io/csvw/metadata/#dfn-table-group-description-compatibility" class="externalDFN">compatible</a> with that in the <a>embedded metadata</a>, as defined in [[!tabular-metadata]].
+        Processors MUST use the first metadata found for processing a <a>tabular data file</a> by using overriding metadata, if provided. Otherwise processors MUST attempt to locate the first metadata document from the <code>Link</code> header or the metadata located through site-wide configuration. If no metadata is supplied or found, processors MUST use <a>embedded metadata</a>. If the metadata does not originate from the embedded metadata, <a>validators</a> MUST verify that the <a href="http://w3c.github.io/csvw/metadata/#dfn-table-group-description" class="externalDFN">table group description</a> within that metadata is <a href="http://w3c.github.io/csvw/metadata/#dfn-table-group-description-compatibility" class="externalDFN">compatible</a> with that in the <a>embedded metadata</a>, as defined in [[!tabular-metadata]].
       </p>
       <section>
         <h3>Overriding Metadata</h3>
@@ -479,33 +478,39 @@ Link: &lt;http://example.org/country_slice.csv&gt;; rel="describes"; type="text/
         </div>
       </section>
       <section>
-        <h3>Standard File Metadata</h3>
+        <h3>Site-wide Location Configuration</h3>
         <p>
-          If the user has not supplied a metadata file as overriding metadata, described in <a href="#overriding-metadata" class="sectionRef"></a>, and no applicable metadata file has been discovered through a <code>Link</code> header, described in <a href="#link-header" class="sectionRef"></a>, processors MUST attempt to locate a file-specific metadata document. This method MUST NOT be used if the URL of the <a>tabular data file</a> contains a query component.
+          If the user has not supplied a metadata file as overriding metadata, described in <a href="#overriding-metadata" class="sectionRef"></a>, and no applicable metadata file has been discovered through a <code>Link</code> header, described in <a href="#link-header" class="sectionRef"></a>, processors MUST attempt to locate a metadata documents through site-wide configuration.
         </p>
         <p>
-          In this case, processors MUST construct a URL for the file-specific metadata document by appending <code>-metadata.json</code> to the location of the <a>tabular data file</a> (with any fragment component of that URL removed) and attempt to retrieve a metadata document from that location.
+          In this case, processors MUST retrieve the file from the well-known URI <code>/.well-known/csvm</code>. (Well-known URIs are defined by [[!RFC5785]].) If no such file is located, processors MUST proceed as if this file were found with the content:
+        </p>
+        <pre>
+{base}-metadata.json
+metadata.json
+        </pre>
+        <p>
+          This file MUST contain a URI template, as defined by [[!URI-TEMPLATE]] on each line. Starting with the first such URI template, processors MUST:
+        </p>
+        <ol>
+          <li>Expand the URI template, with the variable <code>base</code> being set to the URL of the requested <a>tabular data file</a> (with any fragment component of that URL removed).</li>
+          <li>Resolve the resulting URL against the URL of the requested <a>tabular data file</a>.</li>
+          <li>Attempt to retrieve a metadata document at that URL.</li>
+          <li>If no metadata document is found at that location, or if the metadata file found at the location does not explicitly include a reference to the relevant <a>tabular data file</a>, perform these same steps on the next URI template, otherwise use that metadata document.</li>
+        </ol>
+        <p>
+          For example, if the <a>tabular data file</a> is at <code>http://example.org/south-west/devon.csv</code> then processors must attempt to locate a well-known file at <code>http://example.org/.well-known/csvm</code>. If that file contains:
+        </p>
+        <pre class="example">
+{base}.json
+csvm.json
+/csvm?file={base}
+        </pre>
+        <p>
+          the processor will first look for <code>http://example.org/south-west/devon.csv.json</code>. If there is no metadata file in that location, it will then look for <code>http://example.org/south-west/csvm.json</code>. Finally, if that also fails, it will look for <code>http://example.org/csvm?file=http://example.org/south-west/devon.csv.json</code>.
         </p>
         <p>
-          For example, if the <a>tabular data file</a> is at <code>http://example.org/south-west/devon.csv</code> then processors must attempt to locate a metadata document at <code>http://example.org/south-west/devon.csv-metadata.json</code>. On the other hand, if the <a>tabular data file</a> is at <code>http://example.com/index.php?file=43178.csv</code> then, because the URL of the tabular data file includes a query component, the processor must not attempt to look for a file-specific metadata document.
-        </p>
-        <p>
-          If the metadata file found at this location does not explicitly include a reference to the relevant <a>tabular data file</a> then it MUST be ignored.
-        </p>
-      </section>
-      <section>
-        <h3>Standard Directory Metadata</h3>
-        <p>
-          If the user has not supplied a metadata file as overriding metadata, described in <a href="#overriding-metadata" class="sectionRef"></a>, and no applicable metadata file has been discovered through a <code>Link</code> header, described in <a href="#link-header" class="sectionRef"></a>, or from the standard file metadata location, described in <a href="#standard-file-metadata" class="sectionRef"></a>, processors MUST attempt to locate a directory-level metadata document. This method MUST NOT be used if the URL of the <a>tabular data file</a> contains a query component.
-        </p>
-        <p>
-          Processors MUST locate and retrieve the common metadata document for a directory by resolving the relative URL <code>metadata.json</code> against the base URL of the <a>tabular data file</a> and fetching the resulting URL.
-        </p>
-        <p>
-          For example, if the <a>tabular data file</a> is at <code>http://example.org/south-west/devon.csv</code> then processors must attempt to locate a metadata file at <code>http://example.org/south-west/metadata.json</code>. On the other hand, if the tabular data file is at <code>http://example.com/index.php?file=43178.csv</code> then, because the URL of the tabular data file includes a query component, the processor must not attempt to look for a directory-level metadata document.
-        </p>
-        <p>
-          If the metadata file found at this location does not explicitly include a reference to the relevant <a>tabular data file</a> then it MUST be ignored.
+          If no file were found at <code>http://example.org/.well-known/csvm</code>, the processor will use the default locations and try to retrieve metadata from <code>http://example.org/south-west/devon.csv-metadata.json</code> and, if unsuccessful, <code>http://example.org/south-west/metadata.json</code>.
         </p>
       </section>
       <section>
