@@ -432,7 +432,7 @@ $ csvlint data.csv --schema:schema.json
           to supply a schema that describes the contents of the file, against which it can be validated.
         </p>
         <p>
-          Metadata supplied in this way is called overriding, or user-supplied, metadata. Implementations SHOULD define how any options they define are mapped into the vocabulary defined in [[!tabular-metadata]]. If the user selects existing metadata files, implementations MUST NOT use metadata located through the Link header (as described in <a href="#link-header" class="sectionRef"></a>), file-specific metadata (as described in <a href="#standard-file-metadata" class="sectionRef"></a>) or directory-specific metadata (as described in <a href="#standard-directory-metadata" class="sectionRef"></a>).
+          Metadata supplied in this way is called overriding, or user-supplied, metadata. Implementations SHOULD define how any options they define are mapped into the vocabulary defined in [[!tabular-metadata]]. If the user selects existing metadata files, implementations MUST NOT use metadata located through the Link header (as described in <a href="#link-header" class="sectionRef"></a>) or site-wide location configuration (as described in <a href="#site-wide-location-configuration" class="sectionRef"></a>).
         </p>
         <p class="note">
           Users should ensure that any metadata from those locations that they wish to use is explicitly incorporated into the overriding metadata that they use to process tabular data. Processors may provide facilities to make this easier by automatically merging metadata files from different locations, but this specification does not define how such merging is carried out.
@@ -490,7 +490,7 @@ Link: &lt;http://example.org/country_slice.csv&gt;; rel="describes"; type="text/
 metadata.json
         </pre>
         <p>
-          This file MUST contain a URI template, as defined by [[!URI-TEMPLATE]] on each line. Starting with the first such URI template, processors MUST:
+          This file MUST contain a URI template, as defined by [[!URI-TEMPLATE]], on each line. Starting with the first such URI template, processors MUST:
         </p>
         <ol>
           <li>Expand the URI template, with the variable <code>base</code> being set to the URL of the requested <a>tabular data file</a> (with any fragment component of that URL removed).</li>
@@ -572,7 +572,7 @@ csvm.json
         If a validator is passed a <a>tabular data file</a> <code>http://example.org/east-sussex-2015-03.csv</code>,
         the validator would use the metadata located from the CSV file: the first metadata file found through the <code>Link</code> headers found when retrieving that file, or at <code>http://example.org/east-sussex-2015-03.csv-metadata.json</code> or <code>http://example.org/metadata.json</code>.
       </p>
-      <p class="note">Starting with a metadata file can remove the need to perform additional requests to locate linked, file-specific, or directory-specific metadata</p> 
+      <p class="note">Starting with a metadata file can remove the need to perform additional requests to locate linked metadata, or metadata retrieved through site-wide location configuration</p> 
       <section>
         <h2>Creating Annotated Tables</h2>
         <p>After locating metadata, metadata is <a href="http://w3c.github.io/csvw/metadata/#dfn-normalization" class="externalDFN">normalized</a> and coerced into a single <a href="http://w3c.github.io/csvw/metadata/#dfn-table-group-description" class="externalDFN">table group description</a>. When starting with a metadata file, this involves normalizing the provided metadata file and verifying that the <a>embedded metadata</a> for each <a>tabular data file</a> referenced from the metadata is <a href="http://w3c.github.io/csvw/metadata/#dfn-table-group-description-compatibility" class="externalDFN">compatible</a> with the metadata. When starting with a <a>tabular data file</a>, this involves locating the first metadata file as described in <a href="#locating-metadata" class="sectionRef"></a> and normalizing into a single descriptor.
@@ -584,8 +584,7 @@ csvm.json
             <ol class="algorithm">
               <li>metadata supplied by the user (see <a href="#overriding-metadata" class="sectionRef"></a>).</li>
               <li>metadata referenced from a <em>Link Header</em> that may be returned when retrieving the tabular data file (see <a href="#link-header" class="sectionRef"></a>).</li>
-              <li>file-specific metadata in a document located based on the location of the tabular data file (see <a href="#standard-file-metadata" class="sectionRef"></a>).</li>
-              <li>directory-specific metadata in a document located based on the location of the tabular data file (see <a href="#standard-directory-metadata" class="sectionRef"></a>).</li>
+              <li>metadata retrieved through a site-wide location configuration (see <a href="#site-wide-location-configuration" class="sectionRef"></a>).</li>
               <li><a>embedded metadata</a> as defined in <a href="#embedded-metadata" class="sectionRef"></a> with a single <code>tables</code> entry where the <code>url</code> property is set from that of the <a>tabular data file</a>.</li>
             </ol>
           </li>
@@ -2159,6 +2158,19 @@ UNICEF,Education,Teacher training,Chocó,Bojayá
           </p>
         </section>
       </section>
+    </section>
+    <section class="appendix">
+      <h2>IANA Considerations</h2>
+      <p>This section has <strong>not yet been submitted</strong> to IANA for review, approval, and registration.</p>
+      <h3>/.well-known/csvm</h3>
+      <dl>
+        <dt>URI suffix:</dt>
+        <dd>csvm</dd>
+        <dt>Change controller:</dt>
+        <dd>W3C</dd>
+        <dt>Specification document(s):</dt>
+        <dd>This document, <a href="#site-wide-location-configuration" class="sectionRef"></a></dd>
+      </dl>
     </section>
     <section class="appendix informative" id="standards">
       <h2>Existing Standards</h2>
