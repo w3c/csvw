@@ -399,7 +399,7 @@
         In the methods of locating metadata described here, metadata is provided within a single document. The syntax of such documents is defined in [[!tabular-metadata]]. Metadata is located using a specific orer of precedence:
       </p>
       <ol>
-        <li>metadata supplied by the user of the implementation that is processing the tabular data, see <a href="#overriding-metadata" class="sectionRef"></a.></li>
+        <li>metadata supplied by the user of the implementation that is processing the tabular data, see <a href="#overriding-metadata" class="sectionRef"></a>.</li>
         <li>metadata in a document linked to using a <code>Link</code> header associated with the <a>tabular data file</a>, see <a href="#link-header" class="sectionRef"></a>.</li>
         <li>metadata located through a site-wide location configuration, see <a href="#site-wide-location-configuration" class="sectionRef"></a>.</li>
         <li>metadata embedded within the <a>tabular data file</a> itself, see <a href="#embedded-metadata" class="sectionRef"></a>.</li>
@@ -467,7 +467,7 @@ Link: &lt;metadata.json&gt;; rel="describedBy"; type="application/csvm+json"
           an implementation must use the referenced <code>metadata.json</code> to supply metadata for processing the file.
         </p>
         <p>
-          If the metadata file found at this location does not explicitly include a reference to the requested <a>tabular data file</a> then it MUST be ignored.
+          If the metadata file found at this location does not explicitly include a reference to the requested <a>tabular data file</a> then it MUST be ignored. URLs MUST be normalized as described in <a href="#url-normalization" class="sectionRef"></a>.
         </p>
 
         <div class="note">
@@ -619,6 +619,11 @@ csvm.json
       <section>
         <h2>Metadata Compatibility</h2>
         <p>When processing a <a>tabular data file</a> using metadata as discovered using <a href="#locating-metadata" class="sectionRef"></a>, processors MUST ensure that the metadata and <a>tabular data file</a> are compatible, this is typically done by extracting <a>embedded metadata</a> from the <a>tabular data file</a> and determining that the provided or discovered metadata is compatible with the <a>embedded metadata</a> using the procedure defined in <cite><a href="http://w3c.github.io/csvw/metadata/#table-compatibility">Table Compatibility</a></cite> in [[!tabular-metadata]].</p>
+      </section>
+      <section>
+        <h2>URL Normalization</h2>
+        <p>Metadata Discovery and Compatibility involve comparing URLs. When comparing URLs, processors MUST use <cite><a href="https://tools.ietf.org/html/rfc3986#section-6.2.2" class="externalDFN">Syntax-Based Normalization</a></cite> as defined in [[!RFC3968]]. Processors MUST perform <cite><a href="https://tools.ietf.org/html/rfc3986#section-6.2.3" class="externalDFN">Scheme-Based Normalization</a></cite> for HTTP (<code>80</code>) and HTTPS (<code>443</code>) and SHOULD perform <cite><a href="https://tools.ietf.org/html/rfc3986#section-6.2.3" class="externalDFN">Scheme-Based Normalization</a></cite> for other well-known schems.</p>
+          <p class="issue" data-number="562">What is generally considered good practice for this in other specifications?</p>
       </section>
       <section>
         <h2>Parsing Cells</h2>
@@ -852,6 +857,7 @@ csvm.json
             The following time formats MUST be recognized by implementations:
           </p>
           <ul>
+            <li><code>HH:mm:ss.S</code> with one or more trailing <code>S</code> characters indicating the maximum number of fractional seconds e.g., <code>HH:mm:ss.SSS</code> for <code>15:02:37.143</code></li>
             <li><code>HH:mm:ss</code> e.g., <code>15:02:37</code></li>
             <li><code>HHmmss</code> e.g., <code>150237</code></li>
             <li><code>HH:mm</code> e.g., <code>15:02</code></li>
@@ -861,6 +867,7 @@ csvm.json
             The following date/time formats MUST be recognized by implementations:
           </p>
           <ul>
+            <li><code>yyyy-MM-ddTHH:mm:ss.S</code> with one or more trailing <code>S</code> characters indicating the maximum number of fractional seconds e.g., <code>yyyy-MM-ddTHH:mm:ss.SSS</code> for <code>2015-03-15T15:02:37.143</code></li>
             <li><code>yyyy-MM-ddTHH:mm:ss</code> e.g., <code>2015-03-15T15:02:37</code></li>
             <li><code>yyyy-MM-ddTHH:mm</code> e.g., <code>2015-03-15T15:02</code></li>
             <li>any of the date formats above, followed by a single space, followed by any of the time formats above, e.g., <code>M/d/yyyy HH:mm</code> for <code>3/22/2015 15:02</code> or <code>dd.MM.yyyy HH:mm:ss</code> for <code>22.03.2015 15:02:37</code></li>
