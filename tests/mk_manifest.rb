@@ -209,7 +209,7 @@ class Manifest
         "type" => test_class(test, variant),
         "name" => test.name,
         "comment" => test.comment,
-        "approval" => (test.approval ? "csvt:#{test.approval}" : "csvt:Proposed"),
+        "approval" => (test.approval ? "rdft:#{test.approval}" : "rdft:Proposed"),
         "option" => {"noProv" => true},
         "action" => test.action,
       }
