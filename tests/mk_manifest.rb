@@ -168,7 +168,7 @@ class Manifest
       "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
       "mf": "http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#",
       "mq": "http://www.w3.org/2001/sw/DataAccess/tests/test-query#",
-      "csvt": "http://w3c.github.io/csvw/test-vocab#",
+      "csvt": "http://www.w3.org/2013/csvw/tests/vocab#",
       "id": "@id",
       "type": "@type",
       "action": {"@id": "mf:action",  "@type": "@id"},
@@ -256,7 +256,7 @@ class Manifest
 @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix mf:   <http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#> .
-@prefix csvt: <http://w3c.github.io/csvw/tests/vocab#> .
+@prefix csvt: <http://www.w3.org/2013/csvw/tests/vocab#> .
 
 <manifest-#{variant}>  a mf:Manifest ;
 )
