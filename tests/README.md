@@ -33,7 +33,7 @@ Tests may have options which should be used to change processor behavior:
 
 Tests may also have a `csvt:link` property indicating an HTTP Link header which should be returned when serving the `mf:action` file; processors should act as if this value was received in an HTTP request if it is not otherwise set.
 
-The home of the test suite is <http://w3c.github.io/csvw/tests/>.
+The home of the test suite is <http://www.w3.org/2013/csvw/tests/>.
 The base IRI for parsing each file is `mf:action`.  For example, the test test001j and
 test001r require relative IRI resolution against a base of
-<http://w3c.github.io/csvw/tests/test001.csv>.
+<http://www.w3.org/2013/csvw/tests/test001.csv>.
