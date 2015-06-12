@@ -209,7 +209,7 @@ class Manifest
         "action" => test.action,
       }
 
-      entry["result"] = "#{test.result}#{EXTENTIONS[variant]}" if [:rdf, :json].include?(variant)
+      entry["result"] = "#{test.result}#{EXTENTIONS[variant]}" if [:rdf, :json].include?(variant) && !test.option[:negative]
       entry["implicit"] = test.option[:implicit] unless test.option[:implicit].empty?
       entry["httpLink"] = %(<#{test.link_metadata.split('/').last}>; rel="describedby") if test.link_metadata
 
@@ -281,7 +281,7 @@ class Manifest
       output << %(  ];)
       output << %(  csvt:httpLink "<#{test.link_metadata.split('/').last}>; rel=\\"describedby\\"";) if test.link_metadata
       output << %(  mf:action <#{test.action}>;)
-      output << %(  mf:result <#{test.result}#{EXTENTIONS[variant]}>;) if [:rdf, :json].include?(variant)
+      output << %(  mf:result <#{test.result}#{EXTENTIONS[variant]}>;) if [:rdf, :json].include?(variant) && !test.option[:negative]
       output << %(  csvt:contentType "#{test.option[:contentType]}";) if test.option[:contentType]
 
       implicit = test.option[:implicit].map {|f| "<#{f}>"}.join(",\n    ")
