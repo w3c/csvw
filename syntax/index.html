@@ -2309,6 +2309,60 @@ TEXTDATA =  %x20-21 / %x23-2B / %x2D-7E
       </div>
     </section>
     <section class="appendix informative">
+      <h2>Embedding Metadata in HTML Documents</h2>
+      <p>HTML [[!HTML]] <code>script</code> tags can be used to embed data blocks in documents. Metadata [[!tabular-metadata]] describing one or more <a title="tabular data file">tabular data files</a> can embedded in HTML, which can be used as an alternative way to publish datasets.</p>
+      <p>The content should be placed in a <code>script</code> tag with the <code>type</code> set to <code>application/csvm+json</code>. The character encoding of the embedded metadata will match the HTML documents encoding.</p>
+      <pre class="example highlight" title="Metadata in HTML">
+&lt;script type=&quot;application/csvm+json&quot;&gt;
+{
+  &quot;@context&quot;: [&quot;http://www.w3.org/ns/csvw&quot;, {&quot;@language&quot;: &quot;en&quot;}],
+  &quot;url&quot;: &quot;tree-ops.csv&quot;,
+  &quot;dc:title&quot;: &quot;Tree Operations&quot;,
+  &quot;dcat:keyword&quot;: [&quot;tree&quot;, &quot;street&quot;, &quot;maintenance&quot;],
+  &quot;dc:publisher&quot;: {
+    &quot;schema:name&quot;: &quot;Example Municipality&quot;,
+    &quot;schema:url&quot;: {&quot;@id&quot;: &quot;http://example.org&quot;}
+  },
+  &quot;dc:license&quot;: {&quot;@id&quot;: &quot;http://opendefinition.org/licenses/cc-by/&quot;},
+  &quot;dc:modified&quot;: {&quot;@value&quot;: &quot;2010-12-31&quot;, &quot;@type&quot;: &quot;xsd:date&quot;},
+  &quot;tableSchema&quot;: {
+    &quot;columns&quot;: [{
+      &quot;name&quot;: &quot;GID&quot;,
+      &quot;titles&quot;: [&quot;GID&quot;, &quot;Generic Identifier&quot;],
+      &quot;dc:description&quot;: &quot;An identifier for the operation on a tree.&quot;,
+      &quot;datatype&quot;: &quot;string&quot;,
+      &quot;required&quot;: true
+    }, {
+      &quot;name&quot;: &quot;on_street&quot;,
+      &quot;titles&quot;: &quot;On Street&quot;,
+      &quot;dc:description&quot;: &quot;The street that the tree is on.&quot;,
+      &quot;datatype&quot;: &quot;string&quot;
+    }, {
+      &quot;name&quot;: &quot;species&quot;,
+      &quot;titles&quot;: &quot;Species&quot;,
+      &quot;dc:description&quot;: &quot;The species of the tree.&quot;,
+      &quot;datatype&quot;: &quot;string&quot;
+    }, {
+      &quot;name&quot;: &quot;trim_cycle&quot;,
+      &quot;titles&quot;: &quot;Trim Cycle&quot;,
+      &quot;dc:description&quot;: &quot;The operation performed on the tree.&quot;,
+      &quot;datatype&quot;: &quot;string&quot;
+    }, {
+      &quot;name&quot;: &quot;inventory_date&quot;,
+      &quot;titles&quot;: &quot;Inventory Date&quot;,
+      &quot;dc:description&quot;: &quot;The date of the operation that was performed.&quot;,
+      &quot;datatype&quot;: {&quot;base&quot;: &quot;date&quot;, &quot;format&quot;: &quot;M/d/yyyy&quot;}
+    }],
+    &quot;primaryKey&quot;: &quot;GID&quot;,
+    &quot;aboutUrl&quot;: &quot;#gid-{GID}&quot;
+  }
+}
+</script>
+      </pre>
+      <p>Depending on how the HTML document is served, certain strings may need to be escaped.</p>
+      <p>Processing embedded metadata is the same as processing metadata retrieved directly, using the location of the HTML document as base URL of the metadata document, except that the metadata is first extracted from the <code>script</code> element. A metadata document parsed from an HTML DOM will be a stream of character data rather than a stream of UTF-8 encoded bytes. No decoding is necessary if the HTML document has already been parsed into DOM. Each matching <code>script</code> data block is considered to be it's own metadata document.</p>
+    </section>
+    <section class="appendix informative">
       <h2>Acknowledgements</h2>
       <div data-include="../acknowledgements.html"></div>
     </section>
