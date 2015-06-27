@@ -17,6 +17,7 @@
         previousMaturity: "WD",
         previousURI: "http://www.w3.org/TR/2015/WD-tabular-data-model-20150416/",
         edDraftURI: "http://w3c.github.io/csvw/syntax/",
+        testSuiteURI: "http://www.w3.org/2013/csvw/tests/",
         // lcEnd: "3000-01-01",
         // crEnd: "3000-01-01",
         editors: [{
@@ -769,7 +770,7 @@ csvm.json
             <dt><dfn title="datatype format groupChar">groupChar</dfn></dt>
             <dd>A string whose value is used to group digits within the number. The default value is <code>","</code>.</dd>
             <dt><dfn title="datatype format pattern">pattern</dfn></dt>
-            <dd>A regular expression string, in the syntax and interpreted as defined by [[!ECMASCRIPT]].</dd>
+            <dd>A regular expression string, with syntax and processing defined by [[!ECMASCRIPT]].</dd>
           </dl>
           <p class="note">
             Authors are encouraged to be conservative in the regular expressions that they use, sticking to the basic features of regular expressions that are likely to be supported across implementations.
@@ -817,7 +818,7 @@ csvm.json
             Boolean values may be represented in many ways aside from the standard <code>1</code> and <code>0</code> or <code>true</code> and <code>false</code>.
           </p>
           <p>
-            If the <a>datatype base</a> for a cell is <code>boolean</code>, the <a>datatype format</a> annotation provides the true and false values expected, separated by <code>|</code>. For example if <code>format</code> is <code>Y|N</code> then cells must hold either <code>Y</code> or <code>N</code> with <code>Y</code> meaning <code>true</code> and <code>N</code> meaning <code>false</code>.
+            If the <a>datatype base</a> for a cell is <code>boolean</code>, the <a>datatype format</a> annotation provides the true value followed by the false value, separated by <code>|</code>. For example if <code>format</code> is <code>Y|N</code> then cells must hold either <code>Y</code> or <code>N</code> with <code>Y</code> meaning <code>true</code> and <code>N</code> meaning <code>false</code>.
           </p>
           <p>
             The resulting <a>cell value</a> will be one or more boolean <code>true</code> or <code>false</code> values.
@@ -899,7 +900,7 @@ csvm.json
             Durations MUST be formatted and interpreted as defined in [[!xmlschema11-2]], using the [[!ISO8601]] format <code>-?P<var>n</var>Y<var>n</var>M<var>n</var>DT<var>n</var>H<var>n</var>M<var>n</var>S</code>. For example, the duration <code>P1Y1D</code> is used for a year and a day; the duration <code>PT2H30M</code> for 2 hours and 30 minutes.
           </p>
           <p>
-            If the <a>datatype base</a> is a duration type, the <a>datatype format</a> annotation provides a regular expression for the string values, in the syntax and processed as defined by [[!ECMASCRIPT]].
+            If the <a>datatype base</a> is a duration type, the <a>datatype format</a> annotation provides a regular expression for the string values, with syntax and processing defined by [[!ECMASCRIPT]].
           </p>
           <p class="note">
             Authors are encouraged to be conservative in the regular expressions that they use, sticking to the basic features of regular expressions that are likely to be supported across implementations.
@@ -911,7 +912,7 @@ csvm.json
         <section>
           <h3>Formats for other types</h3>
           <p>
-            If the <a>datatype base</a> is not numeric, <code>boolean</code>, a date/time type, or a duration type, the <a>datatype format</a> annotation provides a regular expression for the string values, in the syntax and processed as defined by [[!ECMASCRIPT]].
+            If the <a>datatype base</a> is not numeric, <code>boolean</code>, a date/time type, or a duration type, the <a>datatype format</a> annotation provides a regular expression for the string values, with syntax and processing defined by [[!ECMASCRIPT]].
           </p>
           <p class="note">
             Authors are encouraged to be conservative in the regular expressions that they use, sticking to the basic features of regular expressions that are likely to be supported across implementations.
@@ -931,7 +932,7 @@ csvm.json
         </p>
         <ul>
           <li>use the <a title="table direction">direction</a> annotation on each <a>table</a>, and the <a title="cell text direction">text direction</a> annotation on each cell, to determine the ordering of columns and characters within cells, as described in <a href="#bidirectional-tables" class="sectionRef"></a></li>
-          <li>use the <a title="column titles">titles</a> annotation on each <a>column</a> to provide a header for the column, selecting the first title in a language based on the user's locale and preferences, as described in <a href="#row-and-column-labelling" class="sectionRef"></a></li>
+          <li>use the <a title="column titles">titles</a> annotation on each <a>column</a> to provide a header for the column, selecting the first title in a language based on the user's locale and preferences, as described in <a href="#column-and-row-labelling" class="sectionRef"></a></li>
           <li>add links to headers based on the <a title="cell property URL">property URLs</a> of the cells in the first row of the table</li>
           <li>present <a title="cell value">cell values</a>, particularly boolean, numeric and date/time values, in a lexical form based on the user's locale and preferences</li>
           <li>add links to the presentation of rows and cells based on the <a title="cell about URL">about URL</a> and <a title="cell value URL">value URL</a> annotations on cells</li>
@@ -948,7 +949,7 @@ csvm.json
             The <a title="table direction">direction</a> annotation on the table provides information about the desired display of the table. If <a title="table direction">direction</a> is <code>ltr</code> then the first column should be displayed on the left and the last column on the right. If <a title="table direction">direction</a> is <code>rtl</code> then the first column should be displayed on the right and the last column on the left.
           </p>
           <p>
-            If <a title="table direction">direction</a> is <code>default</code> then tables should be displayed with attention to the bidirectionality of the content of the file. Specifically, the values of the cells in the table should be scanned breadth first: from the first cell in the first column through to the last cell in the first row, down to the last cell in the last column. If the first character in the table with a <a href="http://unicode.org/reports/tr9/#Bidirectional_Character_Types">strong type</a> as defined in [[!BIDI]] indicates a <abbr title="right-to-left">RTL</abbr> directionality, the table should be displayed with the first column on the right and the last column on the left. Otherwise, the table should be displayed with the first column on the left and the last column on the right. Characters such as whitespace, quotes, commas, and numbers do not have a strong type, and therefore are skipped when identifying the character that determines the directionality of the table.
+            If <a title="table direction">direction</a> is <code>auto</code> then tables should be displayed with attention to the bidirectionality of the content of the file. Specifically, the values of the cells in the table should be scanned breadth first: from the first cell in the first column through to the last cell in the first row, down to the last cell in the last column. If the first character in the table with a <a href="http://unicode.org/reports/tr9/#Bidirectional_Character_Types">strong type</a> as defined in [[!BIDI]] indicates a <abbr title="right-to-left">RTL</abbr> directionality, the table should be displayed with the first column on the right and the last column on the left. Otherwise, the table should be displayed with the first column on the left and the last column on the right. Characters such as whitespace, quotes, commas, and numbers do not have a strong type, and therefore are skipped when identifying the character that determines the directionality of the table.
           </p>
           <p>
             Implementations should enable user preferences to override the indicated metadata about the directionality of the table.
@@ -995,7 +996,7 @@ csvm.json
         <ul>
           <li>if the <a href="http://w3c.github.io/csvw/metadata/#dfn-table-description" class="externalDFN">table description</a> is not compatible with the <a>embedded metadata</a> extracted from the <a>tabular data file</a>, as defined in <cite><a href="http://w3c.github.io/csvw/metadata/#table-compatibility">Table Compatibility</a> </cite> in [[!tabular-metadata]].</li>
           <li>if there is more than one <a>row</a> with the same <a title="row primary key">primary key</a>, that is where the <a title="cell">cells</a> listed for the primary key for the row have the same <a title="cell value">values</a> as the cells listed for the primary key for another row,</li>
-          <li>for each <a>row</a> that does not have a <a title="row referenced rows">referenced row</a> for each of the <a title="table foreign keys">foreign keys</a> on the <a>table</a> in which the row appears, or</li>
+          <li>for each <a>row</a> that does not have a unique <a title="row referenced rows">referenced row</a> for each of the <a title="table foreign keys">foreign keys</a> on the <a>table</a> in which the row appears, or</li>
           <li>for each <a title="cell errors">error</a> on each <a>cell</a>.</li>
         </ul>
         <p>
@@ -1055,7 +1056,7 @@ Content-Type: text/csv;charset=ISO-8859-1
       <section id="line-endings">
         <h3>Line Endings</h3>
         <p>
-          The ends of rows in a CSV file should be either <code>CRLF</code> (<code>U+000D U+000A</code>) or <code>LF</code> (<code>U+000A</code>). Line endings within escaped <a title="cell">cells</a> are not normalized.
+          The ends of rows in a CSV file should be <code>CRLF</code> (<code>U+000D U+000A</code>) but may be <code>LF</code> (<code>U+000A</code>). Line endings within escaped <a title="cell">cells</a> are not normalised.
         </p>
       </section>
       <section id="lines">
@@ -2336,6 +2337,7 @@ TEXTDATA =  %x20-21 / %x23-2B / %x2D-7E
           <li>Merging of metadata files has been removed as it was determined not to be necessary.</li>
           <li>Embedded metadata now used for compatibility check only, or as metadata if no other is found.</li>
           <li>The <a title="row titles">titles</a> annotation has been added to rows, and a section added describing the way in which screen readers should announce rows and columns to users</li>
+          <li>A Datatype description may have an <a title="datatype id">id</a> annotation to reference an external datatype definition in XSD, OWL, or some other format.</li>
         </ul>
       </section>
       <section>

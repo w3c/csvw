@@ -15,8 +15,6 @@
 #  * action-metadata - indicates that the `action` is a metadata file
 #  * user-metadata - Generates a user metadata file
 #  * link-metadata - Generates a Link metadata file, and uses the HttpLink property
-#  * file-metadata - Generates file metadata
-#  * directory-metadata - Generates directory-metadata, and places the tests in a separate directory
 #  * extra - other options
 #   * implicit - adds additional implicit files to the teset
 #   * action - overrides the action file used
@@ -54,7 +52,7 @@ class Manifest
   }
   attr_accessor :prefixes, :terms, :properties, :classes, :instances, :datatypes
 
-  Test = Struct.new(:id, :name, :comment, :approval, :option, :action, :result, :user_metadata, :link_metadata, :file_metadata, :directory_metadata)
+  Test = Struct.new(:id, :name, :comment, :approval, :option, :action, :result, :user_metadata, :link_metadata)
 
   attr_accessor :tests
 
@@ -84,7 +82,7 @@ class Manifest
       extras[:invalid] = entry[:"test-type"] == "invalid"
       test = Test.new(entry[:test], entry[:name], entry[:comment], entry[:approval], extras)
 
-      if entry[:"directory-metadata"] == "TRUE" || test.option[:dir]
+      if test.option[:dir]
         test.action = extras.fetch(:action) do
           # action-metadata indicates that processing starts with metadata, not CSV
           if entry[:"action-metadata"] == "TRUE"
@@ -99,8 +97,6 @@ class Manifest
 
         test.user_metadata = "#{test.id}/user-metadata.json" if entry[:"user-metadata"] == "TRUE"
         test.link_metadata = "#{test.id}/linked-metadata.json" if entry[:"link-metadata"] == "TRUE"
-        test.file_metadata = "#{test.action}-metadata.json" if entry[:"file-metadata"] == "TRUE"
-        test.directory_metadata = "#{test.id}/metadata.json" if entry[:"directory-metadata"] == "TRUE"
       else
         test.action = extras.fetch(:action) do
           # action-metadata indicates that processing starts with metadata, not CSV
@@ -115,10 +111,9 @@ class Manifest
         
         test.user_metadata = "#{test.id}-user-metadata.json" if entry[:"user-metadata"] == "TRUE"
         test.link_metadata = "#{test.id}-linked-metadata.json" if entry[:"link-metadata"] == "TRUE"
-        test.file_metadata = "#{test.action}-metadata.json" if entry[:"file-metadata"] == "TRUE"
       end
       test.option[:implicit] = Array(test.option[:implicit])
-      test.option[:implicit] += [test.user_metadata, test.link_metadata, test.file_metadata, test.directory_metadata].compact
+      test.option[:implicit] += [test.user_metadata, test.link_metadata].compact
       test
     end
   end
@@ -126,7 +121,7 @@ class Manifest
   # Create files referenced in the manifest
   def create_files
     tests.each do |test|
-      FileUtils.mkdir(test.id.to_s) unless Dir.exist?(test.id.to_s) if test.directory_metadata || test.option[:dir]
+      FileUtils.mkdir(test.id.to_s) unless Dir.exist?(test.id.to_s) if test.option[:dir]
       files = []
       files << test.action.split('?').first
       files += test.option[:implicit]
@@ -173,7 +168,7 @@ class Manifest
       "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
       "mf": "http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#",
       "mq": "http://www.w3.org/2001/sw/DataAccess/tests/test-query#",
-      "csvt": "http://w3c.github.io/csvw/test-vocab#",
+      "csvt": "http://www.w3.org/2013/csvw/tests/vocab#",
       "id": "@id",
       "type": "@type",
       "action": {"@id": "mf:action",  "@type": "@id"},
@@ -214,7 +209,7 @@ class Manifest
         "action" => test.action,
       }
 
-      entry["result"] = "#{test.result}#{EXTENTIONS[variant]}" if [:rdf, :json].include?(variant)
+      entry["result"] = "#{test.result}#{EXTENTIONS[variant]}" if [:rdf, :json].include?(variant) && !test.option[:negative]
       entry["implicit"] = test.option[:implicit] unless test.option[:implicit].empty?
       entry["httpLink"] = %(<#{test.link_metadata.split('/').last}>; rel="describedby") if test.link_metadata
 
@@ -261,7 +256,7 @@ class Manifest
 @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix mf:   <http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#> .
-@prefix csvt: <http://w3c.github.io/csvw/tests/vocab#> .
+@prefix csvt: <http://www.w3.org/2013/csvw/tests/vocab#> .
 
 <manifest-#{variant}>  a mf:Manifest ;
 )
@@ -286,7 +281,7 @@ class Manifest
       output << %(  ];)
       output << %(  csvt:httpLink "<#{test.link_metadata.split('/').last}>; rel=\\"describedby\\"";) if test.link_metadata
       output << %(  mf:action <#{test.action}>;)
-      output << %(  mf:result <#{test.result}#{EXTENTIONS[variant]}>;) if [:rdf, :json].include?(variant)
+      output << %(  mf:result <#{test.result}#{EXTENTIONS[variant]}>;) if [:rdf, :json].include?(variant) && !test.option[:negative]
       output << %(  csvt:contentType "#{test.option[:contentType]}";) if test.option[:contentType]
 
       implicit = test.option[:implicit].map {|f| "<#{f}>"}.join(",\n    ")
