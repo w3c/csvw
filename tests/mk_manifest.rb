@@ -87,7 +87,7 @@ class Manifest
           # action-metadata indicates that processing starts with metadata, not CSV
           if entry[:"action-metadata"] == "TRUE"
             test.option[:implicit] ||= "#{test.id}/action.csv"
-            "#{test.id}/metadata.json"
+            "#{test.id}/csv-metadata.json"
           else
             "#{test.id}/action.csv"
           end
