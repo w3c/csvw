@@ -951,10 +951,18 @@ Link: &lt;http://example.org/country_slice.csv&gt;; rel="describes"; type="text/
             Implementations should enable user preferences to override the indicated metadata about the directionality of the table.
           </p>
           <p>
-            Once the directionality of the table has been determined, each cell within the table should be considered as a separate <a href="http://unicode.org/reports/tr9/#The_Paragraph_Level">paragraph</a>, as defined by the Unicode Bidirectional Algorithm (<abbr title="Unicode Bidirectional Algorithm">UBA</abbr>) in [[!BIDI]]. The default directionality for the cell is determined by looking at the <a title="cell text direction">text direction</a> annotation for the cell.
+            Once the directionality of the table has been determined, each cell within the table should be considered as a separate <a href="http://unicode.org/reports/tr9/#The_Paragraph_Level">paragraph</a>, as defined by the Unicode Bidirectional Algorithm (<abbr title="Unicode Bidirectional Algorithm">UBA</abbr>) in [[!BIDI]]. The directionality for the cell is determined by looking at the <a title="cell text direction">text direction</a> annotation for the cell, as follows:
+          </p>
+          <ol>
+            <li>If the <a title="cell text direction">text direction</a> is <code>ltr</code> then the cell content should be displayed left-to-right.</li>
+            <li>If the <a title="cell text direction">text direction</a> is <code>rtl</code> then the cell content should be displayed right-to-left.</li>
+            <li>If the <a title="cell text direction">text direction</a> is <code>auto</code> then the cell content should be displayed in the direction determined by the first character in the cell with a <a href="http://unicode.org/reports/tr9/#Bidirectional_Character_Types">strong type</a> as defined in [[!BIDI]].</li>
+          </ol>
+          <p class="note">
+            If the <a href="http://w3c.github.io/csvw/metadata/#cell-textDirection" class="externalDFN">textDirection</a> property in metadata has the value <code>"inherit"</code>, the <a title="cell text direction">text direction</a> annotation for a cell inherits its value from the <a title="table direction">direction</a> annotation on the table.
           </p>
           <p>
-            Thus, as defined by the <abbr title="Unicode Bidirectional Algorithm">UBA</abbr>, if a cell contains no characters with a strong type (if it's a number or date for example) then the way the cell is displayed should be determined by the <a title="cell text direction">text direction</a> annotation of the cell. However, when the cell contains characters with a strong type (such as letters) then they should be displayed according to the Unicode Bidirectional Algorithm as described in [[!BIDI]].
+            When the <a href="column titles">titles</a> of a column are displayed, these should be displayed in the direction determined by the first character in the title with a <a href="http://unicode.org/reports/tr9/#Bidirectional_Character_Types">strong type</a> as defined in [[!BIDI]]. Titles for the same column in different languages may be displayed in different directions.
           </p>
         </section>
         <section>
@@ -1130,7 +1138,7 @@ Content-Type: text/csv;header=absent
             <li><a title="table rows">rows</a> set to an empty list</li>
             <li><a title="table id">id</a> set to <code>null</code></li>
             <li><a title="table url">url</a> set to the location of the file, if known, or <code>null</code></li>
-            <li><a title="table direction">direction</a> set to <code>ltr</code></li>
+            <li><a title="table direction">direction</a> set to <code>auto</code></li>
             <li><a title="table suppress output">suppress output</a> set to <code>false</code></li>
             <li><a title="table notes">notes</a> set to <code>false</code></li>
             <li><a title="table foreign keys">foreign keys</a> set to an empty list</li>
@@ -1228,9 +1236,19 @@ Content-Type: text/csv;header=absent
                             <li><a title="column source number">source number</a> set to <a>source column number</a></li>
                             <li><a title="column name">name</a> set to <code>null</code></li>
                             <li><a title="column titles">titles</a> set to an empty list</li>
-                            <li><a title="column datatype">datatype</a> set to <code>string</code></li>
                             <li><a title="column virtual">virtual</a> set to <code>false</code></li>
                             <li><a title="column suppress output">suppress output</a> set to <code>false</code></li>
+                            <li><a title="column datatype">datatype</a> set to <code>string</code></li>
+                            <li><a title="column default">default</a> set to an empty string</li>
+                            <li><a title="column lang">lang</a> set to <code>und</code></li>
+                            <li><a title="column null">null</a> set to an empty string</li>
+                            <li><a title="column ordered">ordered</a> set to <code>false</code></li>
+                            <li><a title="column required">required</a> set to <code>false</code></li>
+                            <li><a title="column separator">separator</a> set to <code>null</code></li>
+                            <li><a title="column text direction">text direction</a> set to <code>auto</code></li>
+                            <li><a title="column about URL">about URL</a> set to <code>null</code></li>
+                            <li><a title="column property URL">property URL</a> set to <code>null</code></li>
+                            <li><a title="column value URL">value URL</a> set to <code>null</code></li>
                             <li><a title="column cells">cells</a> set to an empty list</li>
                           </ul>
                         </li>
@@ -1245,7 +1263,8 @@ Content-Type: text/csv;header=absent
                         <li><a title="cell string value">string value</a> set to the value at index <em>i</em> in the <a>list of cell values</a></li>
                         <li><a title="cell value">value</a> set to the value at index <em>i</em> in the <a>list of cell values</a></li>
                         <li><a title="cell errors">errors</a> set to an empty list</li>
-                        <li><a title="cell text direction">text direction</a> set to <code>ltr</code></li>
+                        <li><a title="cell text direction">text direction</a> set to <code>auto</code></li>
+                        <li><a title="cell ordered">ordered</a> set to <code>false</code></li>
                         <li><a title="cell about URL">about URL</a> set to <code>null</code></li>
                         <li><a title="cell property URL">property URL</a> set to <code>null</code></li>
                         <li><a title="cell value URL">value URL</a> set to <code>null</code></li>
