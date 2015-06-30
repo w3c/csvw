@@ -485,17 +485,17 @@ Link: &lt;http://example.org/country_slice.csv&gt;; rel="describes"; type="text/
           If the user has not supplied a metadata file as overriding metadata, described in <a href="#overriding-metadata" class="sectionRef"></a>, and no applicable metadata file has been discovered through a <code>Link</code> header, described in <a href="#link-header" class="sectionRef"></a>, processors MUST attempt to locate a metadata documents through site-wide configuration.
         </p>
         <p>
-          In this case, processors MUST retrieve the file from the well-known URI <code>/.well-known/csvm</code>. (Well-known URIs are defined by [[!RFC5785]].) If no such file is located, processors MUST proceed as if this file were found with the content:
+          In this case, processors MUST retrieve the file from the well-known URI <code>/.well-known/csvm</code>. (Well-known URIs are defined by [[!RFC5785]].) If no such file is located (i.e. the response results in a client error <code>4xx</code> status code or a server error <code>5xx</code> status code), processors MUST proceed as if this file were found with the content:
         </p>
         <pre>
 {+url}-metadata.json
 csv-metadata.json
         </pre>
         <p>
-          This file MUST contain a URI template, as defined by [[!URI-TEMPLATE]], on each line. Starting with the first such URI template, processors MUST:
+          The response to retrieving <code>/.well-known/csvm</code> MAY be cached, subject to cache control directives. This includes caching an unsuccessful response such as a <code>404 Not Found</code>.
         </p>
         <p>
-          The response to retrieving <code>/.well-known/csvm</code> MAY be cached, subject to cache control directives, including the absense of the resource, as indicated by a response with status <code>404 Not Found</code> (or equivalent).
+          This file MUST contain a URI template, as defined by [[!URI-TEMPLATE]], on each line. Starting with the first such URI template, processors MUST:
         </p>
         <ol>
           <li>Expand the URI template, with the variable <code>url</code> being set to the URL of the requested <a>tabular data file</a> (with any fragment component of that URL removed).</li>
@@ -517,7 +517,7 @@ csvm.json
         <p>
           If no file were found at <code>http://example.org/.well-known/csvm</code>, the processor will use the default locations and try to retrieve metadata from <code>http://example.org/south-west/devon.csv-metadata.json</code> and, if unsuccessful, <code>http://example.org/south-west/csv-metadata.json</code>.
         </p>
-        <p class="issue atrisk" data-number="555">The use of a well-known location for defining URI patters used to locate metdata files is at risk. The working group solicits feedback on if this mechanism is useful.</p>
+        <p class="issue atrisk" data-number="555">The use of a well-known location for defining URI patters used to locate metdata files is at risk. The Working Group solicits feedback on whether this mechanism is useful and whether it represents major implementation difficulties.</p>
       </section>
       <section>
         <h3>Embedded Metadata</h3>
