@@ -152,7 +152,7 @@
            data-oninclude="updateExample">
       </pre>
       <p>
-        Given the location of the CSV file, this metadata document can be located by appending <code>-metadata.json</code> to the URL (as described in [[!tabular-data-model]]). It provides information for different types of applications:
+        This metadata file may be referenced from a <code>Link</code> header when the CSV file is retrieved, or through looking in known locations for metadata (as described in [[!tabular-data-model]]). It provides information for different types of applications:
       </p>
       <ul>
         <li><dfn>Viewers</dfn> can use the indicated metadata to provide a more user-friendly or human-readable view of the CSV file, which might include displaying it in a table, or as graphs, or charts.</li>
@@ -625,7 +625,7 @@ CSVW,foaf:Project,table;data;conversion
           The top-level object of a metadata document or object referenced through an <a>object property</a> (whether it is a <a>table group description</a>, <a>table description</a>, <a>schema</a>, <a>dialect description</a> or <a>transformation definition</a>) MUST have a <code id="context">@context</code> property. This is an <a>array property</a>, as defined in <cite><a href="http://www.w3.org/TR/json-ld/#context-definitions">Section 8.7</a></cite> of [[!JSON-LD]]. The <code>@context</code> MUST have one of the following values:</p>
         <ul>
           <li>A string value of <code>http://www.w3.org/ns/csvw</code>, or</li>
-          <li>An array composed of a string and an object, where the string is <code>http://www.w3.org/ns/csvw</code> and the object represents a local context definition, which is restricted to contain either or both of the following members:
+          <li>An array composed of a string followed by an object, where the string is <code>http://www.w3.org/ns/csvw</code> and the object represents a local context definition, which is restricted to contain either or both of the following members:
             <dl>
               <dt id="context-base"><code>@base</code></dt>
               <dd>
@@ -1100,7 +1100,6 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           <dd>
             <p>A boolean <a>atomic property</a> taking a single value which indicates whether the column is a <a href="http://w3c.github.io/csvw/syntax/#dfn-virtual-column" class="externalDFN">virtual column</a> not present in the original source. The default value is <code>false</code>. The <a title="normalization">normalized</a> value of this property becomes the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-virtual" class="externalDFN">virtual</a> annotation for the described <a href="http://w3c.github.io/csvw/syntax/#dfn-column" class="externalDFN">column</a>. If present, a virtual column MUST appear after all other non-virtual column definitions.</p>
             <p class="note">Virtual columns are useful for inserting cells with default values into an <a href="http://w3c.github.io/csvw/syntax/#dfn-annotated-table" class="externalDFN">annotated table</a> to control the results of conversions.</p>
-            <p class="issue" data-number="179">We invite comment on whether <a href="http://w3c.github.io/csvw/syntax/#dfn-virtual-column" class="externalDFN">virtual columns</a> are useful enough to include in the final recommendation in spite of the added complexity.</p>
           </dd>
           <dt id="column-ld-id"><code>@id</code></dt>
           <dd>
@@ -1198,7 +1197,6 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
             <p>
               The <a title="normalization">normalized</a> value of this property becomes the <a href="http://w3c.github.io/csvw/syntax/#dfn-column-datatype" class="externalDFN">datatype</a> annotation for the described <a href="http://w3c.github.io/csvw/syntax/#dfn-column" class="externalDFN">column</a>.
             </p>
-            <p class="issue" data-number="223">We invite comment on whether <a href="#cell-datatype"><code>datatype</code></a> should allow for a "union" of types for a cell; this would allow for a set of datatypes that could be matched against the <a href="http://w3c.github.io/csvw/syntax/#dfn-cell-string-value" class="externalDFN">string value</a> of a cell, choosing the first match; e.g., to match either a <code>date</code> or <code>datetime</code>.</p>
           </dd>
           <dt id="cell-default"><code>default</code></dt>
           <dd>
@@ -1486,7 +1484,7 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
           </dd>
           <dt id="dialect-trim"><code>trim</code></dt>
           <dd>
-            <p>An <a>atomic property</a> that, if the boolean <code>true</code>, sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-trim" class="externalDFN">trim</a> flag to <code>true</code> and if the boolean <code>false</code> to <code>false</code>. If the value provided is a string, sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-trim" class="externalDFN">trim</a> flag to the provided value, which MUST be one of <code>"true"</code>, <code>"false"</code>, <code>"start"</code>, or <code>"end"</code>. The default is <code>false</code>.</p>
+            <p>An <a>atomic property</a> that, if the boolean <code>true</code>, sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-trim" class="externalDFN">trim</a> flag to <code>true</code> and if the boolean <code>false</code> to <code>false</code>. If the value provided is a string, sets the <a href="http://w3c.github.io/csvw/syntax/#dfn-trim" class="externalDFN">trim</a> flag to the provided value, which MUST be one of <code>"true"</code>, <code>"false"</code>, <code>"start"</code>, or <code>"end"</code>. The default is <code>true</code>.</p>
           </dd>
           <dt id="dialect-ld-id"><code>@id</code></dt>
           <dd>
@@ -1955,7 +1953,12 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
         <dd>
           <dl>
             <dt>Magic number(s):</dt>
-            <dd>n/a</dd>
+            <dd>
+              None.
+              <p>
+                Although no byte sequence can be guaranteed at a specific location, a valid <code>application/csvm+json</code> document MUST somewhere contain the string <code>"@context"</code> (including quotation characters), followed by one or more whitespace, colon or open-square-bracket characters, followed by the string <code>"http://www.w3.org/ns/csvw"</code> (including quotation characters).
+              </p>
+            </dd>
             <dt>File extension(s):</dt>
             <dd>".json"</dd>
             <dt>Macintosh file type code(s):</dt>
@@ -1992,11 +1995,13 @@ Reporting Senior Post,Grade,Payscale Minimum (£),Payscale Maximum (£),Generic 
       <section>
         <h3>Changes since the working draft of 16 April 2015</h3>
         <ul>
+          <li>There has been a much crisper separation of the concept of <em>annotations</em> as part of an <a href="http://w3c.github.io/csvw/syntax/index.html#dfn-annotated-tabular-data-model" class="externalDFN">Annotated Tabular Data Model</a> and the particular metadata format defined by the current document. This clear separation led to a number of editorial changes, although it did not change the functionalities. In particular, whenever possible, the properties introduced in this document are now defined through the annotations they correspond to in the Tabular Data Model.</li>
           <li>Merging of metadata files has been removed as it was determined not to be necessary.</li>
-          <li>The <a href="#table-compatibility" class="sectionRef"></a> and <a href="#schema-compatibility" class="sectionRef"></a> were added to aide in ensuring that specified metadata and embedded metadata are compatible; this was previously performed as part of merging metadata.</li>
+          <li>The <a href="#table-compatibility" class="sectionRef"></a> and <a href="#schema-compatibility" class="sectionRef"></a> were added to aid in ensuring that specified metadata and embedded metadata are compatible; this was previously performed as part of merging metadata.</li>
           <li>The <a href="#schema-rowTitles"><code>rowTitles</code></a> property has been added to help screen readers provide cues about focus within a table.</li>
           <li>Many invalid property values now are either replaced with their default, or not set, with a warning being generated rather than causing the entire metadata to become invalid and raise an error.</li>
           <li>A Datatype description may have an <a href="#datatype-id"><code>@id</code></a> to reference an external datatype definition in XSD, OWL, or some other format.</li>
+          <li>Default value for <a href="#dialect-trim"><code>trim</code></a> changed from <code>false</code> to <code>true</code>.</li>
         </ul>
       </section>
       <section>

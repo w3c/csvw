@@ -236,7 +236,7 @@
           <li>information about the source or provenance of the data in the table, or</li>
           <li>links to other tables (e.g. to indicate tables that include related information).</li>
         </ul>
-        <p>When originating from [[!tabular-metadata]], these annotations arise from <a href="http://w3c.github.io/csvw/metadata/#dfn-common-property" class="externalDFN">common properties</a> defined on <a href="http://w3c.github.io/csvw/metadata/#dfn-table-group-description" class="externalDFN">table group descriptions</a> within metadata documents.</p>
+        <p>When originating from [[!tabular-metadata]], these annotations arise from <a href="http://w3c.github.io/csvw/metadata/#dfn-common-property" class="externalDFN">common properties</a> defined on <a href="http://w3c.github.io/csvw/metadata/#dfn-table-description" class="externalDFN">table descriptions</a> within metadata documents.</p>
       </section>
       <section>
         <h3>Columns</h3>
@@ -264,8 +264,11 @@
           <li><dfn title="column value URL">value URL</dfn> &mdash; the expected <a title="cell value URL">value URL</a> <a href="http://w3c.github.io/csvw/metadata/#dfn-uri-template-property" class="externalDFN">URI template</a> used to create the URL identifier for the <a title="annotation value">value</a> of each <a>cell</a> in this, as defined in [[!tabular-metadata]].</li>
           <li><dfn title="column virtual">virtual</dfn> &mdash; a boolean that indicates whether the column is a <a>virtual column</a>. <dfn title="virtual column">Virtual columns</dfn> are used to extend the source data with additional empty columns to support more advanced conversions; when this annotation is <code>false</code>, the column is a <dfn>real column</dfn>, which exists in the source data for the table.</li>
         </ul>
+        <p class="note">
+          Several of these annotations arise from <a href="http://w3c.github.io/csvw/metadata/#dfn-inherited-property" class="externalDFN">inherited properties</a> that may be defined within metadata on <a href="http://w3c.github.io/csvw/metadata/#dfn-table-group-description" class="externalDFN">table group</a>, <a href="http://w3c.github.io/csvw/metadata/#dfn-table-description" class="externalDFN">table</a> or individual <a href="http://w3c.github.io/csvw/metadata/#dfn-column-description" class="externalDFN">column</a> descriptions.
+        </p>
         <p>
-          Columns MAY in addition have any number of other <a title="annotation">annotations</a>, such as a description. When originating from [[!tabular-metadata]], these annotations arise from <a href="http://w3c.github.io/csvw/metadata/#dfn-common-property" class="externalDFN">common properties</a> defined on <a href="http://w3c.github.io/csvw/metadata/#dfn-table-group-description" class="externalDFN">table group descriptions</a> within metadata documents.</p>
+          Columns MAY in addition have any number of other <a title="annotation">annotations</a>, such as a description. When originating from [[!tabular-metadata]], these annotations arise from <a href="http://w3c.github.io/csvw/metadata/#dfn-common-property" class="externalDFN">common properties</a> defined on <a href="http://w3c.github.io/csvw/metadata/#dfn-column-description" class="externalDFN">column descriptions</a> within metadata documents.</p>
       </section>
       <section>
         <h3>Rows</h3>
@@ -312,6 +315,9 @@
         </ul>
         <p class="note">
           There presence or absence of quotes around a value within a CSV file is a syntactic detail that is not reflected in the tabular data model. In other words, there is no distinction in the model between the second value in <code>a,,z</code> and the second value in <code>a,"",z</code>.
+        </p>
+        <p class="note">
+          Several of these annotations arise from or are constructed based on <a href="http://w3c.github.io/csvw/metadata/#dfn-inherited-property" class="externalDFN">inherited properties</a> that may be defined within metadata on <a href="http://w3c.github.io/csvw/metadata/#dfn-table-group-description" class="externalDFN">table group</a>, <a href="http://w3c.github.io/csvw/metadata/#dfn-table-description" class="externalDFN">table</a> or <a href="http://w3c.github.io/csvw/metadata/#dfn-column-description" class="externalDFN">column</a> descriptions.
         </p>
         <p>
           Cells MAY have any number of additional <a title="annotation">annotations</a>. The annotations on a cell provide metadata about the value held in the cell, particularly when this overrides the information provided for the <a>column</a> and <a>row</a> that the cell falls within. Annotations on a cell might be:
@@ -397,17 +403,16 @@
         As described in <a href="#model" class="sectionRef"></a>, tabular data may have a number of annotations associated with it. Here we describe the different methods that can be used to locate metadata that provides those annotations.
       </p>
       <p>
-        In the methods of locating metadata described here, metadata is provided within a single document. The syntax of such documents is defined in [[!tabular-metadata]]. Metadata is located using a specific orer of precedence:
+        In the methods of locating metadata described here, metadata is provided within a single document. The syntax of such documents is defined in [[!tabular-metadata]]. Metadata is located using a specific order of precedence:
       </p>
       <ol>
         <li>metadata supplied by the user of the implementation that is processing the tabular data, see <a href="#overriding-metadata" class="sectionRef"></a>.</li>
         <li>metadata in a document linked to using a <code>Link</code> header associated with the <a>tabular data file</a>, see <a href="#link-header" class="sectionRef"></a>.</li>
-        <li>file-specific metadata in a document located based on the location of the <a>tabular data file</a>, see <a href="#standard-file-metadata" class="sectionRef"></a>.</li>
-        <li>directory-specific metadata in a document located based on the location of the <a>tabular data file</a>, see <a href="#standard-directory-metadata" class="sectionRef"></a>.</li>
+        <li>metadata located through a site-wide location configuration, see <a href="#site-wide-location-configuration" class="sectionRef"></a>.</li>
         <li>metadata embedded within the <a>tabular data file</a> itself, see <a href="#embedded-metadata" class="sectionRef"></a>.</li>
       </ol>
       <p>
-        Processors MUST use the first metadata found for processing a <a>tabular data file</a> by using overriding metadata, if provided. Otherwise processors MUST attempt to locate the first metadata document from the <code>Link</code> header, the file-specific metadata, or the directory-specific metadata. If no metadata is supplied or found, processors MUST use <a>embedded metadata</a>. If the metadata does not originate from the embedded metadata, <a>validators</a> MUST verify that the <a href="http://w3c.github.io/csvw/metadata/#dfn-table-group-description" class="externalDFN">table group description</a> within that metadata is <a href="http://w3c.github.io/csvw/metadata/#dfn-table-group-description-compatibility" class="externalDFN">compatible</a> with that in the <a>embedded metadata</a>, as defined in [[!tabular-metadata]].
+        Processors MUST use the first metadata found for processing a <a>tabular data file</a> by using overriding metadata, if provided. Otherwise processors MUST attempt to locate the first metadata document from the <code>Link</code> header or the metadata located through site-wide configuration. If no metadata is supplied or found, processors MUST use <a>embedded metadata</a>. If the metadata does not originate from the embedded metadata, <a>validators</a> MUST verify that the <a href="http://w3c.github.io/csvw/metadata/#dfn-table-group-description" class="externalDFN">table group description</a> within that metadata is <a href="http://w3c.github.io/csvw/metadata/#dfn-table-group-description-compatibility" class="externalDFN">compatible</a> with that in the <a>embedded metadata</a>, as defined in [[!tabular-metadata]].
       </p>
       <section>
         <h3>Overriding Metadata</h3>
@@ -435,7 +440,7 @@ $ csvlint data.csv --schema:schema.json
           to supply a schema that describes the contents of the file, against which it can be validated.
         </p>
         <p>
-          Metadata supplied in this way is called overriding, or user-supplied, metadata. Implementations SHOULD define how any options they define are mapped into the vocabulary defined in [[!tabular-metadata]]. If the user selects existing metadata files, implementations MUST NOT use metadata located through the Link header (as described in <a href="#link-header" class="sectionRef"></a>), file-specific metadata (as described in <a href="#standard-file-metadata" class="sectionRef"></a>) or directory-specific metadata (as described in <a href="#standard-directory-metadata" class="sectionRef"></a>).
+          Metadata supplied in this way is called overriding, or user-supplied, metadata. Implementations SHOULD define how any options they define are mapped into the vocabulary defined in [[!tabular-metadata]]. If the user selects existing metadata files, implementations MUST NOT use metadata located through the Link header (as described in <a href="#link-header" class="sectionRef"></a>) or site-wide location configuration (as described in <a href="#site-wide-location-configuration" class="sectionRef"></a>).
         </p>
         <p class="note">
           Users should ensure that any metadata from those locations that they wish to use is explicitly incorporated into the overriding metadata that they use to process tabular data. Processors may provide facilities to make this easier by automatically merging metadata files from different locations, but this specification does not define how such merging is carried out.
@@ -481,34 +486,44 @@ Link: &lt;http://example.org/country_slice.csv&gt;; rel="describes"; type="text/
         </div>
       </section>
       <section>
-        <h3>Standard File Metadata</h3>
+        <h3>Site-wide Location Configuration</h3>
         <p>
-          If the user has not supplied a metadata file as overriding metadata, described in <a href="#overriding-metadata" class="sectionRef"></a>, and no applicable metadata file has been discovered through a <code>Link</code> header, described in <a href="#link-header" class="sectionRef"></a>, processors MUST attempt to locate a file-specific metadata document. This method MUST NOT be used if the URL of the <a>tabular data file</a> contains a query component.
+          If the user has not supplied a metadata file as overriding metadata, described in <a href="#overriding-metadata" class="sectionRef"></a>, and no applicable metadata file has been discovered through a <code>Link</code> header, described in <a href="#link-header" class="sectionRef"></a>, processors MUST attempt to locate a metadata documents through site-wide configuration.
         </p>
         <p>
-          In this case, processors MUST construct a URL for the file-specific metadata document by appending <code>-metadata.json</code> to the location of the <a>tabular data file</a> (with any fragment component of that URL removed) and attempt to retrieve a metadata document from that location.
+          In this case, processors MUST retrieve the file from the well-known URI <code>/.well-known/csvm</code>. (Well-known URIs are defined by [[!RFC5785]].) If no such file is located (i.e. the response results in a client error <code>4xx</code> status code or a server error <code>5xx</code> status code), processors MUST proceed as if this file were found with the content:
+        </p>
+        <pre>
+{+url}-metadata.json
+csv-metadata.json
+        </pre>
+        <p>
+          The response to retrieving <code>/.well-known/csvm</code> MAY be cached, subject to cache control directives. This includes caching an unsuccessful response such as a <code>404 Not Found</code>.
         </p>
         <p>
-          For example, if the <a>tabular data file</a> is at <code>http://example.org/south-west/devon.csv</code> then processors must attempt to locate a metadata document at <code>http://example.org/south-west/devon.csv-metadata.json</code>. On the other hand, if the <a>tabular data file</a> is at <code>http://example.com/index.php?file=43178.csv</code> then, because the URL of the tabular data file includes a query component, the processor must not attempt to look for a file-specific metadata document.
+          This file MUST contain a URI template, as defined by [[!URI-TEMPLATE]], on each line. Starting with the first such URI template, processors MUST:
+        </p>
+        <ol>
+          <li>Expand the URI template, with the variable <code>url</code> being set to the URL of the requested <a>tabular data file</a> (with any fragment component of that URL removed).</li>
+          <li>Resolve the resulting URL against the URL of the requested <a>tabular data file</a>.</li>
+          <li>Attempt to retrieve a metadata document at that URL.</li>
+          <li>If no metadata document is found at that location, or if the metadata file found at the location does not explicitly include a reference to the relevant <a>tabular data file</a>, perform these same steps on the next URI template, otherwise use that metadata document.</li>
+        </ol>
+        <p>
+          For example, if the <a>tabular data file</a> is at <code>http://example.org/south-west/devon.csv</code> then processors must attempt to locate a well-known file at <code>http://example.org/.well-known/csvm</code>. If that file contains:
+        </p>
+        <pre class="example">
+{+url}.json
+csvm.json
+/csvm?file={url}
+        </pre>
+        <p>
+          the processor will first look for <code>http://example.org/south-west/devon.csv.json</code>. If there is no metadata file in that location, it will then look for <code>http://example.org/south-west/csvm.json</code>. Finally, if that also fails, it will look for <code>http://example.org/csvm?file=http://example.org/south-west/devon.csv.json</code>.
         </p>
         <p>
-          If the metadata file found at this location does not explicitly include a reference to the relevant <a>tabular data file</a> then it MUST be ignored. URLs MUST be normalized as described in <a href="#url-normalization" class="sectionRef"></a>.
+          If no file were found at <code>http://example.org/.well-known/csvm</code>, the processor will use the default locations and try to retrieve metadata from <code>http://example.org/south-west/devon.csv-metadata.json</code> and, if unsuccessful, <code>http://example.org/south-west/csv-metadata.json</code>.
         </p>
-      </section>
-      <section>
-        <h3>Standard Directory Metadata</h3>
-        <p>
-          If the user has not supplied a metadata file as overriding metadata, described in <a href="#overriding-metadata" class="sectionRef"></a>, and no applicable metadata file has been discovered through a <code>Link</code> header, described in <a href="#link-header" class="sectionRef"></a>, or from the standard file metadata location, described in <a href="#standard-file-metadata" class="sectionRef"></a>, processors MUST attempt to locate a directory-level metadata document. This method MUST NOT be used if the URL of the <a>tabular data file</a> contains a query component.
-        </p>
-        <p>
-          Processors MUST locate and retrieve the common metadata document for a directory by resolving the relative URL <code>csv-metadata.json</code> against the base URL of the <a>tabular data file</a> and fetching the resulting URL.
-        </p>
-        <p>
-          For example, if the <a>tabular data file</a> is at <code>http://example.org/south-west/devon.csv</code> then processors must attempt to locate a metadata file at <code>http://example.org/south-west/csv-metadata.json</code>. On the other hand, if the tabular data file is at <code>http://example.com/index.php?file=43178.csv</code> then, because the URL of the tabular data file includes a query component, the processor must not attempt to look for a directory-level metadata document.
-        </p>
-        <p>
-          If the metadata file found at this location does not explicitly include a reference to the relevant <a>tabular data file</a> then it MUST be ignored. URLs MUST be normalized as described in <a href="#url-normalization" class="sectionRef"></a>.
-        </p>
+        <p class="issue atrisk" data-number="555">The use of a well-known location for defining URI patters used to locate metdata files is at risk. The Working Group solicits feedback on whether this mechanism is useful and whether it represents major implementation difficulties.</p>
       </section>
       <section>
         <h3>Embedded Metadata</h3>
@@ -566,10 +581,9 @@ Link: &lt;http://example.org/country_slice.csv&gt;; rel="describes"; type="text/
         the validator would validate all the listed tables, using the locally defined schema at <code>government-spending.csv</code>. It would also use the metadata embedded in the referenced CSV files; for example, when processing <code>http://example.org/east-sussex-2015-03.csv</code>, it would use <a>embedded metadata</a> within that file to verify that the CSV is <a href="http://w3c.github.io/csvw/metadata/#dfn-table-group-description-compatibility" class="externalDFN">compatible</a> with the metadata.
       </p>
       <p>
-        If a validator is passed a <a>tabular data file</a> <code>http://example.org/east-sussex-2015-03.csv</code>,
-        the validator would use the metadata located from the CSV file: the first metadata file found through the <code>Link</code> headers found when retrieving that file, or at <code>http://example.org/east-sussex-2015-03.csv-metadata.json</code> or <code>http://example.org/csv-metadata.json</code>.
+        If a validator is passed a <a>tabular data file</a> <code>http://example.org/east-sussex-2015-03.csv</code>, the validator would use the metadata located from the CSV file: the first metadata file found through the <code>Link</code> headers found when retrieving that file, or located through a site-wide location configuration.
       </p>
-      <p class="note">Starting with a metadata file can remove the need to perform additional requests to locate linked, file-specific, or directory-specific metadata</p> 
+      <p class="note">Starting with a metadata file can remove the need to perform additional requests to locate linked metadata, or metadata retrieved through site-wide location configuration</p> 
       <section>
         <h2>Creating Annotated Tables</h2>
         <p>After locating metadata, metadata is <a href="http://w3c.github.io/csvw/metadata/#dfn-normalization" class="externalDFN">normalized</a> and coerced into a single <a href="http://w3c.github.io/csvw/metadata/#dfn-table-group-description" class="externalDFN">table group description</a>. When starting with a metadata file, this involves normalizing the provided metadata file and verifying that the <a>embedded metadata</a> for each <a>tabular data file</a> referenced from the metadata is <a href="http://w3c.github.io/csvw/metadata/#dfn-table-group-description-compatibility" class="externalDFN">compatible</a> with the metadata. When starting with a <a>tabular data file</a>, this involves locating the first metadata file as described in <a href="#locating-metadata" class="sectionRef"></a> and normalizing into a single descriptor.
@@ -581,8 +595,7 @@ Link: &lt;http://example.org/country_slice.csv&gt;; rel="describes"; type="text/
             <ol class="algorithm">
               <li>metadata supplied by the user (see <a href="#overriding-metadata" class="sectionRef"></a>).</li>
               <li>metadata referenced from a <em>Link Header</em> that may be returned when retrieving the tabular data file (see <a href="#link-header" class="sectionRef"></a>).</li>
-              <li>file-specific metadata in a document located based on the location of the tabular data file (see <a href="#standard-file-metadata" class="sectionRef"></a>).</li>
-              <li>directory-specific metadata in a document located based on the location of the tabular data file (see <a href="#standard-directory-metadata" class="sectionRef"></a>).</li>
+              <li>metadata retrieved through a site-wide location configuration (see <a href="#site-wide-location-configuration" class="sectionRef"></a>).</li>
               <li><a>embedded metadata</a> as defined in <a href="#embedded-metadata" class="sectionRef"></a> with a single <code>tables</code> entry where the <code>url</code> property is set from that of the <a>tabular data file</a>.</li>
             </ol>
           </li>
@@ -620,7 +633,6 @@ Link: &lt;http://example.org/country_slice.csv&gt;; rel="describes"; type="text/
       <section>
         <h2>URL Normalization</h2>
         <p>Metadata Discovery and Compatibility involve comparing URLs. When comparing URLs, processors MUST use <cite><a href="https://tools.ietf.org/html/rfc3986#section-6.2.2" class="externalDFN">Syntax-Based Normalization</a></cite> as defined in [[!RFC3968]]. Processors MUST perform <cite><a href="https://tools.ietf.org/html/rfc3986#section-6.2.3" class="externalDFN">Scheme-Based Normalization</a></cite> for HTTP (<code>80</code>) and HTTPS (<code>443</code>) and SHOULD perform <cite><a href="https://tools.ietf.org/html/rfc3986#section-6.2.3" class="externalDFN">Scheme-Based Normalization</a></cite> for other well-known schems.</p>
-          <p class="issue" data-number="562">What is generally considered good practice for this in other specifications?</p>
       </section>
       <section>
         <h2>Parsing Cells</h2>
@@ -1125,7 +1137,7 @@ Content-Type: text/csv;header=absent
         <dt><dfn>skip rows</dfn></dt>
         <dd>The number of rows to skip at the beginning of the file, before a header row or tabular data, set by the <a href="http://w3c.github.io/csvw/metadata/#dialect-skipRows"><code>skipRows</code></a> property of a <a href="http://w3c.github.io/csvw/metadata/#dfn-dialect-description" class="externalDFN">dialect description</a>. The default is <code>0</code>. A value greater than <code>0</code> will mean that the <a title="row source number">source numbers</a> of <a title="row">rows</a> will be different from their <a title="row number">numbers</a>.</dd>
         <dt><dfn>trim</dfn></dt>
-        <dd>Indicates whether to trim whitespace around cells; may be <code>true</code>, <code>false</code>, <code>start</code>, or <code>end</code>, set by the <a href="http://w3c.github.io/csvw/metadata/#dialect-skipInitialSpace"><code>skipInitialSpace</code></a> or <a href="http://w3c.github.io/csvw/metadata/#dialect-trim"><code>trim</code></a> property of a <a href="http://w3c.github.io/csvw/metadata/#dfn-dialect-description" class="externalDFN">dialect description</a>. The default is <code>false</code>.</dd>
+        <dd>Indicates whether to trim whitespace around cells; may be <code>true</code>, <code>false</code>, <code>start</code>, or <code>end</code>, set by the <a href="http://w3c.github.io/csvw/metadata/#dialect-skipInitialSpace"><code>skipInitialSpace</code></a> or <a href="http://w3c.github.io/csvw/metadata/#dialect-trim"><code>trim</code></a> property of a <a href="http://w3c.github.io/csvw/metadata/#dfn-dialect-description" class="externalDFN">dialect description</a>. The default is <code>true</code>.</dd>
       </dl>
       <p>
         The algorithm for using these flags to parse a document containing tabular data to create a basic <a>annotated tabular data model</a> and to extract <a>embedded metadata</a> is as follows:
@@ -1492,69 +1504,6 @@ Content-Type: text/csv;header=absent
           </p>
           <p>
             Note that this display matches that shown <a href="http://referendum2012.elections.eg/results/referendum-results">on the original website</a>.
-          </p>
-        </div>
-        <div class="issue" data-number="46">
-          <p>
-            An alternative approach is for the CSV to be parsed into a table model in which the columns are numbered in the reverse, for tables which are either marked as or detected to be right-to-left tables. For example, we could introduce a <code>bidi=rtl</code> or similar media type parameter, and use this to determine whether the first column in table generated from the CSV is the text before the first comma in each line or the text after the last comma in the line.
-          </p>
-          <p>
-           In the example above, if the CSV were served with <code>bidi=rtl</code>, or the table was detected as being a right-to-left table, then the column numbering in the model would be reversed:
-          </p>
-          <table style="width: 100%; text-align: right">
-            <col style="width: 10%"/>
-            <col style="width: 10%"/>
-            <col style="width: 10%"/>
-            <col style="width: 10%"/>
-            <col style="width: 10%"/>
-            <col style="width: 10%"/>
-            <col style="width: 10%"/>
-            <col style="width: 10%"/>
-            <col style="width: 10%"/>
-            <col style="width: 10%"/>
-            <thead>
-              <tr style="text-align: center">
-                <th>Column / Row</th>
-                <th>column 9</th>
-                <th>column 8</th>
-                <th>column 7</th>
-                <th>column 6</th>
-                <th>column 5</th>
-                <th>column 4</th>
-                <th>column 3</th>
-                <th>column 2</th>
-                <th>column 1</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th>row 1 (header)</th><th>المحافظة</th><th>نسبة موافق</th><th>نسبة غير موافق</th><th>عدد الناخبين</th><th>الأصوات الصحيحة</th><th>الأصوات الباطلة</th><th>نسبة المشاركة</th><th>موافق</th><th>غير موافق</th>
-              </tr>
-              <tr>
-                <th>row 2</th><td>القليوبية</td><td>60.0</td><td>40.0</td><td>2,639,808</td><td>853,125</td><td>15,224</td><td>32.9</td><td>512,055</td><td>341,070</td>
-              </tr>
-              <tr>
-                <th>row 3</th><td>الجيزة</td><td>66.7</td><td>33.3</td><td>4,383,701</td><td>1,493,092</td><td>24,105</td><td>34.6</td><td>995,417</td><td>497,675</td>
-              </tr>
-              <tr>
-                <th>row 4</th><td>القاهرة</td><td>43.2</td><td>56.8</td><td>6,580,478</td><td>2,254,698</td><td>36,342</td><td>34.8</td><td>974,371</td><td>1,280,327</td>
-              </tr>
-              <tr>
-                <th>row 5</th><td>قنا</td><td>84.5</td><td>15.5</td><td>1,629,713</td><td>364,509</td><td>6,743</td><td>22.8</td><td>307,839</td><td>56,670</td>
-              </tr>
-            </tbody>
-          </table>
-          <p>
-            This would require a change to [[RFC7111]] but that might be required by updates to the definition of <code>text/csv</code> in any case. With the change, the fragment identifier <code>#col=3</code> would then refer to the third column from the right, named <code>نسبة المشاركة</code>.
-          </p>
-          <p>
-            If the model were defined in this way, there would be no need to determine the order of the columns when displayed using a metadata property. Columns would always be displayed with the first column (numbered 1 in the model) on the left. The final display in HTML, for example, would be exactly as above. The only difference would be that <code>#col=3</code> would refer to the third column from the left.
-          </p>
-          <p>
-            We note that using media type parameters is problematic because publishers might not have the ability to set them on their servers, and because they can easily get lost as a file is republished or emailed between people.
-          </p>
-          <p>
-            We invite comment on the best way to approach bidirectionality in CSV files.
           </p>
         </div>
       </section>
@@ -2183,6 +2132,19 @@ UNICEF,Education,Teacher training,Chocó,Bojayá
         </section>
       </section>
     </section>
+    <section class="appendix">
+      <h2>IANA Considerations</h2>
+      <p>This section has <strong>not yet been submitted</strong> to IANA for review, approval, and registration.</p>
+      <h3>/.well-known/csvm</h3>
+      <dl>
+        <dt>URI suffix:</dt>
+        <dd>csvm</dd>
+        <dt>Change controller:</dt>
+        <dd>W3C</dd>
+        <dt>Specification document(s):</dt>
+        <dd>This document, <a href="#site-wide-location-configuration" class="sectionRef"></a></dd>
+      </dl>
+    </section>
     <section class="appendix informative" id="standards">
       <h2>Existing Standards</h2>
       <p>
@@ -2341,6 +2303,7 @@ TEXTDATA =  %x20-21 / %x23-2B / %x2D-7E
           <li>The <a title="row titles">titles</a> annotation has been added to rows, and a section added describing the way in which screen readers should announce rows and columns to users</li>
           <li>A Datatype description may have an <a title="datatype id">id</a> annotation to reference an external datatype definition in XSD, OWL, or some other format.</li>
           <li>Renamed the direction annotation to <a>table direction</a>.</li>
+          <li>The built-in locations for locating metadata files were removed in favor of a site-wide configuration file, which uses the original values for file-specific and directory-specific metadata locations as the default value. See <a href="#site-wide-location-configuration" class="sectionRef"></a>.</li>
         </ul>
       </section>
       <section>
