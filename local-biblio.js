@@ -89,5 +89,11 @@ var localBibliography = {
     "title" : "The Art of Computer Programming Volume 1: Fundamental Algorithms (3rd ed.)",
     "publisher" : "Addison-Wesley Professional",
     "rawDate" : "1997-11-14"
+  },
+  "DOAP": {
+    "authors": ["Ed Dumbill"],
+    "title": "Description of a Project",
+    "status": "Community Specification",
+    "href": "https://github.com/edumbill/doap/wiki"
   }
 };
