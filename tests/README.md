@@ -7,17 +7,11 @@ This test suite contains xxx kinds of tests:
 * CSV to RDF Test (`csvt:CsvToRdfTest`) - the result of processing
   a CSV to RDF (Turtle) and testing results using RDF isomorphism.
 
-* CSV to SPARQL Test (`csvt:CsvToSparqlTest`) - the result of processing
-  a CSV to RDF (Turtle) and testing results using a SPARQL ASK query.
-
 * Metadata to JSON Test (`csvt:JsonToRdfTest`) - the result of processing
   Metadata to JSON with one or more referenced CSV files.
 
 * Metadata to RDF Test (`csvt:CsvToRdfTest`) - the result of processing
   Metadata to RDF (Turtle) with one or more referenced CSV files and testing results using RDF isomorphism.
-
-* Metadata to SPARQL Test (`csvt:CsvToSparqlTest`) - the result of processing
-  a Metadata to RDF (Turtle) with one or more referenced CSV files and testing results using a SPARQL ASK query.
 
 The manifest.ttl file in this directory lists all of the tests in the
 CSV WG's test suite. Each test is one of the above tests. All

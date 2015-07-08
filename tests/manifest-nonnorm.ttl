@@ -1,0 +1,227 @@
+## CSV+ tests
+## Distributed under both the W3C Test Suite License[1] and the W3C 3-
+## clause BSD License[2]. To contribute to a W3C Test Suite, see the
+## policies and contribution forms [3]
+##
+## 1. http://www.w3.org/Consortium/Legal/2008/04-testsuite-license
+## 2. http://www.w3.org/Consortium/Legal/2008/03-bsd-license
+## 3. http://www.w3.org/2004/10/27-testcases
+
+@prefix : <manifest-nonnorm#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix mf:   <http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#> .
+@prefix csvt: <http://www.w3.org/2013/csvw/tests/vocab#> .
+
+<manifest-nonnorm>  a mf:Manifest ;
+
+  rdfs:label "CSV Non-Normative Tests";
+  rdfs:comment "CSV transformation and validation tests which are non-normative and not required for acceptance testing.";
+  mf:entries (
+    :test002 :test003 :test019 :test020 :test021 :test022 :test024 :test025 :test050 :test051
+    :test052 :test054 :test055 :test056 :test057 :test058 :test091
+  ) .
+
+:test002 a csvt:ToJsonTest;
+  mf:name "Quoted field";
+  rdfs:comment "Table with one quoted field without metadata";
+  rdft:approval rdft:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test002.csv>;
+  mf:result <test002.json>;
+  .
+
+:test003 a csvt:ToJsonTest;
+  mf:name "Surrounding spaces";
+  rdfs:comment "Table with whitespace before and after every field without metadata";
+  rdft:approval rdft:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test003.csv>;
+  mf:result <test003.json>;
+  .
+
+:test019 a csvt:ToJsonTest;
+  mf:name "no header";
+  rdfs:comment "If a CSV+ file does not include a header line, this MUST be specified using the `header` parameter.";
+  rdft:approval rdft:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <tree-ops.csv>;
+  mf:result <test019.json>;
+  csvt:contentType "text/csv;header=absent";
+  .
+
+:test020 a csvt:ToJsonTest;
+  mf:name "dialect: trim=start";
+  rdfs:comment "If `trim` is `true` or "start" then whitespace from the start of values that are not enclosed MUST be removed from the value.";
+  rdft:approval rdft:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test020-metadata.json>;
+  mf:result <test020.json>;
+  csvt:implicit <test020.csv>;
+  .
+
+:test021 a csvt:ToJsonTest;
+  mf:name "dialect: trim=end";
+  rdfs:comment "If `trim` is `true` or "end" then whitespace from the end of values that are not enclosed MUST be removed from the value.";
+  rdft:approval rdft:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test021-metadata.json>;
+  mf:result <test021.json>;
+  csvt:implicit <test021.csv>;
+  .
+
+:test022 a csvt:ToJsonTest;
+  mf:name "dialect: trim=true";
+  rdfs:comment "If `trim` is `true` or "start" then whitespace from the start of values that are not enclosed MUST be removed from the value. If `trim` is `true` or "end" then whitespace from the end of values that are not enclosed MUST be removed from the value.";
+  rdft:approval rdft:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test022-metadata.json>;
+  mf:result <test022.json>;
+  csvt:implicit <test022.csv>;
+  .
+
+:test024 a csvt:ToJsonTest;
+  mf:name "dialect: header=false and headerRowCount=1";
+  rdfs:comment "If `true`, sets the `header row count` flag to 1, and if `false` to 0, unless `headerRowCount` is provided, in which case the value provided for the `header` property is ignored.";
+  rdft:approval rdft:Proposed;
+  csvt:option [
+    csvt:noProv true;
+    csvt:metadata <test024-user-metadata.json>;
+  ];
+  mf:action <tree-ops.csv>;
+  mf:result <test024.json>;
+  csvt:implicit <test024-user-metadata.json>;
+  .
+
+:test025 a csvt:ToJsonTest;
+  mf:name "dialect: header=false and skipRows=1";
+  rdfs:comment "Ignore header uses column definitions from metadata";
+  rdft:approval rdft:Proposed;
+  csvt:option [
+    csvt:noProv true;
+    csvt:metadata <test025-user-metadata.json>;
+  ];
+  mf:action <tree-ops.csv>;
+  mf:result <test025.json>;
+  csvt:implicit <test025-user-metadata.json>;
+  .
+
+:test050 a csvt:ToJsonTest;
+  mf:name "dialect: delimiter";
+  rdfs:comment "Recognizes tab-separated-values with appropriate `delimiter`";
+  rdft:approval rdft:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test050-metadata.json>;
+  mf:result <test050.json>;
+  csvt:implicit <tree-ops.tsv>;
+  .
+
+:test051 a csvt:ToJsonTest;
+  mf:name "dialect: commentPrefix in header";
+  rdfs:comment "Adds comments when found in `skipRows`";
+  rdft:approval rdft:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test051-metadata.json>;
+  mf:result <test051.json>;
+  csvt:implicit <test051.csv>;
+  .
+
+:test052 a csvt:ToJsonTest;
+  mf:name "dialect: commentPrefix in rows";
+  rdfs:comment "Adds comments when found in `content`";
+  rdft:approval rdft:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test052-metadata.json>;
+  mf:result <test052.json>;
+  csvt:implicit <test052.csv>;
+  .
+
+:test054 a csvt:ToJsonTest;
+  mf:name "dialect: skipColumns";
+  rdfs:comment "Ignores skipped columns";
+  rdft:approval rdft:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test054-metadata.json>;
+  mf:result <test054.json>;
+  csvt:implicit <tree-ops.csv>;
+  .
+
+:test055 a csvt:ToJsonTest;
+  mf:name "dialect: skipBlankRows";
+  rdfs:comment "Ignores rows in which all columns are empty";
+  rdft:approval rdft:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test055-metadata.json>;
+  mf:result <test055.json>;
+  csvt:implicit <test055.csv>;
+  .
+
+:test056 a csvt:ToJsonTest;
+  mf:name "dialect: skipInitialSpace";
+  rdfs:comment "Equivalent to` trim="start"`";
+  rdft:approval rdft:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test056-metadata.json>;
+  mf:result <test056.json>;
+  csvt:implicit <test056.csv>;
+  .
+
+:test057 a csvt:ToJsonTest;
+  mf:name "dialect as URL reference";
+  rdfs:comment "Loads a `dialect description` if referenced using a URL";
+  rdft:approval rdft:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test057-metadata.json>;
+  mf:result <test057.json>;
+  csvt:implicit <test057.csv>,
+    <test057-dialect.json>;
+  .
+
+:test058 a csvt:ToJsonTest;
+  mf:name "table dialect vs tablegroup dialect";
+  rdfs:comment "A dialect defined in a Table completely overrides that defined in a TableGroup";
+  rdft:approval rdft:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test058-metadata.json>;
+  mf:result <test058.json>;
+  csvt:implicit <test058.csv>;
+  .
+
+:test091 a csvt:NegativeValidationTest;
+  mf:name "same number of columns in each row";
+  rdfs:comment "each `row` MUST contain the same number of cells (although some of these cells may be empty)";
+  rdft:approval rdft:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test091.csv>;
+  csvt:implicit <tree-ops.csv>;
+  .

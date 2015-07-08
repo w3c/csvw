@@ -39,16 +39,19 @@ class Manifest
   TITLE = {
     json: "CSVW JSON tests",
     rdf: "CSVW RDF Tests",
-    validation: "CSVW Validation Tests"
+    validation: "CSVW Validation Tests",
+    nonnorm: "CSV Non-Normative Tests",
   }
   DESCRIPTION = {
     json: "Tests transformation of CSV to JSON.",
     rdf: "Tests transformation of CSV to RDF.",
-    validation: "Tests CSV validation using metadata."
+    validation: "Tests CSV validation using metadata.",
+    nonnorm: "CSV transformation and validation tests which are non-normative and not required for acceptance testing."
   }
   EXTENTIONS = {
     json: 'json',
-    rdf: 'ttl'
+    rdf: 'ttl',
+    nonnorm: 'json',
   }
   attr_accessor :prefixes, :terms, :properties, :classes, :instances, :datatypes
 
@@ -140,24 +143,28 @@ class Manifest
       when :rdf         then "csvt:NegativeRdfTest"
       when :json        then "csvt:NegativeJsonTest"
       when :validation  then "csvt:NegativeValidationTest"
+      when :nonnorm     then "csvt:NegativeValidationTest"
       end
     when test.option[:invalid]
       case variant
       when :rdf         then "csvt:ToRdfTest"
       when :json        then "csvt:ToJsonTest"
       when :validation  then "csvt:NegativeValidationTest"
+      when :nonnorm     then "csvt:NegativeValidationTest"
       end
     when test.option[:warning]
       case variant
       when :rdf         then "csvt:ToRdfTest"
       when :json        then "csvt:ToJsonTest"
       when :validation  then "csvt:WarningValidationTest"
+      when :nonnorm     then "csvt:WarningValidationTest"
       end
     else
       case variant
       when :rdf         then "csvt:ToRdfTest"
       when :json        then "csvt:ToJsonTest"
       when :validation  then "csvt:PositiveValidationTest"
+      when :nonnorm     then "csvt:ToJsonTest"
       end
     end
   end
@@ -198,6 +205,7 @@ class Manifest
 
     tests.each do |test|
       next unless test.option[variant]
+      next if variant != :nonnorm && test.option[:nonnorm]
 
       entry = {
         "id" => "manifest-#{variant}##{test.id}",
@@ -209,7 +217,7 @@ class Manifest
         "action" => test.action,
       }
 
-      entry["result"] = "#{test.result}#{EXTENTIONS[variant]}" if [:rdf, :json].include?(variant) && !test.option[:negative]
+      entry["result"] = "#{test.result}#{EXTENTIONS[variant]}" if test.result
       entry["implicit"] = test.option[:implicit] unless test.option[:implicit].empty?
       entry["httpLink"] = %(<#{test.link_metadata.split('/').last}>; rel="describedby") if test.link_metadata
 
@@ -225,7 +233,7 @@ class Manifest
   def to_html
     # Create vocab.html using vocab_template.haml and compacted vocabulary
     template = File.read("template.haml")
-    manifests = %w(json rdf validation).inject({}) do |memo, v|
+    manifests = %w(json rdf validation nonnorm).inject({}) do |memo, v|
       memo["manifest-#{v}"] = ::JSON.load(File.read("manifest-#{v}.jsonld"))
       memo
     end
@@ -246,11 +254,6 @@ class Manifest
 ## 1. http://www.w3.org/Consortium/Legal/2008/04-testsuite-license
 ## 2. http://www.w3.org/Consortium/Legal/2008/03-bsd-license
 ## 3. http://www.w3.org/2004/10/27-testcases
-##
-## Test types (for now)
-## * CsvToJsonTest  - tests CSV evaluation to JSON
-## * CsvToRdfTest   - tests CSV evaluation to RDF using graph isomorphism
-## * CsvSparqlTest - tests CSV evaulation to RDF using SPARQL ASK query
 
 @prefix : <manifest-#{variant}#> .
 @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -264,12 +267,22 @@ class Manifest
     output << %(  rdfs:comment "#{DESCRIPTION[variant]}";)
     output << %(  mf:entries \()
 
-    tests.select {|t| t.option[variant]}.map {|t| ":#{t.id}"}.each_slice(10) do |entries|
+    tests.select do |t|
+      case variant
+      when :nonnorm then t.option[:nonnorm]
+      else t.option[variant] && !t.option[:nonnorm]
+      end
+    end.map {|t| ":#{t.id}"}.each_slice(10) do |entries|
       output << %(    #{entries.join(' ')})
     end
     output << %(  \) .)
 
-    tests.select {|t| t.option[variant]}.each do |test|
+    tests.select do |t|
+      case variant
+      when :nonnorm then t.option[:nonnorm]
+      else t.option[variant] && !t.option[:nonnorm]
+      end
+    end.each do |test|
       output << "" # separator
       output << ":#{test.id} a #{test_class(test, variant)};"
       output << %(  mf:name "#{test.name}";)
@@ -281,7 +294,7 @@ class Manifest
       output << %(  ];)
       output << %(  csvt:httpLink "<#{test.link_metadata.split('/').last}>; rel=\\"describedby\\"";) if test.link_metadata
       output << %(  mf:action <#{test.action}>;)
-      output << %(  mf:result <#{test.result}#{EXTENTIONS[variant]}>;) if [:rdf, :json].include?(variant) && !test.option[:negative]
+      output << %(  mf:result <#{test.result}#{EXTENTIONS[variant]}>;) if test.result
       output << %(  csvt:contentType "#{test.option[:contentType]}";) if test.option[:contentType]
 
       implicit = test.option[:implicit].map {|f| "<#{f}>"}.join(",\n    ")
@@ -301,7 +314,7 @@ OPT_ARGS = [
   ["--output", "-o",  GetoptLong::REQUIRED_ARGUMENT,"Output to the specified file path"],
   ["--quiet",         GetoptLong::NO_ARGUMENT,      "Supress most output other than progress indicators"],
   ["--touch",         GetoptLong::NO_ARGUMENT,      "Create referenced files and directories if missing"],
-  ["--variant",       GetoptLong::REQUIRED_ARGUMENT,"Test variant, 'rdf' or 'json'"],
+  ["--variant",       GetoptLong::REQUIRED_ARGUMENT,"Test variant, 'rdf', 'json', 'validation', or 'nonnorm'"],
   ["--help", "-?",    GetoptLong::NO_ARGUMENT,      "This message"]
 ]
 def usage
@@ -342,7 +355,7 @@ if options[:format] || options[:variant]
   else  STDERR.puts "Unknown format #{options[:format].inspect}"
   end
 else
-  %w(json rdf validation).each do |variant|
+  %w(json rdf validation nonnorm).each do |variant|
     %w(jsonld ttl).each do |format|
       File.open("manifest-#{variant}.#{format}", "w") do |output|
         output.puts(vocab.send("to_#{format}".to_sym, variant.to_sym))
