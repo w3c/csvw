@@ -93,9 +93,8 @@ class Vocab
     end
 
     classes.each  do |id, entry|
-      [entry[:term], id].compact.each do |term|
-        context[term] = namespaced(id)
-      end
+      term = entry[:term] || id
+      context[term] = namespaced(id)
 
       # Class definition
       node = {
@@ -120,9 +119,8 @@ class Vocab
       defn['@container'] = entry[:@container] if entry[:@container]
       defn['@type'] = entry[:@type] if entry[:@type]
 
-      [entry[:term], id].compact.each do |term|
-        context[term] = defn
-      end
+      term = entry[:term] || id
+      context[term] = defn
 
       # Property definition
       node = {
