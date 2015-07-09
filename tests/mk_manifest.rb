@@ -127,8 +127,8 @@ class Manifest
       files = []
       files << test.action.split('?').first
       files += test.option[:implicit]
-      files << "#{test.result}ttl"  if test.result && test.option[:rdf] && test.option[:rdf] != "negative"
-      files << "#{test.result}json" if test.result && test.option[:json] && test.option[:json] != "negative"
+      files << test.result_rdf  if test.result_rdf
+      files << test.result_json if test.result_json
       files.compact.select {|f| !File.exist?(f)}.each do |f|
         File.open(f, "w") {|io| io.puts( f.end_with?('.json') ? "{}" : "")}
       end
