@@ -55,7 +55,7 @@ class Manifest
   }
   attr_accessor :prefixes, :terms, :properties, :classes, :instances, :datatypes
 
-  Test = Struct.new(:id, :name, :comment, :approval, :option, :action, :result, :user_metadata, :link_metadata)
+  Test = Struct.new(:id, :name, :comment, :approval, :option, :action, :result_rdf, :result_json, :user_metadata, :link_metadata)
 
   attr_accessor :tests
 
@@ -77,12 +77,9 @@ class Manifest
         memo[k.to_sym] = v.include?(',') ? v.split(',') : v
         memo
       end
-      extras[:rdf] = entry[:rdf] == "TRUE"
-      extras[:json] = entry[:json] == "TRUE"
-      extras[:validation] = entry[:validate] == "TRUE"
-      extras[:negative] = entry[:"test-type"] == "negative"
-      extras[:warning] = entry[:"test-type"] == "warning"
-      extras[:invalid] = entry[:"test-type"] == "invalid"
+      extras[:rdf] = entry[:rdf] unless entry[:rdf] == "FALSE"
+      extras[:json] = entry[:json] unless entry[:json] == "FALSE"
+      extras[:validation] = entry[:validate] unless entry[:validate] == "FALSE"
       test = Test.new(entry[:test], entry[:name], entry[:comment], entry[:approval], extras)
 
       if test.option[:dir]
@@ -95,8 +92,9 @@ class Manifest
             "#{test.id}/action.csv"
           end
         end
-        
-        test.result = extras.fetch(:result, "#{test.id}/result.") if (extras[:rdf] || extras[:json]) && !extras[:negative]
+
+        test.result_rdf  = "#{test.id}/result.ttl" if test.option[:rdf] && test.option[:rdf] != "negative"
+        test.result_json = "#{test.id}/result.json" if test.option[:json] && test.option[:json] != "negative"
 
         test.user_metadata = "#{test.id}/user-metadata.json" if entry[:"user-metadata"] == "TRUE"
         test.link_metadata = "#{test.id}/linked-metadata.json" if entry[:"link-metadata"] == "TRUE"
@@ -110,7 +108,8 @@ class Manifest
             "#{test.id}.csv"
           end
         end
-        test.result = extras.fetch(:result, "#{test.id}.") if (extras[:rdf] || extras[:json]) && !extras[:negative]
+        test.result_rdf  = "#{test.id}.ttl" if test.option[:rdf] && test.option[:rdf] != "negative"
+        test.result_json = "#{test.id}.json" if test.option[:json] && test.option[:json] != "negative"
         
         test.user_metadata = "#{test.id}-user-metadata.json" if entry[:"user-metadata"] == "TRUE"
         test.link_metadata = "#{test.id}-linked-metadata.json" if entry[:"link-metadata"] == "TRUE"
@@ -128,8 +127,8 @@ class Manifest
       files = []
       files << test.action.split('?').first
       files += test.option[:implicit]
-      files << "#{test.result}ttl"  if test.result && test.option[:rdf]
-      files << "#{test.result}json" if test.result && test.option[:json]
+      files << "#{test.result}ttl"  if test.result && test.option[:rdf] && test.option[:rdf] != "negative"
+      files << "#{test.result}json" if test.result && test.option[:json] && test.option[:json] != "negative"
       files.compact.select {|f| !File.exist?(f)}.each do |f|
         File.open(f, "w") {|io| io.puts( f.end_with?('.json') ? "{}" : "")}
       end
@@ -137,34 +136,38 @@ class Manifest
   end
 
   def test_class(test, variant)
-    case
-    when test.option[:negative]
-      case variant
-      when :rdf         then "csvt:NegativeRdfTest"
-      when :json        then "csvt:NegativeJsonTest"
-      when :validation  then "csvt:NegativeValidationTest"
-      when :nonnorm     then "csvt:NegativeValidationTest"
+    case variant
+    when :rdf
+      case test.option[:rdf]
+      when "negative" then "csvt:NegativeRdfTest"
+      when "warning"  then "csvt:ToRdfTestWithWarnings"
+      when "positive" then "csvt:ToRdfTest"
+      else
+        raise "unknown combination of '#{variant}' with #{test}"
       end
-    when test.option[:invalid]
-      case variant
-      when :rdf         then "csvt:ToRdfTest"
-      when :json        then "csvt:ToJsonTest"
-      when :validation  then "csvt:NegativeValidationTest"
-      when :nonnorm     then "csvt:NegativeValidationTest"
+    when :json
+      case test.option[:json]
+      when "negative" then "csvt:NegativeJsonTest"
+      when "warning"  then "csvt:ToJsonTestWithWarnings"
+      when "positive" then "csvt:ToJsonTest"
+      else
+        raise "unknown combination of '#{variant}' with #{test}"
       end
-    when test.option[:warning]
-      case variant
-      when :rdf         then "csvt:ToRdfTest"
-      when :json        then "csvt:ToJsonTest"
-      when :validation  then "csvt:WarningValidationTest"
-      when :nonnorm     then "csvt:WarningValidationTest"
+    when :validation
+      case test.option[:validation]
+      when "negative" then "csvt:NegativeValidationTest"
+      when "warning"  then "csvt:WarningValidationTest"
+      when "positive" then "csvt:PositiveValidationTest"
+      else
+        raise "unknown combination of '#{variant}' with #{test}"
       end
-    else
-      case variant
-      when :rdf         then "csvt:ToRdfTest"
-      when :json        then "csvt:ToJsonTest"
-      when :validation  then "csvt:PositiveValidationTest"
-      when :nonnorm     then "csvt:ToJsonTest"
+    when :nonnorm
+      case
+      when test.option[:json] == "positive" then "csvt:ToJsonTest"
+      when test.option[:json] == "warning" then "csvt:ToJsonTestWithWarnings"
+      when test.option[:validation] == "negative" then "csvt:NegativeValidationTest"
+      else
+        raise "unknown combination of '#{variant}' with #{test}"
       end
     end
   end
@@ -217,7 +220,8 @@ class Manifest
         "action" => test.action,
       }
 
-      entry["result"] = "#{test.result}#{EXTENTIONS[variant]}" if test.result
+      entry["result"] = test.result_rdf if test.result_rdf && variant == :rdf
+      entry["result"] = test.result_json if test.result_json && [:json, :nonnorm].include?(variant)
       entry["implicit"] = test.option[:implicit] unless test.option[:implicit].empty?
       entry["httpLink"] = %(<#{test.link_metadata.split('/').last}>; rel="describedby") if test.link_metadata
 
@@ -294,7 +298,8 @@ class Manifest
       output << %(  ];)
       output << %(  csvt:httpLink "<#{test.link_metadata.split('/').last}>; rel=\\"describedby\\"";) if test.link_metadata
       output << %(  mf:action <#{test.action}>;)
-      output << %(  mf:result <#{test.result}#{EXTENTIONS[variant]}>;) if test.result
+      output << %(  mf:result <#{test.result_rdf}>;) if test.result_rdf && variant == :rdf
+      output << %(  mf:result <#{test.result_json}>;) if test.result_json && [:json, :nonnorm].include?(variant)
       output << %(  csvt:contentType "#{test.option[:contentType]}";) if test.option[:contentType]
 
       implicit = test.option[:implicit].map {|f| "<#{f}>"}.join(",\n    ")
