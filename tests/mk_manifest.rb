@@ -178,6 +178,7 @@ class Manifest
       "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
       "mf": "http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#",
       "mq": "http://www.w3.org/2001/sw/DataAccess/tests/test-query#",
+      "rdft": "http://www.w3.org/ns/rdftest#",
       "csvt": "http://www.w3.org/2013/csvw/tests/vocab#",
       "id": "@id",
       "type": "@type",
@@ -264,11 +265,12 @@ class Manifest
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix mf:   <http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#> .
 @prefix csvt: <http://www.w3.org/2013/csvw/tests/vocab#> .
+@prefix rdft: <http://www.w3.org/ns/rdftest#> .
 
 <manifest-#{variant}>  a mf:Manifest ;
 )
     output << %(  rdfs:label "#{TITLE[variant]}";)
-    output << %(  rdfs:comment "#{DESCRIPTION[variant]}";)
+    output << %(  rdfs:comment """#{DESCRIPTION[variant]}""";)
     output << %(  mf:entries \()
 
     tests.select do |t|
@@ -290,7 +292,7 @@ class Manifest
       output << "" # separator
       output << ":#{test.id} a #{test_class(test, variant)};"
       output << %(  mf:name "#{test.name}";)
-      output << %(  rdfs:comment "#{test.comment}";)
+      output << %(  rdfs:comment """#{test.comment}""";)
       output << %(  rdft:approval #{(test.approval ? "rdft:#{test.approval}" : "rdft:Proposed")};)
       output << %(  csvt:option [\n    csvt:noProv true;)
       output << %(    csvt:metadata <#{test.user_metadata}>;) if test.user_metadata
