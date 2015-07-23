@@ -58,6 +58,7 @@ with open(cfg['csv_fn'], 'rb') as csvfile:
             virtualCols[ col.get('name')] = col
 
     for row_i, tableRow in enumerate(myreader):
+        print "\n\n"
         for col_j, cellValue in enumerate(tableRow):
             colTitle = foundCols.get(col_j, "N/A")
             decodedCellValue = cellValue.decode('utf-8') # assumes encoding. TODO.
@@ -79,6 +80,7 @@ with open(cfg['csv_fn'], 'rb') as csvfile:
                 # todo: override
 
         # Now loop through virtual cols for this row ID and emit. Needless code duplication here too.
+        print
         for k,v in virtualCols.items():
             if verbose:
                 print "Virtual column: k=%s v=%s " % (k,v)
@@ -88,11 +90,21 @@ with open(cfg['csv_fn'], 'rb') as csvfile:
                 vrow_propertyUrl = expandTemplate(virtualCellSpec.get('propertyUrl', "N/A"), row_i)
                 vrow_valueUrl = expandTemplate(virtualCellSpec.get('valueUrl', "NA"), row_i)
 
-                dt = virtualCellSpec.get('datatype','N/A')
-                if dt == "anyURI":
-                    print "<%s> <%s> <%s> . # VirtualLinkTriple" % (expandBaseHref(vrow_aboutUrl),expandNS(vrow_propertyUrl),expandBaseHref(vrow_valueUrl))
-                else:
-                    print "<%s> <%s> \"%s\" . # VirtualTextTriple" % (expandBaseHref(vrow_aboutUrl),expandNS(myrow_propertyUrl),vrow_valueUrl)
+                # TODO
+                # a) <http://events.example.net/#event-0> <http://schema.org/url> "#place-0" . # VirtualTextTriple
+                # b) <http://events.example.net/#offer-0> <http://schema.org/url> "schema:Offer" . # VirtualTextTriple
+                # - wrong property, and ns needs expansion.
+
+                # defs:
+                #A:   "name": "offers", "virtual": true, "aboutUrl": "#event-{_row}", "propertyUrl": "schema:offers",  "valueUrl": "#offer-{_row}"
+                #B:  "name": "type_offer", "virtual": true, "aboutUrl": "#offer-{_row}", "propertyUrl": "rdf:type", "valueUrl": "schema:Offer"
+
+                print "<%s> <%s> <%s> . # VirtualTriple" % (expandNS(expandBaseHref(vrow_aboutUrl)),expandNS(vrow_propertyUrl),expandNS(expandBaseHref(vrow_valueUrl)))
+                #dt = virtualCellSpec.get('datatype','N/A')
+                #if dt == "anyURI":
+                #    print "<%s> <%s> <%s> . # VirtualLinkTriple" % (expandBaseHref(vrow_aboutUrl),expandNS(vrow_propertyUrl),expandBaseHref(vrow_valueUrl))
+                #else:
+                #    print "<%s> <%s> \"%s\" . # VirtualTextTriple" % (expandBaseHref(vrow_aboutUrl),expandNS(vrow_propertyUrl),expandNS(vrow_valueUrl))
             else:
                 print "# ERROR: Failed to get VirtualCellSpec. %s " % virtualCellSpec
 
