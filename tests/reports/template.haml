@@ -103,6 +103,25 @@
       td.passed-most {color: darkorange;}
       td.passed-some {color: red;}
       td.passed-none {color: gray;}
+
+      dl.test-detail, dl.test-options {
+        padding: 0.5em;
+      }
+      dl.test-detail>dt, dl.test-options>dt {
+        float: left;
+        clear: left;
+        text-align: right;
+        font-weight: bold;
+        color: green;
+      }
+      dl.test-detail>dt:after, dl.test-options>dt:after {content: ": "}
+      dl.test-detail>dd, dl.test-options>dd {
+        margin: 0 0 0 110px;
+        padding: 0 0 0.5em 0;
+      }
+      dl.test-description>dt {margin-top: 2em;}
+      .warn {color: orange;}
+      .error {color: red;}
   %body{prefix: "earl: http://www.w3.org/ns/earl# doap: http://usefulinc.com/ns/doap# mf: http://www.w3.org/2001/sw/DataAccess/tests/test-manifest#"}
     %section#abstract{about: tests['@id'], typeof: Array(tests['@type']).join(" ")}
       %p
@@ -174,10 +193,10 @@
       - tests['entries'].each do |manifest|
         - test_cases = manifest['entries']
         %section{typeof: manifest['@type'].join(" "), resource: manifest['@id']}
-          %h2{property: "dc:title mf:name"}<=manifest['title']
-          - Array(manifest['description']).each do |desc|
-            %p{property: "rdfs:comment"}<
-              ~ CGI.escapeHTML desc
+          %h2{property: "dc:title mf:name"}<=manifest['rdfs:label']
+          %div{property: "rdfs:comment"}
+            :markdown
+              #{manifest['rdfs:comment']}
           %table.report
             - skip_subject = {}
             - passed_tests = []
@@ -288,25 +307,59 @@
     %section.appendix
       %h2
         Test Definitions
-      %dl
-        - tests['entries'].each do |manifest|
-          %div{property: "mf:entries", inlist: true, resource: manifest['@id']}
-            %h3{about: manifest['@id'], property: "rdfs:label"}<~manifest['title']
-            :markdown
-              #{manifest['description']}
+      - tests['entries'].each do |manifest|
+        %section
+          %h3<~manifest['rdfs:label']
+          :markdown
+            #{manifest['rdfs:comment']}
+          %dl.test-description
             - manifest['entries'].each do |test|
-              %dl.test-description
-                %dt{id: test_refs[test['@id']], resource: test['@id']}
-                  = "Test #{test['@id'].split("#").last[4..-1]}: "
-                  %span{property: "dc:title mf:name"}<
-                    ~ CGI.escapeHTML test['title']
-                %dd{property: "mf:entry", inlist: true, resource: test['@id'], typeof: test['@type']}
-                  %div{property: "dc:description", lang: 'en'}
-                    :markdown
-                      #{test['description']}
-                  %p
-                    Test Description:
-                    %a{href: test['@id'].sub('tests/manifest', 'tests/#manifest')}=test['@id'].sub('tests/manifest', 'tests/#manifest')
+              %dt{id: test_refs[test['@id']]}
+                = "Test #{test['@id'].split("#").last[4..-1]}: #{test['title']}"
+              %dd
+                :markdown
+                  #{test['rdfs:comment']}
+                - if test['@type'].to_s =~ /Negative/
+                  %p.error
+                    Negative Test.
+                - if test['@type'].to_s =~ /Warning/
+                  %p.warn
+                    Expects Warnings.
+                %dl.test-detail
+                  %dt="type"
+                  %dd<~test['@type'].detect {|t| t.start_with?('http://www.w3.org/2013/csvw/tests/vocab')}.split('#').last
+                  %dt="approval"
+                  %dd<~test['http://www.w3.org/ns/rdftest#approval'].values.first.split('#').last
+                  - if test['testAction']
+                    %dt="action"
+                    %dd
+                      %a{href: test['testAction']}<~test['testAction']
+                  - if test['testResult']
+                    %dt="result"
+                    %dd
+                      %a{href: test['testResult']}<~test['testResult']
+                  - if test['http://www.w3.org/2013/csvw/tests/vocab#httpLink']
+                    %dt="Link Header"
+                    %dd
+                      %code&= test['http://www.w3.org/2013/csvw/tests/vocab#httpLink']
+                  - if test['http://www.w3.org/2013/csvw/tests/vocab#implicit']
+                    %dt="Implicit"
+                    %dd
+                      - imp = test['http://www.w3.org/2013/csvw/tests/vocab#implicit']
+                      - imp = [imp] unless imp.is_a?(Array)
+                      - imp = imp.map{|i| i.values}.flatten.compact
+                      - imp.each do |u|
+                        %a{href: u}<~u
+                  - if opt = test['http://www.w3.org/2013/csvw/tests/vocab#option']
+                    %dt="options"
+                    %dd
+                      - if opt['http://www.w3.org/2013/csvw/tests/vocab#noProv']
+                        noProv: true
+                      - if opt['http://www.w3.org/2013/csvw/tests/vocab#minimal']
+                        minimal: true
+                      - if opt['http://www.w3.org/2013/csvw/tests/vocab#metadata']
+                        user metadata:
+                        %a{href: opt['http://www.w3.org/2013/csvw/tests/vocab#metadata'].values.first}<~opt['http://www.w3.org/2013/csvw/tests/vocab#metadata'].values.first
     %section#appendix{property: "earl:generatedBy", resource: tests['generatedBy']['@id'], typeof: tests['generatedBy']['@type']}
       %h2
         Report Generation Software
