@@ -224,7 +224,7 @@ class Manifest
       entry["result"] = test.result_rdf if test.result_rdf && variant == :rdf
       entry["result"] = test.result_json if test.result_json && [:json, :nonnorm].include?(variant)
       entry["implicit"] = test.option[:implicit] unless test.option[:implicit].empty?
-      entry["httpLink"] = %(<#{test.link_metadata.split('/').last}>; rel="describedby") if test.link_metadata
+      entry["httpLink"] = %(<#{test.link_metadata.split('/').last}>; rel="describedby"; type="application/csvm+json") if test.link_metadata
 
       entry["option"]["metadata"] = test.user_metadata if test.user_metadata
       entry["option"]["minimal"] = true if test.option[:minimal]
