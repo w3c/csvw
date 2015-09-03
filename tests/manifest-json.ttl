@@ -41,7 +41,9 @@
     :test216 :test217 :test218 :test219 :test220 :test221 :test222 :test223 :test224 :test225
     :test226 :test227 :test228 :test229 :test230 :test231 :test232 :test233 :test234 :test235
     :test236 :test237 :test238 :test242 :test243 :test244 :test245 :test246 :test247 :test248
-    :test251 :test252 :test253 :test259 :test260 :test261
+    :test251 :test252 :test253 :test259 :test260 :test261 :test263 :test264 :test266 :test267
+    :test268 :test269 :test270 :test271 :test272 :test273 :test274 :test275 :test276 :test277
+    :test278 :test279 :test280 :test281
   ) .
 
 :test001 a csvt:ToJsonTest;
@@ -2742,4 +2744,216 @@
   ];
   mf:action <test261-metadata.json>;
   csvt:implicit <test261.csv>;
+  .
+
+:test263 a csvt:ToJsonTest;
+  mf:name "@type on a common property can be a built-in type";
+  rdfs:comment """The value of any member of `@type` MUST be either a _term_ defined in [csvw-context], a _prefixed name_ where the prefix is a term defined in [csvw-context], or an absolute URL.""";
+  rdft:approval rdft:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test263-metadata.json>;
+  mf:result <test263.json>;
+  csvt:implicit <tree-ops.csv>;
+  .
+
+:test264 a csvt:ToJsonTest;
+  mf:name "@type on a common property can be a CURIE if the prefix is one of the built-in ones";
+  rdfs:comment """The value of any member of `@type` MUST be either a _term_ defined in [csvw-context], a _prefixed name_ where the prefix is a term defined in [csvw-context], or an absolute URL.""";
+  rdft:approval rdft:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test264-metadata.json>;
+  mf:result <test264.json>;
+  csvt:implicit <tree-ops.csv>;
+  .
+
+:test266 a csvt:ToJsonTestWithWarnings;
+  mf:name "`null` contains an array of (valid) string & (invalid) numeric values";
+  rdfs:comment """Processors MUST issue a warning if a property is set to an invalid value type""";
+  rdft:approval rdft:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test266-metadata.json>;
+  mf:result <test266.json>;
+  csvt:implicit <tree-ops.csv>;
+  .
+
+:test267 a csvt:NegativeJsonTest;
+  mf:name "@id on datatype is invalid (eg starts with _:)";
+  rdfs:comment """It MUST NOT start with `_:` and it MUST NOT be the URL of a built-in datatype.""";
+  rdft:approval rdft:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test267-metadata.json>;
+  csvt:implicit <tree-ops.csv>;
+  .
+
+:test268 a csvt:ToJsonTest;
+  mf:name "`base` missing on datatype (defaults to string)";
+  rdfs:comment """An atomic property that contains a single string: the name of one of the built-in datatypes, as listed above (and which are defined as terms in the default context). Its default is string.""";
+  rdft:approval rdft:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test268-metadata.json>;
+  mf:result <test268.json>;
+  csvt:implicit <tree-ops.csv>;
+  .
+
+:test269 a csvt:ToJsonTestWithWarnings;
+  mf:name "`format` for a boolean datatype is a string but in the wrong form (eg YN)";
+  rdfs:comment """If the datatype base for a cell is `boolean`, the datatype format annotation provides the true value followed by the false value, separated by `|`. If the format does not follow this syntax, implementations MUST issue a warning and proceed as if no format had been provided.""";
+  rdft:approval rdft:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test269-metadata.json>;
+  mf:result <test269.json>;
+  csvt:implicit <test269.csv>;
+  .
+
+:test270 a csvt:ToJsonTestWithWarnings;
+  mf:name "transformation includes an invalid property (eg foo)";
+  rdfs:comment """All terms used within a metadata document MUST be defined in [csvw-context] defined for this specification""";
+  rdft:approval rdft:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test270-metadata.json>;
+  mf:result <test270.json>;
+  csvt:implicit <tree-ops.csv>;
+  .
+
+:test271 a csvt:NegativeJsonTest;
+  mf:name "foreign key includes an invalid property (eg `dc:description`)";
+  rdfs:comment """A foreign key definition is a JSON object that must contain only the following properties. . .""";
+  rdft:approval rdft:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test271-metadata.json>;
+  csvt:implicit <test271.csv>;
+  .
+
+:test272 a csvt:NegativeJsonTest;
+  mf:name "foreign key reference includes an invalid property (eg `dc:description`)";
+  rdfs:comment """A foreign key definition is a JSON object that must contain only the following properties. . .""";
+  rdft:approval rdft:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test272-metadata.json>;
+  csvt:implicit <test272.csv>;
+  .
+
+:test273 a csvt:ToJsonTest;
+  mf:name "`@base` set in `@context` overriding eg CSV location";
+  rdfs:comment """If present, its value MUST be a string that is interpreted as a URL which is resolved against the location of the metadata document to provide the **base URL** for other URLs in the metadata document.""";
+  rdft:approval rdft:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test273-metadata.json>;
+  mf:result <test273.json>;
+  csvt:implicit <test273/action.csv>;
+  .
+
+:test274 a csvt:NegativeJsonTest;
+  mf:name "`@context` object includes properties other than `@base` and `@language`";
+  rdfs:comment """The `@context` MUST have one of the following values: An array composed of a string followed by an object, where the string is `http://www.w3.org/ns/csvw` and the object represents a local context definition, which is restricted to contain either or both of the following members.""";
+  rdft:approval rdft:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test274-metadata.json>;
+  csvt:implicit <tree-ops.csv>;
+  .
+
+:test275 a csvt:ToJsonTestWithWarnings;
+  mf:name "property acceptable on column appears on table group";
+  rdfs:comment """Table Group may only use defined properties.""";
+  rdft:approval rdft:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test275-metadata.json>;
+  mf:result <test275.json>;
+  csvt:implicit <tree-ops.csv>;
+  .
+
+:test276 a csvt:ToJsonTestWithWarnings;
+  mf:name "property acceptable on column appears on table";
+  rdfs:comment """Table may only use defined properties.""";
+  rdft:approval rdft:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test276-metadata.json>;
+  mf:result <test276.json>;
+  csvt:implicit <tree-ops.csv>;
+  .
+
+:test277 a csvt:ToJsonTestWithWarnings;
+  mf:name "property acceptable on table appears on column";
+  rdfs:comment """Column may only use defined properties.""";
+  rdft:approval rdft:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test277-metadata.json>;
+  mf:result <test277.json>;
+  csvt:implicit <tree-ops.csv>;
+  .
+
+:test278 a csvt:ToJsonTestWithWarnings;
+  mf:name "CSV has more headers than there are columns in the metadata";
+  rdfs:comment """Two schemas are compatible if they have the same number of non-virtual column descriptions, and the non-virtual column descriptions at the same index within each are compatible with each other.""";
+  rdft:approval rdft:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test278-metadata.json>;
+  mf:result <test278.json>;
+  csvt:implicit <tree-ops.csv>;
+  .
+
+:test279 a csvt:ToJsonTestWithWarnings;
+  mf:name "duration not matching xsd pattern";
+  rdfs:comment """Value MUST be a valid xsd:duration.""";
+  rdft:approval rdft:Approved;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test279-metadata.json>;
+  mf:result <test279.json>;
+  csvt:implicit <test279.csv>;
+  .
+
+:test280 a csvt:ToJsonTestWithWarnings;
+  mf:name "dayTimeDuration not matching xsd pattern";
+  rdfs:comment """Value MUST be a valid xsd:dayTimeDuration.""";
+  rdft:approval rdft:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test280-metadata.json>;
+  mf:result <test280.json>;
+  csvt:implicit <test280.csv>;
+  .
+
+:test281 a csvt:ToJsonTestWithWarnings;
+  mf:name "yearMonthDuration not matching xsd pattern";
+  rdfs:comment """Value MUST be a valid xsd:yearMonthDuration.""";
+  rdft:approval rdft:Proposed;
+  csvt:option [
+    csvt:noProv true;
+  ];
+  mf:action <test281-metadata.json>;
+  mf:result <test281.json>;
+  csvt:implicit <test281.csv>;
   .
