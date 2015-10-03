@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width,initial-scale=1" name="viewport" />
+    <title>Tabular Data on the Web: A Primer</title>
+    <script class="remove" src="../local-biblio.js"></script>
+    <script class="remove" src="https://www.w3.org/Tools/respec/respec-w3c-common"></script>
+    <script class="remove" src="../replace-ed-uris.js"></script>
+    <script class="remove">
+      var respecConfig = {
+          localBiblio: localBibliography,
+          specStatus: "ED",
+          shortName: "csvw-primer",
+          //publishDate:  "2014-03-27",
+          //previousPublishDate: "2015-04-16",
+          //previousMaturity: "WD",
+          //previousURI: "http://www.w3.org/TR/2015/WD-tabular-metadata-20150416/",
+          edDraftURI: "http://w3c.github.io/csvw/primer/",
+          //testSuiteURI: "http://www.w3.org/2013/csvw/tests/",
+          //implementationReportURI: "http://www.w3.org/2013/csvw/tests/reports/index.html",
+          // lcEnd: "3000-01-01",
+          //crEnd: "2015-10-30",
+          editors: [{
+            name: "Jeni Tennison",
+            company: "Open Data Institute",
+            companyURL: "http://theodi.org/",
+            w3cid: "33715"
+          }],
+          wg: "CSV on the Web Working Group",
+          wgURI: "http://www.w3.org/2013/csvw/",
+          wgPublicList: "public-csv-wg",
+          wgPatentURI: "http://www.w3.org/2004/01/pp-impl/68238/status",
+          otherLinks: [{
+            key: "Repository",
+            data: [{
+                value: "We are on Github",
+                href: "https://github.com/w3c/csvw"
+            }, {
+                value: "File a bug",
+                href: "https://github.com/w3c/csvw"
+            }]
+          }],
+          inlineCSS: true,
+          issueBase: "https://github.com/w3c/csvw/issues/",
+          noIDLIn: true,
+          noLegacyStyle: false
+          };
+    </script>
+    <script class="remove">
+    function escapeContent(doc, content) {
+          var utils = require("core/utils");
+    // perform transformations to make it render and prettier
+      return utils.xmlEscape(content);
+    }
+    </script>
+    <style>
+      td, th { padding-left: 1em; padding-right: 1em; }
+      tbody tr th { text-align: left; }
+      ol.algorithm {
+        counter-reset: numsection;
+        list-style-type: none;
+      }
+      ol.algorithm > li {
+        margin: 1em -1em;
+        padding-right: 1em;
+        text-indent: -1em;
+      }
+      ol.algorithm > li:before {
+        font-weight: bold;
+        counter-increment: numsection;
+        content: counters(numsection, ".") " ";
+      }
+      ol.algorithm>li p, ol.algorithm>li div {text-indent: 0em}
+      ol.algorithm>li>p:first-child {position: relative; display: inline;}
+      pre {overflow: auto;}
+      dd a.externalDFN, p a.externalDFN {border-bottom:  1px solid #99c; font-style: italic;}
+
+      dl.typography dt { font-weight: normal}
+      dl.typography dd { margin-bottom: 0.3em; margin-top: 0.2em;}
+      dl.typography a.externalDFN { border-bottom:  1px solid #99c; font-style: italic; }
+    </style>
+  </head>
+  <body>
+    <section id="abstract">
+      <p>
+        CSV is one of the most popular formats for publishing data on the web. It is concise, easy to understand by both humans and computers, and aligns nicely to the tabular nature of most data.
+      </p>
+      <p>
+        But CSV is also a poor format for data. There is no mechanism within CSV to indicate the type of data in a particular column, or whether values in a particular column must be unique. It is therefore hard to validate and prone to errors such as missing values or mismatching formats.
+      </p>
+      <p>
+        The <a href="http://www.w3.org/2013/csvw">CSV on the Web Working Group</a> has developed standard ways to express useful metadata about CSV files and other kinds of tabular data. This primer takes you through the ways in which these standards work together, covering:
+      </p>
+      <ul>
+        <li>What we mean by "tabular data" and "CSV"</li>
+        <li>Where files that provide metadata about CSV live</li>
+        <li>How to define the content of columns in a CSV file</li>
+        <li>How to provide other metadata about a CSV file</li>
+      </ul>
+      <p>
+        Where possible, this primer links back to the normative definitions of terms and properties in the standards. Nothing in this primer overrides those normative definitions.
+      </p>
+    </section>
+    <section id="sotd">
+      <p>
+        The <a href="http://www.w3.org/2013/csvw">CSV on the Web Working Group</a> was <a href="http://www.w3.org/2013/05/lcsv-charter.html">chartered</a> to produce a recommendation "Access methods for CSV Metadata" as well as recommendations for "Metadata vocabulary for CSV data" and "Mapping mechanism to transforming CSV into various formats (e.g., RDF, JSON, or XML)". This non-normative document is a primer that describes how these standards work together for new readers. The normative standards are:
+      </p>
+      <ul>
+        <li><a href="http://w3c.github.io/csvw/syntax/">Model for Tabular Data and Metadata on the Web</a></li>
+        <li><a href="http://w3c.github.io/csvw/metadata/">Metadata Vocabulary for Tabular Data</a></li>
+        <li><a href="http://w3c.github.io/csvw/csv2json/">Generating JSON from Tabular Data on the Web</a></li>
+        <li><a href="http://w3c.github.io/csvw/csv2rdf/">Generating RDF from Tabular Data on the Web</a></li>
+      </ul>
+    </section>
+    <section>
+      <h2>What is tabular data and CSV?</h2>
+      <p>
+        Tabular data is any data that can be arranged in a table, like the one here:
+      </p>
+      <table>
+        <tr><th></th><th>column 1</th><th>column 2</th><th>column 3</th></tr>
+        <tr><th>row 1</th><td>cell in column 1 and row 1</td><td>cell in column 2 and row 1</td><td>cell in column 3 and row 1</td></tr>
+        <tr><th>row 2</th><td>cell in column 1 and row 2</td><td>cell in column 2 and row 2</td><td>cell in column 3 and row 2</td></tr>
+        <tr><th>row 3</th><td>cell in column 1 and row 3</td><td>cell in column 2 and row 3</td><td>cell in column 3 and row 3</td></tr>
+      </table>
+      <p>
+        There are lots of syntaxes for expressing tabular data on the web. You can put it in HTML tables, pass it around as Excel spreadsheets, or store it in a SQL database.
+      </p>
+      <p>
+        One easy way to pass around tabular data is as CSV: as comma-separated values. A CSV file writes each row on a separate line and each cell is separated from the next with a comma. The values of cells can be written with double quotes around them; this is necessary when a cell value contains a line break or a comma. So the tabular data above can be expressed in CSV as:
+      </p>
+      <pre class="example">
+cell in column 1 and row 1,cell in column 2 and row 1,cell in column 3 and row 1
+cell in column 1 and row 2,cell in column 2 and row 2,cell in column 3 and row 2
+cell in column 1 and row 3,cell in column 2 and row 3,cell in column 3 and row 3
+</pre>
+      <p>
+        or, with double quotes around cell values:
+      </p>
+      <pre class="example">
+"cell in column 1 and row 1","cell in column 2 and row 1","cell in column 3 and row 1"
+"cell in column 1 and row 2","cell in column 2 and row 2","cell in column 3 and row 2"
+"cell in column 1 and row 3","cell in column 2 and row 3","cell in column 3 and row 3"
+</pre>
+      <p>
+        CSV files usually have an additional row at the top called a header row, which gives human-readable names or titles for each of the columns. Here is a sample CSV file that contains a header row:
+      </p>
+      <pre class="example">
+<strong>"country","country group","name (en)","name (fr)","name (de)","latitude","longitude"</strong>
+"at","eu","Austria","Autriche","Österreich","47.6965545","13.34598005"
+"be","eu","Belgium","Belgique","Belgien","50.501045","4.47667405"
+"bg","eu","Bulgaria","Bulgarie","Bulgarien","42.72567375","25.4823218"
+</pre>
+      <p>
+        Column titles are a type of annotation on a column, not part of the data itself. For example, they don't count when you're counting the rows in a table:
+      </p>
+      <table>
+        <tr><th></th><th>column 1</th><th>column 2</th><th>column 3</th><th>column 4</th></tr>
+        <tr><th>titles</th><th>country</th><th>country group</th><th>name (en)</th><th>name (fr)</th><th>name (de)</th><th>latitude</th><th>longitude</th></tr>
+        <tr><th>row 1</th><td>AT</td><td>eu</td><td>Austria</td><td>Autriche</td><td>Österreich</td><td>47.6965545</td><td>13.34598005</td>
+        <tr><th>row 2</th><td>BE</td><td>eu</td><td>Belgium</td><td>Belgique</td><td>Belgien</td><td>50.501045</td><td>4.47667405</td>
+        <tr><th>row 3</th><td>BG</td><td>eu</td><td>Bulgaria</td><td>Bulgarie</td><td>Bulgarien</td><td>42.72567375</td><td>25.4823218</td>
+      </table>
+    </section>
+    <section>
+      <h1>How can you provide metadata for CSV?</h1>
+      <p>
+        You can provide metadata about CSV files using a JSON metadata file. If you're just providing metadata about one file, the easiest thing to do is to name the CSV file by adding <code>-metadata.json</code> to the end of the name of the CSV file. For example, if your CSV file is called <code>countries.csv</code> then call the metadata file <code>countries.csv-metadata.json</code>.
+      </p>
+      <p>
+        The simplest metadata file you can create contains a single table description and looks like:
+      </p>
+      <pre class="example">
+{
+  "@context": "http://www.w3.org/ns/csvw",
+  "url": "countries.csv"
+}
+      </pre>
+      <p>
+        Metadata files must always include the <code>@context</code> property with that value: this enables implementations to tell that these are CSV metadata files. The <code>url</code> property points to the CSV file that the metadata file describes.
+      </p>
+      <p>
+        By default, if implementations can't find a metadata file by appending <code>-metadata.json</code> to the filename of the CSV file, they'll just look for a file called <code>csv-metadata.json</code> in the same directory.
+      </p>
+      <p>
+        Metadata files can also describe several CSV files at once, using a slightly different syntax:
+      </p>
+      <pre class="example">
+{
+  "@context": "http://www.w3.org/ns/csvw",
+  "tables": [{
+    "url": "countries.csv"
+  }, {
+    "url": "country-groups.csv"
+  }, {
+    "url": "unemployment.csv"
+  }]
+}
+      </pre>
+      <p>
+        Here, the <code>tables</code> property holds an array of table descriptions, each with the URL of the CSV file that it's describing. The metadata file as a whole describes a group of tables.
+      </p>
+    </section>
+    <section>
+      <h1>What kind of information can you provide about a CSV file?</h1>
+      <p>
+        The description of a table within a metadata file can include:
+      </p>
+      <ul>
+        <li>metadata about the CSV file, such as a description, authorship or licensing information, which can provide context for people using the CSV file</li>
+        <li>a definition of the structure of the CSV file, which can be used to validate the data that it holds</li>
+        <li>instructions that enable processors to transform the CSV file into other formats, such as JSON or RDF</li>
+      </ul>
+      <p>
+        We'll come on to how to define the structure of the CSV file, and how to transform CSV into other formats, later. For now, let's look at the other metadata that you can provide about a CSV file. Here's an example:
+      </p>
+      <pre class="example">
+{
+  "@context": "http://www.w3.org/ns/csvw",
+  "dc:title": "Unemployment in Europe (monthly)"
+  "dc:description": "Harmonized unemployment data for European countries."
+  "dc:creator": "Eurostat",
+  "tables": [{
+    "url": "countries.csv",
+    "dc:title": "Countries"
+  }, {
+    "url": "country-groups.csv",
+    "dc:title": "Country groups"
+  }, {
+    "url": "unemployment.csv",
+    "dc:title": "Unemployment (monthly)",
+    "dc:description": "The total number of people unemployed"
+  }]
+}
+</pre>
+      <p>
+        This example uses <a href="http://dublincore.org/documents/dcmi-terms/">Dublin Core</a> as a vocabulary for providing metadata. You can tell that's the vocabulary that's being used because the terms like <code>dc:title</code> and <code>dc:description</code> begin with the prefix <code>dc</code>, which stands for Dublin Core.
+      </p>
+      <p>
+        There are several different metadata vocabularies in common use around the web. Some people use <a href="http://dublincore.org/documents/dcmi-terms/">Dublin Core</a>. Some people use <a href="http://schema.org">schema.org</a>. Some people use <a href="http://www.w3.org/TR/vocab-dcat/">DCAT</a>. All of these vocabularies can be used independently or together. A publisher could alternatively use:
+      </p>
+      <pre class="example">
+{
+  "@context": "http://www.w3.org/ns/csvw",
+  "schema:name": "Unemployment in Europe (monthly)"
+  "schema:description": "Harmonized unemployment data for European countries."
+  "schema:creator": { "schema:name": "Eurostat" },
+  "tables": [{
+    "url": "countries.csv",
+    "schema:name": "Countries"
+  }, {
+    "url": "country-groups.csv",
+    "schema:name": "Country groups"
+  }, {
+    "url": "unemployment.csv",
+    "schema:name": "Unemployment (monthly)",
+    "dc:description": "The total number of people unemployed"
+  }]
+}
+</pre>
+      <p class="note">
+        It's not clear at the moment which metadata vocabulary will give publishers the most benefits. Search engines are likely to recognise <a href="http://schema.org">schema.org</a>. RDF-based systems are more likely to recognise Dublin Core.
+      </p>
+      <p>
+        More generally, you can use prefixed properties like these on any of the objects in a metadata document. The prefixes that are recognised are those used in the <a href="http://www.w3.org/2011/rdfa-context/rdfa-1.1">RDFa 1.1 Initial Context</a>. Other properties must be named with full URLs.
+      </p>
+    </section>
+    <section>
+      <h1>How do you support units of measure?</h1>
+    </section>
+    <section>
+      <h1>What about multi-lingual CSV files?</h1>
+    </section>
+    <section>
+      <h1>What about CSV that isn't standard CSV?</h1>
+    </section>
+  </body>
+</html>
+
