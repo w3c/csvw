@@ -1,8 +1,8 @@
 var conversions = [
-  ["http://w3c.github.io/csvw/syntax/", "http://www.w3.org/TR/2015/PR-tabular-data-model-20151117/"],
-  ["http://w3c.github.io/csvw/csv2rdf/", "http://www.w3.org/TR/2015/PR-csv2rdf-20151117/"],
-  ["http://w3c.github.io/csvw/csv2json/", "http://www.w3.org/TR/2015/PR-csv2json-20151117/"],
-  ["http://w3c.github.io/csvw/metadata/", "http://www.w3.org/TR/2015/PR-tabular-metadata-20151117/"],
+  ["http://w3c.github.io/csvw/syntax/", "http://www.w3.org/TR/2015/REC-tabular-data-model-20151217/"],
+  ["http://w3c.github.io/csvw/csv2rdf/", "http://www.w3.org/TR/2015/REC-csv2rdf-20151217/"],
+  ["http://w3c.github.io/csvw/csv2json/", "http://www.w3.org/TR/2015/REC-csv2json-20151217/"],
+  ["http://w3c.github.io/csvw/metadata/", "http://www.w3.org/TR/2015/REC-tabular-metadata-20151217/"],
   ["http://w3c.github.io/csvw/use-cases-and-requirements/", "http://www.w3.org/TR/2014/WD-csvw-ucr-20140701/"]          
 ];
 
@@ -13,9 +13,9 @@ var localBibliography = {
         "Gregg Kellogg"
       ],
       "title": "Model for Tabular Data and Metadata on the Web",
-      "href" : "http://www.w3.org/TR/2015/PR-tabular-data-model-20151117/",
-      "rawDate": "2015-11-17",
-      "status" : "PR",
+      "href" : "http://www.w3.org/TR/2015/REC-tabular-data-model-20151217/",
+      "rawDate": "2015-12-17",
+      "status" : "REC",
       "publisher": "W3C"
   },
   "tabular-metadata": {
@@ -24,9 +24,9 @@ var localBibliography = {
         "Gregg Kellogg"
       ],
       "title": "Metadata Vocabulary for Tabular Data",
-      "href" : "http://www.w3.org/TR/2015/PR-tabular-metadata-20151117/",
-      "rawDate": "2015-11-17",
-      "status" : "PR",
+      "href" : "http://www.w3.org/TR/2015/REC-tabular-metadata-20151217/",
+      "rawDate": "2015-12-17",
+      "status" : "REC",
       "publisher": "W3C"
   },
   "csv2json": {
@@ -35,9 +35,9 @@ var localBibliography = {
         "Ivan Herman"
       ],
       "title": "Generating JSON from Tabular Data on the Web",
-      "href" : "http://www.w3.org/TR/2015/PR-csv2json-20151117/",
-      "rawDate": "2015-11-17",
-      "status" : "PR",
+      "href" : "http://www.w3.org/TR/2015/PR-csv2json-20151217/",
+      "rawDate": "2015-12-17",
+      "status" : "REC",
       "publisher": "W3C"
   },
   "csv2rdf": {
@@ -47,9 +47,9 @@ var localBibliography = {
         "Gregg Kellogg"
       ],
       "title": "Generating RDF from Tabular Data on the Web",
-      "href" : "http://www.w3.org/TR/2015/PR-csv2rdf-20151117/",
-      "rawDate": "2015-11-17",
-      "status" : "PR",
+      "href" : "http://www.w3.org/TR/2015/PR-csv2rdf-20151217/",
+      "rawDate": "2015-12-17",
+      "status" : "REC",
       "publisher": "W3C"
   },
   "csvw-context": {
