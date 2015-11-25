@@ -1,0 +1,87 @@
+<html>
+  <head>
+    <title>Example of CSVW metadata in HTML referencing external CSV</title>
+    <style type="text/css">
+    /* Style Turtle script blocks to be visable */
+    pre.example script {
+        display:block;
+    }
+    </style>
+  </head>
+  <body>
+    <p>This shows an example of embeddeding CSV metadata within an HTML document referencing an <a rel="describes" href="countries.csv">external CSV</a> which contains the following:</p>
+    <table id="countries">
+      <caption>Countries</caption>
+      <tr><th>countryCode</th><th>latitude</th><th>longitude</th><th>name</th></tr>
+      <tr><td>AD</td><td>42.5</td><td>1.6</td><td>Andorra</td></tr>
+      <tr><td>AE</td><td>23.4</td><td>53.8</td><td>United Arab Emirates</td></tr>
+      <tr><td>AF</td><td>33.9</td><td>67.7</td><td>Afghanistan</td></tr>
+    </table>
+    <table id="country_slice">
+      <caption>Countries</caption>
+      <tr><th>countryRef</th><th>year</th><th>population</th></tr>
+      <tr><td>AF</td><td>1960</td><td>9616353</td></tr>
+      <tr><td>AF</td><td>1961</td><td>9799379</td></tr>
+      <tr><td>AF</td><td>1962</td><td>9989846</td></tr>
+    </table>
+    <p>The metadata is describe here in a script element:</p>
+    <pre class="example">
+      <script type="application/csvm+json">
+      {
+        "@context": "http://www.w3.org/ns/csvw",
+        "tables": [{
+          "url": "countries.csv",
+          "tableSchema": {
+            "columns": [{
+              "name": "countryCode",
+              "titles": "countryCode",
+              "datatype": "string",
+              "propertyUrl": "http://www.geonames.org/ontology{#_name}"
+            }, {
+              "name": "latitude",
+              "titles": "latitude",
+              "datatype": "number"
+            }, {
+              "name": "longitude",
+              "titles": "longitude",
+              "datatype": "number"
+            }, {
+              "name": "name",
+              "titles": "name",
+              "datatype": "string"
+            }],
+            "aboutUrl": "countries.csv{#countryCode}",
+            "propertyUrl": "http://schema.org/{_name}",
+            "primaryKey": "countryCode"
+          }
+        }, {
+          "url": "country_slice.csv",
+          "tableSchema": {
+            "columns": [{
+              "name": "countryRef",
+              "titles": "countryRef",
+              "valueUrl": "countries.csv{#countryRef}"
+            }, {
+              "name": "year",
+              "titles": "year",
+              "datatype": "gYear"
+            }, {
+              "name": "population",
+              "titles": "population",
+              "datatype": "integer"
+            }],
+            "foreignKeys": [{
+              "columnReference": "countryRef",
+              "reference": {
+                "resource": "countries.csv",
+                "columnReference": "countryCode"
+              }
+            }]
+          }
+        }]
+      }
+      </script>
+    </pre>
+    <p>The metadata is also <a rel="describedby" href="countries.json">described in JSON</a>.</p>
+  </body>
+</html>
