@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width,initial-scale=1" name="viewport" />
+    <title>Embedding Tabular Metadata in HTML</title>
+    <script class="remove" src="../local-biblio.js"></script>
+    <script class="remove" src="https://www.w3.org/Tools/respec/respec-w3c-common"></script>
+    <script class="remove" src="../replace-ed-uris.js"></script>
+    <script class="remove">
+      var respecConfig = {
+          localBiblio: localBibliography,
+          specStatus: "ED",
+          shortName: "csvw-html",
+          //publishDate:  "2014-03-27",
+          //previousPublishDate: "2015-04-16",
+          //previousMaturity: "WD",
+          //previousURI: "http://www.w3.org/TR/2015/WD-tabular-metadata-20150416/",
+          edDraftURI: "http://w3c.github.io/csvw/html-note/",
+          //testSuiteURI: "http://www.w3.org/2013/csvw/tests/",
+          //implementationReportURI: "http://www.w3.org/2013/csvw/tests/reports/index.html",
+          // lcEnd: "3000-01-01",
+          //crEnd: "2015-10-30",
+          editors: [{
+            name: "Gregg Kellogg",
+            url: "http://greggkellogg.net/",
+            company: "Kellogg Associates",
+            companyURL: "http://kellogg-assoc.com/",
+            w3cid: "44770"
+           }],
+          wg: "CSV on the Web Working Group",
+          wgURI: "http://www.w3.org/2013/csvw/",
+          wgPublicList: "public-csv-wg",
+          wgPatentURI: "http://www.w3.org/2004/01/pp-impl/68238/status",
+          otherLinks: [{
+            key: "Repository",
+            data: [{
+                value: "We are on Github",
+                href: "https://github.com/w3c/csvw"
+            }, {
+                value: "File a bug",
+                href: "https://github.com/w3c/csvw"
+            }]
+          }],
+          inlineCSS: true,
+          issueBase: "https://github.com/w3c/csvw/issues/",
+          noIDLIn: true,
+          noLegacyStyle: false
+          };
+    </script>
+    <script class="remove">
+    function escapeContent(doc, content) {
+          var utils = require("core/utils");
+    // perform transformations to make it render and prettier
+      return utils.xmlEscape(content);
+    }
+    </script>
+    <style>
+      td, th { padding-left: 1em; padding-right: 1em; }
+      tbody tr th { text-align: left; }
+      ol.algorithm {
+        counter-reset: numsection;
+        list-style-type: none;
+      }
+      ol.algorithm > li {
+        margin: 1em -1em;
+        padding-right: 1em;
+        text-indent: -1em;
+      }
+      ol.algorithm > li:before {
+        font-weight: bold;
+        counter-increment: numsection;
+        content: counters(numsection, ".") " ";
+      }
+      ol.algorithm>li p, ol.algorithm>li div {text-indent: 0em}
+      ol.algorithm>li>p:first-child {position: relative; display: inline;}
+      pre {overflow: auto;}
+      dd a.externalDFN, p a.externalDFN {border-bottom:  1px solid #99c; font-style: italic;}
+
+      dl.typography dt { font-weight: normal}
+      dl.typography dd { margin-bottom: 0.3em; margin-top: 0.2em;}
+      dl.typography a.externalDFN { border-bottom:  1px solid #99c; font-style: italic; }
+    </style>
+  </head>
+  <body>
+    <section id="abstract">
+      <p>The <a href="http://w3c.github.io/csvw/syntax/">Model for Tabular Data and Metadata on the Web</a> describes mechanisms for extracting metadata from CSV documents starting with either a <a href="http://w3c.github.io/csvw/syntax/#dfn-tabular-data-file" class="externalDFN">tabular data file</a>, or a metadata description. In the case of starting with a CSV document, a procedure is followed to locate metadata describing that CSV (see <a href="http://w3c.github.io/csvw/syntax/#locating-metadata">Locating Metadata</a> in [[!tabular-data-model]]). Alternatively, processing may begin with a metadata file directly, which references the <a href="http://w3c.github.io/csvw/syntax/#dfn-tabular-data-file" class="externalDFN">tabular data file(s)</a>. However, in some cases, it is prefered to publish datasets using HTML rather than starting with either CSV or metadata files.</p>
+      <p>Secondly, tabular data is often contained within HTML in the form of <a href="http://www.w3.org/TR/html5/tabular-data.html#tabular-data">HTML table elements</a> (see [[!html5]]). This document describes a means of identifying such tables from [[!tabular-metadata]] and extracting annotated tabular data from HTML tables.</p>
+    </section>
+    <section id="sotd">
+      <p>
+        The <a href="http://www.w3.org/2013/csvw">CSV on the Web Working Group</a> was <a href="http://www.w3.org/2013/05/lcsv-charter.html">chartered</a> to produce a recommendation "Access methods for CSV Metadata" as well as recommendations for "Metadata vocabulary for CSV data" and "Mapping mechanism to transforming CSV into various formats (e.g., RDF, JSON, or XML)". This non-normative documement describes extensions for discovering [[!tabular-metadata]] within HTML documents, and for extracting <a href="http://w3c.github.io/csvw/syntax/#dfn-annotated-tabular-data-model" class="externalDFN">annotated tabular data</a> from HTML tables. The normative standards are:
+      </p>
+      <ul>
+        <li><a href="http://w3c.github.io/csvw/syntax/">Model for Tabular Data and Metadata on the Web</a></li>
+        <li><a href="http://w3c.github.io/csvw/metadata/">Metadata Vocabulary for Tabular Data</a></li>
+        <li><a href="http://w3c.github.io/csvw/csv2json/">Generating JSON from Tabular Data on the Web</a></li>
+        <li><a href="http://w3c.github.io/csvw/csv2rdf/">Generating RDF from Tabular Data on the Web</a></li>
+      </ul>
+    </section>
+    <section>
+      <h2>Embedding Tabular Metadata within HTML Documents</h2>
+      <p class="note">This section describes a mechanism similar to <a href="http://www.w3.org/TR/json-ld/#embedding-json-ld-in-html-documents">Embedding JSON-LD in HTML Documents</a> (see [[json-ld]]).</p>
+      <p>HTML <code>script</code> tags can be used to embed data blocks in documents (see <a href="http://www.w3.org/TR/html5/scripting-1.html#scripting-1">Scripting</a> in [[!html5]]). Metadata [[!tabular-metadata]] describing one or more <a href="http://w3c.github.io/csvw/syntax/#dfn-tabular-data-file" class="externalDFN">tabular data files</a> can embedded in HTML, which can be used as an alternative way to publish datasets.</p>
+      <p>The content should be placed in a <code>script</code> tag with the <code>type</code> set to <code>application/csvm+json</code>. The character encoding of the embedded metadata will match the HTML documents encoding.</p>
+    <pre class="example highlight" title="Tabular Meatadata embedded in HTML">
+      &lt;html&gt;
+        &lt;head&gt;
+          &lt;script type=&quot;application/csvm+json&quot;&gt;
+          {
+            &quot;@context&quot;: &quot;http://www.w3.org/ns/csvw&quot;,
+            &quot;tables&quot;: [{
+              &quot;url&quot;: &quot;#countries&quot;,
+              &quot;tableSchema&quot;: {
+                &quot;columns&quot;: [{
+                  &quot;name&quot;: &quot;countryCode&quot;,
+                  &quot;titles&quot;: &quot;countryCode&quot;,
+                  &quot;datatype&quot;: &quot;string&quot;,
+                  &quot;propertyUrl&quot;: &quot;http://www.geonames.org/ontology{#_name}&quot;
+                }, {
+                  &quot;name&quot;: &quot;latitude&quot;,
+                  &quot;titles&quot;: &quot;latitude&quot;,
+                  &quot;datatype&quot;: &quot;number&quot;
+                }, {
+                  &quot;name&quot;: &quot;longitude&quot;,
+                  &quot;titles&quot;: &quot;longitude&quot;,
+                  &quot;datatype&quot;: &quot;number&quot;
+                }, {
+                  &quot;name&quot;: &quot;name&quot;,
+                  &quot;titles&quot;: &quot;name&quot;,
+                  &quot;datatype&quot;: &quot;string&quot;
+                }],
+                &quot;aboutUrl&quot;: &quot;#countries_{countryCode}&quot;,
+                &quot;propertyUrl&quot;: &quot;http://schema.org/{_name}&quot;,
+                &quot;primaryKey&quot;: &quot;countryCode&quot;
+              }
+            }, {
+              &quot;url&quot;: &quot;#country_slice&quot;,
+              &quot;tableSchema&quot;: {
+                &quot;columns&quot;: [{
+                  &quot;name&quot;: &quot;countryRef&quot;,
+                  &quot;titles&quot;: &quot;countryRef&quot;,
+                  &quot;valueUrl&quot;: &quot;#countries_{countryRef}&quot;
+                }, {
+                  &quot;name&quot;: &quot;year&quot;,
+                  &quot;titles&quot;: &quot;year&quot;,
+                  &quot;datatype&quot;: &quot;gYear&quot;
+                }, {
+                  &quot;name&quot;: &quot;population&quot;,
+                  &quot;titles&quot;: &quot;population&quot;,
+                  &quot;datatype&quot;: &quot;integer&quot;
+                }],
+                &quot;foreignKeys&quot;: [{
+                  &quot;columnReference&quot;: &quot;countryRef&quot;,
+                  &quot;reference&quot;: {
+                    &quot;resource&quot;: &quot;#countries&quot;,
+                    &quot;columnReference&quot;: &quot;countryCode&quot;
+                  }
+                }]
+              }
+            }]
+          }
+          &lt;/script&gt;
+          ...
+        &lt;/head&gt;
+        &lt;body&gt;
+          ...
+        &lt;/body&gt;
+      &lt;/html&gt;
+    </pre>
+    <p>Depending on how the HTML document is served, certain strings may need to be escaped.</p>
+    <p>Processing embedded metadata is the same as processing metadata retrieved directly, using the location of the HTML document as base URL of the metadata document, except that the metadata is first extracted from the <code>script</code> element. A metadata document parsed from an HTML DOM will be a stream of character data rather than a stream of UTF-8 encoded bytes. No decoding is necessary if the HTML document has already been parsed into DOM. Each matching <code>script</code> data block is considered to be it's own metadata document.</p>
+    <p>To aid processors not including an HTML tool chain, HTML documentes including metadata within a <code>script</code> element should also provide the location of a native JSON version of the metadata using a Link header using the equivalent mechanism described for CSV files in <a href="#link-header" class="sectionRef"></a>.</p>
+    </section>
+    <section>
+      <h2>Extracting Tabular Data from HTML Tables</h2>
+      <p class="note">This section describes a mechanism for referencing HTML one or more tables from [[!tabular-metadata]], extracting raw tabular data and processing to create <a href="http://w3c.github.io/csvw/syntax/#dfn-annotated-tabular-data-model" class="externalDFN">annotated tabular data</a>.</p>
+  </body>
+</html>
+
