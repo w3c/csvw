@@ -35,7 +35,7 @@ var localBibliography = {
         "Ivan Herman"
       ],
       "title": "Generating JSON from Tabular Data on the Web",
-      "href" : "http://www.w3.org/TR/2015/PR-csv2json-20151217/",
+      "href" : "http://www.w3.org/TR/2015/REC-csv2json-20151217/",
       "rawDate": "2015-12-17",
       "status" : "REC",
       "publisher": "W3C"
@@ -47,7 +47,7 @@ var localBibliography = {
         "Gregg Kellogg"
       ],
       "title": "Generating RDF from Tabular Data on the Web",
-      "href" : "http://www.w3.org/TR/2015/PR-csv2rdf-20151217/",
+      "href" : "http://www.w3.org/TR/2015/REC-csv2rdf-20151217/",
       "rawDate": "2015-12-17",
       "status" : "REC",
       "publisher": "W3C"
