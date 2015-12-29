@@ -156,7 +156,7 @@ cell in column 1 and row 3,cell in column 2 and row 3,cell in column 3 and row 3
         Column titles are a type of annotation on a column, not part of the data itself. For example, they don't count when you're counting the rows in a table:
       </p>
       <table>
-        <tr><th></th><th>column 1</th><th>column 2</th><th>column 3</th><th>column 4</th></tr>
+        <tr><th></th><th>column 1</th><th>column 2</th><th>column 3</th><th>column 4</th><th>column 5</th><th>column 6</th><th>column 7</th></tr>
         <tr><th>titles</th><th>country</th><th>country group</th><th>name (en)</th><th>name (fr)</th><th>name (de)</th><th>latitude</th><th>longitude</th></tr>
         <tr><th>row 1</th><td>AT</td><td>eu</td><td>Austria</td><td>Autriche</td><td>Österreich</td><td>47.6965545</td><td>13.34598005</td>
         <tr><th>row 2</th><td>BE</td><td>eu</td><td>Belgium</td><td>Belgique</td><td>Belgien</td><td>50.501045</td><td>4.47667405</td>
@@ -267,10 +267,109 @@ cell in column 1 and row 3,cell in column 2 and row 3,cell in column 3 and row 3
       </p>
     </section>
     <section>
+      <h1>How can you say which columns are expected in a CSV file?</h1>
+      <p>
+        You can give information about the columns in a CSV file through a table schema. The simplest thing you can do is say what those columns should be called. For example, if you have some CSV like this:
+      </p>
+      <pre class="example">
+"country","country group","name (en)","name (fr)","name (de)","latitude","longitude"
+"at","eu","Austria","Autriche","Österreich","47.6965545","13.34598005"
+"be","eu","Belgium","Belgique","Belgien","50.501045","4.47667405"
+"bg","eu","Bulgaria","Bulgarie","Bulgarien","42.72567375","25.4823218"
+</pre>
+      <p>
+        You can say that the table contains seven columns named as they are in this CSV file like so:
+      </p>
+      <pre class="example">
+{
+  "@context": "http://www.w3.org/ns/csvw",
+  "url": "countries.csv"
+  "tableSchema": {
+    "columns": [{
+      "titles": "country"
+    },{
+      "titles": "country group"
+    },{
+      "titles": "name (en)"
+    },{
+      "titles": "name (fr)"
+    },{
+      "titles": "name (de)"
+    },{
+      "titles": "latitude"
+    },{
+      "titles": "longitude"
+    }]
+  }
+}
+      </pre>
+      <p class="note">
+        See <a href="#shared-schemas" class="sectionRef"></a> to understand why the property <code>titles</code> is plural.
+      </p>
+      <p>
+        A validator can check that the CSV file holds the expected columns (both the right number of columns and columns with the expected titles).
+      </p>
+    </section>
+    <section>
+      <h1>How can you say what kinds of values are expected in a column?</h1>
+      <p>
+        There's lots more that you can say about the expected content of columns in a CSV file. The most obvious thing is to indicate the data type. For example, with the CSV file:
+      </p>
+      <pre class="example">
+"country","country group","name (en)","name (fr)","name (de)","latitude","longitude"
+"at","eu","Austria","Autriche","Österreich","47.6965545","13.34598005"
+"be","eu","Belgium","Belgique","Belgien","50.501045","4.47667405"
+"bg","eu","Bulgaria","Bulgarie","Bulgarien","42.72567375","25.4823218"
+</pre>
+      <p>
+        The first five columns are strings and the last two are numbers. You can indicate this with the <code>datatype</code> property for each column:
+      </p>
+      <pre class="example">
+{
+  "@context": "http://www.w3.org/ns/csvw",
+  "url": "countries.csv"
+  "tableSchema": {
+    "columns": [{
+      "titles": "country",
+      "datatype": "string"
+    },{
+      "titles": "country group",
+      "datatype": "string"
+    },{
+      "titles": "name (en)",
+      "datatype": "string"
+    },{
+      "titles": "name (fr)",
+      "datatype": "string"
+    },{
+      "titles": "name (de)",
+      "datatype": "string"
+    },{
+      "titles": "latitude",
+      "datatype": "number"
+    },{
+      "titles": "longitude",
+      "datatype": "number"
+    }]
+  }
+}
+      </pre>
+      <p>
+        There are a number of different datatypes supported by CSV on the Web implementations, based on the set defined in [[xmlschema11-2]]. The complete set is shown in the following diagram:
+      </p>
+      <figure id="fig-datatypes" style="text-align:center">
+        <img src="http://www.w3.org/TR/tabular-metadata/datatypes.svg" style="width: 50%" alt="Built-in Datatype Hierarchy diagram" longdesc="http://www.w3.org/TR/tabular-metadata/datatypes.html#imageDescription" />
+        <figcaption>Diagram showing the built-in datatypes, based on [[xmlschema11-2]]; names in parentheses denote aliases to the [[xmlschema11-2]] terms (see the diagram in <a href="http://www.w3.org/TR/tabular-metadata/datatypes.svg">SVG</a> or <a href="http://www.w3.org/TR/tabular-metadata/datatypes.png">PNG</a> formats)</figcaption>
+      </figure>
+    </section>
+    <section>
       <h1>How do you support units of measure?</h1>
     </section>
     <section>
       <h1>What about multi-lingual CSV files?</h1>
+    </section>
+    <section id="shared-schemas">
+      <h1>How can you specify a single schema for multiple CSV files?</h1>
     </section>
     <section>
       <h1>What about CSV that isn't standard CSV?</h1>
