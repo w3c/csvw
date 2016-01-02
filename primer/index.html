@@ -5,7 +5,8 @@
     <meta content="width=device-width,initial-scale=1" name="viewport" />
     <title>Tabular Data on the Web: A Primer</title>
     <script class="remove" src="../local-biblio.js"></script>
-    <script class="remove" src="https://www.w3.org/Tools/respec/respec-w3c-common"></script>
+    <!--<script class="remove" src="https://www.w3.org/Tools/respec/respec-w3c-common"></script>-->
+    <script class="remove" src="http://pandora.aptest.com/w3c/respec-style/builds/respec-w3c-common.js"></script>
     <script class="remove" src="../replace-ed-uris.js"></script>
     <script class="remove">
       var respecConfig = {
@@ -57,28 +58,6 @@
     <style>
       td, th { padding-left: 1em; padding-right: 1em; }
       tbody tr th { text-align: left; }
-      ol.algorithm {
-        counter-reset: numsection;
-        list-style-type: none;
-      }
-      ol.algorithm > li {
-        margin: 1em -1em;
-        padding-right: 1em;
-        text-indent: -1em;
-      }
-      ol.algorithm > li:before {
-        font-weight: bold;
-        counter-increment: numsection;
-        content: counters(numsection, ".") " ";
-      }
-      ol.algorithm>li p, ol.algorithm>li div {text-indent: 0em}
-      ol.algorithm>li>p:first-child {position: relative; display: inline;}
-      pre {overflow: auto;}
-      dd a.externalDFN, p a.externalDFN {border-bottom:  1px solid #99c; font-style: italic;}
-
-      dl.typography dt { font-weight: normal}
-      dl.typography dd { margin-bottom: 0.3em; margin-top: 0.2em;}
-      dl.typography a.externalDFN { border-bottom:  1px solid #99c; font-style: italic; }
     </style>
   </head>
   <body>
@@ -95,8 +74,9 @@
       <ul>
         <li>What we mean by "tabular data" and "CSV"</li>
         <li>Where files that provide metadata about CSV live</li>
-        <li>How to define the content of columns in a CSV file</li>
-        <li>How to provide other metadata about a CSV file</li>
+        <li>How to create a schema to validate the content of a CSV file</li>
+        <li>How to specify how a CSV file should be converted to RDF or JSON</li>
+        <li>How to provide other documentation and metadata about a CSV file</li>
       </ul>
       <p>
         Where possible, this primer links back to the normative definitions of terms and properties in the standards. Nothing in this primer overrides those normative definitions.
@@ -114,265 +94,830 @@
       </ul>
     </section>
     <section>
-      <h2>What is tabular data and CSV?</h2>
+      <h1>Introduction</h1>
       <p>
-        Tabular data is any data that can be arranged in a table, like the one here:
+        We'll begin with some basic concepts.
       </p>
-      <table>
-        <tr><th></th><th>column 1</th><th>column 2</th><th>column 3</th></tr>
-        <tr><th>row 1</th><td>cell in column 1 and row 1</td><td>cell in column 2 and row 1</td><td>cell in column 3 and row 1</td></tr>
-        <tr><th>row 2</th><td>cell in column 1 and row 2</td><td>cell in column 2 and row 2</td><td>cell in column 3 and row 2</td></tr>
-        <tr><th>row 3</th><td>cell in column 1 and row 3</td><td>cell in column 2 and row 3</td><td>cell in column 3 and row 3</td></tr>
-      </table>
-      <p>
-        There are lots of syntaxes for expressing tabular data on the web. You can put it in HTML tables, pass it around as Excel spreadsheets, or store it in a SQL database.
-      </p>
-      <p>
-        One easy way to pass around tabular data is as CSV: as comma-separated values. A CSV file writes each row on a separate line and each cell is separated from the next with a comma. The values of cells can be written with double quotes around them; this is necessary when a cell value contains a line break or a comma. So the tabular data above can be expressed in CSV as:
-      </p>
-      <pre class="example">
-cell in column 1 and row 1,cell in column 2 and row 1,cell in column 3 and row 1
-cell in column 1 and row 2,cell in column 2 and row 2,cell in column 3 and row 2
-cell in column 1 and row 3,cell in column 2 and row 3,cell in column 3 and row 3
-</pre>
-      <p>
-        or, with double quotes around cell values:
-      </p>
-      <pre class="example">
-"cell in column 1 and row 1","cell in column 2 and row 1","cell in column 3 and row 1"
-"cell in column 1 and row 2","cell in column 2 and row 2","cell in column 3 and row 2"
-"cell in column 1 and row 3","cell in column 2 and row 3","cell in column 3 and row 3"
-</pre>
-      <p>
-        CSV files usually have an additional row at the top called a header row, which gives human-readable names or titles for each of the columns. Here is a sample CSV file that contains a header row:
-      </p>
-      <pre class="example">
-<strong>"country","country group","name (en)","name (fr)","name (de)","latitude","longitude"</strong>
-"at","eu","Austria","Autriche","Österreich","47.6965545","13.34598005"
-"be","eu","Belgium","Belgique","Belgien","50.501045","4.47667405"
-"bg","eu","Bulgaria","Bulgarie","Bulgarien","42.72567375","25.4823218"
-</pre>
-      <p>
-        Column titles are a type of annotation on a column, not part of the data itself. For example, they don't count when you're counting the rows in a table:
-      </p>
-      <table>
-        <tr><th></th><th>column 1</th><th>column 2</th><th>column 3</th><th>column 4</th><th>column 5</th><th>column 6</th><th>column 7</th></tr>
-        <tr><th>titles</th><th>country</th><th>country group</th><th>name (en)</th><th>name (fr)</th><th>name (de)</th><th>latitude</th><th>longitude</th></tr>
-        <tr><th>row 1</th><td>AT</td><td>eu</td><td>Austria</td><td>Autriche</td><td>Österreich</td><td>47.6965545</td><td>13.34598005</td>
-        <tr><th>row 2</th><td>BE</td><td>eu</td><td>Belgium</td><td>Belgique</td><td>Belgien</td><td>50.501045</td><td>4.47667405</td>
-        <tr><th>row 3</th><td>BG</td><td>eu</td><td>Bulgaria</td><td>Bulgarie</td><td>Bulgarien</td><td>42.72567375</td><td>25.4823218</td>
-      </table>
+      <section>
+        <h2>What is tabular data and CSV?</h2>
+        <p>
+          Tabular data is any data that can be arranged in a table, like the one here:
+        </p>
+        <table>
+          <tr><th></th><th>column 1</th><th>column 2</th><th>column 3</th></tr>
+          <tr><th>row 1</th><td>cell in column 1 and row 1</td><td>cell in column 2 and row 1</td><td>cell in column 3 and row 1</td></tr>
+          <tr><th>row 2</th><td>cell in column 1 and row 2</td><td>cell in column 2 and row 2</td><td>cell in column 3 and row 2</td></tr>
+          <tr><th>row 3</th><td>cell in column 1 and row 3</td><td>cell in column 2 and row 3</td><td>cell in column 3 and row 3</td></tr>
+        </table>
+        <p>
+          There are lots of syntaxes for expressing tabular data on the web. You can put it in HTML tables, pass it around as Excel spreadsheets, or store it in a SQL database.
+        </p>
+        <p>
+          One easy way to pass around tabular data is as CSV: as comma-separated values. A CSV file writes each row on a separate line and each cell is separated from the next with a comma. The values of cells can be written with double quotes around them; this is necessary when a cell value contains a line break or a comma. So the tabular data above can be expressed in CSV as:
+        </p>
+        <pre class="example">
+  cell in column 1 and row 1,cell in column 2 and row 1,cell in column 3 and row 1
+  cell in column 1 and row 2,cell in column 2 and row 2,cell in column 3 and row 2
+  cell in column 1 and row 3,cell in column 2 and row 3,cell in column 3 and row 3
+  </pre>
+        <p>
+          or, with double quotes around cell values:
+        </p>
+        <pre class="example">
+  "cell in column 1 and row 1","cell in column 2 and row 1","cell in column 3 and row 1"
+  "cell in column 1 and row 2","cell in column 2 and row 2","cell in column 3 and row 2"
+  "cell in column 1 and row 3","cell in column 2 and row 3","cell in column 3 and row 3"
+  </pre>
+        <p>
+          CSV files usually have an additional row at the top called a header row, which gives human-readable names or titles for each of the columns. Here is a sample CSV file that contains a header row:
+        </p>
+        <pre class="example">
+  <strong>"country","country group","name (en)","name (fr)","name (de)","latitude","longitude"</strong>
+  "at","eu","Austria","Autriche","Österreich","47.6965545","13.34598005"
+  "be","eu","Belgium","Belgique","Belgien","50.501045","4.47667405"
+  "bg","eu","Bulgaria","Bulgarie","Bulgarien","42.72567375","25.4823218"
+  </pre>
+        <p>
+          Column titles are a type of annotation on a column, not part of the data itself. For example, they aren't included when you're counting the rows in a table:
+        </p>
+        <table class="overlarge">
+          <tr><th></th><th>column 1</th><th>column 2</th><th>column 3</th><th>column 4</th><th>column 5</th><th>column 6</th><th>column 7</th></tr>
+          <tr><th>titles</th><th>country</th><th>country group</th><th>name (en)</th><th>name (fr)</th><th>name (de)</th><th>latitude</th><th>longitude</th></tr>
+          <tr><th>row 1</th><td>AT</td><td>eu</td><td>Austria</td><td>Autriche</td><td>Österreich</td><td>47.6965545</td><td>13.34598005</td>
+          <tr><th>row 2</th><td>BE</td><td>eu</td><td>Belgium</td><td>Belgique</td><td>Belgien</td><td>50.501045</td><td>4.47667405</td>
+          <tr><th>row 3</th><td>BG</td><td>eu</td><td>Bulgaria</td><td>Bulgarie</td><td>Bulgarien</td><td>42.72567375</td><td>25.4823218</td>
+        </table>
+      </section>
+      <section>
+        <h2>How can you provide extra information about CSV data?</h2>
+        <p>
+          You can provide extra information, known as metadata, about CSV files using a JSON metadata file. If you're just providing metadata about one file, the easiest thing to do is to name the CSV file by adding <code>-metadata.json</code> to the end of the name of the CSV file. For example, if your CSV file is called <code>countries.csv</code> then call the metadata file <code>countries.csv-metadata.json</code>.
+        </p>
+        <p>
+          The simplest metadata file you can create contains a single table description and looks like:
+        </p>
+        <pre class="example">
+  {
+    "@context": "http://www.w3.org/ns/csvw",
+    "url": "countries.csv"
+  }
+        </pre>
+        <p>
+          Metadata files must always include the <code>@context</code> property with a value <code>"http://www.w3.org/ns/csvw"</code>: this enables implementations to tell that these are CSV metadata files. The <code>url</code> property points to the CSV file that the metadata file describes.
+        </p>
+        <p>
+          The description of a table within a metadata file can include:
+        </p>
+        <ul>
+          <li>documentation about the CSV file, such as a description, authorship or licensing information, which can provide context for people using the CSV file</li>
+          <li>a definition of the structure of the CSV file, which can be used to validate the data that it holds</li>
+          <li>instructions that enable processors to transform the CSV file into other formats, such as JSON or RDF</li>
+        </ul>
+        <p>
+          By default, if implementations can't find a metadata file by appending <code>-metadata.json</code> to the filename of the CSV file, they'll just look for a file called <code>csv-metadata.json</code> in the same directory as the CSV file.
+        </p>
+        <p>
+          Metadata files can also describe several CSV files at once, using a slightly different syntax:
+        </p>
+        <pre class="example">
+  {
+    "@context": "http://www.w3.org/ns/csvw",
+    <strong>"tables": [{
+      "url": "countries.csv"
+    }, {
+      "url": "country-groups.csv"
+    }, {
+      "url": "unemployment.csv"
+    }]</strong>
+  }
+        </pre>
+        <p>
+          Here, the <code>tables</code> property holds an array of table descriptions, each with the URL of the CSV file that it's describing. The metadata file as a whole describes a group of tables.
+        </p>
+      </section>
+      <section id="column-info">
+        <h2>How can you provide extra information about the columns in a CSV file?</h2>
+        <p>
+          You can give information about the columns in a CSV file through a table schema. The simplest thing you can do is say what those columns are called. For example, if you have some CSV like this:
+        </p>
+        <pre class="example">
+  "country","country group","name (en)","name (fr)","name (de)","latitude","longitude"
+  "at","eu","Austria","Autriche","Österreich","47.6965545","13.34598005"
+  "be","eu","Belgium","Belgique","Belgien","50.501045","4.47667405"
+  "bg","eu","Bulgaria","Bulgarie","Bulgarien","42.72567375","25.4823218"
+  </pre>
+        <p>
+          You can say that the table contains seven columns named as they are in this CSV file like so:
+        </p>
+        <pre class="example">
+  {
+    "@context": "http://www.w3.org/ns/csvw",
+    "url": "countries.csv"
+    <strong>"tableSchema": {
+      "columns": [{
+        "titles": "country"
+      },{
+        "titles": "country group"
+      },{
+        "titles": "name (en)"
+      },{
+        "titles": "name (fr)"
+      },{
+        "titles": "name (de)"
+      },{
+        "titles": "latitude"
+      },{
+        "titles": "longitude"
+      }]
+    }</strong>
+  }
+        </pre>
+        <p class="note">
+          See <a href="#shared-schemas" class="sectionRef"></a> to understand why the property <code>titles</code> is plural.
+        </p>
+        <p>
+          A validator can check that the CSV file holds the expected columns (both the right number of columns and columns with the expected titles).
+        </p>
+      </section>
     </section>
     <section>
-      <h1>How can you provide metadata for CSV?</h1>
+      <h1>Documenting CSVs</h1>
       <p>
-        You can provide metadata about CSV files using a JSON metadata file. If you're just providing metadata about one file, the easiest thing to do is to name the CSV file by adding <code>-metadata.json</code> to the end of the name of the CSV file. For example, if your CSV file is called <code>countries.csv</code> then call the metadata file <code>countries.csv-metadata.json</code>.
+        Providing metadata about CSVs can be useful simply in providing extra information to anyone who wants to work with them.
       </p>
-      <p>
-        The simplest metadata file you can create contains a single table description and looks like:
-      </p>
-      <pre class="example">
+      <section>
+        <h2>How can you provide documentation about a CSV file?</h2>
+        <p>
+          Here's an example that includes some extra descriptive documentation about a number of CSV files:
+        </p>
+        <pre class="example">
 {
   "@context": "http://www.w3.org/ns/csvw",
-  "url": "countries.csv"
-}
-      </pre>
-      <p>
-        Metadata files must always include the <code>@context</code> property with that value: this enables implementations to tell that these are CSV metadata files. The <code>url</code> property points to the CSV file that the metadata file describes.
-      </p>
-      <p>
-        By default, if implementations can't find a metadata file by appending <code>-metadata.json</code> to the filename of the CSV file, they'll just look for a file called <code>csv-metadata.json</code> in the same directory.
-      </p>
-      <p>
-        Metadata files can also describe several CSV files at once, using a slightly different syntax:
-      </p>
-      <pre class="example">
-{
-  "@context": "http://www.w3.org/ns/csvw",
+  <strong>"dc:title": "Unemployment in Europe (monthly)"
+  "dc:description": "Harmonized unemployment data for European countries."
+  "dc:creator": "Eurostat",</strong>
   "tables": [{
-    "url": "countries.csv"
+    "url": "countries.csv",
+    <strong>"dc:title": "Countries"</strong>
   }, {
-    "url": "country-groups.csv"
+    "url": "country-groups.csv",
+    <strong>"dc:title": "Country groups"</strong>
   }, {
-    "url": "unemployment.csv"
+    "url": "unemployment.csv",
+    <strong>"dc:title": "Unemployment (monthly)",
+    "dc:description": "The total number of people unemployed"</strong>
   }]
 }
-      </pre>
-      <p>
-        Here, the <code>tables</code> property holds an array of table descriptions, each with the URL of the CSV file that it's describing. The metadata file as a whole describes a group of tables.
-      </p>
+</pre>
+        <p>
+          This example uses <a href="http://dublincore.org/documents/dcmi-terms/">Dublin Core</a> as a vocabulary for providing metadata. You can tell that's the vocabulary that's being used because the terms like <code>dc:title</code> and <code>dc:description</code> begin with the prefix <code>dc</code>, which stands for Dublin Core.
+        </p>
+        <p>
+          There are several different metadata vocabularies in common use around the web. Some people use <a href="http://dublincore.org/documents/dcmi-terms/">Dublin Core</a>. Some people use <a href="http://schema.org">schema.org</a>. Some people use <a href="http://www.w3.org/TR/vocab-dcat/">DCAT</a>. All of these vocabularies can be used independently or together. A publisher could alternatively use:
+        </p>
+        <pre class="example">
+  {
+    "@context": "http://www.w3.org/ns/csvw",
+    <strong>"schema:name": "Unemployment in Europe (monthly)"
+    "schema:description": "Harmonized unemployment data for European countries."
+    "schema:creator": { "schema:name": "Eurostat" },</strong>
+    "tables": [{
+      "url": "countries.csv",
+      <strong>"schema:name": "Countries"</strong>
+    }, {
+      "url": "country-groups.csv",
+      <strong>"schema:name": "Country groups"</strong>
+    }, {
+      "url": "unemployment.csv",
+      <strong>"schema:name": "Unemployment (monthly)",
+      "dc:description": "The total number of people unemployed"</strong>
+    }]
+  }
+  </pre>
+        <p class="note">
+          It's not clear at the moment which metadata vocabulary will give publishers the most benefits. Search engines are likely to recognise <a href="http://schema.org">schema.org</a>. RDF-based systems are more likely to recognise Dublin Core.
+        </p>
+        <p>
+          More generally, you can use prefixed properties like these on any of the objects in a metadata document. The prefixes that are recognised are those used in the <a href="http://www.w3.org/2011/rdfa-context/rdfa-1.1">RDFa 1.1 Initial Context</a>. Other properties must be named with full URLs.
+        </p>
+      </section>
+      <section>
+        <h2>How can you provide documentation about the columns in a CSV file?</h2>
+        <p>
+          You can use metadata properties like the ones used for tables for individual columns as well. For example:
+        </p>
+        <pre class="example">
+  {
+    "@context": "http://www.w3.org/ns/csvw",
+    "url": "countries.csv"
+    "tableSchema": {
+      "columns": [{
+        "titles": "country",
+        <strong>"dc:description": "The ISO two-letter code for a country, in lowercase."</strong>
+      },{
+        "titles": "country group",
+        <strong>"dc:description": "A lowercase two-letter code for a group of countries."</strong>
+      },{
+        "titles": "name (en)",
+        <strong>"dc:description": "The official name of the country in English."</strong>
+      },{
+        "titles": "name (fr)",
+        <strong>"dc:description": "The official name of the country in French."</strong>
+      },{
+        "titles": "name (de)",
+        <strong>"dc:description": "The official name of the country in German."</strong>
+      },{
+        "titles": "latitude",
+        <strong>"dc:description": "The latitude of an indicative point in the country."</strong>
+      },{
+        "titles": "longitude",
+        <strong>"dc:description": "The longitude of an indicative point in the country."</strong>
+      }]
+    }
+  }
+        </pre>
+      </section>
     </section>
     <section>
-      <h1>What kind of information can you provide about a CSV file?</h1>
+      <h1>Validating CSVs</h1>
       <p>
-        The description of a table within a metadata file can include:
+        Validation is all about checking whether a file contains what you expect it to contain. For CSV files, this can be about:
       </p>
       <ul>
-        <li>metadata about the CSV file, such as a description, authorship or licensing information, which can provide context for people using the CSV file</li>
-        <li>a definition of the structure of the CSV file, which can be used to validate the data that it holds</li>
-        <li>instructions that enable processors to transform the CSV file into other formats, such as JSON or RDF</li>
+        <li>the number of columns there are and what they're called (see <a href="#column-info" class="sectionRef"></a>)</li>
+        <li>what kind of values columns contain</li>
+        <li>whether any of those values are unique</li>
+        <li>whether they match values in other CSV files</li>
       </ul>
-      <p>
-        We'll come on to how to define the structure of the CSV file, and how to transform CSV into other formats, later. For now, let's look at the other metadata that you can provide about a CSV file. Here's an example:
-      </p>
-      <pre class="example">
-{
-  "@context": "http://www.w3.org/ns/csvw",
-  "dc:title": "Unemployment in Europe (monthly)"
-  "dc:description": "Harmonized unemployment data for European countries."
-  "dc:creator": "Eurostat",
-  "tables": [{
-    "url": "countries.csv",
-    "dc:title": "Countries"
-  }, {
-    "url": "country-groups.csv",
-    "dc:title": "Country groups"
-  }, {
-    "url": "unemployment.csv",
-    "dc:title": "Unemployment (monthly)",
-    "dc:description": "The total number of people unemployed"
-  }]
+      <section>
+        <h2>How can you say what kinds of values are expected in a column?</h2>
+        <p>
+          There's lots more that you can say about the expected content of columns in a CSV file. The most obvious thing is to indicate the data type. For example, with the CSV file:
+        </p>
+        <pre class="example">
+  "country","country group","name (en)","name (fr)","name (de)","latitude","longitude"
+  "at","eu","Austria","Autriche","Österreich","47.6965545","13.34598005"
+  "be","eu","Belgium","Belgique","Belgien","50.501045","4.47667405"
+  "bg","eu","Bulgaria","Bulgarie","Bulgarien","42.72567375","25.4823218"
+  </pre>
+        <p>
+          The first five columns are strings and the last two are numbers. You can indicate this with the <code>datatype</code> property for each column:
+        </p>
+        <pre class="example">
+  {
+    "@context": "http://www.w3.org/ns/csvw",
+    "url": "countries.csv"
+    "tableSchema": {
+      "columns": [{
+        "titles": "country",
+        "datatype": "string"
+      },{
+        "titles": "country group",
+        "datatype": "string"
+      },{
+        "titles": "name (en)",
+        "datatype": "string"
+      },{
+        "titles": "name (fr)",
+        "datatype": "string"
+      },{
+        "titles": "name (de)",
+        "datatype": "string"
+      },{
+        "titles": "latitude",
+        "datatype": "number"
+      },{
+        "titles": "longitude",
+        "datatype": "number"
+      }]
+    }
+  }
+        </pre>
+        <p class="note">
+          You don't have to include <code>"datatype": "string"</code> for columns that are strings &mdash; columns are assumed to hold strings if no datatype is explicitly specified.
+        </p>
+        <p>
+          There are a number of different datatypes supported by CSV on the Web implementations, based on the set defined in [[xmlschema11-2]]. The complete set is shown in the following diagram:
+        </p>
+        <figure id="fig-datatypes" style="text-align:center">
+          <img src="http://www.w3.org/TR/tabular-metadata/datatypes.svg" style="width: 75%" alt="Built-in Datatype Hierarchy diagram" longdesc="http://www.w3.org/TR/tabular-metadata/datatypes.html#imageDescription" />
+          <figcaption>Diagram showing the built-in datatypes, based on [[xmlschema11-2]]; names in parentheses denote aliases to the [[xmlschema11-2]] terms (see the diagram in <a href="http://www.w3.org/TR/tabular-metadata/datatypes.svg">SVG</a> or <a href="http://www.w3.org/TR/tabular-metadata/datatypes.png">PNG</a> formats)</figcaption>
+        </figure>
+      </section>
+      <section>
+        <h2>How do you define new datatypes?</h2>
+        <p>
+          You can define new datatypes based on the built-in datatypes using an object as the value of the <code>datatype</code> property rather than a string. For example:
+        </p>
+        <pre class="example">
+"datatype": {
+  "base": "integer",
+  "minimum": "1",
+  "maximum": "5"
+}</pre>
+        <p>
+          The <code>base</code> property must be an existing datatype. The other properties on the new datatype define extra restrictions on values of the new datatype. You can give the new datatype a name and description to provide extra documentation for people using the data:
+        </p>
+        <pre class="example">
+"datatype": {
+  "dc:title": "Star Rating",
+  "dc:description": "A star rating between 1 and 5."
+  "base": "integer",
+  "minimum": "1",
+  "maximum": "5"
+}</pre>
+      </section>
+      <section id="string-restriction">
+        <h2>How do you restrict what kind of strings a column contains?</h2>
+        <p>
+          In the example we've been using, the first column always contains a country code consisting of two lowercase letters. This is a new datatype based on <code>string</code>. You can specify the format for string values in a column using a regular expression, like this:
+        </p>
+        <pre class="example">{
+  "titles": "country",
+  "datatype": {
+    "dc:title": "Country Code",
+    "dc:description": "Country codes as specified in ISO 3166.",
+    "base": "string",
+    <strong>"format": "[a-z]{2}"</strong>
+  }
 }
-</pre>
-      <p>
-        This example uses <a href="http://dublincore.org/documents/dcmi-terms/">Dublin Core</a> as a vocabulary for providing metadata. You can tell that's the vocabulary that's being used because the terms like <code>dc:title</code> and <code>dc:description</code> begin with the prefix <code>dc</code>, which stands for Dublin Core.
-      </p>
-      <p>
-        There are several different metadata vocabularies in common use around the web. Some people use <a href="http://dublincore.org/documents/dcmi-terms/">Dublin Core</a>. Some people use <a href="http://schema.org">schema.org</a>. Some people use <a href="http://www.w3.org/TR/vocab-dcat/">DCAT</a>. All of these vocabularies can be used independently or together. A publisher could alternatively use:
-      </p>
-      <pre class="example">
-{
-  "@context": "http://www.w3.org/ns/csvw",
-  "schema:name": "Unemployment in Europe (monthly)"
-  "schema:description": "Harmonized unemployment data for European countries."
-  "schema:creator": { "schema:name": "Eurostat" },
-  "tables": [{
-    "url": "countries.csv",
-    "schema:name": "Countries"
-  }, {
-    "url": "country-groups.csv",
-    "schema:name": "Country groups"
-  }, {
-    "url": "unemployment.csv",
-    "schema:name": "Unemployment (monthly)",
-    "dc:description": "The total number of people unemployed"
-  }]
-}
-</pre>
-      <p class="note">
-        It's not clear at the moment which metadata vocabulary will give publishers the most benefits. Search engines are likely to recognise <a href="http://schema.org">schema.org</a>. RDF-based systems are more likely to recognise Dublin Core.
-      </p>
-      <p>
-        More generally, you can use prefixed properties like these on any of the objects in a metadata document. The prefixes that are recognised are those used in the <a href="http://www.w3.org/2011/rdfa-context/rdfa-1.1">RDFa 1.1 Initial Context</a>. Other properties must be named with full URLs.
-      </p>
-    </section>
-    <section>
-      <h1>How can you say which columns are expected in a CSV file?</h1>
-      <p>
-        You can give information about the columns in a CSV file through a table schema. The simplest thing you can do is say what those columns should be called. For example, if you have some CSV like this:
-      </p>
-      <pre class="example">
+  </pre>
+        <p>
+          It's also possible to restrict the length of a string-based datatype using the <code>length</code> or <code>minLength</code> and/or <code>maxLength</code> properties. For example the following says that the column holding the English names of countries must have values between 3 and 128 characters long:
+        </p>
+        <pre class="example">{
+  "titles": "name (en)",
+  "datatype": {
+    "base": "string",
+    <strong>"minLength": "3",
+    "maxLength": "128"</strong>
+  }
+}</pre>
+      </section>
+      <section>
+        <h2>How do you restrict the size of numbers a column contains?</h2>
+        <p>
+          The size of numbers in a column can be restricted using the <code>minimum</code> and <code>maximum</code> properties and/or the <code>minExclusive</code> and <code>maxExclusive</code> properties. In our example, one column contains latitudes, which can range between -90 and +90:
+        </p>
+        <pre class="example">{
+  "titles": "latitude",
+  "datatype": {
+    "base": "number",
+    <strong>"minimum": "-90",
+    "maximum": "90"</strong>
+  }
+}</pre>
+      </section>
+      <section>
+        <h2>How do you ensure that decimal numbers have a particular precision or leading zeros?</h2>
+        <p>
+          In the example we're using, the latitudes are provided to between six and eight decimal places and there are no leading or trailing zeros. You can use the <code>format</code> property to provide a pattern that matches these numbers. In the pattern, <code>0</code> represents a required digit and <code>#</code> represents an optional digit. For the <code>latitude</code>, the definition looks like:
+        </p>
+        <pre class="example">{
+  "titles": "latitude",
+  "datatype": {
+    "base": "number",
+    "minimum": "-90",
+    "maximum": "90",
+    <strong>"format": "#0.000000##"</strong>
+  }
+}</pre>
+        <p>
+          The <code>format</code> property can also be used to indicate that values in a column should have leading zeros. For example, if a column were supposed to hold a three digit number you could use the pattern <code>000</code>.
+        </p>
+      </section>
+      <section>
+        <h2>How do you validate numbers that aren't in standard numeric formats?</h2>
+        <p>
+          Sometimes numbers within a CSV file won't be in a standard numeric format. For example, they might include commas as grouping characters (eg <code>12,345,678</code>) or as decimal points (eg <code>12,3</code>). In these cases, you can use the <code>format</code> property with an object value.
+        </p>
+        <p>
+          To match numbers with grouping separators as in <code>12,345,678</code> you should specify <code>","</code> as the <code>groupChar</code> for the format. The <code>pattern</code> property then holds the pattern that indicates how many digits should be in each group. This example validates numbers with groups of three digits separated by commas:
+        </p>
+        <pre class="example">
+"datatype": {
+  "base": "integer",
+  <strong>"format": {
+    "groupChar": ",",
+    "pattern": "#,##0"
+  }</strong>
+}</pre>
+        <p>
+          To match numbers with decimal separators other than <code>.</code>, as in <code>12,3</code>, you should specify <code>","</code> as the <code>decimalChar</code> for the format. This example validates numbers with commas as decimal points:
+        </p>
+        <pre class="example">
+"datatype": {
+  "base": "integer",
+  <strong>"format": {
+    "decimalChar": ","
+  }</strong>
+}</pre>
+        <p>
+          You can mix and match decimal and grouping characters and patterns. For example, in France it's standard to use commas for decimal points and spaces for grouping characters, so CSV files produced in France might contain numbers like <code>1 234 567,89</code>. These could be validated with a datatype like:
+        </p>
+        <pre class="example">
+"datatype": {
+  "base": "integer",
+  <strong>"format": {
+    "decimalChar": ",",
+    "groupChar": " ",
+    "pattern": "# ##0,0#"
+  }</strong>
+}</pre>
+      </section>
+      <section>
+        <h2>How do you restrict what kind of dates and times a column contains?</h2>
+        <p>
+          Dates and times are treated similarly to numbers. You can use the <code>minimum</code>, <code>maximum</code>, <code>minExclusive</code> and/or <code>maxExclusive</code> properties to restrict their values.
+        </p>
+        <p>
+          For example, to indicate that the column should contain dates later than 1st January 2000, you can use the datatype:
+        </p>
+        <pre class="example">
+"datatype": {
+  "base": "date",
+  <strong>"minimum": "2000-01-01"</strong>
+}</pre>
+        <p>
+          To indicate that the column should contain times before midday (exclusive), you can use the datatype:
+        </p>
+        <pre class="example">
+"datatype": {
+  "base": "time",
+  <strong>"minExclusive": "12:00:00"</strong>
+}</pre>
+        <p class="note">
+          The format of dates or times used for minimum or maximum values is always the <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601</a> format: <code>yyyy-MM-dd</code> for dates, <code>HH:mm:ss.S</code> for times and <code>yyyy-MM-ddTHH:mm:ss.S</code> for date/times.
+        </p>
+      </section>
+      <section>
+        <h2>How do you validate dates that aren't in standard date or time formats?</h2>
+        <p>
+          Dates and times in CSV files often come in formats other than the standard <a href="https://en.wikipedia.org/wiki/ISO_8601">ISO 8601</a> format. You can use the <code>format</code> property to indicate the expected format of the date or time.
+        </p>
+        <p>
+          For example, to recognise dates in the usual UK format such as 31/10/2015 for 31st October 2015, you could use:
+        </p>
+        <pre class="example">
+"datatype": {
+  "base": "date",
+  <strong>"format": "dd/MM/yyyy"</strong>
+}</pre>
+        <p>
+          Implementations are only required to understand a particular set of common formats for dates and times. These formats are, for dates:
+        </p>
+        <ul>
+          <li><code>yyyy-MM-dd</code> e.g., <code>2015-03-22</code></li>
+          <li><code>yyyyMMdd</code> e.g., <code>20150322</code></li>
+          <li><code>dd-MM-yyyy</code> e.g., <code>22-03-2015</code></li>
+          <li><code>d-M-yyyy</code> e.g., <code>22-3-2015</code></li>
+          <li><code>MM-dd-yyyy</code> e.g., <code>03-22-2015</code></li>
+          <li><code>M-d-yyyy</code> e.g., <code>3-22-2015</code></li>
+          <li><code>dd/MM/yyyy</code> e.g., <code>22/03/2015</code></li>
+          <li><code>d/M/yyyy</code> e.g., <code>22/3/2015</code></li>
+          <li><code>MM/dd/yyyy</code> e.g., <code>03/22/2015</code></li>
+          <li><code>M/d/yyyy</code> e.g., <code>3/22/2015</code></li>
+          <li><code>dd.MM.yyyy</code> e.g., <code>22.03.2015</code></li>
+          <li><code>d.M.yyyy</code> e.g., <code>22.3.2015</code></li>
+          <li><code>MM.dd.yyyy</code> e.g., <code>03.22.2015</code></li>
+          <li><code>M.d.yyyy</code> e.g., <code>3.22.2015</code></li>
+        </ul>
+        <p>
+          For times:
+        </p>
+        <ul>
+          <li><code>HH:mm:ss.S</code> with one or more trailing <code>S</code> characters indicating the maximum number of fractional seconds e.g., <code>HH:mm:ss.SSS</code> for <code>15:02:37.143</code></li>
+          <li><code>HH:mm:ss</code> e.g., <code>15:02:37</code></li>
+          <li><code>HHmmss</code> e.g., <code>150237</code></li>
+          <li><code>HH:mm</code> e.g., <code>15:02</code></li>
+          <li><code>HHmm</code> e.g., <code>1502</code></li>
+        </ul>
+        <p>
+          And for date/times:
+        </p>
+        <ul>
+          <li><code>yyyy-MM-ddTHH:mm:ss.S</code> with one or more trailing <code>S</code> characters indicating the maximum number of fractional seconds e.g., <code>yyyy-MM-ddTHH:mm:ss.SSS</code> for <code>2015-03-15T15:02:37.143</code></li>
+          <li><code>yyyy-MM-ddTHH:mm:ss</code> e.g., <code>2015-03-15T15:02:37</code></li>
+          <li><code>yyyy-MM-ddTHH:mm</code> e.g., <code>2015-03-15T15:02</code></li>
+          <li>any of the date formats above, followed by a single space, followed by any of the time formats above, e.g., <code>M/d/yyyy HH:mm</code> for <code>3/22/2015 15:02</code> or <code>dd.MM.yyyy HH:mm:ss</code> for <code>22.03.2015 15:02:37</code></li>
+        </ul>
+        <p class="note">
+          None of these formats include names or abbreviations for months or days. The implementation you use might support other date and time formats as well, including specialised formats for the other date and time datatypes such as <code>gMonthYear</code>. Check your implementation's documentation to see what it supports.
+        </p>
+      </section>
+      <section>
+        <h2>How do you validate boolean values that aren't <code>true</code> or <code>false</code>?</h2>
+        <p>
+          By default, validators will recognise boolean values that are <code>1</code> or <code>0</code> or <code>true</code> or <code>false</code>. If a CSV file contains boolean values like <code>T</code> and <code>F</code> or <code>Yes</code> and <code>No</code> then you can create a derived boolean datatype that uses that syntax using the <code>format</code> property, with the two possible values separated by a <code>|</code>, for example:
+        </p>
+        <pre class="example">
+"datatype": {
+  "base": "boolean",
+  <strong>"format": "Yes|No"</strong>
+}</pre>
+      </section>
+      <section>
+        <h2>How do you specify a list of valid values for a column?</h2>
+        <p>
+          The example CSV file we're using is this:
+        </p>
+        <pre class="example">
 "country","country group","name (en)","name (fr)","name (de)","latitude","longitude"
 "at","eu","Austria","Autriche","Österreich","47.6965545","13.34598005"
 "be","eu","Belgium","Belgique","Belgien","50.501045","4.47667405"
 "bg","eu","Bulgaria","Bulgarie","Bulgarien","42.72567375","25.4823218"
 </pre>
-      <p>
-        You can say that the table contains seven columns named as they are in this CSV file like so:
-      </p>
-      <pre class="example">
-{
-  "@context": "http://www.w3.org/ns/csvw",
-  "url": "countries.csv"
-  "tableSchema": {
-    "columns": [{
-      "titles": "country"
-    },{
-      "titles": "country group"
-    },{
-      "titles": "name (en)"
-    },{
-      "titles": "name (fr)"
-    },{
-      "titles": "name (de)"
-    },{
-      "titles": "latitude"
-    },{
-      "titles": "longitude"
-    }]
+        <p>
+          In it, the second column, <code>country group</code>, contains either the value <code>eu</code> or the value <code>non-eu</code>. Despite there being two values, this isn't a boolean column. Instead, it's a column that has only two valid values.
+        </p>
+        <p>
+          There are two ways to specify that a column contains one of a list of values: using a regular expression to list the values and using a reference to a separate CSV file that contains the values.
+        </p>
+        <section>
+          <h3>Using a regular expression</h3>
+          <p>
+            Using a regular expression to list values works best if those values are strings, if there are only a few of them, and if they are self-explanatory such that you don't want to provide any additional information about them.
+          </p>
+          <p>
+            In this example, the <code>country group</code> column could be specified as:
+          </p>
+          <pre class="example">{
+  "titles": "country group",
+  "datatype": {
+    "base": "string",
+    <strong>"format": "eu|non-eu"</strong>
   }
-}
-      </pre>
-      <p class="note">
-        See <a href="#shared-schemas" class="sectionRef"></a> to understand why the property <code>titles</code> is plural.
-      </p>
-      <p>
-        A validator can check that the CSV file holds the expected columns (both the right number of columns and columns with the expected titles).
-      </p>
-    </section>
-    <section>
-      <h1>How can you say what kinds of values are expected in a column?</h1>
-      <p>
-        There's lots more that you can say about the expected content of columns in a CSV file. The most obvious thing is to indicate the data type. For example, with the CSV file:
-      </p>
-      <pre class="example">
-"country","country group","name (en)","name (fr)","name (de)","latitude","longitude"
-"at","eu","Austria","Autriche","Österreich","47.6965545","13.34598005"
-"be","eu","Belgium","Belgique","Belgien","50.501045","4.47667405"
-"bg","eu","Bulgaria","Bulgarie","Bulgarien","42.72567375","25.4823218"
+}</pre>
+          <p>
+            As described in <a href="#string-restriction" class="sectionRef"></a>, the <code>format</code> property contains a regular expression. List the options separated by <code>|</code> and ensure that you escape any of the characters in the options that have special meaning in regular expressions.
+          </p>
+        </section>
+        <section>
+          <h3>Using a separate CSV file</h3>
+          <p>
+            A more powerful method of listing the valid values in a particular column is to list those values in a separate CSV file. The CSV file can be very simple, containing just a single column that lists the valid values. In this example, we can create <code>country-groups.csv</code> containing:
+          </p>
+          <pre class="example">
+group
+eu
+non-eu
 </pre>
-      <p>
-        The first five columns are strings and the last two are numbers. You can indicate this with the <code>datatype</code> property for each column:
-      </p>
-      <pre class="example">
+          <p>
+            We can then provide definitions for both the <code>countries.csv</code> and <code>country-groups.csv</code> files, and state that the <code>country group</code> column in <code>countries.csv</code> references the <code>group</code> column in <code>country_groups.csv</code>. This reference from one file to another is called a <dfn>foreign key</dfn>.
+          </p>
+          <p>
+            To use a foreign key, both files must be referenced in the same metadata document, and both columns must be given names. Column names are only used inside the metadata document and you can only use (ASCII) letters, numbers, <code>.</code> and <code>_</code> within them. So the basic metadata document, before adding the foreign key, should look like:
+          </p>
+          <pre class="example">
 {
   "@context": "http://www.w3.org/ns/csvw",
-  "url": "countries.csv"
-  "tableSchema": {
-    "columns": [{
-      "titles": "country",
-      "datatype": "string"
-    },{
-      "titles": "country group",
-      "datatype": "string"
-    },{
-      "titles": "name (en)",
-      "datatype": "string"
-    },{
-      "titles": "name (fr)",
-      "datatype": "string"
-    },{
-      "titles": "name (de)",
-      "datatype": "string"
-    },{
-      "titles": "latitude",
-      "datatype": "number"
-    },{
-      "titles": "longitude",
-      "datatype": "number"
-    }]
-  }
+  "tables": [{
+    "url": "countries.csv",
+    "tableSchema": {
+      "columns": [{
+        "titles": "country"
+      },{
+        <strong>"name": "country_group",</strong>
+        "titles": "country group"
+      },{
+        "titles": "name (en)"
+      },{
+        "titles": "name (fr)"
+      },{
+        "titles": "name (de)"
+      },{
+        "titles": "latitude"
+      },{
+        "titles": "longitude"
+      }]
+    }
+  }, {
+    "url": "country-groups.csv",
+    "tableSchema": {
+      "columns": [{
+        <strong>"name": "group",</strong>
+        "titles": "group"
+      }]
+    }
+  }]
 }
-      </pre>
-      <p>
-        There are a number of different datatypes supported by CSV on the Web implementations, based on the set defined in [[xmlschema11-2]]. The complete set is shown in the following diagram:
-      </p>
-      <figure id="fig-datatypes" style="text-align:center">
-        <img src="http://www.w3.org/TR/tabular-metadata/datatypes.svg" style="width: 50%" alt="Built-in Datatype Hierarchy diagram" longdesc="http://www.w3.org/TR/tabular-metadata/datatypes.html#imageDescription" />
-        <figcaption>Diagram showing the built-in datatypes, based on [[xmlschema11-2]]; names in parentheses denote aliases to the [[xmlschema11-2]] terms (see the diagram in <a href="http://www.w3.org/TR/tabular-metadata/datatypes.svg">SVG</a> or <a href="http://www.w3.org/TR/tabular-metadata/datatypes.png">PNG</a> formats)</figcaption>
-      </figure>
+</pre>
+          <p>
+            The foreign key is defined in the schema for the <code>countries.csv</code> table, as follows:
+          </p>
+          <pre class="example">
+{
+  "@context": "http://www.w3.org/ns/csvw",
+  "tables": [{
+    "url": "countries.csv",
+    "tableSchema": {
+      "columns": [{
+        "titles": "country"
+      },{
+        "name": "country_group",
+        "titles": "country group"
+      },{
+        "titles": "name (en)"
+      },{
+        "titles": "name (fr)"
+      },{
+        "titles": "name (de)"
+      },{
+        "titles": "latitude"
+      },{
+        "titles": "longitude"
+      }],
+      <strong>"foreignKeys": [{
+        "columnReference": "country_group",
+        "reference": {
+          "resource": "country-groups.csv",
+          "columnReference": "group"
+        }
+      }]</strong>
+    }
+  }, {
+    "url": "country-groups.csv",
+    "tableSchema": {
+      "columns": [{
+        "name": "group",
+        "titles": "group"
+      }]
+    }
+  }]
+}
+</pre>
+          <p>
+            The <code>foreignKeys</code> property can hold several foreign keys. Each contains a <code>columnReference</code> to a column or list of columns in one CSV file, and a <code>reference</code> which defines a column or list of columns in another CSV file.
+          </p>
+          <p>
+            The advantage of this method of listing the values allowed in a column is that the CSV file that contains the list of possible values can also provide additional information about those values. For example, we can provide expansions of what <code>eu</code> and <code>non-eu</code> mean in different languages:
+          </p>
+          <pre class="example">
+group,name (en),name (fr),name (de)
+eu,"European Union","Union européenne","Europäische Union"
+non-eu,"Non EU countries","Pays hors Union européenne",Nicht-EU-Länder
+</pre>
+        </section>
+      </section>
+      <section>
+        <h2>How do you enable a column to have a mix of value types?</h2>
+        <p>
+          Sometimes a column that contains numbers will contain special values, such as <code>X</code> or <code>NK</code>, when a value is unknown or redacted. If these columns are simply classified as numeric then the non-numeric values will be classed as errors.
+        </p>
+        <p>
+          To avoid values being classified as errors when they are being used to indicate missing values, list those values as null values using the <code>null</code> property. This can take either a single string or an array of strings. For example, the <code>latitude</code> column might usually be numeric but hold an <code>X</code> if there is no indicative point for the country:
+        </p>
+        <pre class="example">{
+  "titles": "latitude",
+  <strong>"null": "X",</strong>
+  "datatype": {
+    "base": "number",
+    "minimum": "-90",
+    "maximum": "90"
+  }
+}</pre>
+        <p class="note">
+          The <code>null</code> property can also be useful when a column contains values that are of the right type but used to indicate a missing value. It's not uncommon, for example, for publishers to use the value <code>99</code> in a column that contains integers to indicate that a value is missing.
+        </p>
+      </section>
+      <section>
+        <h2>What if the cells in a column contain lists of values?</h2>
+        <p>
+
+        </p>
+      </section>
+      <section>
+        <h2>How do you ensure every row has a value for a column?</h2>
+        <p>
+          By default, a validator won't give any errors if a value is missing in a column. If you want to ensure that a value is provided for every row in the column, use the <code>required</code> property for that column, with the value <code>true</code>.
+        </p>
+        <p>
+          In our example, we might say that all the columns are required except the French and German names (applications being expected to default to the English name if the translation is missing):
+        </p>
+        <pre class="example">
+"tableSchema": {
+  "columns": [{
+    "titles": "country",
+    <strong>"required": true</strong>
+  },{
+    "titles": "country group",
+    <strong>"required": true</strong>
+  },{
+    "titles": "name (en)",
+    <strong>"required": true</strong>
+  },{
+    "titles": "name (fr)"    
+  },{
+    "titles": "name (de)"
+  },{
+    "titles": "latitude",
+    <strong>"required": true</strong>
+  },{
+    "titles": "longitude",
+    <strong>"required": true</strong>
+  }]
+}
+</pre>
+        <p class="note">
+          Setting <code>required</code> to <code>true</code> means that you can't have any null values in a column. If, in this example, <code>latitude</code> and <code>longitude</code> had <code>null</code> set to <code>X</code> then those columns couldn't contain an <code>X</code>. It doesn't usually make sense to specify both <code>null</code> and <code>required</code>.
+        </p>
+      </section>
+      <section>
+        <h2>How do you indicate all the values in a column are unique?</h2>
+        <p>
+          In our example, the <code>country</code> column must contain unique values: each row should define a different country. To specify this, you can use a primary key to refer to the name of the column:
+        </p>
+        <pre class="example">
+"tableSchema": {
+  "columns": [{
+    <strong>"name": "country",</strong>
+    "titles": "country"
+  },{
+    "titles": "country group"
+  },{
+    "titles": "name (en)"
+  },{
+    "titles": "name (fr)"
+  },{
+    "titles": "name (de)"
+  },{
+    "titles": "latitude"
+  },{
+    "titles": "longitude"
+  }],
+  <strong>"primaryKey": "country"</strong>
+}
+</pre>
+        <p>
+          Each CSV file can only have one primary key. A primary key can be made up of a number of columns that have to be unique in combination: the classic example would be <code>["firstName", "lastName"]</code>.
+        </p>
+      </section>
     </section>
     <section>
-      <h1>How do you support units of measure?</h1>
+      <h1>Transforming CSVs</h1>
+      <section>
+        <h2>What can you transform CSV into?</h2>
+      </section>
+      <section>
+        <h2>What values get used in the output of a transformation?</h2>
+      </section>
+      <section>
+        <h2>What value gets used in the output if it's missing in the CSV?</h2>
+      </section>
+      <section>
+        <h2>What properties get used in the output of a transformation?</h2>
+      </section>
+      <section>
+        <h2>How do you map values into URLs?</h2>
+      </section>
+      <section>
+        <h2>How do you indicate the type of the thing described by each row?</h2>
+      </section>
+      <section>
+        <h2>How can you add extra output into the result?</h2>
+      </section>
+      <section>
+        <h2>How do you transform into nested structures in JSON?</h2>
+      </section>
+      <section>
+        <h2>How do you indicate that values should be mapped to a list rather than repeating properties in RDF?</h2>
+      </section>
     </section>
     <section>
-      <h1>What about multi-lingual CSV files?</h1>
-    </section>
-    <section id="shared-schemas">
-      <h1>How can you specify a single schema for multiple CSV files?</h1>
+      <h1>Multi-lingual CSVs</h1>
+      <section>
+        <h2>How do you indicate the language used by the metadata file?</h2>
+      </section>
+      <section>
+        <h2>How do you provide metadata such as descriptions in different languages?</h2>
+      </section>
+      <section>
+        <h2>How do you provide titles for columns in different languages?</h2>
+      </section>
+      <section>
+        <h2>How do you specify the language of the values in a column?</h2>
+      </section>
+      <section>
+        <h2>How do you indicate that tables should be displayed right-to-left?</h2>
+      </section>
     </section>
     <section>
-      <h1>What about CSV that isn't standard CSV?</h1>
+      <h1>Advanced Use</h1>
+      <section>
+        <h2>How do you support units of measure?</h2>
+      </section>
+      <section id="shared-schemas">
+        <h2>How can you specify a single schema for multiple CSV files?</h2>
+      </section>
+      <section>
+        <h2>How can you provide a label for a row?</h2>
+      </section>
+      <section>
+        <h2>What about CSV that isn't standard CSV?</h2>
+      </section>
+      <section>
+        <h2>What if you want to put metadata files somewhere else?</h2>
+      </section>
     </section>
   </body>
 </html>
