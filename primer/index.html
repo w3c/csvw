@@ -400,7 +400,7 @@ cell in column 1 and row 3,cell in column 2 and row 3,cell in column 3 and row 3
           There are a number of different datatypes supported by CSV on the Web implementations, based on the set defined in [[xmlschema11-2]]. The complete set is shown in the following diagram:
         </p>
         <figure id="fig-datatypes" style="text-align:center">
-          <img src="http://www.w3.org/TR/tabular-metadata/datatypes.svg" style="width: 75%" alt="Built-in Datatype Hierarchy diagram" longdesc="http://www.w3.org/TR/tabular-metadata/datatypes.html#imageDescription" />
+          <img src="http://www.w3.org/TR/tabular-metadata/datatypes.svg" style="max-width: 600px" alt="Built-in Datatype Hierarchy diagram" longdesc="http://www.w3.org/TR/tabular-metadata/datatypes.html#imageDescription" />
           <figcaption>Diagram showing the built-in datatypes, based on [[xmlschema11-2]]; names in parentheses denote aliases to the [[xmlschema11-2]] terms (see the diagram in <a href="http://www.w3.org/TR/tabular-metadata/datatypes.svg">SVG</a> or <a href="http://www.w3.org/TR/tabular-metadata/datatypes.png">PNG</a> formats)</figcaption>
         </figure>
       </section>
@@ -954,19 +954,132 @@ non-eu,"Non EU countries","Pays hors Union européenne",Nicht-EU-Länder
       </section>
       <section>
         <h2>How do you provide metadata such as descriptions in different languages?</h2>
+        <p>
+          Metadata such as descriptions can be objects rather than strings. Using objects is useful when you want to provide the language for a value. In this case, the object should have two properties: a <code>@value</code> property holding the natural-language string and a <code>@lang</code> value indicating what language that string is in. For example:
+        </p>
+        <pre class="example">
+{
+  "titles": "name (en)",
+  "dc:description": <strong>{ 
+    "@value": "The official name of the country in English.",
+    "@lang": "en"
+  }</strong>
+}</pre>
+        <p>
+          You can use an array to provide the same metadata in many different languages, for example:
+        </p>
+        <pre class="example">
+"dc:title": [{
+  "@lang": "en",
+  "@value": "Unemployment in Europe (monthly)"
+},{
+  "@lang": "de",
+  "@value": "Arbeitslosigkeit in Europa (monatlich)"
+},{
+  "@lang": "fr",
+  "@value": "Le Chômage en Europe (mensuel)"
+}]
+        </pre>
+        <p class="note">
+          If you don't indicate the language used for metadata, processors will assume it's the default language used in the metadata as a whole.
+        </p>
       </section>
       <section>
         <h2>How do you provide titles for columns in different languages?</h2>
+        <p>
+          You can use an object as the value for the <code>titles</code> property for a column to provide titles in different languages. Within the object, each property is a language and the value is the title in that language:
+        </p>
+        <pre class="example">
+"titles": {
+  "en": "Country",
+  "de": "Land",
+  "fr": "Pays"
+}</pre>
+        <p class="note">
+          If you don't indicate the language used for the title of a column, processors will assume it's the default language used in the metadata as a whole.
+        </p>
       </section>
       <section>
         <h2>How do you specify the language of the values in a column?</h2>
+        <p>
+          Within an individual CSV file, it may be that different columns contain values that are in different languages. In the example we're using, there are three columns that each contain the name of a country, in English, French and German:
+        </p>
+        <pre class="example">
+"country","country group","name (en)","name (fr)","name (de)","latlong"
+"at","eu","Austria","Autriche","Österreich","47.6965545 13.34598005"
+"be","eu","Belgium","Belgique","Belgien","50.501045 4.47667405"
+"bg","eu","Bulgaria","Bulgarie","Bulgarien","42.72567375 25.4823218"
+</pre>
+        <p>
+          Use the <code>lang</code> property on the column description to indicate the language of text in that column:
+        </p>
+        <pre class="example">
+{
+  <strong>"@context": [ "http://www.w3.org/ns/csvw", { "@language": "en "} ],</strong>
+  "dc:title": "Countries"
+  "url": "countries.csv"
+  "tableSchema": {
+    "columns": [{
+      "titles": "country",
+      "dc:description": "The ISO two-letter code for a country, in lowercase."
+    },{
+      "titles": "country group",
+      "dc:description": "A lowercase two-letter code for a group of countries."
+    },{
+      "titles": "name (en)",
+      "dc:description": "The official name of the country in English.",
+      <strong>"lang": "en"</strong>
+    },{
+      "titles": "name (fr)",
+      "dc:description": "The official name of the country in French.",
+      <strong>"lang": "fr"</strong>
+    },{
+      "titles": "name (de)",
+      "dc:description": "The official name of the country in German.",
+      <strong>"lang": "de"</strong>
+    },{
+      "titles": "latitude",
+      "dc:description": "The latitude of an indicative point in the country."
+    },{
+      "titles": "longitude",
+      "dc:description": "The longitude of an indicative point in the country."
+    }]
+  }
+}
+</pre>
+        <p class="note">
+          There's no relationship between the language used in a metadata file and that used in the CSV file that it describes.
+        </p>
       </section>
       <section>
         <h2>How do you indicate that tables should be displayed right-to-left?</h2>
+        <p>
+          Implementations that display tables according to the specs should mostly be able to guess whether a table should be displayed left-to-right or right-to-left based on the content of the table. Implementations will look at the content of the cells to work out which way to display their content and will look at the content of the table as a whole to work out whether to display the first column on the right or left of the page.
+        </p>
+        <p>
+          If you want to override the display of a particular column then you can use the <code>textDirection</code> property on a column description to explicitly be <code>rtl</code> or <code>ltr</code>:
+        </p>
+        <pre class="example">
+{
+  "titles": "name (ar)",
+  "lang": "ar",
+  <strong>"textDirection": "rtl"</strong>
+}
+        </pre>
+        <p>
+          If you want to override the display of the table overall then you can use the <code>tableDirection</code> property on the description of the table, or for all tables in the group.
+        </p>
+        <pre class="example">
+{
+  <strong>"@context": "http://www.w3.org/ns/csvw",</strong>
+  "url": "results.csv",
+  <strong>"tableDirection": "rtl"</strong>
+}
+</pre>
+        <p>
+          The value of the <code>tableDirection</code> property is inherited to all columns in the table, so any text within this table will similarly be displayed right-to-left. This can be overridden by setting <code>textDirection</code> to <code>ltr</code> or <code>auto</code> (in which case the direction of the text within each cell will be determined by its contents).
+        </p>
       </section>
-    </section>
-    <section id="shared-schemas">
-      <h1>How can you specify a single schema for multiple CSV files?</h1>
     </section>
     <section>
       <h1>Advanced Use</h1>
