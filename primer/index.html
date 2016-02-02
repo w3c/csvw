@@ -1470,6 +1470,28 @@ code,name
       </section>
       <section>
         <h2>What if you want to put metadata files somewhere else?</h2>
+        <p>
+          By default, if you point a processor at a CSV file on the web, they will append <code>-metadata.json</code> to the end of the URL of the CSV file to try to find metadata for it. If they can't find a metadata file there, they will look in the directory containing the CSV file for a file called <code>csv-metadata.json</code> and use that file.
+        </p>
+        <p>
+          Looking for files in this way isn't appropriate on all servers. As a publisher, it might be that you have URLs for CSV files that are automatically generated using queries, such as <code>http://example.org/data?format=csv&amp;x=15&amp;y=53</code> or that you want metadata to live in a separate subdirectory or central location. 
+        </p>
+        <p>
+          As a publisher, you can control where processors look for metadata for your CSV files by listing the locations to look at within the <code>/.well-known/csvm</code> file on your server. (This is a well-known location as defined in [[RFC5785]].) This file should contain a list of URL patterns which will be expanded by substituting <code>url</code> for the URL of the CSV file, and then resolving against the location of the CSV file. Lines might look like:
+        </p>
+        <pre class="example">
+/metadata?for={url}
+?format=metadata
+{+url}m
+        </pre>
+        <p>
+          With a CSV file at <code>http://example.org/data.csv</code> this would lead the processor to search for metadata at:
+        </p>
+        <pre class="example">
+http://example.org/metadata?for=http://example.org/data.csv
+http://example.org/data.csv?format=metadata
+http://example.org/data.csvm
+        </pre>
       </section>
     </section>
   </body>
