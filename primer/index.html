@@ -1108,6 +1108,105 @@ non-eu,"Non EU countries","Pays hors Union européenne",Nicht-EU-Länder
       <h1>Advanced Use</h1>
       <section>
         <h2>How do you support units of measure?</h2>
+        <p>
+          There is no native support for expressing the units of measure for a particular column. You can, however, use documentation to tell people who are using the data what unit of measure is used for that particular column. This can be informal within the description of the column:
+        </p>
+        <pre class="example">
+{
+  "titles": "distance",
+  "dc:description": "Distance (kilometres)"
+}</pre>
+        <p>
+          Alternatively, it can be more explicit using an existing units-of-measure property and vocabulary, such as:
+        </p>
+        <pre class="example">
+{
+  "titles": "distance",
+  "http://purl.org/linked-data/sdmx/2009/attribute#unitMeasure": { "@id": "http://qudt.org/vocab/unit#Kilometre" }
+}</pre>
+        <section>
+          <h3>Transforming to structured values</h3>
+          <p>
+            If you are generating JSON or RDF from CSV, you may want to generate structured values that include the units of each value from the CSV file. This is a little complicated, but useful if different rows contain values that use different units. In this case, the output that you're aiming for in RDF would look something like:
+          </p>
+          <pre class="example">
+[] :distance &lt;#row-1-distance&gt; .
+
+&lt;#row-1-distance&gt;
+  schema:value 3.5 ;
+  schema:unitCode &lt;http://qudt.org/vocab/unit#Kilometre&gt; ;
+  .
+</pre>
+          <p>
+            and in JSON something like this:
+          </p>
+          <pre class="example">
+  "distance": {
+    "@id": "#row-1-distance",
+    "schema:value": 3.5
+    "schema:unitCode": "http://qudt.org/vocab/unit#Kilometre"
+  }
+  </pre>
+          <p class="note">
+            You may want to use different properties than <code>schema:value</code> and <code>schema:unitCode</code>; if so, just use different <code>propertyUrl</code>s.
+          </p>
+          <p>
+            You need to decide on a pattern for the URLs for the values themselves, and set the <code>aboutUrl</code> for the relevant column create that URL. In this example, the URLs that look like <code>#row-1-distance</code> can be generated with the pattern <code>#row-{_row}-distance</code>. The <code>propertyUrl</code> for the column needs to be <code>schema:value</code> as the value in the column provides the value for that property. So the column description looks like:
+          </p>
+          <pre class="example">
+  {
+    "name": "distance_value",
+    "titles": "distance",
+    "datatype": "number",
+    "aboutUrl": "#row-{_row}-distance",
+    "propertyUrl": "schema:value"
+  }</pre>
+          <p>
+            You then need to use virtual columns (descriptions of additional columns that don't exist in the source CSV) to generate the relationship between the thing whose distance is being measured and the structured value, and the additional property providing the unit for the structured value.
+          </p>
+          <p>
+            To generate the relationship being the thing that has the distance and the structured value, the virtual column's <code>valueUrl</code> needs to hold the same URL template as you used before:
+          </p>
+          <pre class="example">
+  {
+    "name": "distance",
+    "virtual": true,
+    "valueUrl": "#row-{_row}-distance"
+  }</pre>
+          <p>
+            To create the units property, you need another virtual column where the <code>aboutUrl</code> of that virtual column generates the URL for the structured value, the <code>propertyUrl</code> is <code>schema:unitCode</code> and the <code>valueUrl</code> is the URL representing the unit (in this case <code>http://qudt.org/vocab/unit#Kilometre</code>):
+          </p>
+          <pre class="example">
+  {
+    "name": "distance_unit",
+    "aboutUrl": "#row-{_row}-distance",
+    "propertyUrl": "schema:unitCode",
+    "valueUrl": "http://qudt.org/vocab/unit#Kilometre"
+  }</pre>
+        </section>
+        <section>
+          <h3>Named datatypes in RDF</h3>
+          <p>
+            If you are generating RDF from CSV, you may want to define a datatype for a column and then provide additional information about that datatype as properties. For example, the column description could look like:
+          </p>
+          <pre class="example">
+{
+  "titles": "distance",
+  "datatype": {
+    "@id": "http://example.org/unit/kilometre",
+    "rdfs:label": "Kilometre",
+    "base": "number" <!-- TODO here: use standard property IDs if possible -->
+  }
+}</pre>
+          <p>
+            When values are generated in RDF for this column, they will be assigned the relevant datatype, for example:
+          </p>
+          <pre class="example">
+[] :distance "3.5"^^&lt;http://example.org/unit/kilometre&gt; .
+
+&lt;http://example.org/unit/kilometre&gt; rdfs:label "Kilometre" .
+</pre>
+        </section>
       </section>
       <section id="shared-schemas">
         <h2>How can you specify a single schema for multiple CSV files?</h2>
