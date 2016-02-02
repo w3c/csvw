@@ -400,6 +400,44 @@ cell in column 1 and row 3,cell in column 2 and row 3,cell in column 3 and row 3
       </section>
       <section>
         <h2>How should you annotate individual cells?</h2>
+        <p>
+          There's no standardised facility in the CSV on the Web specifications for annotating individual cells, but there is a hook that will enable best practice about how to do that to emerge: the <code>notes</code> property on a table description can contain objects that represent annotations.
+        </p>
+        <p>
+          The <a href="https://www.w3.org/annotation/">W3C Web Annotation Working Group</a> is working on a vocabulary for annotations themselves. This vocabulary includes the concept of a <em>target</em> for an annotation and its <em>body</em> (the content of the annotation).
+        </p>
+        <p>
+          If you are annotating a single cell, the target needs to point to that cell. The easiest way to do that is to use fragment identifiers for CSV files as defined in [[RFC7111]]. These fragment identifiers reference cells based on their position within the original CSV file, with the first row in the CSV file (usually the header row) counted as 1. For example, with the CSV file:
+        </p>
+        <pre class="example">
+"country","country group","name (en)","name (fr)","name (de)","latitude","longitude"
+"at","eu","Austria","Autriche","Österreich","47.6965545","13.34598005"
+"be","eu","Belgium","Belgique","Belgien","50.501045","4.47667405"
+"bg","eu","Bulgaria","Bulgarie","Bulgarien","42.72567375","25.4823218"
+</pre>
+        <p>
+          the cell containing <code>Belgique</code> is at <code>#cell=3,4</code>. It's also possible to refer to ranges of cells with this syntax and to use <code>*</code> to refer to the last row in the file. For example, to target a comment on all the locations in the CSV file you could use the fragment identifier <code>#cell=2,6-*,7</code>.
+        </p>
+        <p>
+          To create comments, then, the <code>notes</code> property can hold an array of objects that use the Web Annotation structure. For example:
+        </p>
+        <pre class="example">
+{
+  "@context": "http://www.w3.org/ns/csvw",
+  "url": "countries.csv",
+  "notes": [{
+    "@type": "oa:Annotation",
+    "oa:hasTarget": { "@id": "countries.csv#cell=2,6-*,7" },
+    "oa:hasBody": { "oa:text": "These locations are of representative points." },
+    "oa:motivatedBy": { "@id": "oa:commenting" }
+  }, {
+    "@type": "oa:Annotation",
+    "oa:hasTarget": { "@id": "countries.csv#cell=3,4" },
+    "oa:hasBody": { "oa:text": "Corrected." },
+    "oa:motivatedBy": { "@id": "oa:editing" }
+  }]
+}
+</pre>
       </section>
     </section>
     <section>
