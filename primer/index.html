@@ -342,7 +342,61 @@ cell in column 1 and row 3,cell in column 2 and row 3,cell in column 3 and row 3
       </section>
       <section>
         <h2>What about when metadata like this is structured?</h2>
-        <!-- eg creator with a schema:name, schema:url -->
+        <p>
+          We've already seen an example where metadata supplied about a table is structured. Look at the <code>schema:creator</code> here:
+        </p>
+        <pre class="example">
+{
+  "@context": "http://www.w3.org/ns/csvw",
+  "schema:name": "Unemployment in Europe (monthly)",
+  "schema:description": "Harmonized unemployment data for European countries."
+  <strong>"schema:creator": { "schema:name": "Eurostat" },</strong>
+  "tables": [{
+    "url": "countries.csv"
+  }, {
+    "url": "country-groups.csv"
+  }, {
+    "url": "unemployment.csv"
+  }]
+}
+</pre>
+        <p>
+          The metadata supplied for a table or group of tables can have nested objects within it. You can provide arrays of values. It will be interpreted as if it is (a minimal version of) [[json-ld]]. Particular patterns that are useful are:
+        </p>
+        <ul>
+          <li>Use nested objects to create structure; for example you could supply the website and telephone number of the creator of a table as well as their name:
+            <pre class="example">
+"schema:creator": {
+  "schema:name": "Eurostat",
+  "schema:url": "http://ec.europa.eu/eurostat",
+  "schema:contactPoint": [{
+    "schema:telephone": "+44 20 300 63103",
+    "schema:availableLanguage": "English"
+  }, {
+    "schema:telephone": "+49 30 223 86 029",
+    "schema:availableLanguage": "Deutsch"
+  }, {
+    "schema:telephone": "+33 1 77 68 89 07"
+    "schema:availableLanguage": "français"
+  }]
+}
+</pre>
+          </li>
+          <li>Use <code>@type</code> to indicate the type of objects if there's an appropriate type to use, for example in this case Eurostat is an governmental organisation:
+            <pre class="example">
+"schema:creator": {
+  "schema:name": "Eurostat",
+  <strong>"@type": "schema:GovernmentOrganization"</strong>
+}
+</pre>
+          </li>
+          <li>Use an <code>@id</code> property to provide values that are URLs for things about which more information is available at that URL. For example, rather than providing all the information about Eurostat embedded within the metadata, you could just reference out to it:
+            <pre class="example">
+"schema:creator": { "@id": "http://ec.europa.eu/eurostat" }
+</pre>
+            or you could include the <code>@id</code> along with other basic properties to make it more readable for humans.
+          </li>
+        </ul>
       </section>
       <section>
         <h2>How should you annotate individual cells?</h2>
