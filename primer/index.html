@@ -1007,7 +1007,7 @@ non-eu,"Non EU countries","Pays hors Union européenne",Nicht-EU-Länder
           If you don't indicate the language used for metadata, processors will assume it's the default language used in the metadata as a whole.
         </p>
       </section>
-      <section>
+      <section id="column-title-languages">
         <h2>How do you provide titles for columns in different languages?</h2>
         <p>
           You can use an object as the value for the <code>titles</code> property for a column to provide titles in different languages. Within the object, each property is a language and the value is the title in that language:
@@ -1210,6 +1210,115 @@ non-eu,"Non EU countries","Pays hors Union européenne",Nicht-EU-Länder
       </section>
       <section id="shared-schemas">
         <h2>How can you specify a single schema for multiple CSV files?</h2>
+        <p>
+          CSV on the Web is designed to enable you to reuse the same schema when publishing multiple CSV files, even if those files are created by different organisations and therefore reside in different places. Rather than embedding a schema within the description of a table, the <code>tableSchema</code> property can point out to a schema held somewhere else.
+        </p>
+        <p>
+          For example, if you were a statistical agency and wanted municipalities to publish their unemployment figures using the same schema, you could specify the columns that you wanted included within the schema you specified at <code>http://example.org/schema/unemployment.json</code>:
+        </p>
+        <pre class="example">
+{
+  "columns": [{
+    "name": "municipality"
+  }, {
+    "name": "month",
+    "datatype": "gYearMonth"
+  }, {
+    "name": "unemployment",
+    "datatype": "number"
+  }]
+}
+</pre>
+        <p>
+          Experience shows that publishers of data in CSV files often use their own headings for the columns. So long as these don't change the meaning of the column, as a statistical agency you probably don't care. The <code>titles</code> property allows you to provide multiple alternative titles that people may use in an array:
+        </p>
+        <pre class="example">
+{
+  "columns": [{
+    "name": "municipality",
+    <strong>"titles": [ "Municipality", "City", "Area" ]</strong>
+  }, {
+    "name": "month",
+    <strong>"titles": [ "Month", "Period" ],</strong>
+    "datatype": "gYearMonth"
+  }, {
+    "name": "unemployment",
+    <strong>"titles": [ "Unemployment Rate", "Unemployment", "Number unemployed" ]</strong>
+    "datatype": "number"
+  }]
+}
+</pre>
+        <p class="note">
+          In cases where the data is being gathered from multiple countries, it may also be useful to specify multiple possible titles in different languages, as described in <a href="#column-title-languages" class="sectionRef"></a>.
+        </p>
+        <p>
+          It will help consistency and processing of the data if the municipalities use a consistent set of codes to indicate which municipality the data relates to. As the statistical agency, you can supply the relevant codes in a CSV file, eg <code>http://example.org/ref/municipalities.csv</code>:
+        </p>
+        <pre class="example">
+code,name
+0101,Absecon City
+0102,Atlantic City
+0103,Brigantine City
+...
+</pre>
+        <p>
+          This file will of course have its own simple schema, <code>http://example.org/schema/municipalities.json</code>, that provides the datatype for the municipality codes and indicates that they are unique through a primary key:
+        </p>
+        <pre class="example">
+{
+  "columns": [{
+    "name": "code",
+    "datatype": { "format": "\d{4}" }
+  }, {
+    "name": "name"
+  }],
+  "primaryKey": "code"
+}
+</pre>
+        <p>
+          A foreign key in the schema supplied by the statistical authority ensures that the codes used in the unemployment data match up with the standard set supplied by the statistical authority:
+        </p>
+        <pre class="example">
+{
+  "columns": [{
+    "name": "municipality",
+    "titles": [ "Municipality", "City", "Area" ]
+  }, {
+    "name": "month",
+    "titles": [ "Month", "Period" ],
+    "datatype": "gYearMonth"
+  }, {
+    "name": "unemployment",
+    "titles": [ "Unemployment Rate", "Unemployment", "Number unemployed" ]
+    "datatype": "number"
+  }],
+  <strong>"foreignKeys": [{
+    "columnReference": "municipality",
+    "reference": {
+      "resource": "http://example.org/ref/municipalities.csv",
+      "columnReference": "code"
+    }
+  }]</strong>
+}
+</pre>
+        <p>
+          When a municipality describes their unemployment CSV, they will need to point to your schema for their data and to the centrally provided municipalities reference data and schema:
+        </p>
+        <pre class="example">
+{
+  "@context": "http://www.w3.org/ns/csvw",
+  "tables": [{
+    "url": "http://local.example.org/data/unemployment.csv",
+    <strong>"tableSchema": "http://example.org/schema/unemployment.json"</strong>
+  }, {
+    <strong>"url": "http://example.org/ref/municipalities.csv",
+    "tableSchema": "http://example.org/schema/municipalities.json"</strong>
+  }]
+}
+</pre>
+        <p class="note">
+          A more complex example in which there is linking between pairs of files where the schemas are provided by a central authority is provided in the section <a href="https://www.w3.org/TR/tabular-metadata/#foreign-key-reference-between-schemas">Foreign Key Reference Between Schemas</a> within [[tabular-metadata]].
+        </p>
       </section>
       <section>
         <h2>How can you provide a label for a row?</h2>
