@@ -4,12 +4,10 @@
     <meta charset="utf-8" />
     <meta content="width=device-width,initial-scale=1" name="viewport" />
     <title>Embedding Tabular Metadata in HTML</title>
-    <script class="remove" src="../local-biblio.js"></script>
     <script class="remove" src="https://www.w3.org/Tools/respec/respec-w3c-common"></script>
     <script class="remove" src="../replace-ed-uris.js"></script>
     <script class="remove">
       var respecConfig = {
-          localBiblio: localBibliography,
           specStatus: "ED",
           shortName: "csvw-html",
           //publishDate:  "2014-03-27",
@@ -32,7 +30,6 @@
           wgURI: "http://www.w3.org/2013/csvw/",
           wgPublicList: "public-csv-wg",
           wgPatentURI: "http://www.w3.org/2004/01/pp-impl/68238/status",
-          useExperimentalStyles: true,
           otherLinks: [{
             key: "Repository",
             data: [{
@@ -106,78 +103,106 @@
     </section>
     <section>
       <h2>Embedding Tabular Metadata within HTML Documents</h2>
-      <p>This section describes a mechanism similar to <a href="http://www.w3.org/TR/json-ld/#embedding-json-ld-in-html-documents">Embedding JSON-LD in HTML Documents</a> (see [[json-ld]]).</p>
-      <p>HTML <code>script</code> tags can be used to embed data blocks in documents (see <cite><a href="http://www.w3.org/TR/html5/scripting-1.html#scripting-1">Scripting</a></cite> in [[html5]]). Metadata [[tabular-metadata]] describing one or more <cite><a href="http://w3c.github.io/csvw/syntax/#dfn-tabular-data-file" class="externalDFN">tabular data files</a></cite> can embedded in HTML, which can be used as an alternative way to publish datasets.</p>
-      <p>The content should be placed in a <code>script</code> tag with the <code>type</code> set to <code>application/csvm+json</code>. The character encoding of the embedded metadata will match the HTML documents encoding.</p>
-    <pre class="example highlight" title="Tabular Meatadata embedded in HTML">
-      &lt;html&gt;
-        &lt;head&gt;
-          &lt;script type=&quot;application/csvm+json&quot;&gt;
-          {
-            &quot;@context&quot;: &quot;http://www.w3.org/ns/csvw&quot;,
-            &quot;tables&quot;: [{
-              &quot;url&quot;: &quot;countries.csv&quot;,
-              &quot;tableSchema&quot;: {
-                &quot;columns&quot;: [{
-                  &quot;name&quot;: &quot;countryCode&quot;,
-                  &quot;titles&quot;: &quot;countryCode&quot;,
-                  &quot;datatype&quot;: &quot;string&quot;,
-                  &quot;propertyUrl&quot;: &quot;http://www.geonames.org/ontology{#_name}&quot;
-                }, {
-                  &quot;name&quot;: &quot;latitude&quot;,
-                  &quot;titles&quot;: &quot;latitude&quot;,
-                  &quot;datatype&quot;: &quot;number&quot;
-                }, {
-                  &quot;name&quot;: &quot;longitude&quot;,
-                  &quot;titles&quot;: &quot;longitude&quot;,
-                  &quot;datatype&quot;: &quot;number&quot;
-                }, {
-                  &quot;name&quot;: &quot;name&quot;,
-                  &quot;titles&quot;: &quot;name&quot;,
-                  &quot;datatype&quot;: &quot;string&quot;
-                }],
-                &quot;aboutUrl&quot;: &quot;countries.csv{#countryCode}&quot;,
-                &quot;propertyUrl&quot;: &quot;http://schema.org/{_name}&quot;,
-                &quot;primaryKey&quot;: &quot;countryCode&quot;
-              }
-            }, {
-              &quot;url&quot;: &quot;country_slice.csv&quot;,
-              &quot;tableSchema&quot;: {
-                &quot;columns&quot;: [{
-                  &quot;name&quot;: &quot;countryRef&quot;,
-                  &quot;titles&quot;: &quot;countryRef&quot;,
-                  &quot;valueUrl&quot;: &quot;countries.csv{#countryRef}&quot;
-                }, {
-                  &quot;name&quot;: &quot;year&quot;,
-                  &quot;titles&quot;: &quot;year&quot;,
-                  &quot;datatype&quot;: &quot;gYear&quot;
-                }, {
-                  &quot;name&quot;: &quot;population&quot;,
-                  &quot;titles&quot;: &quot;population&quot;,
-                  &quot;datatype&quot;: &quot;integer&quot;
-                }],
-                &quot;foreignKeys&quot;: [{
-                  &quot;columnReference&quot;: &quot;countryRef&quot;,
-                  &quot;reference&quot;: {
-                    &quot;resource&quot;: &quot;countries.csv&quot;,
-                    &quot;columnReference&quot;: &quot;countryCode&quot;
-                  }
-                }]
-              }
-            }]
-          }
-          &lt;/script&gt;
-          ...
-        &lt;/head&gt;
-        &lt;body&gt;
-          ...
-        &lt;/body&gt;
-      &lt;/html&gt;
-    </pre>
-    <p>Depending on how the HTML document is served, certain strings may need to be escaped.</p>
-    <p>Processing embedded metadata is the same as processing <cite><a href="http://w3c.github.io/csvw/syntax/#overriding-metadata">Overriding Metadata</a></cite> where the retrieved document type is <code>text/html</code> or <code>application/xhtml+xml</code> instead of a JSON document type. The base URI of the encapsulating HTML document provides a "Base URI Embedded in Content" per [[RFC3986]] <cite><a href="https://tools.ietf.org/html/rfc3986#section-5.1.1">section 5.1.1</a></cite>; metadata is extracted from the first <code>script</code> element having <code>@type</code> <code>application/csvm+json</code>. Metadata documents parsed from an HTML DOM will be a stream of character data rather than a stream of UTF-8 encoded bytes. No decoding is necessary if the HTML document has already been parsed into DOM. Each matching <code>script</code> data block is considered to be it's own metadata document.</p>
-    <p>To aid processors not including an HTML tool chain, HTML documents including metadata within a <code>script</code> element should also provide the location of a native JSON version of the metadata using a Link header using the equivalent mechanism described for CSV files by <cite><a href="http://w3c.github.io/csvw/syntax/#link-header" class="sectionRef">Link Header</a></cite> in [[tabular-data-model]].</p>
+      <p>Metadata may be exposed in an HTML document in a couple of different ways.</p>
+      <section>
+        <h3>Embedding Metadata in a <code>script</code> Element</h3>
+        <p>This section describes mechanisms similar to <a href="http://www.w3.org/TR/json-ld/#embedding-json-ld-in-html-documents">Embedding JSON-LD in HTML Documents</a> (see [[json-ld]]) for <dfn data-lt-noDefault data-lt="embedded metadata|embedding metadata|embed metadata">embedding metadata</dfn> within an HTML document.</p>
+        <p>HTML <code>script</code> elements can be used to embed data blocks in documents (see <cite><a href="http://www.w3.org/TR/html5/scripting-1.html#scripting-1">Scripting</a></cite> in [[html5]]). Metadata [[tabular-metadata]] describing one or more <cite><a href="http://w3c.github.io/csvw/syntax/#dfn-tabular-data-file" class="externalDFN">tabular data files</a></cite> can embedded in HTML, which can be used as an alternative way to publish datasets.</p>
+        <p>The content should be placed in a <code>script</code> element with the <code>type</code> set to <code>application/csvm+json</code>. The character encoding of the embedded metadata will match the HTML documents encoding.</p>
+        <pre class="example highlight" title="Tabular Meatadata embedded in HTML">
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;script type=&quot;application/csvm+json&quot;&gt;
+    {
+      &quot;@context&quot;: &quot;http://www.w3.org/ns/csvw&quot;,
+      &quot;tables&quot;: [{
+        &quot;url&quot;: &quot;countries.csv&quot;,
+        &quot;tableSchema&quot;: {
+          &quot;columns&quot;: [{
+            &quot;name&quot;: &quot;countryCode&quot;,
+            &quot;titles&quot;: &quot;countryCode&quot;,
+            &quot;datatype&quot;: &quot;string&quot;,
+            &quot;propertyUrl&quot;: &quot;http://www.geonames.org/ontology{#_name}&quot;
+          }, {
+            &quot;name&quot;: &quot;latitude&quot;,
+            &quot;titles&quot;: &quot;latitude&quot;,
+            &quot;datatype&quot;: &quot;number&quot;
+          }, {
+            &quot;name&quot;: &quot;longitude&quot;,
+            &quot;titles&quot;: &quot;longitude&quot;,
+            &quot;datatype&quot;: &quot;number&quot;
+          }, {
+            &quot;name&quot;: &quot;name&quot;,
+            &quot;titles&quot;: &quot;name&quot;,
+            &quot;datatype&quot;: &quot;string&quot;
+          }],
+          &quot;aboutUrl&quot;: &quot;countries.csv{#countryCode}&quot;,
+          &quot;propertyUrl&quot;: &quot;http://schema.org/{_name}&quot;,
+          &quot;primaryKey&quot;: &quot;countryCode&quot;
+        }
+      }, {
+        &quot;url&quot;: &quot;country_slice.csv&quot;,
+        &quot;tableSchema&quot;: {
+          &quot;columns&quot;: [{
+            &quot;name&quot;: &quot;countryRef&quot;,
+            &quot;titles&quot;: &quot;countryRef&quot;,
+            &quot;valueUrl&quot;: &quot;countries.csv{#countryRef}&quot;
+          }, {
+            &quot;name&quot;: &quot;year&quot;,
+            &quot;titles&quot;: &quot;year&quot;,
+            &quot;datatype&quot;: &quot;gYear&quot;
+          }, {
+            &quot;name&quot;: &quot;population&quot;,
+            &quot;titles&quot;: &quot;population&quot;,
+            &quot;datatype&quot;: &quot;integer&quot;
+          }],
+          &quot;foreignKeys&quot;: [{
+            &quot;columnReference&quot;: &quot;countryRef&quot;,
+            &quot;reference&quot;: {
+              &quot;resource&quot;: &quot;countries.csv&quot;,
+              &quot;columnReference&quot;: &quot;countryCode&quot;
+            }
+          }]
+        }
+      }]
+    }
+    &lt;/script&gt;
+    ...
+  &lt;/head&gt;
+  &lt;body&gt;
+    ...
+  &lt;/body&gt;
+&lt;/html&gt;
+        </pre>
+        <p>Depending on how the HTML document is served, script content may need to be escaped. See <cite><a href="https://www.w3.org/TR/html5/scripting-1.html#restrictions-for-contents-of-script-elements">Restrictions for contents of <code>script</code> elements</a></cite> in [[html5]] for more information.</p>
+      <p>Processing embedded metadata is the same as processing <cite><a href="http://w3c.github.io/csvw/syntax/#overriding-metadata">Overriding Metadata</a></cite> where the retrieved document type is <code>text/html</code> or <code>application/xhtml+xml</code> instead of a JSON document type. The base URI of the encapsulating HTML document provides a "Base URI Embedded in Content" per [[RFC3986]] <cite><a href="https://tools.ietf.org/html/rfc3986#section-5.1.1">section 5.1.1</a></cite>; metadata is extracted from the first <code>script</code> element having <code>@type</code> <code>application/csvm+json</code>. Metadata documents parsed from an HTML DOM will be a stream of character data rather than a stream of UTF-8 encoded bytes. No decoding is necessary if the HTML document has already been parsed into DOM. Each matching <code>script</code> data block is considered to be it's own metadata document.</p>
+      </section>
+      <section>
+        <h3>Linking to Metadata</h3>
+        <p>An alternative to <a>embedding metadata</a> within a <code>script</code> element is linking to the metadata using an HTTP Link header and/or an HTML ´<code>link</code> element using the equivalent mechanism described for CSV files by <cite><a href="http://w3c.github.io/csvw/syntax/#link-header" class="sectionRef">Link Header</a></cite> in [[tabular-data-model]]. <dfn>Linked metadata</dfn> provides an alternate mechanism for referncing metadata that would otherwise be discovered by <cite><a href="https://www.w3.org/TR/tabular-data-model/#locating-metadata">Locating Metadata</a> as defined in [[tabular-data-model]]</cite>. See <cite><a href="https://www.w3.org/TR/html5/document-metadata.html#the-link-element">The <code>link</code> element</a></cite> in [[html5]] for more information.</p>
+        <pre class="example highlight" title="Linking to Metadata">
+HTTP/1.1 200 OK
+Link: &lt;metadata.jsonld&gt;; rel=&quot;describedby&quot;
+Content-Type: text/html
+
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;link rel=&quot;describedby&quot; type=&quot;application/csvm+json&quot; href=&quot;metadata.json&quot;/&gt;
+    ...
+  &lt;/head&gt;
+&lt;/html&gt;
+        </pre>
+        <p>The preceding example shows an HTTP response containing an HTML document containing a <code>link</code> element referencing external metadata along with an HTTP Link header referencing the same metadata.</p>
+        <div class="practice">
+          <p><span class="practicelab">HTML and HTTP Link references must be consistent</span></p>
+          <p class="practicedesc">If using both HTML <code>link</code> and HTTP Link it is important that references be consistent.</p>
+        </div>
+        <div class="practice">
+          <p><span class="practicelab">Prefer embedded metadata</span></p>
+          <p class="practicedesc">To avoid inconsistancies, do not both <a>embed metadata</a> and <a>link metadata</a> as differences in the embedded representation and the linked representation can cause processing inconsistencies.</p>
+        </div>
     </section>
+  </section>
     <section>
       <h2>Extracting Tabular Data from HTML Tables</h2>
       <p>This section describes a mechanism for locating tabular data within an HTML document, extracting tabular data from an identified <cite><a href="http://www.w3.org/TR/html5/tabular-data.html#tabular-data">table element</a></cite>, and processing the tabular data to create <cite><a href="http://w3c.github.io/csvw/syntax/#dfn-annotated-table" class="externalDFN">annotated tables</a></cite>.</p>
@@ -219,7 +244,7 @@
           <tr><td>AF</td><td>33.9</td><td>67.7</td><td>Afghanistan</td></tr>
         </table>
         <table id="country_slice">
-          <caption>Countries</caption>
+          <caption>Country Slice</caption>
           <tr><th>countryRef</th><th>year</th><th>population</th></tr>
           <tr><td>AF</td><td>1960</td><td>9616353</td></tr>
           <tr><td>AF</td><td>1961</td><td>9799379</td></tr>
