@@ -82,7 +82,6 @@
       div.example script {
           display:block;
       }
-      </style>
     </style>
   </head>
   <body>
@@ -108,7 +107,7 @@
         <h3>Embedding Metadata in a <code>script</code> Element</h3>
         <p>This section describes mechanisms similar to <a href="http://www.w3.org/TR/json-ld/#embedding-json-ld-in-html-documents">Embedding JSON-LD in HTML Documents</a> (see [[json-ld]]) for <dfn data-lt-noDefault data-lt="embedded metadata|embedding metadata|embed metadata">embedding metadata</dfn> within an HTML document.</p>
         <p>HTML <code>script</code> elements can be used to embed data blocks in documents (see <cite><a href="http://www.w3.org/TR/html5/scripting-1.html#scripting-1">Scripting</a></cite> in [[html5]]). Metadata [[tabular-metadata]] describing one or more <cite><a href="http://w3c.github.io/csvw/syntax/#dfn-tabular-data-file" class="externalDFN">tabular data files</a></cite> can embedded in HTML, which can be used as an alternative way to publish datasets.</p>
-        <p>The content should be placed in a <code>script</code> element with the <code>type</code> set to <code>application/csvm+json</code>. The character encoding of the embedded metadata will match the HTML documents encoding.</p>
+        <p>The content should be placed in a <cite><a href="https://www.w3.org/TR/html5/scripting-1.html#the-script-element"><code>script</code> element</a></cite> with the <code>type</code> set to <code>application/csvm+json</code>. The character encoding of the embedded metadata will match the HTML documents encoding.</p>
         <pre class="example highlight" title="Tabular Meatadata embedded in HTML">
 &lt;html&gt;
   &lt;head&gt;
@@ -174,7 +173,7 @@
   &lt;/body&gt;
 &lt;/html&gt;
         </pre>
-        <p>Depending on how the HTML document is served, script content may need to be escaped. See <cite><a href="https://www.w3.org/TR/html5/scripting-1.html#restrictions-for-contents-of-script-elements">Restrictions for contents of <code>script</code> elements</a></cite> in [[html5]] for more information.</p>
+        <p>Depending on how the HTML document is served, <code>script</code> content may need to be escaped. See <cite><a href="https://www.w3.org/TR/html5/scripting-1.html#restrictions-for-contents-of-script-elements">Restrictions for contents of <code>script</code> elements</a></cite> in [[html5]] for more information.</p>
       <p>Processing embedded metadata is the same as processing <cite><a href="http://w3c.github.io/csvw/syntax/#overriding-metadata">Overriding Metadata</a></cite> where the retrieved document type is <code>text/html</code> or <code>application/xhtml+xml</code> instead of a JSON document type. The base URI of the encapsulating HTML document provides a "Base URI Embedded in Content" per [[RFC3986]] <cite><a href="https://tools.ietf.org/html/rfc3986#section-5.1.1">section 5.1.1</a></cite>; metadata is extracted from the first <code>script</code> element having <code>@type</code> <code>application/csvm+json</code>. Metadata documents parsed from an HTML DOM will be a stream of character data rather than a stream of UTF-8 encoded bytes. No decoding is necessary if the HTML document has already been parsed into DOM. Each matching <code>script</code> data block is considered to be it's own metadata document.</p>
       </section>
       <section>
@@ -195,7 +194,7 @@ Content-Type: text/html
         <p>The preceding example shows an HTTP response containing an HTML document containing a <code>link</code> element referencing external metadata along with an HTTP Link header referencing the same metadata.</p>
         <div class="practice">
           <p><span class="practicelab">HTML and HTTP Link references must be consistent</span></p>
-          <p class="practicedesc">If using both HTML <code>link</code> and HTTP Link it is important that references be consistent.</p>
+          <p class="practicedesc">If using both HTML <code>link</code> and HTTP Link it is important to reference the same metadata URI.</p>
         </div>
         <div class="practice">
           <p><span class="practicelab">Prefer embedded metadata</span></p>
@@ -203,10 +202,10 @@ Content-Type: text/html
         </div>
     </section>
   </section>
-    <section>
+    <section id="extracting-table-data">
       <h2>Extracting Tabular Data from HTML Tables</h2>
       <p>This section describes a mechanism for locating tabular data within an HTML document, extracting tabular data from an identified <cite><a href="http://www.w3.org/TR/html5/tabular-data.html#tabular-data">table element</a></cite>, and processing the tabular data to create <cite><a href="http://w3c.github.io/csvw/syntax/#dfn-annotated-table" class="externalDFN">annotated tables</a></cite>.</p>
-      <p>In addition to <a href="http://w3c.github.io/csvw/syntax/#dfn-tabular-data-file" class="externalDFN">tabular data files</a>, a metadata <a href="http://w3c.github.io/csvw/syntax/#dfn-table-id" class="externalDFN">table id</a> MAY reference an HTML table within an HTML document. A reference within an HTML document is described using a document-relative <em>fragment identifier</em> which is defined using the <code>@id</code> attribute on an <cite><a href="http://www.w3.org/TR/html5/tabular-data.html#tabular-data">HTML table element</a></cite>.</p>
+      <p>In addition to <a href="http://w3c.github.io/csvw/syntax/#dfn-tabular-data-file" class="externalDFN">tabular data files</a>, a metadata <a href="http://w3c.github.io/csvw/syntax/#dfn-table-id" class="externalDFN">table id</a> may reference an HTML table within an HTML document. A reference within an HTML document is described using a document-relative <em>fragment identifier</em> which is defined using the <code>@id</code> attribute on an <cite><a href="http://www.w3.org/TR/html5/tabular-data.html#tabular-data">HTML <code>table</code> element</a></cite>.</p>
       <div class="practice">
         <p><span class="practicelab">Include metadata and referenced HTML tables in a single HTML document</span></p>
         <p class="practicedesc">HTML documents which are self contained, including both embedded metadata which references HTML tables contained within the same document are preferred to HTML tables or CSV files defined externally.</p>
@@ -233,7 +232,7 @@ Content-Type: text/html
         <p class="practicedesc">Tables should be organized with the first rows containing only <code>th</code> elements to describe column headers. Subsequent rows should contain only <code>td</code> elements to describe table data.</p>
       </div>
       </section>
-      <section>
+      <section id="html-example">
         <h3>Example</h3>
         <p>The following tables are identified using <a href="#countries"><code>#countries</code></a> and <a href="#country_slice"><code>#country_slice</code></a>:</p>
         <table id="countries">
@@ -250,25 +249,23 @@ Content-Type: text/html
           <tr><td>AF</td><td>1961</td><td>9799379</td></tr>
           <tr><td>AF</td><td>1962</td><td>9989846</td></tr>
         </table>
-        <pre class="example highlight"
-             title="Referenced HTML tables"
-             data-transform="escapeContent">
-          <table id="countries">
-            <caption>Countries</caption>
-            <tr><th>countryCode</th><th>latitude</th><th>longitude</th><th>name</th></tr>
-            <tr><td>AD</td><td>42.5</td><td>1.6</td><td>Andorra</td></tr>
-            <tr><td>AE</td><td>23.4</td><td>53.8</td><td>United Arab Emirates</td></tr>
-            <tr><td>AF</td><td>33.9</td><td>67.7</td><td>Afghanistan</td></tr>
-          </table>
-          <table id="country_slice">
-            <caption>Country Slice</caption>
-            <tr><th>countryRef</th><th>year</th><th>population</th></tr>
-            <tr><td>AF</td><td>1960</td><td>9616353</td></tr>
-            <tr><td>AF</td><td>1961</td><td>9799379</td></tr>
-            <tr><td>AF</td><td>1962</td><td>9989846</td></tr>
-          </table>
+        <pre class="example highlight" title="Referenced HTML tables">
+&lt;table id=&quot;countries&quot;&gt;
+  &lt;caption&gt;Countries&lt;/caption&gt;
+  &lt;tr&gt;&lt;th&gt;countryCode&lt;/th&gt;&lt;th&gt;latitude&lt;/th&gt;&lt;th&gt;longitude&lt;/th&gt;&lt;th&gt;name&lt;/th&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;AD&lt;/td&gt;&lt;td&gt;42.5&lt;/td&gt;&lt;td&gt;1.6&lt;/td&gt;&lt;td&gt;Andorra&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;AE&lt;/td&gt;&lt;td&gt;23.4&lt;/td&gt;&lt;td&gt;53.8&lt;/td&gt;&lt;td&gt;United Arab Emirates&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;AF&lt;/td&gt;&lt;td&gt;33.9&lt;/td&gt;&lt;td&gt;67.7&lt;/td&gt;&lt;td&gt;Afghanistan&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+&lt;table id=&quot;country_slice&quot;&gt;
+  &lt;caption&gt;Country Slice&lt;/caption&gt;
+  &lt;tr&gt;&lt;th&gt;countryRef&lt;/th&gt;&lt;th&gt;year&lt;/th&gt;&lt;th&gt;population&lt;/th&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;AF&lt;/td&gt;&lt;td&gt;1960&lt;/td&gt;&lt;td&gt;9616353&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;AF&lt;/td&gt;&lt;td&gt;1961&lt;/td&gt;&lt;td&gt;9799379&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;AF&lt;/td&gt;&lt;td&gt;1962&lt;/td&gt;&lt;td&gt;9989846&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
         </pre>
-        <p>The metadata is describe here in a script element:</p>
+        <p>The metadata is describe here in a <code>script</code> element:</p>
         <pre class="example">
           <script type="application/csvm+json">
           {
@@ -342,6 +339,32 @@ Content-Type: text/html
              data-oninclude="escapeContent">
         </pre>
       </section>
+    </section>
+    <section>
+      <h3>Extracting Tabular Data from embedded CSV</h3>
+      <p>This section describes a mechanism for locating tabular data within an HTML document, extracting tabular data from an identified <cite><a href="https://www.w3.org/TR/html5/scripting-1.html#the-script-element"><code>script</code> element</a></cite>, and processing the tabular data to create <cite><a href="http://w3c.github.io/csvw/syntax/#dfn-annotated-table" class="externalDFN">annotated tables</a></cite>.</p>
+      <p>In addition to <a>embedded metadata</a>, CSV data may also be embedded within HTML using a <cite><a href="https://www.w3.org/TR/html5/scripting-1.html#the-script-element"><code>script</code> element</a></cite>. The general provisions and access patterns described in <a href="#extracting-table-data" class="sectionRef"></a> apply for embedded CSV data.</p>
+      <section id="csv-example">
+        <h3>Example</h3>
+        <p>The following CSV <code>script</code> elements are identified using <a href="#countries"><code>#countries</code></a> and <a href="#country_slice"><code>#country_slice</code></a>:</p>
+        <pre class="example highlight" title="Referenced CSV data">
+&lt;script id=&quot;countries&quot; type=&quot;text/csv&quot;&gt;
+countryCode,latitude,longitude,name
+AD,42.5,1.6,Andorra
+AE,23.4,53.8,&quot;United Arab Emirates&quot;
+AF,33.9,67.7,Afghanistan
+&lt;/script&gt;
+
+&lt;script id=&quot;country_slice&quot; type=&quot;text/csv&quot;&gt;
+countryRef,year,population
+AF,1960,9616353
+AF,1961,9799379
+AF,1962,9989846
+&lt;/script&gt;
+        </pre>
+        <p>The metadata shown in <a href="#html-example" class="sectionRef"></a> can be used to access embedded CSV as well as HTML tables.</p>
+      </section>
+    </section>
   </body>
 </html>
 
