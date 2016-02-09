@@ -9,7 +9,6 @@
     <script class="remove" src="../replace-ed-uris.js"></script>
     <script class="remove">
       var respecConfig = {
-          localBiblio: localBibliography,
           specStatus: "ED",
           shortName: "csvw-primer",
           //publishDate:  "2014-03-27",
@@ -980,31 +979,536 @@ non-eu,"Non EU countries","Pays hors Union européenne",Nicht-EU-Länder
       <h1>Transforming CSVs</h1>
       <section>
         <h2>What can you transform CSV into?</h2>
+        <p>
+          You can of course transform CSV into anything you like using your favourite programming language. However, the CSV on the Web specs provide standardised ways of mapping CSV into two other formats:
+        </p>
+        <ul>
+          <li>JSON, in [[csv2json]]</li>
+          <li>RDF, in [[csv2rdf]]</li>
+        </ul>
+        <p>
+          These specifications make use of the metadata described in this primer during the transformation to decide what to include in the transformed output and how to include it. Processors that support these standardised transformations can be used by people who can't program.
+        </p>
+        <p>
+          These specifications describe what output you get if you don't supply any metadata. Given a CSV file like this:
+        </p>
+        <pre class="example">
+"country","country group","name (en)","name (fr)","name (de)","latitude","longitude"
+"at","eu","Austria","Autriche","Österreich","47.6965545","13.34598005"
+"be","eu","Belgium","Belgique","Belgien","50.501045","4.47667405"
+"bg","eu","Bulgaria","Bulgarie","Bulgarien","42.72567375","25.4823218"
+</pre>
+        <p>
+          the usual, minimal JSON output would be:
+        </p>
+        <pre class="example">[{
+  "country": "at",
+  "country group": "eu",
+  "name (en)": "Austria",
+  "name (fr)": "Autriche",
+  "name (de)": "Österreich",
+  "latitude": "47.6965545",
+  "longitude": "13.34598005"
+}, {
+  "country": "be",
+  "country group": "eu",
+  "name (en)": "Belgium",
+  "name (fr)": "Belgique",
+  "name (de)": "Belgien",
+  "latitude": "50.501045",
+  "longitude": "4.47667405"
+}, {
+  "country": "bg",
+  "country group": "eu",
+  "name (en)": "Bulgaria",
+  "name (fr)": "Bulgarie",
+  "name (de)": "Bulgarien",
+  "latitude": "42.72567375",
+  "longitude": "25.4823218"
+}]</pre>
+        <p>
+          and the RDF output would be:
+        </p>
+        <pre class="example">
+@prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .
+
+[
+  &lt;#country&gt; "at";
+  &lt;#country%20group&gt; "eu";
+  &lt;#latitude&gt; "47.6965545";
+  &lt;#longitude&gt; "13.34598005";
+  &lt;#name%20%28de%29&gt; "Österreich";
+  &lt;#name%20%28en%29&gt; "Austria";
+  &lt;#name%20%28fr%29&gt; "Autriche"
+] .
+
+[
+  &lt;#country&gt; "be";
+  &lt;#country%20group&gt; "eu";
+  &lt;#latitude&gt; "50.501045";
+  &lt;#longitude&gt; "4.47667405";
+  &lt;#name%20%28de%29&gt; "Belgien";
+  &lt;#name%20%28en%29&gt; "Belgium";
+  &lt;#name%20%28fr%29&gt; "Belgique"
+] .
+
+[
+  &lt;#country&gt; "bg";
+  &lt;#country%20group&gt; "eu";
+  &lt;#latitude&gt; "42.72567375";
+  &lt;#longitude&gt; "25.4823218";
+  &lt;#name%20%28de%29&gt; "Bulgarien";
+  &lt;#name%20%28en%29&gt; "Bulgaria";
+  &lt;#name%20%28fr%29&gt; "Bulgarie"
+] .
+        </pre>
       </section>
       <section>
         <h2>What values get used in the output of a transformation?</h2>
         <p>
+          The result of a transformation will include typed values based on the datatype and language of each column. So if we state that the longitude and latitude are numbers and the names are strings in the given language, as in this metadata:
         </p>
         <pre class="example">
+{
+  "@context": "http://www.w3.org/ns/csvw",
+  "url": "countries.csv",
+  "tableSchema": {
+    "columns": [{
+      "titles": "country"
+    },{
+      "titles": "country group"
+    },{
+      "titles": "name (en)",
+      "lang": "en"
+    },{
+      "titles": "name (fr)",
+      "lang": "fr"
+    },{
+      "titles": "name (de)",
+      "lang": "de"
+    },{
+      "titles": "latitude",
+      "datatype": "number"
+    },{
+      "titles": "longitude",
+      "datatype": "number"
+    }]
+  }
+}
+</pre>
+        <p>
+          then the JSON will look like:
+        </p>
+        <pre class="example">[{
+  "country": "at",
+  "country group": "eu",
+  "name (en)": "Austria",
+  "name (fr)": "Autriche",
+  "name (de)": "Österreich",
+  "latitude": 47.6965545,
+  "longitude": 13.34598005
+},{
+  "country": "be",
+  "country group": "eu",
+  "name (en)": "Belgium",
+  "name (fr)": "Belgique",
+  "name (de)": "Belgien",
+  "latitude": 50.501045,
+  "longitude": 4.47667405
+},{
+  "country": "bg",
+  "country group": "eu",
+  "name (en)": "Bulgaria",
+  "name (fr)": "Bulgarie",
+  "name (de)": "Bulgarien",
+  "latitude": 42.72567375,
+  "longitude": 25.4823218
+}]
+        </pre>
+        <p>
+          and the RDF will look like:
+        </p>
+        <pre class="example">
+@prefix rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt; .
+@prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .
+
+[
+  &lt;#country&gt; "at";
+  &lt;#country%20group&gt; "eu";
+  &lt;#latitude&gt; 4.76965545e1;
+  &lt;#longitude&gt; 1.334598005e1;
+  &lt;#name%20%28de%29&gt; "Österreich"@de;
+  &lt;#name%20%28en%29&gt; "Austria"@en;
+  &lt;#name%20%28fr%29&gt; "Autriche"@fr
+] .
+
+[
+  &lt;#country&gt; "be";
+  &lt;#country%20group&gt; "eu";
+  &lt;#latitude&gt; 5.0501045e1;
+  &lt;#longitude&gt; 4.47667405e0;
+  &lt;#name%20%28de%29&gt; "Belgien"@de;
+  &lt;#name%20%28en%29&gt; "Belgium"@en;
+  &lt;#name%20%28fr%29&gt; "Belgique"@fr
+] .
+
+[
+  &lt;#country&gt; "bg";
+  &lt;#country%20group&gt; "eu";
+  &lt;#latitude&gt; 4.272567375e1;
+  &lt;#longitude&gt; 2.54823218e1;
+  &lt;#name%20%28de%29&gt; "Bulgarien"@de;
+  &lt;#name%20%28en%29&gt; "Bulgaria"@en;
+  &lt;#name%20%28fr%29&gt; "Bulgarie"@fr
+] .
+       </pre>
       </section>
       <section>
         <h2>What value gets used in the output if it's missing in the CSV?</h2>
+        <p>
+          If there's a missing value in the CSV, then usually the property will be omitted in the result as well. So if the latitude and longitude are missing for the first row of the CSV file we've been using, the equivalent JSON won't include those properties either:
+        </p>
+        <pre class="example">{
+  "country": "at",
+  "country group": "eu",
+  "name (en)": "Austria",
+  "name (fr)": "Autriche",
+  "name (de)": "Österreich"
+}</pre>
+        <p>
+          and nor will the RDF:
+        </p>
+        <pre class="example">[
+  &lt;#country&gt; "at";
+  &lt;#country%20group&gt; "eu";
+  &lt;#name%20%28de%29&gt; "Österreich"@de;
+  &lt;#name%20%28en%29&gt; "Austria"@en;
+  &lt;#name%20%28fr%29&gt; "Autriche"@fr
+] .</pre>
+        <p>
+          If you want a value to appear even when the value is missing in the CSV, you can provide that value as the <code>default</code> for the column. This value must be supplied as a string but will be treated exactly as if it had appeared within the CSV file. For example, if you supply a non-numeric string for a numeric column, as in:
+        </p>
+        <pre class="example">{
+  "titles": "latitude",
+  "datatype": "number",
+  <strong>"default": "NOT KNOWN"</strong>
+}</pre>
+        <p>
+          The default value will be seen as an invalid value and therefore represented as a string in the output.
+        </p>
       </section>
       <section>
+        <h2>How are the properties in the output of a transformation named?</h2>
         <p>
+          By default, the properties in the JSON and RDF come from the titles of the columns (the headers in the CSV file). In RDF, since the properties are URIs, the names are URL-encoded and turned into fragment identifiers in a URL based on the location of the CSV file being transformed. Hence in the previous examples there have been property names like <code>"name (en)"</code> in JSON and <code>#name%20%28en%29</code> in RDF.
         </p>
         <p>
+          You can override this default by supplying a <code>name</code> for the column. That name will be used instead of the title of the column when creating the property. So if you have:
+        </p>
+        <pre class="example">
+{
+  "titles": "name (en)",
+  "name": "english_name"
+}
+</pre>
+        <p>
+          then the property will be called <code>english_name</code> in the JSON output and <code>#english_name</code> in the RDF output.
         </p>
         <p>
+          You can also use the <code>propertyUrl</code> property to supply a prefixed name or a URL for the property. For example, to use <code>schema:latitude</code> as the name for the <code>latitude</code> property in both the JSON and the RDF output, you could use:
         </p>
+        <pre class="example">{
+  "titles": "latitude",
+  <strong>"propertyUrl": "schema:latitude"</strong>
+  "datatype": "number"
+}</pre>
+        <p>
+          The <code>propertyUrl</code> property can be used to map several columns in the CSV file onto properties with the same name. In our example, each country has several names which are all really the same property; the schema could look like:
+        </p>
+        <pre class="example">{
+  "titles": "name (en)",
+  <strong>"propertyUrl": "schema:name"</strong>
+  "lang": "en"
+},{
+  "titles": "name (fr)",
+  <strong>"propertyUrl": "schema:name"</strong>
+  "lang": "fr"
+},{
+  "titles": "name (de)",
+  <strong>"propertyUrl": "schema:name"</strong>
+  "lang": "de"
+}</pre>
+        <p>
+          With that schema, the JSON output will contain:
+        </p>
+        <pre class="example">
+"schema:name": ["Belgium", "Belgique", "Belgien"]
+        </pre>
+        <p>
+          and the RDF output will contain:
+        </p>
+        <pre class="example">
+schema:name "Belgium"@en, "Belgique"@fr, "Belgien"@de
+        </pre>
+        <p>
+          If there isn't a relevant property in one of the vocabularies that is built-in to CSV on the Web (those listed as part of the <a href="https://www.w3.org/2011/rdfa-context/rdfa-1.1">RDFa 1.1 initial context</a>), the <code>propertyUrl</code> can hold a URL template. Usually this template won't include any substitutable parts because it's generally the case that the property should be the same for the whole column. For example, you might have:
+        </p>
+        <pre class="example">{
+  "titles": "country group",
+  "propertyUrl": "http://example.org/def/countryGroup"
+}</pre>
+        <p>
+          In this case, the result of a transformation to JSON will contain:
+        </p>
+        <pre class="example">
+"http://example.org/def/countryGroup": "eu"
+        </pre>
+        <p>
+          and the RDF similarly:
+        </p>
+        <pre class="example">
+&lt;http://example.org/def/countryGroup&gt; "eu"
+        </pre>
       </section>
       <section>
         <h2>How do you map values into URLs?</h2>
         <p>
+          Sometimes a column contains a value that can be programmatically mapped into a URL. In this case, the <code>valueUrl</code> property contains a template for the URL that it should be mapped into.
         </p>
+        <p>
+          For example, say that there were pages for each country on the web at eg <code>http://example.org/country/at</code>. In that case, the URL for the country could be generated with the URL template <code>http://example.org/country/{country}</code>. Within this template, <code>{country}</code> inserts the value from the column named <code>country</code> into the URL. So the metadata could contain:
+        </p>
+        <pre class="example">{
+  "titles": "country",
+  <strong>"name": "country",
+  "valueUrl": "http://example.org/country/{country}",</strong>
+  "propertyUrl": "schema:url"
+}</pre>
+        <p>
+          The JSON output would then contain:
+        </p>
+        <pre class="example">
+"schema:url": "http://example.org/country/at"
+        </pre>
+        <p>
+          and the RDF output:
+        </p>
+        <pre class="example">
+schema:url &lt;http://example.org/country/at&gt;
+        </pre>
+        <p>
+          If you want to preserve the original value from the column <em>and</em> use it to create a URL, you may want to introduce a virtual column. For example, with the latitude and longitude of each country available, you might want to provide a link to a map centered on the country within Google Maps. The URLs for these look like <a href="https://www.google.com/maps/@50.501045,4.476674,7z">https://www.google.com/maps/@50.501045,4.476674,7z</a>, and a template like <code>https://www.google.com/maps/@{lat},{long},7z</code>.
+        </p>
+        <p>
+          To add a property that points to this URL, add a virtual column at the end of the column definitions within the schema. A virtual column definition looks just like a normal column definition but with the <code>virtual</code> property set to <code>true</code>:
+        </p>
+        <pre class="example">
+{
+  "@context": "http://www.w3.org/ns/csvw",
+  "url": "countries.csv",
+  "tableSchema": {
+    "columns": [{
+      "titles": "country"
+    },{
+      "titles": "country group"
+    },{
+      "titles": "name (en)",
+      "lang": "en"
+    },{
+      "titles": "name (fr)",
+      "lang": "fr"
+    },{
+      "titles": "name (de)",
+      "lang": "de"
+    },{
+      "titles": "latitude",
+      <strong>"name": "lat",</strong>
+      "datatype": "number"
+    },{
+      "titles": "longitude",
+      <strong>"name": "long",</strong>
+      "datatype": "number"
+    },<strong>{
+      "virtual": true,
+      "propertyUrl": "schema:hasMap",
+      "valueUrl": "https://www.google.com/maps/@{lat},{long},7z"
+    }</strong>]
+  }
+}
+</pre>
+        <p>
+          In JSON, this will result in the output:
+        </p>
+        <pre class="example">
+"schema:hasMap": "https://www.google.com/maps/@42.72567375,25.4823218,7z"
+        </pre>
+        <p>
+          and in RDF, the output:
+        </p>
+        <pre class="example">
+schema:hasMap &lt;https://www.google.com/maps/@42.72567375,25.4823218,7z&gt;
+        </pre>
       </section>
       <section>
         <h2>How do you indicate the type of the thing described by each row?</h2>
+        <p>
+          Whether generating JSON or RDF it can be useful to indicate that each row contains data about a particular type of thing, such as a Person or a Country. There isn't usually a column within tabular data that indicates the type of the row (because it's generally the same for every row, so including it would be superfluous), so you have to add it as a virtual column.
+        </p>
+        <p>
+          The virtual column needs to come after the descriptions of columns actually within the data. It should have its <code>virtual</code> property set to <code>true</code> and its <code>propertyUrl</code> set to <code>rdf:type</code> to indicate that the virtual column will indicate the type of entity the row is about. The <code>valueUrl</code> property can then be set to the prefixed name or URL of the type of the entity. For example, when each row represents a Country, you might use:
+        </p>
+        <pre class="example">{
+  "virtual": true,
+  "propertyUrl": "rdf:type",
+  "valueUrl": "schema:Country"
+}</pre>
+        <p>
+          In the JSON this value will be transformed into the value of the <code>@type</code> property on the relevant object:
+        </p>
+        <pre class="example">
+"@type": "schema:Country"
+        </pre>
+        <p>
+          In RDF output, it becomes the class for the entity:
+        </p>
+        <pre class="example">
+a schema:Country
+        </pre>
+      </section>
+      <section>
+        <h2>How do you include extra metadata in the result of the transformation?</h2>
+        <p>
+          Transformations into JSON or RDF can be carried out in one of two modes. In minimal mode, which is what we've looked at so far, the output only contains data from the rows within the CSV file. In full mode, the output also contains metadata about the CSV file, including metadata from the metadata file.
+        </p>
+        <p>
+          For example, say that our metadata file looked like:
+        </p>
+        <pre class="example">
+{
+  "@context": "http://www.w3.org/ns/csvw",
+  "url": "countries.csv",
+  <strong>"schema:name": "Countries",
+  "schema:description": "European countries for which comparative statistics are collected by Eurostat.",
+  "schema:creator": { "schema:name": "Eurostat" },</strong>
+  "tableSchema": {
+    ...
+  }
+}
+</pre>
+        <p>
+          The output of a full JSON transformation would look like:
+        </p>
+        <pre class="example">{
+  "tables": [{
+    "url":"countries.csv",
+    <strong>"schema:name":"Countries",
+    "schema:description":"European countries for which comparative statistics are collected by Eurostat.",
+    "schema:creator": {
+      "schema:name": "Eurostat"
+    },</strong>
+    "row": [{
+      "url": "countries.csv#row=2",
+      "rownum":1,
+      "describes": [{
+        "country": "at",
+        "country group": "eu",
+        "name (en)": "Austria",
+        "name (fr)": "Autriche",
+        "name (de)": "Österreich",
+        "latitude": 47.6965545,
+        "longitude": 13.34598005
+      }]
+    }, {
+      "url": "countries.csv#row=3",
+      "rownum": 2,
+      "describes": [{
+        "country": "be",
+        "country group": "eu",
+        "name (en)": "Belgium",
+        "name (fr)": "Belgique",
+        "name (de)": "Belgien",
+        "latitude": 50.501045,
+        "longitude": 4.47667405
+      }]
+    }, {
+      "url": "countries.csv#row=4",
+      "rownum": 3,
+      "describes": [{
+        "country": "bg",
+        "country group": "eu",
+        "name (en)": "Bulgaria",
+        "name (fr)": "Bulgarie",
+        "name (de)": "Bulgarien",
+        "latitude": 42.72567375,
+        "longitude": 25.4823218
+      }]
+    }]
+  }]
+}
+        </pre>
+        <p>
+          Similarly, the output of the full RDF would look like:
+        </p>
+        <pre class="example">
+@prefix csvw: &lt;http://www.w3.org/ns/csvw#&gt; .
+@prefix rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt; .
+@prefix schema: &lt;http://schema.org/&gt; .
+@prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .
+
+ [
+    a csvw:TableGroup;
+    csvw:table [
+      a csvw:Table;
+      <strong>schema:creator [ schema:name "Eurostat" ];
+      schema:description "European countries for which comparative statistics are collected by Eurostat.";
+      schema:name "Countries";</strong>
+      csvw:row [
+        a csvw:Row;
+        csvw:describes [
+          &lt;#country&gt; "at";
+          &lt;#country%20group&gt; "eu";
+          &lt;#latitude&gt; 4.76965545e1;
+          &lt;#longitude&gt; 1.334598005e1;
+          &lt;#name%20%28de%29&gt; "Osterreich"@de;
+          &lt;#name%20%28en%29&gt; "Austria"@en;
+          &lt;#name%20%28fr%29&gt; "Autriche"@fr
+        ];
+        csvw:rownum 1;
+        csvw:url &lt;#row=2&gt;
+      ],  [
+        a csvw:Row;
+        csvw:describes [
+          &lt;#country&gt; "be";
+          &lt;#country%20group&gt; "eu";
+          &lt;#latitude&gt; 5.0501045e1;
+          &lt;#longitude&gt; 4.47667405e0;
+          &lt;#name%20%28de%29&gt; "Belgien"@de;
+          &lt;#name%20%28en%29&gt; "Belgium"@en;
+          &lt;#name%20%28fr%29&gt; "Belgique"@fr
+        ];
+        csvw:rownum 2;
+        csvw:url &lt;#row=3&gt;
+      ],  [
+        a csvw:Row;
+        csvw:describes [
+          &lt;#country&gt; "bg";
+          &lt;#country%20group&gt; "eu";
+          &lt;#latitude&gt; 4.272567375e1;
+          &lt;#longitude&gt; 2.54823218e1;
+          &lt;#name%20%28de%29&gt; "Bulgarien"@de;
+          &lt;#name%20%28en%29&gt; "Bulgaria"@en;
+          &lt;#name%20%28fr%29&gt; "Bulgarie"@fr
+        ];
+        csvw:rownum 3;
+        csvw:url &lt;#row=4&gt;
+      ];
+      csvw:url &lt;&gt;
+    ]
+ ] .
+        </pre>
+        <p>
+          Metadata provided about tables is interpreted based on the rules for [[json-ld]] which means that you can provide as much structure within that metadata as you like, including providing structured values, languages and datatypes, so that the data in the output includes what you need it to.
+        </p>
       </section>
       <section>
         <h2>How can you add extra output into the result?</h2>
