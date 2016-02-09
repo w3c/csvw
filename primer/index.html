@@ -1078,19 +1078,19 @@ non-eu,"Non EU countries","Pays hors Union européenne",Nicht-EU-Länder
       "titles": "country group"
     },{
       "titles": "name (en)",
-      "lang": "en"
+      <strong>"lang": "en"</strong>
     },{
       "titles": "name (fr)",
-      "lang": "fr"
+      <strong>"lang": "fr"</strong>
     },{
       "titles": "name (de)",
-      "lang": "de"
+      <strong>"lang": "de"</strong>
     },{
       "titles": "latitude",
-      "datatype": "number"
+      <strong>"datatype": "number"</strong>
     },{
       "titles": "longitude",
-      "datatype": "number"
+      <strong>"datatype": "number"</strong>
     }]
   }
 }
@@ -1104,24 +1104,24 @@ non-eu,"Non EU countries","Pays hors Union européenne",Nicht-EU-Länder
   "name (en)": "Austria",
   "name (fr)": "Autriche",
   "name (de)": "Österreich",
-  "latitude": 47.6965545,
-  "longitude": 13.34598005
+  <strong>"latitude": 47.6965545,
+  "longitude": 13.34598005</strong>
 },{
   "country": "be",
   "country group": "eu",
   "name (en)": "Belgium",
   "name (fr)": "Belgique",
   "name (de)": "Belgien",
-  "latitude": 50.501045,
-  "longitude": 4.47667405
+  <strong>"latitude": 50.501045,
+  "longitude": 4.47667405</strong>
 },{
   "country": "bg",
   "country group": "eu",
   "name (en)": "Bulgaria",
   "name (fr)": "Bulgarie",
   "name (de)": "Bulgarien",
-  "latitude": 42.72567375,
-  "longitude": 25.4823218
+  <strong>"latitude": 42.72567375,
+  "longitude": 25.4823218</strong>
 }]
         </pre>
         <p>
@@ -1134,31 +1134,31 @@ non-eu,"Non EU countries","Pays hors Union européenne",Nicht-EU-Länder
 [
   &lt;#country&gt; "at";
   &lt;#country%20group&gt; "eu";
-  &lt;#latitude&gt; 4.76965545e1;
+  <strong>&lt;#latitude&gt; 4.76965545e1;
   &lt;#longitude&gt; 1.334598005e1;
   &lt;#name%20%28de%29&gt; "Österreich"@de;
   &lt;#name%20%28en%29&gt; "Austria"@en;
-  &lt;#name%20%28fr%29&gt; "Autriche"@fr
+  &lt;#name%20%28fr%29&gt; "Autriche"@fr</strong>
 ] .
 
 [
   &lt;#country&gt; "be";
   &lt;#country%20group&gt; "eu";
-  &lt;#latitude&gt; 5.0501045e1;
+  <strong>&lt;#latitude&gt; 5.0501045e1;
   &lt;#longitude&gt; 4.47667405e0;
   &lt;#name%20%28de%29&gt; "Belgien"@de;
   &lt;#name%20%28en%29&gt; "Belgium"@en;
-  &lt;#name%20%28fr%29&gt; "Belgique"@fr
+  &lt;#name%20%28fr%29&gt; "Belgique"@fr</strong>
 ] .
 
 [
   &lt;#country&gt; "bg";
   &lt;#country%20group&gt; "eu";
-  &lt;#latitude&gt; 4.272567375e1;
+  <strong>&lt;#latitude&gt; 4.272567375e1;
   &lt;#longitude&gt; 2.54823218e1;
   &lt;#name%20%28de%29&gt; "Bulgarien"@de;
   &lt;#name%20%28en%29&gt; "Bulgaria"@en;
-  &lt;#name%20%28fr%29&gt; "Bulgarie"@fr
+  &lt;#name%20%28fr%29&gt; "Bulgarie"@fr</strong>
 ] .
        </pre>
       </section>
@@ -1254,7 +1254,7 @@ schema:name "Belgium"@en, "Belgique"@fr, "Belgien"@de
         </p>
         <pre class="example">{
   "titles": "country group",
-  "propertyUrl": "http://example.org/def/countryGroup"
+  <strong>"propertyUrl": "http://example.org/def/countryGroup"</strong>
 }</pre>
         <p>
           In this case, the result of a transformation to JSON will contain:
@@ -1346,6 +1346,108 @@ schema:url &lt;http://example.org/country/at&gt;
         </p>
         <pre class="example">
 schema:hasMap &lt;https://www.google.com/maps/@42.72567375,25.4823218,7z&gt;
+        </pre>
+      </section>
+      <section>
+        <h2>How do you include an identifier for the thing described by each row?</h2>
+        <p>
+          By default, the things described by each row don't have identifiers associated with them in either JSON or RDF outputs. You can add an identifier for the row by setting the <code>aboutUrl</code> property. Usually that's done at the top level of the schema.
+        </p>
+        <p>
+          For example, say each row in <code>countries.csv</code> was about a country whose identifier looked like <code>http://example.org/country/{code}</code> where <code>code</code> was the value within the first column of the CSV file (the <code>country</code> column). The <code>aboutUrl</code> could be set to the generate this URL for each row using a URL template:
+        </p>
+        <pre class="example">
+{
+  "@context": "http://www.w3.org/ns/csvw",
+  "url": "countries.csv",
+  "tableSchema": {
+    <strong>"aboutUrl": "http://example.org/country/{code}",</strong>
+    "columns": [{
+      "titles": "country",
+      <strong>"name": "code"</strong>
+    },{
+      "titles": "country group"
+    },{
+      "titles": "name (en)",
+      "lang": "en"
+    },{
+      "titles": "name (fr)",
+      "lang": "fr"
+    },{
+      "titles": "name (de)",
+      "lang": "de"
+    },{
+      "titles": "latitude",
+      "datatype": "number"
+    },{
+      "titles": "longitude",
+      "datatype": "number"
+    }]
+  }
+}
+</pre>
+        <p>
+          In the JSON, these identifiers are turned into <code>@id</code> properties on the objects generated for each row:
+        </p>
+        <pre class="example">[{
+  <strong>"@id": "http: //example.org/country/at",</strong>
+  "code": "at",
+  "country group": "eu",
+  "name (en)": "Austria",
+  "name (fr)": "Autriche",
+  "name (de)": "Österreich"
+},{
+  <strong>"@id": "http: //example.org/country/be",</strong>
+  "code": "be",
+  "country group": "eu",
+  "name (en)": "Belgium",
+  "name (fr)": "Belgique",
+  "name (de)": "Belgien",
+  "latitude": 50.501045,
+  "longitude": 4.47667405
+},{
+  <strong>"@id": "http: //example.org/country/bg",</strong>
+  "code": "bg",
+  "country group": "eu",
+  "name (en)": "Bulgaria",
+  "name (fr)": "Bulgarie",
+  "name (de)": "Bulgarien",
+  "latitude": 42.72567375,
+  "longitude": 25.4823218
+}]</pre>
+        <p>
+          In the RDF, these identifiers become the identifiers for the entities that the properties relate to, rather than those being blank nodes:
+        </p>
+        <pre class="example">
+@prefix rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt; .
+@prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .
+
+&lt;http://example.org/country/at&gt; 
+   &lt;#code&gt; "at";
+   &lt;#country%20group&gt; "eu";
+   &lt;#latitude&gt; 4.76965545e1;
+   &lt;#longitude&gt; 1.334598005e1;
+   &lt;#name%20%28de%29&gt; "Österreich"@de;
+   &lt;#name%20%28en%29&gt; "Austria"@en;
+   &lt;#name%20%28fr%29&gt; "Autriche"@fr .
+
+&lt;http://example.org/country/be&gt; 
+   &lt;#code&gt; "be";
+   &lt;#country%20group&gt; "eu";
+   &lt;#latitude&gt; 5.0501045e1;
+   &lt;#longitude&gt; 4.47667405e0;
+   &lt;#name%20%28de%29&gt; "Belgien"@de;
+   &lt;#name%20%28en%29&gt; "Belgium"@en;
+   &lt;#name%20%28fr%29&gt; "Belgique"@fr .
+
+&lt;http://example.org/country/bg&gt; 
+   &lt;#code&gt; "bg";
+   &lt;#country%20group&gt; "eu";
+   &lt;#latitude&gt; 4.272567375e1;
+   &lt;#longitude&gt; 2.54823218e1;
+   &lt;#name%20%28de%29&gt; "Bulgarien"@de;
+   &lt;#name%20%28en%29&gt; "Bulgaria"@en;
+   &lt;#name%20%28fr%29&gt; "Bulgarie"@fr .
         </pre>
       </section>
       <section>
@@ -1468,7 +1570,7 @@ a schema:Country
           &lt;#country%20group&gt; "eu";
           &lt;#latitude&gt; 4.76965545e1;
           &lt;#longitude&gt; 1.334598005e1;
-          &lt;#name%20%28de%29&gt; "Osterreich"@de;
+          &lt;#name%20%28de%29&gt; "Österreich"@de;
           &lt;#name%20%28en%29&gt; "Austria"@en;
           &lt;#name%20%28fr%29&gt; "Autriche"@fr
         ];
@@ -1510,29 +1612,378 @@ a schema:Country
         </p>
       </section>
       <section>
-        <h2>How can you add extra output into the result?</h2>
-      </section>
-      <section>
-        <h2>How can you remove output from the result?</h2>
+        <h2>How can you remove output from a transformation result?</h2>
+        <p>
+          By default, the output from a JSON or RDF transformation will include all the data from all the columns of all the tables in the metadata document. It may be that you're not interested in some of that within the output of your transformation. In that case, you can use the <code>suppressOutput</code> property in the metadata to exclude the data that you're not interested in.
+        </p>
+        <p>
+          For example, perhaps I'm not interested in the non-English names of countries in my output. In that case, I could suppress them as follows:
+        </p>
+        <pre class="example">{
+  "titles": "name (fr)",
+  "lang": "fr",
+  <strong>"suppressOutput": true</strong>
+}</pre>
+        <p>
+          Similarly, when generating the output for a set of tables, you can suppress the output from a whole table by adding the <code>suppressOutput</code> property to the description of that table:
+        </p>
+        <pre class="example">
+{
+  "@context": "http://www.w3.org/ns/csvw",
+  "tables": [{
+    "url": "countries.csv"
+  }, {
+    "url": "country-groups.csv",
+    <strong>"suppressOutput": true</strong>
+  }, {
+    "url": "unemployment.csv"
+  }]
+}</pre>
       </section>
       <section>
         <h2>How do you transform into nested structures in JSON?</h2>
+        <p>
+          While tabular data is by necessity flat, it often holds data that is actually structured. For example, the data that we have been looking at:
+        </p>
+        <pre class="example">
+"country","country group","name (en)","name (fr)","name (de)","latitude","longitude"
+"at","eu","Austria","Autriche","Österreich","47.6965545","13.34598005"
+"be","eu","Belgium","Belgique","Belgien","50.501045","4.47667405"
+"bg","eu","Bulgaria","Bulgarie","Bulgarien","42.72567375","25.4823218"
+</pre>
+        <p>
+          if modelled according to the <a href="schema.org">schema.org</a> vocabulary, would look like:
+        </p>
+        <pre class="example">[{
+  "@type": "schema:Country",
+  "schema:name": ["Austria", "Autriche", "Österreich"],
+  "schema:geo": {
+    "@type": "schema:GeoCoordinates",
+    "schema:latitude":47.6965545,
+    "schema:longitude":13.34598005
+  }
+}, {
+  "@type": "schema:Country",
+  "schema:name": ["Belgium", "Belgique", "Belgien"],
+  "schema:geo": {
+    "@type": "schema:GeoCoordinates",
+    "schema:latitude":50.501045,
+    "schema:longitude":4.47667405
+  }
+}, {
+  "@type": "schema:Country",
+  "schema:name": ["Bulgaria", "Bulgarie", "Bulgarien"],
+  "schema:geo": {
+    "@type": "schema:GeoCoordinates",
+    "schema:latitude":42.72567375,
+    "schema:longitude":25.4823218
+  }
+}]</pre>
+        <p>
+          Generating JSON in this shape requires the judicious use of virtual columns, <code>aboutUrl</code> and <code>valueUrl</code>: if you create a column whose <code>valueUrl</code> corresponds to the <code>aboutUrl</code> of another column, you will create nested properties.
+        </p>
+        <p>
+          In this example, we can use two <code>aboutUrl</code>s: one in the form <code>http://example.org/country/{code}</code> for the Country and one in the form <code>http://example.org/country/{code}#geo</code> for the geo-coordinates of the country. The names are properties of the former while the longitude and latitude are properties of the latter. A virtual column can add the association between the two objects, with a <code>propertyUrl</code> of <code>schema:geo</code>, like so:
+        </p>
+        <pre class="example">
+{
+  "@context": "http://www.w3.org/ns/csvw",
+  "url": "countries.csv",
+  "tableSchema": {
+    "aboutUrl": "http://example.org/country/{code}",
+    "columns": [{
+      "titles": "country",
+      "name": "code",
+      "suppressOutput": true
+    },{
+      "titles": "country group",
+      "suppressOutput": true
+    },{
+      "titles": "name (en)",
+      "lang": "en",
+      "propertyUrl": "schema:name"
+    },{
+      "titles": "name (fr)",
+      "lang": "fr",
+      "propertyUrl": "schema:name"
+    },{
+      "titles": "name (de)",
+      "lang": "de",
+      "propertyUrl": "schema:name"
+    },{
+      "titles": "latitude",
+      "datatype": "number",
+      <strong>"aboutUrl": "http://example.org/country/{code}#geo",</strong>
+      "propertyUrl": "schema:latitude"
+    },{
+      "titles": "longitude",
+      "datatype": "number",
+      <strong>"aboutUrl": "http://example.org/country/{code}#geo",</strong>
+      "propertyUrl": "schema:longitude"
+    },{
+      "virtual": true,
+      "propertyUrl": "rdf:type",
+      "valueUrl": "schema:Country"
+    },<strong>{
+      "virtual": true,
+      "propertyUrl": "schema:geo",
+      "valueUrl": "http://example.org/country/{code}#geo"
+    }</strong>,{
+      "virtual": true,
+      "aboutUrl": "http://example.org/country/{code}#geo",
+      "propertyUrl": "rdf:type",
+      "valueUrl": "schema:GeoCoordinates"
+    }]
+  }
+}</pre>
+        <p class="note">
+          Note also in this example the use of <code>suppressOutput</code> to remove properties that we're not interested in, and the use of virtual columns to add type information to both types of generated object.
+        </p>
+        <p>
+          The result of this transformation is close to what we were aiming for, though with the addition of <code>@id</code> properties:
+        </p>
+        <pre class="example">[{
+  "@id": "http://example.org/country/at",
+  "@type": "schema:Country",
+  "schema:name": ["Austria", "Autriche", "Österreich"],
+  "schema:geo": {
+    "@id": "http://example.org/country/at#geo",
+    "@type": "schema:GeoCoordinates",
+    "schema:latitude": 47.6965545,
+    "schema:longitude": 13.34598005
+  }
+}, {
+  "@id": "http://example.org/country/be",
+  "@type": "schema:Country",
+  "schema:name": ["Belgium", "Belgique", "Belgien"],
+  "schema:geo": {
+    "@id":"http://example.org/country/be#geo",
+    "@type": "schema:GeoCoordinates",
+    "schema:latitude": 50.501045,
+    "schema:longitude": 4.47667405
+  }
+}, {
+  "@id": "http://example.org/country/bg",
+  "@type": "schema:Country",
+  "schema:name": ["Bulgaria", "Bulgarie", "Bulgarien"],
+  "schema:geo": {
+    "@id": "http://example.org/country/bg#geo",
+    "@type": "schema:GeoCoordinates",
+    "schema:latitude": 42.72567375,
+    "schema:longitude": 25.4823218
+  }
+}]</pre>
+        <p>
+          The same metadata will generate similar RDF, though the nesting structure is not so obvious because of the way RDF works:
+        </p>
+        <pre class="example">
+@prefix rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt; .
+@prefix schema: &lt;http://schema.org/&gt; .
+@prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .
+
+&lt;http://example.org/country/at&gt; a schema:Country;
+   schema:geo &lt;http://example.org/country/at#geo&gt;;
+   schema:name "Austria"@en, "Autriche"@fr, "Österreich"@de .
+
+&lt;http://example.org/country/be&gt; a schema:Country;
+   schema:geo &lt;http://example.org/country/be#geo&gt;;
+   schema:name "Belgium"@en, "Belgique"@fr, "Belgien"@de .
+
+&lt;http://example.org/country/bg&gt; a schema:Country;
+   schema:geo &lt;http://example.org/country/bg#geo&gt;;
+   schema:name "Bulgaria"@en, "Bulgarie"@fr, "Bulgarien"@de .
+
+&lt;http://example.org/country/at#geo&gt; a schema:GeoCoordinates;
+   schema:latitude 4.76965545e1;
+   schema:longitude 1.334598005e1 .
+
+&lt;http://example.org/country/be#geo&gt; a schema:GeoCoordinates;
+   schema:latitude 5.0501045e1;
+   schema:longitude 4.47667405e0 .
+
+&lt;http://example.org/country/bg#geo&gt; a schema:GeoCoordinates;
+   schema:latitude 4.272567375e1;
+   schema:longitude 2.54823218e1 .
+           </pre>
       </section>
       <section>
         <h2>How do you indicate that values should be mapped to a list rather than repeating properties in RDF?</h2>
+        <p>
+          If you are used to using RDF you'll know that there's a big difference between having a property that has multiple values (ie multiple triples with the same subject and property) and a property that has a <code>rdf:List</code> as a value. Sometimes one is appropriate, sometimes the other. The <code>ordered</code> property enables you to indicate which to use for values that are sequences in the original data.
+        </p>
+        <p>
+          Let's use as an example the version of our data in which the latitude and longitude are in the same property:
+        </p>
+        <pre class="example">
+"country","country group","name (en)","name (fr)","name (de)","latlong"
+"at","eu","Austria","Autriche","Österreich","47.6965545 13.34598005"
+"be","eu","Belgium","Belgique","Belgien","50.501045 4.47667405"
+"bg","eu","Bulgaria","Bulgarie","Bulgarien","42.72567375 25.4823218"
+</pre>
+        <p>
+          In this example, if we state that the <code>latlong</code> column is space-separated like so:
+        </p>
+        <pre class="example">{
+  "titles": "latlong",
+  <strong>"separator": " ",</strong>
+  "datatype": "number"
+}</pre>
+        <p>
+          we'll end up with output like this:
+        </p>
+        <pre class="example">[
+  &lt;#country&gt; "at";
+  &lt;#country%20group&gt; "eu";
+  &lt;#name%20%28en%29&gt; "Austria"@en;
+  &lt;#name%20%28fr%29&gt; "Autriche"@fr;
+  &lt;#name%20%28de%29&gt; "Österreich"@de;
+  <strong>&lt;#latlong&gt; 4.76965545e1, 1.334598005e1;</strong>
+] .</pre>
+        <p>
+          This shows the <code>#latlong</code> property having two values: <code>4.76965545e1</code> and <code>1.334598005e1</code>. These values could easily get mixed up such that the first was taken to be the longitude and the second the latitude rather than the other way around.
+        </p>
+        <p>
+          To avoid this mix-up occurring, set the <code>ordered</code> property to <code>true</code>:
+        </p>
+        <pre class="example">{
+  "titles": "latlong",
+  "separator": " ",
+  <strong>"ordered": true,</strong>
+  "datatype": "number"
+}</pre>
+        <p>
+          This will make the processor use a <code>rdf:List</code> for the value of the <code>#latlong</code> property instead, which in Turtle looks like:
+        </p>
+        <pre class="example">[
+  &lt;#country&gt; "at";
+  &lt;#country%20group&gt; "eu";
+  &lt;#name%20%28en%29&gt; "Austria"@en;
+  &lt;#name%20%28fr%29&gt; "Autriche"@fr;
+  &lt;#name%20%28de%29&gt; "Österreich"@de;
+  <strong>&lt;#latlong&gt; ( 4.76965545e1, 1.334598005e1 );</strong>
+] .</pre>
+        <p class="note">
+          The <code>ordered</code> property makes no difference to JSON output because sequences in CSV are always transformed into arrays in JSON.
+        </p>
       </section>
       <section>
         <h2>How should you transform CSV into JSON-LD?</h2>
+        <p>
+          As illustrated above, it is possible to transform CSV into something that looks like JSON-LD by transforming it into JSON. You can add <code>@id</code> properties for identifiers using <code>aboutUrl</code> and add <code>@type</code> properties for types using virtual columns.
+        </p>
+        <p>
+          However, if you're really after JSON-LD as an output, the best route is to transform into RDF and emit that RDF as JSON-LD. This will give you more control over the context that's used to determine the properties and structure of the output.
+        </p>
       </section>
       <section>
         <h2>How should you display CSV tables in HTML?</h2>
+        <p>
+          There's no single specified way of displaying CSV tables in HTML. If you are writing code to do so, it's good practice to:
+        </p>
+        <ul>
+          <li>use the locale of the user of the browser to determine which titles to display for columns, and how to format numbers and dates within the table</li>
+          <li>respect the directionality of the table and the text within the table that's indicated through the <code>tableDirection</code> and <code>textDirection</code> properties</li>
+          <li>use the <code>aboutUrl</code> and <code>valueUrl</code> properties to link out to other pages from cells within the table, and the <code>propertyUrl</code> to link out to information about the property a column represents</li>
+          <li>display the metadata that's available about the table so that people get a full idea of the context of the data</li>
+          <li>provide a way to access notes and annotations that have been provided about individual cells, rows or columns</li>
+          <li>highlight cells that contain errors so that they're easy to spot and correct</li>
+          <li>provide links to other related resources indicated through the metadata supplied for the table</li>
+          <li>keep columns that are used to provide a title for each row (using <code>rowTitles</code>) visible; for screen readers, use these to label the rows so that people can navigate through the table easily</li>
+          <li>link out to the original CSV file so that people can download it</li>
+        </ul>
       </section>
       <section>
         <h2>How can you transform CSV into the DataCube vocabulary?</h2>
-        <!-- see https://github.com/w3c/csvw/blob/gh-pages/examples/rdf-data-cube-example.md -->
+        <p>
+          The Data Cube vocabulary [[vocab-data-cube]] is a vocabulary for statistical data based on <a href="https://sdmx.org/">SDMX</a> (Statistical Data and Metadata eXchange). Statistical data is often expressed in tables, sometimes with one row per Observation and sometimes with each cell containing a different Observation.
+        </p>
+        <p>
+          Generating data in the Data Cube vocabulary requires the use of techniques that have been described above, such as adding identifiers to entities, adding structure and types through virtual columns, and using metadata to supply additional static context.
+        </p>
+        <p>
+          There is a <a href="https://github.com/w3c/csvw/blob/gh-pages/examples/rdf-data-cube-example.md">fully worked out example</a> of transforming to DataCube, using meterological data as its basis, available on the Github repository for the Working Group.
+        </p>
       </section>
       <section>
         <h2>How can you transform CSV into other formats?</h2>
+        <p>
+          While there are only specifications for transforming CSV into JSON and RDF, there is an extension mechanism within CSV metadata to indicate other transformations that could be applied to CSV files. The <code>transformations</code> property on a table description holds an array of descriptions of transformations that processors could carry out. There's no guarantees that a given processor will recognise them, but over time it might be that there begins to be recognised practices for how such transformations might work.
+        </p>
+        <p>
+          The transformations must have the following properties:
+        </p>
+        <dl>
+          <dt><code>targetFormat</code></dt>
+          <dd>gives a URL for the format that the transformation transforms into, for example <code>http://www.iana.org/assignments/media-types/application/xml</code> for XML</dd>
+          <dt><code>url</code></dt>
+          <dd>points to a script or template that can be used to transform the CSV into that format</dd>
+          <dt><code>scriptFormat</code></dt>
+          <dd>gives a URL for the format that the script is in, for example <code>https://mustache.github.io/</code> for Mustache or <code>http://www.iana.org/assignments/media-types/application/javascript</code> for Javascript</li>
+        </dl>
+        <p>
+          You can also supply a <code>titles</code> property to provide a human-readable description of the output of the transformation, and a <code>source</code> property to indicate that the <em>input</em> to the transformation isn't the original CSV or tabular data, but <code>json</code> or <code>rdf</code>.
+        </p>
+        <p>
+          For example, if I wanted to convert the data that we've been using into XML, I could create a Mustache template like this at <code>xml-template.mustache</code>:
+        </p>
+        <pre class="example">
+{{#tables}}
+  &lt;countries&gt;
+    {{#row}}
+      {{#describes}}
+        &lt;country id="{{country}}" group="{{country_group}}"&gt;
+          &lt;name xml:lang="en"&gt;{{name_en}}&lt;/name&gt;
+          &lt;name xml:lang="fr"&gt;{{name_fr}}&lt;/name&gt;
+          &lt;name xml:lang="de"&gt;{{name_de}}&lt;/name&gt;
+          &lt;geo lat="{{latitude}}" long="{{longitude}}" /&gt;
+        &lt;/country&gt;
+      {{/describes}}
+    {{/row}}
+  &lt;/countries&gt;
+{{/tables}}
+</pre>
+        <p>
+          In the metadata for the CSV file I could then include:
+        </p>
+        <pre class="example">{
+  "@context": "http://www.w3.org/ns/csvw",
+  "url": "countries.csv",
+  "transformations": [{
+    "targetFormat": "http://www.iana.org/assignments/media-types/application/xml",
+    "titles": "Simple XML version",
+    "url": "xml-template.mustache",
+    "scriptFormat": "https://mustache.github.io/",
+    "source": "json"
+  }]
+}</pre>
+        <p>
+          Processors that recognised the URL for Mustache could offer users the option of passing the JSON output to a Mustache processor, which would generate:
+        </p>
+        <pre class="example">
+&lt;countries&gt;
+  &lt;country id="at" group="eu"&gt;
+    &lt;name xml:lang="en"&gt;Austria&lt;/name&gt;
+    &lt;name xml:lang="fr"&gt;Autriche&lt;/name&gt;
+    &lt;name xml:lang="de"&gt;Österreich&lt;/name&gt;
+    &lt;geo lat="47.6965545" long="13.34598005" /&gt;
+  &lt;/country&gt;
+  &lt;country id="be" group="eu"&gt;
+    &lt;name xml:lang="en"&gt;Belgium&lt;/name&gt;
+    &lt;name xml:lang="fr"&gt;Belgique&lt;/name&gt;
+    &lt;name xml:lang="de"&gt;Belgien&lt;/name&gt;
+    &lt;geo lat="50.501045" long="4.47667405" /&gt;
+  &lt;/country&gt;
+  &lt;country id="bg" group="eu"&gt;
+    &lt;name xml:lang="en"&gt;Bulgaria&lt;/name&gt;
+    &lt;name xml:lang="fr"&gt;Bulgarie&lt;/name&gt;
+    &lt;name xml:lang="de"&gt;Bulgarien&lt;/name&gt;
+    &lt;geo lat="42.72567375" long="25.4823218" /&gt;
+  &lt;/country&gt;
+&lt;/countries&gt;
+        </pre>
+        <p>
+          Processors should document the kind of transformation scripts that they can recognise and how they process them.
+        </p>
       </section>
     </section>
     <section>
