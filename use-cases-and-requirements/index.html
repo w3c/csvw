@@ -3634,6 +3634,171 @@ catalogNumber,scientificName,individualCount,datasetID
                 <a href="#UC-CollatingHumanitarianResponseInformation">CollatingHumanitarianResponseInformation</a>.
               </p>
             </dd>
+            <dt id="R-SyntacticTypeDefinition">R-SyntacticTypeDefinition</dt>
+            <dd>
+              <em id="_R-SyntacticTypeDefinition">
+                <strong>Ability to declare syntactic type for cells within a specified column.</strong>
+              </em>
+              <p>Whilst it is possible to automatically detect the type of data (e.g. date, number) in a 
+                given cell, this can be error prone. For example, the date <em>April 1st</em> if written
+                as <code>1/4</code> may be interpreted as a decimal fraction.</p>
+              <p>It shall be possible to declare the data type for the cells in a given column of a 
+                tabular data file. Only one data type can be declared for a given column.</p>
+              <div class="note">
+                <p>An application may still attempt to automatically detect the data type for a given
+                cell. However, the explicit declaration shall always take precedent.</p>
+              </div>
+              <div class="note">
+                <p>The data type declaration will typically be used to declare that a column contains
+                integers, floating point numbers or text. However, it may be used to assert that a cell 
+                contains, say, embedded 
+                XML content (<code><a href="http://www.w3.org/TR/2014/REC-rdf11-concepts-20140225/#section-XMLLiteral">rdf:XMLLiteral</a></code>), 
+                datetime values (<code><a href="http://www.w3.org/TR/xmlschema11-2/#dateTime">xsd:dateTime</a></code>) or 
+                geometry expressed as well-known-text (<code>geo:wktLiteral</code>,
+                GeoSPARQL [[geosparql]] section <em>8.5.1 RDFS Datatypes</em> refers).</p>
+              </div>
+              <p>
+                <strong>Motivation:</strong>
+                <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>, 
+                <a href="#UC-DigitalPreservationOfGovernmentRecords">DigitalPreservationOfGovernmentRecords</a>, 
+                <a href="#UC-ReliabilityAnalyzesOfPoliceOpenData">ReliabilityAnalyzesOfPoliceOpenData</a>, 
+                <a href="#UC-AnalyzingScientificSpreadsheets">AnalyzingScientificSpreadsheets</a>,
+                <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>,
+                <a href="#UC-DisplayingLocationsOfCareHomesOnAMap">DisplayingLocationsOfCareHomesOnAMap</a>,
+                <a href="#UC-IntelligentlyPreviewingCSVFiles">IntelligentlyPreviewingCSVFiles</a>,
+                <a href="#UC-CanonicalMappingOfCSV">CanonicalMappingOfCSV</a>,
+                <a href="#UC-SupportingSemantic-basedRecommendations">SupportingSemantic-basedRecommendations</a>,
+                <a href="#UC-PublicationOfBiodiversityInformation">PublicationOfBiodiversityInformation</a>,
+                <a href="#UC-CollatingHumanitarianResponseInformation">CollatingHumanitarianResponseInformation</a>,
+                <a href="#UC-PlatformIntegrationUsingSTDF">PlatformIntegrationUsingSTDF</a> and 
+                <a href="#UC-ConsistentPublicationOfLocalAuthorityData">ConsistentPublicationOfLocalAuthorityData</a>.
+              </p>
+            </dd>
+            <dt id="R-SemanticTypeDefinition">R-SemanticTypeDefinition</dt>
+            <dd>
+              <em id="_R-SemanticTypeDefinition">
+                <strong>Ability to declare semantic type for cells within a specified column.</strong>
+              </em>
+              <p>Each row in a tabular data set describes a given resource or entity. The properties 
+              for that entity are described in the cells of that row. All the cells in a given column
+              are anticipated to provide the same property.</p>
+              <p>It shall be possible to declare the semantic relationship between the entity that a 
+              given row describes and a cell in a given column.</p>
+              <p>The following example of an <a href="http://www.onetcenter.org/taxonomy/2010/list.html?d=1">occupational listing</a>
+              illustrates how a row of tabular data can be mapped to equivalent content expressed in RDF (Turtle).</p>
+              <p> The mappings are:
+                <ul>
+                  <li><code>O*NET-SOC 2010 Code</code> is mapped to <a href="http://www.w3.org/2009/08/skos-reference/skos.html#notation">skos:notation</a></li>
+                  <li><code>O*NET-SOC 2010 Title</code> is mapped to <a href="http://www.w3.org/TR/rdf-schema/#ch_label">rdfs:label</a></li>
+                  <li><code>O*NET-SOC 2010 Description</code> is mapped to <a href="http://dublincore.org/documents/2012/06/14/dcmi-terms/?v=terms#terms-description">dc:description</a></li>
+                </ul>
+              </p>
+              <pre class="example">
+CSV
+---
+
+O*NET-SOC 2010 Code,O*NET-SOC 2010 Title,O*NET-SOC 2010 Description
+         11-1011.00,    Chief Executives,"Determine and formulate policies and provide overall direction of companies [...]."
+{snip}                
+
+RDF (Turtle)
+------------
+
+ex:11-1011.00
+    skos:notation "11-1011.00" ;
+    rdfs:label "Chief Executives" ;
+    dc:description "Determine and formulate policies and provide overall direction of companies [...]." .
+              </pre>
+              
+              <p>A copy of the occupational listing CSV is available <a href="2010_Occupations.csv">locally</a>.</p>
+              
+              <div class="note">
+                <p>To express semantics in a machine readable form, RDF seems the appropriate choice.
+                  Furthermore, best practice indicates that one should adopt common and widely adopted
+                  patterns (e.g. RDF vocabularies, OWL ontologies) when publishing data to enable a
+                  wide audience to consume and understand the data. Existing (de facto) standard
+                  patterns may add complexity when defining the semantics associated with a particular
+                  row such that a single RDF predicate is insufficient. </p>
+                <p>For example, to express a quantity value using <a href="http://qudt.org/">QUDT</a>
+                  we use an instance of <code>qudt:QuantityValue</code> to relate the numerical value
+                  with the quantity kind (e.g. air temperature) and unit of measurement (e.g.
+                  Celsius). Thus the semantics needed for a column containing temperature values might
+                  be: <code>qudt:value/qudt:numericValue</code> – more akin to a <a
+                    href="http://marmotta.apache.org/ldpath/language.html">LDPath</a>.</p>
+                <p>Furthermore, use of OWL axioms when defining a sub-property of
+                  <code>qudt:value</code> would allow the quantity type and unit of measurement to
+                  be inferred, with the column semantics then being specified as
+                  <code>ex:temperature_Cel/qudt:numericValue</code>.</p>
+              </div>
+              <p>
+                <strong>Motivation:</strong>
+                <a href="#UC-DigitalPreservationOfGovernmentRecords">DigitalPreservationOfGovernmentRecords</a>, 
+                <a href="#UC-PublicationOfNationalStatistics">PublicationOfNationalStatistics</a>,
+                <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>,
+                <a href="#UC-ReliabilityAnalyzesOfPoliceOpenData">ReliabilityAnalyzesOfPoliceOpenData</a>,
+                <a href="#UC-AnalyzingScientificSpreadsheets">AnalyzingScientificSpreadsheets</a>,
+                <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>,
+                <a href="#UC-IntelligentlyPreviewingCSVFiles">IntelligentlyPreviewingCSVFiles</a>,
+                <a href="#UC-SupportingSemantic-basedRecommendations">SupportingSemantic-basedRecommendations</a>,
+                <a href="#UC-MakingSenseOfOtherPeoplesData">MakingSenseOfOtherPeoplesData</a>,
+                <a href="#UC-PublicationOfBiodiversityInformation">PublicationOfBiodiversityInformation</a> and
+                <a href="#UC-CollatingHumanitarianResponseInformation">CollatingHumanitarianResponseInformation</a>.
+              </p>
+            </dd>
+            <dt id="R-MissingValueDefinition">R-MissingValueDefinition</dt>
+            <dd>
+              <em id="_R-MissingValueDefinition">
+                <strong>Ability to declare a "missing value" token and, optionally, a reason for the
+                  value to be missing</strong>
+              </em>
+              <p>Significant amounts of existing tabular text data include values such as
+                <code>-999</code>. Typically, these are outside the normal expected range of values
+                and are meant to infer that the value for that cell is missing. Automated parsing of
+                CSV files needs to recognise such missing value tokens and behave accordingly.
+                Furthermore, it is often useful for a data publisher to declare <em>why</em> a value
+                is missing; e.g. <code>withheld</code> or <code>aboveMeasurementRange</code></p>
+              <p>
+                <strong>Motivation:</strong>
+                <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>,
+                <a href="#UC-OrganogramData">OrganogramData</a>,
+                <a href="#UC-OpenSpendingData">OpenSpendingData</a>,
+                <a href="#UC-NetCdFcDl">NetCdFcDl</a>, 
+                <a href="#UC-PaloAltoTreeData">PaloAltoTreeData</a> and
+                <a href="#UC-PlatformIntegrationUsingSTDF">PlatformIntegrationUsingSTDF</a>.
+              </p>
+            </dd>
+            <dt id="R-URIMapping">R-URIMapping</dt>
+            <dd>
+              <em id="_R-URIMapping">
+                <strong>Ability to map cell values within a given column into corresponding URI</strong>
+              </em>
+              <p>Tabular data often makes use of local identifiers to uniquely identify an entity described within a tabular data file
+              or to reference an entity described in the same data file or elsewhere (e.g. reference data, code lists, etc.). 
+              The local identifier will often be unique within a particular scope (e.g. a code list or data set), but cannot 
+              be guaranteed to be globally unique. In order to make these local identifiers globally unique (e.g. so that
+              the entity described by a row in a tabular data file can be referred to from an external source, or to establish 
+              links between the tabular data and the related reference data) it is necessary to map those local identifiers
+              to URIs.</p>
+              <p>It shall be possible to declare how local identifiers used within a column of a particular dataset
+              can be mapped to their respective URI. Typically, this may be achieved by concatenating the local identifier with 
+              a prefix - although more complex mappings are anticipated such as removal of "special characters" that are not 
+              permitted in URIs (as defined in [[RFC3986]]) or CURIEs [[curie]]).</p>
+              <p>Furthermore, where the local identifier is part of a controlled vocabulary, code list or thesaurus, it should
+              be possible to specify the URI for the controlled vocabulary within which the local identfier is defined.</p>
+              <p class="note">Also see the related requirement <a href="#R-ForeignKeyReferences">R-ForeignKeyReferences</a>.</p>
+              <p>
+                <strong>Motivation:</strong>
+                <a href="#UC-DigitalPreservationOfGovernmentRecords">DigitalPreservationOfGovernmentRecords</a>,
+                <a href="#UC-OrganogramData">OrganogramData</a>, 
+                <a href="#UC-PublicationOfPropertyTransactionData">PublicationOfPropertyTransactionData</a>,
+                <a href="#UC-AnalyzingScientificSpreadsheets">AnalyzingScientificSpreadsheets</a>,
+                <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>, 
+                <a href="#UC-PaloAltoTreeData">PaloAltoTreeData</a>,
+                <a href="#UC-PublicationOfBiodiversityInformation">PublicationOfBiodiversityInformation</a>,
+                <a href="#UC-MakingSenseOfOtherPeoplesData">MakingSenseOfOtherPeoplesData</a> and
+                <a href="#UC-ExpressingHierarchyWithinOccupationalListings">ExpressingHierarchyWithinOccupationalListings</a>.
+              </p>
+            </dd>
           </dl>
         </section>
       </section>
@@ -3727,171 +3892,7 @@ catalogNumber,scientificName,individualCount,datasetID
             
             
             
-            <dt id="R-SyntacticTypeDefinition">R-SyntacticTypeDefinition</dt>
-            <dd>
-              <em id="_R-SyntacticTypeDefinition">
-                <strong>Ability to declare syntactic type for cells within a specified column.</strong>
-              </em>
-              <p>Whilst it is possible to automatically detect the type of data (e.g. date, number) in a 
-                given cell, this can be error prone. For example, the date <em>April 1st</em> if written
-                as <code>1/4</code> may be interpreted as a decimal fraction.</p>
-              <p>It shall be possible to declare the data type for the cells in a given column of a 
-                tabular data file. Only one data type can be declared for a given column.</p>
-              <div class="note">
-                <p>An application may still attempt to automatically detect the data type for a given
-                cell. However, the explicit declaration shall always take precedent.</p>
-              </div>
-              <div class="note">
-                <p>The data type declaration will typically be used to declare that a column contains
-                integers, floating point numbers or text. However, it may be used to assert that a cell 
-                contains, say, embedded 
-                XML content (<code><a href="http://www.w3.org/TR/2014/REC-rdf11-concepts-20140225/#section-XMLLiteral">rdf:XMLLiteral</a></code>), 
-                datetime values (<code><a href="http://www.w3.org/TR/xmlschema11-2/#dateTime">xsd:dateTime</a></code>) or 
-                geometry expressed as well-known-text (<code>geo:wktLiteral</code>,
-                GeoSPARQL [[geosparql]] section <em>8.5.1 RDFS Datatypes</em> refers).</p>
-              </div>
-              <p>
-                <strong>Motivation:</strong>
-                <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>, 
-                <a href="#UC-DigitalPreservationOfGovernmentRecords">DigitalPreservationOfGovernmentRecords</a>, 
-                <a href="#UC-ReliabilityAnalyzesOfPoliceOpenData">ReliabilityAnalyzesOfPoliceOpenData</a>, 
-                <a href="#UC-AnalyzingScientificSpreadsheets">AnalyzingScientificSpreadsheets</a>,
-                <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>,
-                <a href="#UC-DisplayingLocationsOfCareHomesOnAMap">DisplayingLocationsOfCareHomesOnAMap</a>,
-                <a href="#UC-IntelligentlyPreviewingCSVFiles">IntelligentlyPreviewingCSVFiles</a>,
-                <a href="#UC-CanonicalMappingOfCSV">CanonicalMappingOfCSV</a>,
-		            <a href="#UC-SupportingSemantic-basedRecommendations">SupportingSemantic-basedRecommendations</a>,
-                <a href="#UC-PublicationOfBiodiversityInformation">PublicationOfBiodiversityInformation</a>,
-                <a href="#UC-CollatingHumanitarianResponseInformation">CollatingHumanitarianResponseInformation</a>,
-                <a href="#UC-PlatformIntegrationUsingSTDF">PlatformIntegrationUsingSTDF</a> and 
-                <a href="#UC-ConsistentPublicationOfLocalAuthorityData">ConsistentPublicationOfLocalAuthorityData</a>.
-              </p>
-            </dd>
-            <dt id="R-SemanticTypeDefinition">R-SemanticTypeDefinition</dt>
-            <dd>
-              <em id="_R-SemanticTypeDefinition">
-                <strong>Ability to declare semantic type for cells within a specified column.</strong>
-              </em>
-              <p>Each row in a tabular data set describes a given resource or entity. The properties 
-              for that entity are described in the cells of that row. All the cells in a given column
-              are anticipated to provide the same property.</p>
-              <p>It shall be possible to declare the semantic relationship between the entity that a 
-              given row describes and a cell in a given column.</p>
-              <p>The following example of an <a href="http://www.onetcenter.org/taxonomy/2010/list.html?d=1">occupational listing</a>
-              illustrates how a row of tabular data can be mapped to equivalent content expressed in RDF (Turtle).</p>
-              <p> The mappings are:
-                <ul>
-                  <li><code>O*NET-SOC 2010 Code</code> is mapped to <a href="http://www.w3.org/2009/08/skos-reference/skos.html#notation">skos:notation</a></li>
-                  <li><code>O*NET-SOC 2010 Title</code> is mapped to <a href="http://www.w3.org/TR/rdf-schema/#ch_label">rdfs:label</a></li>
-                  <li><code>O*NET-SOC 2010 Description</code> is mapped to <a href="http://dublincore.org/documents/2012/06/14/dcmi-terms/?v=terms#terms-description">dc:description</a></li>
-                </ul>
-              </p>
-              <pre class="example">
-CSV
----
-
-O*NET-SOC 2010 Code,O*NET-SOC 2010 Title,O*NET-SOC 2010 Description
-         11-1011.00,    Chief Executives,"Determine and formulate policies and provide overall direction of companies [...]."
-{snip}                
-
-RDF (Turtle)
-------------
-
-ex:11-1011.00
-    skos:notation "11-1011.00" ;
-    rdfs:label "Chief Executives" ;
-    dc:description "Determine and formulate policies and provide overall direction of companies [...]." .
-              </pre>
-              
-              <p>A copy of the occupational listing CSV is available <a href="2010_Occupations.csv">locally</a>.</p>
-              
-              <div class="note">
-                <p>To express semantics in a machine readable form, RDF seems the appropriate choice.
-                  Furthermore, best practice indicates that one should adopt common and widely adopted
-                  patterns (e.g. RDF vocabularies, OWL ontologies) when publishing data to enable a
-                  wide audience to consume and understand the data. Existing (de facto) standard
-                  patterns may add complexity when defining the semantics associated with a particular
-                  row such that a single RDF predicate is insufficient. </p>
-                <p>For example, to express a quantity value using <a href="http://qudt.org/">QUDT</a>
-                  we use an instance of <code>qudt:QuantityValue</code> to relate the numerical value
-                  with the quantity kind (e.g. air temperature) and unit of measurement (e.g.
-                  Celsius). Thus the semantics needed for a column containing temperature values might
-                  be: <code>qudt:value/qudt:numericValue</code> – more akin to a <a
-                    href="http://marmotta.apache.org/ldpath/language.html">LDPath</a>.</p>
-                <p>Furthermore, use of OWL axioms when defining a sub-property of
-                  <code>qudt:value</code> would allow the quantity type and unit of measurement to
-                  be inferred, with the column semantics then being specified as
-                  <code>ex:temperature_Cel/qudt:numericValue</code>.</p>
-              </div>
-              <p>
-                <strong>Motivation:</strong>
-                <a href="#UC-DigitalPreservationOfGovernmentRecords">DigitalPreservationOfGovernmentRecords</a>, 
-                <a href="#UC-PublicationOfNationalStatistics">PublicationOfNationalStatistics</a>,
-                <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>,
-                <a href="#UC-ReliabilityAnalyzesOfPoliceOpenData">ReliabilityAnalyzesOfPoliceOpenData</a>,
-                <a href="#UC-AnalyzingScientificSpreadsheets">AnalyzingScientificSpreadsheets</a>,
-                <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>,
-                <a href="#UC-IntelligentlyPreviewingCSVFiles">IntelligentlyPreviewingCSVFiles</a>,
-            		<a href="#UC-SupportingSemantic-basedRecommendations">SupportingSemantic-basedRecommendations</a>,
-                <a href="#UC-MakingSenseOfOtherPeoplesData">MakingSenseOfOtherPeoplesData</a>,
-                <a href="#UC-PublicationOfBiodiversityInformation">PublicationOfBiodiversityInformation</a> and
-                <a href="#UC-CollatingHumanitarianResponseInformation">CollatingHumanitarianResponseInformation</a>.
-              </p>
-            </dd>
-            <dt id="R-MissingValueDefinition">R-MissingValueDefinition</dt>
-            <dd>
-              <em id="_R-MissingValueDefinition">
-                <strong>Ability to declare a "missing value" token and, optionally, a reason for the
-                  value to be missing</strong>
-              </em>
-              <p>Significant amounts of existing tabular text data include values such as
-                <code>-999</code>. Typically, these are outside the normal expected range of values
-                and are meant to infer that the value for that cell is missing. Automated parsing of
-                CSV files needs to recognise such missing value tokens and behave accordingly.
-                Furthermore, it is often useful for a data publisher to declare <em>why</em> a value
-                is missing; e.g. <code>withheld</code> or <code>aboveMeasurementRange</code></p>
-              <p>
-                <strong>Motivation:</strong>
-                <a href="#UC-SurfaceTemperatureDatabank">SurfaceTemperatureDatabank</a>,
-                <a href="#UC-OrganogramData">OrganogramData</a>,
-                <a href="#UC-OpenSpendingData">OpenSpendingData</a>,
-                <a href="#UC-NetCdFcDl">NetCdFcDl</a>, 
-                <a href="#UC-PaloAltoTreeData">PaloAltoTreeData</a> and
-                <a href="#UC-PlatformIntegrationUsingSTDF">PlatformIntegrationUsingSTDF</a>.
-              </p>
-            </dd>
-            <dt id="R-URIMapping">R-URIMapping</dt>
-            <dd>
-              <em id="_R-URIMapping">
-                <strong>Ability to map cell values within a given column into corresponding URI</strong>
-              </em>
-              <p>Tabular data often makes use of local identifiers to uniquely identify an entity described within a tabular data file
-              or to reference an entity described in the same data file or elsewhere (e.g. reference data, code lists, etc.). 
-              The local identifier will often be unique within a particular scope (e.g. a code list or data set), but cannot 
-              be guaranteed to be globally unique. In order to make these local identifiers globally unique (e.g. so that
-              the entity described by a row in a tabular data file can be referred to from an external source, or to establish 
-              links between the tabular data and the related reference data) it is necessary to map those local identifiers
-              to URIs.</p>
-              <p>It shall be possible to declare how local identifiers used within a column of a particular dataset
-              can be mapped to their respective URI. Typically, this may be achieved by concatenating the local identifier with 
-              a prefix - although more complex mappings are anticipated such as removal of "special characters" that are not 
-              permitted in URIs (as defined in [[RFC3986]]) or CURIEs [[curie]]).</p>
-              <p>Furthermore, where the local identifier is part of a controlled vocabulary, code list or thesaurus, it should
-              be possible to specify the URI for the controlled vocabulary within which the local identfier is defined.</p>
-              <p class="note">Also see the related requirement <a href="#R-ForeignKeyReferences">R-ForeignKeyReferences</a>.</p>
-              <p>
-                <strong>Motivation:</strong>
-                <a href="#UC-DigitalPreservationOfGovernmentRecords">DigitalPreservationOfGovernmentRecords</a>,
-                <a href="#UC-OrganogramData">OrganogramData</a>, 
-                <a href="#UC-PublicationOfPropertyTransactionData">PublicationOfPropertyTransactionData</a>,
-                <a href="#UC-AnalyzingScientificSpreadsheets">AnalyzingScientificSpreadsheets</a>,
-                <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>, 
-                <a href="#UC-PaloAltoTreeData">PaloAltoTreeData</a>,
-                <a href="#UC-PublicationOfBiodiversityInformation">PublicationOfBiodiversityInformation</a>,
-                <a href="#UC-MakingSenseOfOtherPeoplesData">MakingSenseOfOtherPeoplesData</a> and
-                <a href="#UC-ExpressingHierarchyWithinOccupationalListings">ExpressingHierarchyWithinOccupationalListings</a>.
-              </p>
-            </dd>
+            
             <dt id="R-UnitMeasureDefinition">R-UnitMeasureDefinition</dt>
             <dd>
               <em id="_R-UnitMeasureDefinition">
