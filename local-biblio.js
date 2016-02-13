@@ -3,10 +3,32 @@ var conversions = [
   ["http://w3c.github.io/csvw/csv2rdf/", "http://www.w3.org/TR/2015/REC-csv2rdf-20151217/"],
   ["http://w3c.github.io/csvw/csv2json/", "http://www.w3.org/TR/2015/REC-csv2json-20151217/"],
   ["http://w3c.github.io/csvw/metadata/", "http://www.w3.org/TR/2015/REC-tabular-metadata-20151217/"],
-  ["http://w3c.github.io/csvw/use-cases-and-requirements/", "http://www.w3.org/TR/2014/WD-csvw-ucr-20140701/"]          
+  ["http://w3c.github.io/csvw/use-cases-and-requirements/", "http://www.w3.org/TR/2016/NOTE-csvw-ucr-20160225/"],
+  ["http://w3c.github.io/csvw/primer/", "http://www.w3.org/TR/2016/NOTE-tabular-data-primer-20160225/"],
+  ["http://w3c.github.io/csvw/html-note/", "http://www.w3.org/TR/2016/NOTE-csvw-html-20160225/"]
 ];
 
 var localBibliography = {
+    "csvw-html": {
+          "authors": [
+            "Gregg Kellogg"
+          ],
+          "title": "Embedding Tabular Metadata in HTML",
+          "href" : "http://www.w3.org/TR/2016/NOTE-csvw-html-20160225/",
+          "rawDate": "2016-12-25",
+          "status" : "NOTE",
+          "publisher": "W3C"
+    },
+  "tabular-data-primer": {
+        "authors": [
+          "Jeni Tennison"
+        ],
+        "title": "CSV on the Web: A Primer",
+        "href" : "http://www.w3.org/TR/2016/NOTE-tabular-data-primer-20160225/",
+        "rawDate": "2016-12-25",
+        "status" : "NOTE",
+        "publisher": "W3C"
+  },
   "tabular-data-model": {
       "authors": [
         "Jeni Tennison",
