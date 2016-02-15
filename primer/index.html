@@ -220,6 +220,7 @@ cell in column 1 and row 3,cell in column 2 and row 3,cell in column 3 and row 3
         </p>
         <p>See also:</p>
         <ul>
+          <li><a href="#dialects" class="sectionRef"></a></li>
           <li><a href="#well-known-location" class="sectionRef"></a></li>
         </ul>
       </section>
@@ -2714,7 +2715,7 @@ code,name
           A lot of what's called "CSV" that's published on the web isn't actually CSV. It might use something other than commas (such as tabs or semi-colons) as separators between values, or might have multiple header lines.
         </p>
         <p>
-          The specification for CSV as a format is [[RFC4180]]. However, this is an informational specification and it's not uncommon for applications to deviate from it.
+          The specification for CSV as a format is [[RFC4180]]. However, this is an informational specification and and not a formal standard. Therefore, applications may deviate from it.
         </p>
         <p>
           The metadata that's described here can be used with files that contain tabular data but that aren't CSV. You can provide guidance to processors that are trying to parse those files through the <a href="http://w3c.github.io/csvw/metadata/#table-dialect"><code>dialect</code></a> property on a table description. For example, say we were dealing with a tab-separated file that contains multiple header lines at <code>http://example.org/data/unemployment.tsv</code>:
@@ -2816,13 +2817,16 @@ code,name
       <section id="well-known-location">
         <h2>What if you want to put metadata files somewhere else?</h2>
         <p>
-          By default, if you point a processor at a CSV file on the web, they will append <code>-metadata.json</code> to the end of the URL of the CSV file to try to find metadata for it. If they can't find a metadata file there, they will look in the directory containing the CSV file for a file called <code>csv-metadata.json</code> and use that file.
+          By default, if you point a processor at a CSV file on the web, they will look for a <code>Link</code> header within the response with <code>rel="describedby"</code> and specifying a content type of <code>application/csvm+json</code>, <code>application/ld+json</code> or <code>application/json</code>. If you're publishing CSV files and it's possible to set the <code>Link</code> header, this is the best way of telling processors where to look for metadata files.
+        </p>
+        <p>
+          If processors don't see an appropriate <code>Link</code> header, they will append <code>-metadata.json</code> to the end of the URL of the CSV file to try to find metadata for it. If they can't find a metadata file there, they will look in the directory containing the CSV file for a file called <code>csv-metadata.json</code> and use that file.
         </p>
         <p>
           Looking for files in this way isn't appropriate on all servers. As a publisher, it might be that you have URLs for CSV files that are automatically generated using queries, such as <code>http://example.org/data?format=csv&amp;x=15&amp;y=53</code> or that you want metadata to live in a separate subdirectory or central location.
         </p>
         <p>
-          As a publisher, you can control where processors look for metadata for your CSV files by listing the locations to look at within the <code>/.well-known/csvm</code> file on your server. (This is a well-known location as defined in [[RFC5785]].) This file should contain a list of URL patterns which will be expanded by substituting <code>url</code> for the URL of the CSV file, and then resolving against the location of the CSV file. Lines might look like:
+          As a publisher, if you can't or don't want to use the <code>Link</code> header, you can control where processors look for metadata for your CSV files by listing the locations to look at within the <code>/.well-known/csvm</code> file on your server. (This is a well-known location as defined in [[RFC5785]].) This file should contain a list of URL patterns which will be expanded by substituting <code>url</code> for the URL of the CSV file, and then resolving against the location of the CSV file. Lines might look like:
         </p>
         <pre class="example">
 /metadata?for={url}
