@@ -593,6 +593,7 @@ cell in column 1 and row 3,cell in column 2 and row 3,cell in column 3 and row 3
           <li><a href="#date-format" class="sectionRef"></a></li>
           <li><a href="#boolean-format" class="sectionRef"></a></li>
           <li><a href="#units-of-measure" class="sectionRef"></a></li>
+          <li><a href="#geospatial" class="sectionRef"></a></li>
         </ul>
       </section>
       <section id="string-restriction">
@@ -628,6 +629,7 @@ cell in column 1 and row 3,cell in column 2 and row 3,cell in column 3 and row 3
           <li><a href="#boolean-format" class="sectionRef"></a></li>
           <li><a href="#enumeration-regexp" class="sectionRef"></a></li>
           <li><a href="#column-language" class="sectionRef"></a></li>
+          <li><a href="#geospatial" class="sectionRef"></a></li>
         </ul>
       </section>
       <section id="number-restriction">
@@ -2531,6 +2533,117 @@ a schema:Country
             <li><a href="#transformation-values" class="sectionRef"></a></li>
           </ul>
         </section>
+      </section>
+      <section id="geospatial">
+        <h2>How do you support geospatial data?</h2>
+        <p>
+          There are many different ways of representing geospatial data within a CSV file, and no single best practice for doing so.
+        </p>
+        <p>
+          At the simplest level, it's possible to reference geospatial coordinates as points with separate columns for latitude, longitude and if necessary altitude (or using a different spatial reference system). This enables separate validation for the separate coordinates. The example used throughout this primer uses this setup:
+        </p>
+        <pre class="example">
+"country","country group","name (en)","name (fr)","name (de)",<strong>"latitude","longitude"</strong>
+"at","eu","Austria","Autriche","Österreich",<strong>"47.6965545","13.34598005"</strong>
+"be","eu","Belgium","Belgique","Belgien",<strong>"50.501045","4.47667405"</strong>
+"bg","eu","Bulgaria","Bulgarie","Bulgarien",<strong>"42.72567375","25.4823218"</strong>
+</pre>
+        <p>
+          Metadata can be used to provide specialist types for the values of these coordinates, to group the coordinates together, and to provide a link that uses the coordinates to provide a map:
+        </p>
+        <pre class="example">{
+  "titles": "latitude",
+  "name": "lat",
+  "datatype": {
+    "base": "number",
+    "minimum": "-90",
+    "maximum": "90"
+  },
+  "aboutUrl": "http://example.org/country/{code}#geo",
+  "propertyUrl": "schema:latitude"
+}, {
+  "titles": "longitude",
+  "name": "long",
+  "datatype": {
+    "base": "number",
+    "minimum": "-180",
+    "maximum": "180"
+  },
+  "aboutUrl": "http://example.org/country/{code}#geo",
+  "propertyUrl": "schema:longitude"
+}, {
+  "virtual": true,
+  "propertyUrl": "schema:geo",
+  "valueUrl": "http://example.org/country/{code}#geo"
+}, {
+  "virtual": true,
+  "aboutUrl": "http://example.org/country/{code}#geo",
+  "propertyUrl": "rdf:type",
+  "valueUrl": "schema:GeoCoordinates"
+}, {
+  "virtual": true,
+  "propertyUrl": "schema:hasMap",
+  "valueUrl": "https://www.google.com/maps/@{lat},{long},7z"
+}</pre>
+        <p>
+          You can put latitude and longitude into a single column, with a character separator between the numbers. This was demonstrated earlier as well:
+        </p>
+        <pre class="example">
+"country","country group","name (en)","name (fr)","name (de)","latlong"
+"at","eu","Austria","Autriche","Österreich","47.6965545 13.34598005"
+"be","eu","Belgium","Belgique","Belgien","50.501045 4.47667405"
+"bg","eu","Bulgaria","Bulgarie","Bulgarien","42.72567375 25.4823218"
+</pre>
+        <p>
+          Putting both coordinates into the same column, here space separated, makes it harder to accurately validate the individual coordinates. They also cannot be separated out into separate property values when converting to JSON or RDF. So this is a more restrictive method and best avoided.
+        </p>
+        <p>
+          CSV files may also need to contain geometries beyond individual points. There are no built-in formats for geometries recognised by implementations of CSV on the Web. Geometries may be expressed using <a href="http://geojson.org">GeoJSON</a>, <a href="https://developers.google.com/kml/">KML</a> or <a href="https://en.wikipedia.org/wiki/Well-known_text">OGC Well-Known Text</a> representations. In each case, schemas may indicate that columns containing geometries adhere to a particular type:
+        </p>
+        <ul>
+          <li><code>json</code> if the format is JSON-based</li>
+          <li><code>xml</code> if the format is XML-based</li>
+          <li><code>string</code> if the format is text-based</li>
+        </ul>
+        <p>
+          You can use the <a href="http://w3c.github.io/csvw/metadata/#datatype-format"><code>format</code></a> property to further constrain the content of columns containing these values. For example, you could use:
+        </p>
+        <pre class="example">
+"datatype": {
+  "@id": "http://geojson.org/",
+  "base": "json",
+  "format": "\\{ ?\"type\": ?\"Polygon\",.+\\}"
+}
+        </pre>
+        <p>
+          to indicate that a column contains a Polygon in GeoJSON, or:
+        </p>
+        <pre class="example">
+"datatype": {
+  "@id": "http://www.iana.org/assignments/media-types/application/vnd.google-earth.kml+xml",
+  "base": "xml",
+  "format": ".*\\&lt;kml xmlns=\"http://www\\.opengis\\.net/kml/2.2\"\\&gt;.+\\&lt;/kml\\&gt;"
+}
+        </pre>
+        <p>
+          to indicate that a column contains KML, or:
+        </p>
+        <pre class="example">
+"datatype": {
+  "base": "string",
+  "format": "POLYGON \\(\\(\\d+(\\.\\d+)? \\d+(\\.\\d+)?(, \\d+(\\.\\d+)? \\d+(\\.\\d+)?)+\\)\\)"
+}
+        </pre>
+        <p>
+          to indicate that a column contains an OGC WTK Polygon.
+        </p>
+        <p>See also:</p>
+        <ul>
+          <li><a href="#new-datatypes" class="sectionRef"></a></li>
+          <li><a href="#sequence-values" class="sectionRef"></a></li>
+          <li><a href="http://w3c.github.io/csvw/metadata/#datatypes">Datatypes</a> in [[tabular-metadata]]</li>
+          <li><a href="http://w3c.github.io/csvw/syntax/#datatypes">Datatypes</a> in [[tabular-data-model]]</li>
+        </ul>
       </section>
       <section id="shared-schemas">
         <h2>How can you specify a single schema for multiple CSV files?</h2>
