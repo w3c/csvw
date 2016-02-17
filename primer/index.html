@@ -2494,10 +2494,32 @@ a schema:Country
         <pre class="example">
 {
   "titles": "distance",
-  "http://purl.org/linked-data/sdmx/2009/attribute#unitMeasure": {
-      "@id": "http://qudt.org/vocab/unit#Kilometre"
+  "http://purl.org/linked-data/sdmx/2009/attribute#unitMeasure": { 
+    "@id": "http://qudt.org/vocab/unit#Kilometer"
   }
 }</pre>
+        <p>
+          to which you could even add more detail if you wanted (this is replicating the canonical definition of <a href="http://qudt.org/1.1/vocab/OVG_units-qudt-(v1.1).ttl">definition of <code>unit:Kilometer</code></a> from the <a href="http://qudt.org/">Quanitites, Units, Dimensions and Data Types (QUDT) Ontologies</a>):
+        </p>
+        <pre class="example">
+ {
+  "titles": "distance",
+  "http://purl.org/linked-data/sdmx/2009/attribute#unitMeasure": { 
+    "@id": "http://qudt.org/vocab/unit#Kilometre",
+    "@type": [ 
+      "http://qudt.org/schema/qudt#SIUnit", 
+      "http://qudt.org/schema/qudt#DerivedUnit",
+      "http://qudt.org/schema/qudt#LengthUnit" 
+    ],
+    "rdfs:label": "Kilometer",
+    "http://qudt.org/schema/qudt#abbreviation": "km",
+    "http://qudt.org/schema/qudt#code": "1091",
+    "http://qudt.org/schema/qudt#conversionMultiplier": 1000,
+    "http://qudt.org/schema/qudt#conversionOffset": 0.0,
+    "http://qudt.org/schema/qudt#symbol": "km",
+    "skos:exactMatch": { "@id": "http://dbpedia.org/resource/Kilometre" }
+  }
+}       </pre>
         <section id="uom-structured-values">
           <h3>Supporting units of measure by transforming to structured values</h3>
           <p>
@@ -2508,18 +2530,19 @@ a schema:Country
 
 &lt;#row-1-distance&gt;
   schema:value 3.5 ;
-  schema:unitCode &lt;http://qudt.org/vocab/unit#Kilometre&gt; .
+  schema:unitCode &lt;http://qudt.org/vocab/unit#Kilometer&gt; ;
+  .
 </pre>
           <p>
             and in JSON something like this:
           </p>
           <pre class="example">
-  "distance": {
-    "@id": "#row-1-distance",
-    "schema:value": 3.5
-    "schema:unitCode": "http://qudt.org/vocab/unit#Kilometre"
-  }
-  </pre>
+"distance": {
+  "@id": "#row-1-distance",
+  "schema:value": 3.5
+  "schema:unitCode": "http://qudt.org/vocab/unit#Kilometer"
+}
+</pre>
           <p class="note">
             You may want to use different properties than <code>schema:value</code> and <code>schema:unitCode</code>; if so, just use different <a href="http://w3c.github.io/csvw/metadata/#cell-propertyUrl"><code>propertyUrl</code></a>s.
           </p>
@@ -2527,13 +2550,13 @@ a schema:Country
             You need to decide on a pattern for the URLs for the values themselves, and set the <a href="http://w3c.github.io/csvw/metadata/#cell-aboutUrl"><code>aboutUrl</code></a> for the relevant column create that URL. In this example, the URLs that look like <code>#row-1-distance</code> can be generated with the pattern <code>#row-{_row}-distance</code>. The <a href="http://w3c.github.io/csvw/metadata/#cell-propertyUrl"><code>propertyUrl</code></a> for the column needs to be <code>schema:value</code> as the value in the column provides the value for that property. So the column description looks like:
           </p>
           <pre class="example">
-  {
-    "name": "distance_value",
-    "titles": "distance",
-    "datatype": "number",
-    "aboutUrl": "#row-{_row}-distance",
-    "propertyUrl": "schema:value"
-  }</pre>
+{
+  "name": "distance_value",
+  "titles": "distance",
+  "datatype": "number",
+  "aboutUrl": "#row-{_row}-distance",
+  "propertyUrl": "schema:value"
+}</pre>
           <p>
             You then need to use virtual columns (descriptions of additional columns that don't exist in the source CSV) to generate the relationship between the thing whose distance is being measured and the structured value, and the additional property providing the unit for the structured value.
           </p>
@@ -2541,26 +2564,41 @@ a schema:Country
             To generate the relationship being the thing that has the distance and the structured value, the virtual column's <a href="http://w3c.github.io/csvw/metadata/#cell-valueUrl"><code>valueUrl</code></a> needs to hold the same URL template as you used before:
           </p>
           <pre class="example">
-  {
-    "name": "distance",
-    "virtual": true,
-    "valueUrl": "#row-{_row}-distance"
-  }</pre>
+{
+  "name": "distance",
+  "virtual": true,
+  "valueUrl": "#row-{_row}-distance"
+}</pre>
           <p>
             To create the units property, you need another virtual column where the <a href="http://w3c.github.io/csvw/metadata/#cell-aboutUrl"><code>aboutUrl</code></a> of that virtual column generates the URL for the structured value, the <a href="http://w3c.github.io/csvw/metadata/#cell-propertyUrl"><code>propertyUrl</code></a> is <code>schema:unitCode</code> and the <a href="http://w3c.github.io/csvw/metadata/#cell-valueUrl"><code>valueUrl</code></a> is the URL representing the unit (in this case <code>http://qudt.org/vocab/unit#Kilometre</code>):
           </p>
           <pre class="example">
-  {
-    "name": "distance_unit",
-    "aboutUrl": "#row-{_row}-distance",
-    "propertyUrl": "schema:unitCode",
-    "valueUrl": "http://qudt.org/vocab/unit#Kilometre"
-  }</pre>
+{
+  "name": "distance_unit",
+  "aboutUrl": "#row-{_row}-distance",
+  "propertyUrl": "schema:unitCode",
+  "valueUrl": "http://qudt.org/vocab/unit#Kilometer"
+}</pre>
+          <p>
+            If it's necessary to add more detail about the unit (e.g. the fact that it's a unit of length) this can be done with additional virtual columns:
+          </p>
+          <pre class="example">
+{
+  "name": "kilometer_abbreviation",
+  "virtual": true,
+  "aboutUrl": "http://qudt.org/vocab/unit#Kilometer",
+  "propertyUrl": "rdf:type",
+  "valueUrl": "http://qudt.org/schema/qudt#LengthUnit"
+}</pre>
+          <p>
+            Usually, however, processors should recognise or be able to resolve the URL for the unit to understand that it's a unit of length, if this is important for onward processing.
+          </p>
           <p>See also:</p>
           <ul>
             <li><a href="#value-urls" class="sectionRef"></a></li>
             <li><a href="#row-identifiers" class="sectionRef"></a></li>
             <li><a href="#nested-structures" class="sectionRef"></a></li>
+            <li><a href="http://qudt.org/">Quanitites, Units, Dimensions and Data Types (QUDT) Ontologies</a></li>
           </ul>
         </section>
         <section id="uom-datatypes">
@@ -2574,7 +2612,7 @@ a schema:Country
   "datatype": {
     "@id": "http://example.org/unit/kilometre",
     "rdfs:label": "Kilometre",
-    "base": "number" <!-- TODO here: use standard property IDs if possible -->
+    "base": "number"
   }
 }</pre>
           <p>
@@ -2585,6 +2623,20 @@ a schema:Country
 
 &lt;http://example.org/unit/kilometre&gt; rdfs:label "Kilometre" .
 </pre>
+          <p>
+            Again, it is possible to include additional information about the unit being used as the datatype within the definition of the datatype:
+          </p>
+          <pre class="example">
+{
+  "titles": "distance",
+  "datatype": {
+    "@id": "http://example.org/unit/kilometre",
+    <strong>"@type": "http://example.org/quantity/length",</strong>
+    "rdfs:label": "Kilometre",
+    "base": "number",
+    <strong>"skos:notation": "km"</strong>
+  }
+}</pre>
           <p>See also:</p>
           <ul>
             <li><a href="#new-datatypes" class="sectionRef"></a></li>
