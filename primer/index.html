@@ -2610,7 +2610,7 @@ a schema:Country
 "bg","eu","Bulgaria","Bulgarie","Bulgarien",<strong>"42.72567375","25.4823218"</strong>
 </pre>
         <p>
-          Metadata can be used to provide specialist types for the values of these coordinates, to group the coordinates together, and to provide a link that uses the coordinates to provide a map:
+          Metadata can be used to provide specialist types for the values of these coordinates, to indicate that they are latitude and longitude (by mapping to the well-known <code>schema:latitude</code> and <code>schema:longitude</code> properties which specify the use of WGS84), to group the coordinates together, and to provide a link that uses the coordinates to provide a map:
         </p>
         <pre class="example">{
   "titles": "latitude",
@@ -2646,25 +2646,16 @@ a schema:Country
   "propertyUrl": "schema:hasMap",
   "valueUrl": "https://www.google.com/maps/@{lat},{long},7z"
 }</pre>
-        <p>
-          You can put latitude and longitude into a single column, with a character separator between the numbers. This was demonstrated earlier as well:
-        </p>
-        <pre class="example">
-"country","country group","name (en)","name (fr)","name (de)","latlong"
-"at","eu","Austria","Autriche","Österreich","47.6965545 13.34598005"
-"be","eu","Belgium","Belgique","Belgien","50.501045 4.47667405"
-"bg","eu","Bulgaria","Bulgarie","Bulgarien","42.72567375 25.4823218"
-</pre>
-        <p>
-          Putting both coordinates into the same column, here space separated, makes it harder to accurately validate the individual coordinates. They also cannot be separated out into separate property values when converting to JSON or RDF. So this is a more restrictive method and best avoided.
+        <p class="note">
+          You can put latitude and longitude into a single column, with a character separator between the numbers as shown in <a href="#sequence-values" class="sectionRef"></a>. However, this makes it harder to accurately validate the individual coordinates. They also cannot be separated out into separate property values when converting to JSON or RDF. So this is a more restrictive method and best avoided.
         </p>
         <p>
-          CSV files may also need to contain geometries beyond individual points. There are no built-in formats for geometries recognised by implementations of CSV on the Web. Geometries may be expressed using <a href="http://geojson.org">GeoJSON</a>, <a href="https://developers.google.com/kml/">KML</a> or <a href="https://en.wikipedia.org/wiki/Well-known_text">OGC Well-Known Text</a> representations. In each case, schemas may indicate that columns containing geometries adhere to a particular type:
+          CSV files may also need to contain geometries beyond individual points. There are no built-in formats for geometries recognised by implementations of CSV on the Web. Geometries may be expressed using <a href="http://geojson.org">GeoJSON</a>, <a href="https://developers.google.com/kml/">KML</a> or <a href="https://en.wikipedia.org/wiki/Well-known_text">OGC Well-Known Text (WKT)</a> representations. In each case, schemas may indicate that columns containing geometries adhere to a particular type:
         </p>
         <ul>
-          <li><code>json</code> if the format is JSON-based</li>
-          <li><code>xml</code> if the format is XML-based</li>
-          <li><code>string</code> if the format is text-based</li>
+          <li><code>json</code> if the format is JSON-based such as GeoJSON</li>
+          <li><code>xml</code> if the format is XML-based such as KML</li>
+          <li><code>string</code> if the format is text-based such as OGC WKT</li>
         </ul>
         <p>
           You can use the <a href="http://w3c.github.io/csvw/metadata/#datatype-format"><code>format</code></a> property to further constrain the content of columns containing these values. For example, you could use:
@@ -2693,10 +2684,14 @@ a schema:Country
 "datatype": {
   "base": "string",
   "format": "POLYGON \\(\\(\\d+(\\.\\d+)? \\d+(\\.\\d+)?(, \\d+(\\.\\d+)? \\d+(\\.\\d+)?)+\\)\\)"
+  "rdfs:seeAlso": "http://www.opengeospatial.org/standards/sfa"
 }
         </pre>
         <p>
-          to indicate that a column contains an OGC WTK Polygon.
+          to indicate that a column contains a very basic OGC WKT Polygon. (More sophisticated regular expressions could be used if properties held different types of objects such as points or lines or more complex polygons expressed in OGC WKT.)
+        </p>
+        <p class="note">
+          There is no standard way of expressing which coordinate reference system is being used, except as provided within the formats themselves. The <a href="https://www.w3.org/2015/spatial">W3C Spatial Data on the Web Working Group</a> may make recommendations in this area within [[sdw-bp]].
         </p>
         <p>See also:</p>
         <ul>
