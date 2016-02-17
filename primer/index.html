@@ -2650,11 +2650,11 @@ a schema:Country
           You can put latitude and longitude into a single column, with a character separator between the numbers as shown in <a href="#sequence-values" class="sectionRef"></a>. However, this makes it harder to accurately validate the individual coordinates. They also cannot be separated out into separate property values when converting to JSON or RDF. So this is a more restrictive method and best avoided.
         </p>
         <p>
-          CSV files may also need to contain geometries beyond individual points. There are no built-in formats for geometries recognised by implementations of CSV on the Web. Geometries may be expressed using <a href="http://geojson.org">GeoJSON</a>, <a href="https://developers.google.com/kml/">KML</a> or <a href="https://en.wikipedia.org/wiki/Well-known_text">OGC Well-Known Text (WKT)</a> representations. In each case, schemas may indicate that columns containing geometries adhere to a particular type:
+          CSV files may also need to contain geometries beyond individual points. There are no built-in formats for geometries recognised by implementations of CSV on the Web. Geometries may be expressed using <a href="http://geojson.org">GeoJSON</a>, <a href="http://www.opengeospatial.org/standards/gml">GML</a>, <a href="https://developers.google.com/kml/">KML</a> or <a href="https://en.wikipedia.org/wiki/Well-known_text">OGC Well-Known Text (WKT)</a> representations. In each case, schemas may indicate that columns containing geometries adhere to a particular type:
         </p>
         <ul>
           <li><code>json</code> if the format is JSON-based such as GeoJSON</li>
-          <li><code>xml</code> if the format is XML-based such as KML</li>
+          <li><code>xml</code> if the format is XML-based such as GML or KML</li>
           <li><code>string</code> if the format is text-based such as OGC WKT</li>
         </ul>
         <p>
@@ -2669,6 +2669,16 @@ a schema:Country
         </pre>
         <p>
           to indicate that a column contains a Polygon in GeoJSON, or:
+        </p>
+        <pre class="example">
+"datatype": {
+  "@id": "http://www.iana.org/assignments/media-types/application/gml+xml",
+  "base": "xml",
+  "format": ".*\\&lt;gml:Point xmlns:gml=\"http://www\.opengis\.net/ont/gml" srsName=\"([^\"])+\".*\\&gt;.+\\&lt;/gml:Point\\&gt;"
+}
+        </pre>
+        <p>
+          to indicate that a column contains a GML Point, or:
         </p>
         <pre class="example">
 "datatype": {
@@ -2691,7 +2701,7 @@ a schema:Country
           to indicate that a column contains a very basic OGC WKT Polygon. (More sophisticated regular expressions could be used if properties held different types of objects such as points or lines or more complex polygons expressed in OGC WKT.)
         </p>
         <p class="note">
-          There is no standard way of expressing which coordinate reference system is being used, except as provided within the formats themselves. The <a href="https://www.w3.org/2015/spatial">W3C Spatial Data on the Web Working Group</a> may make recommendations in this area within [[sdw-bp]].
+          There is no standard way of expressing which coordinate reference system (CRS) is being used within CSV metadata, but GeoJSON, GML and OGC WKT values can include information about which CRS they use. The <a href="https://www.w3.org/2015/spatial">W3C Spatial Data on the Web Working Group</a> intend to make recommendations in this area within [[sdw-bp]].
         </p>
         <p>See also:</p>
         <ul>
