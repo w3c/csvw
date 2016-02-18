@@ -15,7 +15,7 @@ var localBibliography = {
           ],
           "title": "Embedding Tabular Metadata in HTML",
           "href" : "http://www.w3.org/TR/2016/NOTE-csvw-html-20160225/",
-          "rawDate": "2016-12-25",
+          "rawDate": "2016-02-25",
           "status" : "NOTE",
           "publisher": "W3C"
     },
@@ -25,7 +25,7 @@ var localBibliography = {
         ],
         "title": "CSV on the Web: A Primer",
         "href" : "http://www.w3.org/TR/2016/NOTE-tabular-data-primer-20160225/",
-        "rawDate": "2016-12-25",
+        "rawDate": "2016-02-25",
         "status" : "NOTE",
         "publisher": "W3C"
   },
