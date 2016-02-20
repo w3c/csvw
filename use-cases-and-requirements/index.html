@@ -2577,7 +2577,7 @@ MCL TRANSPORT CONSULTANTS LTD,Concessionary Fares Scheme,"£10,476","Economy, Tr
         information is simply not shared at all, leaving gaps in the understanding of the field situation.
         </p>
 
-        <p>The <a href="https://sites.google.com/site/hxlproject/home">Humanitarian eXchange Language</a>
+        <p>The <a href="http://hxlstandard.org/">Humanitarian eXchange Language</a>
         (HXL) project seeks to address this concern; enabling information from diverse parties to be
         collated into a single "Humanitarian Data Registry". Supporting tools are provided to assist
         participants in a given response initiative in finding information within this registry to
@@ -2596,73 +2596,35 @@ MCL TRANSPORT CONSULTANTS LTD,Concessionary Fares Scheme,"£10,476","Economy, Tr
         </ul>
 
         <p>To address these issues, the HXL project have developed a number of
-        <a href="https://docs.google.com/document/d/1srkEdEQiMEYDmk0Jo2rWpsFStYcgp5XaqYJQON6lfvU/edit?pli=1">conventions</a>
+        <a href="http://hxlstandard.org/standard/1_0beta/tagging/">conventions</a>
         for publishing tabular data in CSV format.</p>
 
-        <p>Instead of relying on matching text strings, a
-        <a href="https://docs.google.com/spreadsheets/d/1aq2ojDnceIcTNdLWVKP856AuFPItJP1TWwMaPrKPXXw/edit?pli=1#gid=0">data dictionary</a>
-        provides a set of short (3-character) identifier for each field type. These field
-        codes are provided on the first row of the CSV file. The second row of the CSV file
-        provides a textual column name - as determined in the natural language of the data
-        publisher. The field code is normative, whilst the textual column name is merely
-        informative.</p>
+        <p>Column headings in the tabular data are supplemented with short <em>hashtags</em> that are defined in the <a href="http://hxlstandard.org/standard/1_0beta/dictionary/">HXL hashtag dictionary</a>. The hashtag provides the normative meaning of the data in the column while the column header from the original data, a literal text string, is informative. This allows software systems to quickly ascertain the meaning of the data irrespective of the column heading and language used in the original data. For example, where a column provides information on the numbers of people affected by an emergency, the heading may be one of: "People affected", "Affected", "# de personnes concernées", "Afectadas/os" etc. The hashtag <code>#affected</code> is used to provide a common key to interpret the data.</p>
 
         <pre class="example">
-.         100,          101,            A00
-Location name,Location code,People affected
-       Town A,     01000001,           2000
-       Town B,     01000002,            750
-       Town C,     01000003,           1920
+. Cluster,     District,  People affected,   People reached
+  #sector,        #adm1,        #affected,         #reached
+     WASH,        Coast,             9000,             9000
+     WASH,    Mountains,             1000,              200
+Education,        Coast,            15500,             8000
+Education,    Mountains,              750,              600
+   Health,        Coast,            20000,             3500
+   Health,    Mountains,             3500,             1500
         </pre>
 
         <p>(whitespace included for clarity)</p>
 
         <p><strong>Requires:</strong>
-        <a href="#R-MultipleHeadingRows">MultipleHeadingRows</a>.</p>
-
-        <div class="note">
-          <p>The <a href="https://docs.google.com/document/d/1srkEdEQiMEYDmk0Jo2rWpsFStYcgp5XaqYJQON6lfvU/edit?pli=1">HXL tabular data conventions</a>
-            also propose an alternate where the 3-character field code is pre-pended to the textual
-            column name; e.g. <code>100 Location name</code>.</p>
-        </div>
-
-        <p>The data dictionary provides both a semantic meaning for the column and the data
-        type for values, as illustrated in the snippet below:</p>
-
-        <pre class="example">
-Code,                Title,Data type,                                                             Description,   Example
- 000,        Date reported,     Date,                            The date that this data record was released.,2014-06-23
- 001,Start date applicable,     Date,             The date when the data in this report was first applicable.,2014-05-01
- 002,  End date applicable,     Date,              The date when the data in this report was last applicable.,2014-05-31
- 010,   Source description,     Text,A free-text description of the source organisation for this data record.,  OXFAM GB
- 011,            Source id,     Code,   A unique identifier for the source organisation for this data record.,      5120
- {snip}
-        </pre>
-
-        <p>(whitespace included for clarity)</p>
-
-        <p><strong>Requires:</strong>
-          <a href="#R-SyntacticTypeDefinition">SyntacticTypeDefinition</a> and
+          <a href="#R-MultipleHeadingRows">MultipleHeadingRows</a> and
           <a href="#R-SemanticTypeDefinition">SemanticTypeDefinition</a>.</p>
 
-        <div class="note">
-          <p>At time of writing, the
-          <a href="https://docs.google.com/spreadsheets/d/1aq2ojDnceIcTNdLWVKP856AuFPItJP1TWwMaPrKPXXw/edit?pli=1#gid=0">data dictionary</a>
-            does not provide an explicit mapping to the
-            <a href="http://hxl.humanitarianresponse.info/ns/index.html">HXL data vocabulary</a>
-            from the earlier proof of concept work.</p>
-        </div>
-
-        <p>For multilingual content, this document proposes that the field-identifiers allow
-        an optional "/" followed by an ISO 639 language code. The language code applies to the
-        content contained within that column and may also apply to the column label.</p>
+        <p>Hashtags may be supplemented with attributes to refine the meaning of the data. A <a href="http://hxlstandard.org/standard/1_0beta/dictionary/#attributes">suggested set of attributes</a> is provided in the HXL hashtag dictionary. For example, attributes may be used to specify the language used for the text in a given column using "<code>+</code>" followed by an ISO 639 language code:</p>
 
         <pre class="example">
-.           B00/en,                      B00/fr
-     Project title,             Titre du projet
+.    Project title,             Titre du projet
+      #activity+en,                #activity+fr
 Malaria treatments,     Traitement du paludisme
   Teacher training,Formation des enseignant(e)s
-
         </pre>
 
         <p>(whitespace included for clarity)</p>
@@ -2675,8 +2637,8 @@ Malaria treatments,     Traitement du paludisme
         geocodes for multiple locations pertaining to the subject of the record.</p>
 
         <pre class="example">
-.     101,      101,      101
-P-code #1,P-code #2,P-code #3
+P-code  1,P-code  2,P-code  3
+#loc+code,#loc+code,#loc+code
    020503,         ,
    060107,   060108,
    173219,         ,
@@ -2689,39 +2651,28 @@ P-code #1,P-code #2,P-code #3
         <p><strong>Requires:</strong>
         <a href="#R-RepeatedProperties">RepeatedProperties</a>.</p>
 
+        <p>In the example above, we see an often repeated pattern where data includes codes to reference some authoritative
+        term, definition or other resource; e.g. the <em>location code</em> <code>020503</code>. In order
+        to make sense of the data, these codes must be reconciled with their official definitions.</p>
+
+        <p><strong>Requires:</strong>
+        <a href="#R-AssociationOfCodeValuesWithExternalDefinitions">AssociationOfCodeValuesWithExternalDefinitions</a>.</p>
+
         <p>A snippet of an example of a tabular HXL data file is provided below. A local copy
         of the HXL data file is also available:
         <a href="HXL_3W_samples_draft_Multilingual.csv">HXL_3W_samples_draft_Multilingual.csv</a>.</p>
 
         <pre class="example">
-.             000,         010,               B30,             B41,               B40/es,           B40/en,   B50/en,   105/es,                126,   125/en,120/en,                 131,      130/en
-Fecha del informe,      Fuente,     Implementador,Código de sector,       Sector / grupo,   Sector / group,Subsector,     País,Código de provincia, Province,Region,Código del municipio,Municipality
-       2013-11-19,Mapaction OP,      World VISION,             S01,Refugio de emergencia,Emergency Shelter,         ,Filipinas,           60400000,    Aklan,    VI,                    ,
-       2013-11-19,   DHNetwork,DFID Medical Teams,             S02,                Salud,           Health,         ,         ,           60400000,    Aklan,    VI,                    ,
-       2013-11-19,   DHNetwork,               MSF,             S02,                Salud,           Health,         ,         ,           60400000,    Aklan,    VI,                    ,
-       2013-11-19,  Cluster 3W,     LDS Charities,             S03,                 WASH,             WASH,  Hygiene,Filipinas,           60400000,    Aklan,    VI,                    ,
+Fecha del informe,      Fuente,     Implementador,Código de sector,       Sector / grupo,   Sector / group,    Subsector,     País,Código de provincia, Province,    Region,Código del municipio,Municipality
+   #date+reported,#meta+source,              #org,    #sector+code,           #sector+es,       #sector+en,#subsector+en, #country,         #adm1+code, #adm1+en,#region+en,          #adm2+code,    #adm2+en
+       2013-11-19,Mapaction OP,      World VISION,             S01,Refugio de emergencia,Emergency Shelter,             ,Filipinas,           60400000,    Aklan,        VI,                    ,
+       2013-11-19,   DHNetwork,DFID Medical Teams,             S02,                Salud,           Health,             ,         ,           60400000,    Aklan,        VI,                    ,
+       2013-11-19,   DHNetwork,               MSF,             S02,                Salud,           Health,             ,         ,           60400000,    Aklan,        VI,                    ,
+       2013-11-19,  Cluster 3W,     LDS Charities,             S03,                 WASH,             WASH,      Hygiene,Filipinas,           60400000,    Aklan,        VI,                    ,
 {snip}
         </pre>
 
         <p>(whitespace included for clarity)</p>
-
-        <p>Finally, note that the humanitarian data often includes codes to reference some authoritative
-        term, definition or other resource; e.g. the <em>Province code</em> <code>60400000</code>. In order
-        to establish links between data sets, these codes must be reconciled with their official definitions.</p>
-
-        <p><strong>Requires:</strong>
-        <a href="#R-AssociationOfCodeValuesWithExternalDefinitions">AssociationOfCodeValuesWithExternalDefinitions</a>.</p>
-
-        <p>The <a href="http://hxl.humanitarianresponse.info/">HXL proof of concept project</a>
-        (from 2012-2013) developed an <a href="http://hxl.humanitarianresponse.info/ns/index.html">RDF/OWL vocabulary</a>
-        to describe the resources and properties pertinent to this domain. Whilst the current implementation of
-        HXL build on a tabular data model, rather than a graph data model, the HXL project are reviewing the
-        need to provide an RDF export format. Publication of HXL data as RDF allows that information to be
-        augmented with additional triples to, say, provide additional content or establish links between
-        data sets. Exporting HXL as RDF would greatly benefit from the availability of standard tooling.</p>
-
-        <p><strong>Requires:</strong>
-          <a href="#R-CsvToRdfTransformation">CsvToRdfTransformation</a>.</p>
 
       </section>
       <section id="UC-ExpressingHierarchyWithinOccupationalListings">
@@ -3227,8 +3178,7 @@ ExtractDate,OrganisationURI,OrganisationLabel,ServiceTypeURI,ServiceTypeLabel,Lo
                 <a href="#UC-PublicationOfPropertyTransactionData">PublicationOfPropertyTransactionData</a>,
                 <a href="#UC-RepresentingEntitiesAndFactsExtractedFromText">RepresentingEntitiesAndFactsExtractedFromText</a>,
                 <a href="#UC-CanonicalMappingOfCSV">CanonicalMappingOfCSV</a>,
-                <a href="#UC-PublicationOfBiodiversityInformation">PublicationOfBiodiversityInformation</a>,
-                <a href="#UC-CollatingHumanitarianResponseInformation">CollatingHumanitarianResponseInformation</a> and
+                <a href="#UC-PublicationOfBiodiversityInformation">PublicationOfBiodiversityInformation</a> and
                 <a href="#UC-ExpressingHierarchyWithinOccupationalListings">ExpressingHierarchyWithinOccupationalListings</a>.
               </p>
               <div class="note">
@@ -3581,7 +3531,6 @@ catalogNumber,scientificName,individualCount,datasetID
                 <a href="#UC-CanonicalMappingOfCSV">CanonicalMappingOfCSV</a>,
                 <a href="#UC-SupportingSemantic-basedRecommendations">SupportingSemantic-basedRecommendations</a>,
                 <a href="#UC-PublicationOfBiodiversityInformation">PublicationOfBiodiversityInformation</a>,
-                <a href="#UC-CollatingHumanitarianResponseInformation">CollatingHumanitarianResponseInformation</a>,
                 <a href="#UC-PlatformIntegrationUsingSTDF">PlatformIntegrationUsingSTDF</a> and
                 <a href="#UC-ConsistentPublicationOfLocalAuthorityData">ConsistentPublicationOfLocalAuthorityData</a>.
               </p>
