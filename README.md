@@ -1,6 +1,6 @@
 # CSV on the Web Repository #
 
-## The Past ##
+## The Working Group Era ##
 
 This repository was originally used by W3C’s [CSV on the Web Working Group](http://www.w3.org/2013/csvw). The group has defined and published 7 documents, namely:
 
@@ -16,6 +16,6 @@ The group was chaired by [Jeni Tennison](http://theodi.org/team/jeni-tennison) a
 
 The repository includes a [final release](https://github.com/w3c/csvw/releases/tag/final-release-WG-2016), representing the status of the repository when the Working Group was closed.
 
-## The Present ##
+## The Community Group Era ##
 
 After the closure of the Working Group the activity around CSV (and, in more general, tabular) data on the Web was taken up by the [CSV on the Web Community Group](https://www.w3.org/community/csvw/), which was closed in May 2026. This repository was used for issue management, new documents, experimentations, etc. 
