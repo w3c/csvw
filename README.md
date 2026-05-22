@@ -18,4 +18,4 @@ The repository includes a [final release](https://github.com/w3c/csvw/releases/t
 
 ## The Present ##
 
-After the closure of the Working Group the activity around CSV (and, in more general, tabular) data on the Web has been taken up by the [CSV on the Web Community Group](https://www.w3.org/community/csvw/). All discussions on new possible features, implementation experiences, possible issues, etc, are conducted in that community group, which is open to everyone. Although the Community Group is not allowed to make changes on the official documents, this repository is used for issue management, new documents, experimentations, etc. If you are interested by this area, please [join the Community Group](https://www.w3.org/community/csvw/join)!
+After the closure of the Working Group the activity around CSV (and, in more general, tabular) data on the Web was taken up by the [CSV on the Web Community Group](https://www.w3.org/community/csvw/), which was closed in May 2026. This repository was used for issue management, new documents, experimentations, etc. 
